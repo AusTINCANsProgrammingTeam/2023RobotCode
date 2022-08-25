@@ -4,11 +4,20 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ExampleSubsystem extends SubsystemBase {
+public class driveTrainSim extends SubsystemBase {
+
+  private Encoder m_leftEncoder = new Encoder(0, 1);
+  private Encoder m_rightEncoder = new Encoder(2, 3);
+
+  private EncoderSim m_leftEncoderSim = new EncoderSim(m_leftEncoder);
+  private EncoderSim m_rightEncoderSim = new EncoderSim(m_rightEncoder);
+
   /** Creates a new ExampleSubsystem. */
-  public ExampleSubsystem() {}
+  public driveTrainSim() {}
 
   @Override
   public void periodic() {
