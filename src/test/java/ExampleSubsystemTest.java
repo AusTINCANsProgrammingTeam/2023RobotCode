@@ -35,11 +35,12 @@ public class ExampleSubsystemTest {
   }
 
   @Test // marks this method as a test
-  public void doesntWorkWhenClosed() {
+  public void testSpeed() {
     Random rand = new Random();
     for (int i = 0; i < kNumTests; i++){
         // nextDouble gets value between 0.0 and 1.0. Do math to extend the range and center on 0.
         double s = 2*rand.nextDouble()-1;
+        System.out.println(s);
         dut.spin(s);
         assertEquals(s, simMotor.getSpeed(), kDelta); //Check that motor speed matches what we wrote
     }
