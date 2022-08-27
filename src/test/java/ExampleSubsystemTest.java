@@ -1,16 +1,17 @@
-package frc.robot.tests;
-
 import static org.junit.Assert.*;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.*;
 
 import java.util.Random;
+
 import org.junit.*;
 
 import frc.robot.subsystems.ExampleSubsystem;
 
 
+// Extremely simple unit testing as an example of JUnit tests
+// See https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/robot-simulation/unit-testing.html for a slightly more detailed example
 public class ExampleSubsystemTest {
 
   private static final double kDelta = 1e-2;
@@ -18,8 +19,7 @@ public class ExampleSubsystemTest {
 
   //DUT -> Device Under Test
   private ExampleSubsystem dut;
-  // PWM matches the -1.0 to 1.0 range that this simple example is using even though 
-  // the actual object is CAN controlled
+
   private PWMSim simMotor;
 
   @Before // this method will run before each test
@@ -32,16 +32,17 @@ public class ExampleSubsystemTest {
   @After // this method will run after each test
   public void shutdown() throws Exception {
     dut.close(); // destroy our subsystem object so we do each test from a clean slate
+    simMotor.resetData();
   }
 
   @Test // marks this method as a test
   public void testSpeed() {
     Random rand = new Random();
     for (int i = 0; i < kNumTests; i++){
-        // nextDouble gets value between 0.0 and 1.0. Do math to extend the range and center on 0.
+        // nextDouble gets random value between 0.0 and 1.0. Do math to extend the range and center on 0.
         double s = 2*rand.nextDouble()-1;
-        System.out.println(s);
         dut.spin(s);
+        //JUnit Assert class provides this and many other comparision functions.
         assertEquals(s, simMotor.getSpeed(), kDelta); //Check that motor speed matches what we wrote
     }
   }

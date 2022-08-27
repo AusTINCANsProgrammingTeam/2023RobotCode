@@ -4,24 +4,23 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ExampleSubsystem extends SubsystemBase implements AutoCloseable {
 
-  private CANSparkMax motor;
+  // FIXME using PWMSparkMax because CANSparkMax doesn't have an equivalent simulation class
+  // May limit how much we can do in terms of JUnit tests
+  private PWMSparkMax motor;
 
   /** Creates a new ExampleSubsystem. */
   public ExampleSubsystem() {
-    motor = new CANSparkMax(0, MotorType.kBrushless); 
+    motor = new PWMSparkMax(0);
   }
 
   public void spin(double velocity) {
     motor.set(velocity);
   }
-
 
   @Override
   public void periodic() {
