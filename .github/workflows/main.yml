@@ -46,4 +46,4 @@ jobs:
       # Awk One-liner stolen from https://stackoverflow.com/questions/27447705/grep-without-filtering 
 
     - name: Git Clean Check
-      run: test -z "$(git status --porcelain)" || { git diff; exit 1; }
+      run: test -z "$(git -c core.fileMode=false status --porcelain)" || { git diff; exit 1; }
