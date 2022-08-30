@@ -37,6 +37,11 @@ deploy {
     }
 }
 
+test {
+    useJUnit()
+}
+
+
 def deployArtifact = deploy.targets.roborio.artifacts.frcJava
 
 // Set to true to use debug for JNI.
@@ -66,6 +71,7 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
     testImplementation 'junit:junit:4.13.1'
+    implementation 'junit:junit:4.13.1'
 }
 
 // Simulation configuration (e.g. environment variables).
