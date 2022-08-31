@@ -29,10 +29,6 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    # Grant execute permission for gradlew
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
     # Runs a single command using the runners shell
     - name: Compile and run tests on robot code
       run: ./gradlew build
@@ -46,4 +42,4 @@ jobs:
       # Awk One-liner stolen from https://stackoverflow.com/questions/27447705/grep-without-filtering 
 
     - name: Git Clean Check
-      run: test -z "$(git -c core.fileMode=false status --porcelain)" || { git diff; exit 1; }
+      run: test -z "$(git status --porcelain)" || { git diff; exit 1; }
