@@ -1,0 +1,45 @@
+# This is a basic workflow to build robot code.
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events for main and develop branches
+on:
+  push:
+    branches: 
+      - main 
+      - develop 
+      - 'release/**'
+  pull_request:
+    branches: 
+      - main 
+      - develop 
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # This grabs the WPILib docker container
+    container: wpilib/roborio-cross-ubuntu:2022-18.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Runs a single command using the runners shell
+    - name: Compile and run tests on robot code
+      run: ./gradlew build
+
+    # Runs a simulation to spot check crashes
+    - name: Run simulation to check for runtime errors
+      run: timeout 1m ./gradlew simulateJava 2>&1 | awk -v rc=0 '/The robot program quit unexpectedly/ { rc=1 } 1; END {exit rc}'
+      # 1. Run simulation with 1 minute timeout
+      # 2. Redirect stderr to stdout (just in case)
+      # 3. Use awk to check for robot crash message and set the return code based on this. (Alternative to grep that doesn't filter the simulation output)
+      # Awk One-liner stolen from https://stackoverflow.com/questions/27447705/grep-without-filtering 
+
+    - name: Git Clean Check
+      run: test -z "$(git status --porcelain)" || { git diff; exit 1; }
