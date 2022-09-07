@@ -49,7 +49,7 @@ public class SwerveTeleopCommand extends CommandBase {
         //Smooth input using a slew limiter, map to a speeds in meters/radians per second
         xSpeed = xLimiter.calculate(xSpeed) * (DriveConstants.kPhysicalMaxSpeed / DriveConstants.kSpeedFactor);
         ySpeed = yLimiter.calculate(ySpeed) * (DriveConstants.kPhysicalMaxSpeed / DriveConstants.kSpeedFactor);
-        turnSpeed = turnLimiter.calculate(turnSpeed) * (DriveConstants.kPhysicalMaxSpeed / DriveConstants.kSpeedFactor);
+        turnSpeed = turnLimiter.calculate(turnSpeed) * (DriveConstants.kPhysicalMaxAngularSpeed / DriveConstants.kAngularSpeedFactor);
 
         //Construct Chassis Speeds
         ChassisSpeeds chassisSpeeds;
