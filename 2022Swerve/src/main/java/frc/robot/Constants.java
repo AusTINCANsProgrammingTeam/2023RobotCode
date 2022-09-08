@@ -51,7 +51,7 @@ public final class Constants {
 
         public static final class frontLeftModule{
             public static final int driveMotorID = 0;
-            public static final int turningMotorID = 0;
+            public static final int turningMotorID = 1;
             public static final boolean driveMotorReversed = false;
             public static final boolean turningMotorReversed = false;
             public static final int absoluteEncoderID = 0;
@@ -60,31 +60,31 @@ public final class Constants {
         }
 
         public static final class frontRightModule{
-            public static final int driveMotorID = 0;
-            public static final int turningMotorID = 0;
+            public static final int driveMotorID = 3;
+            public static final int turningMotorID = 4;
             public static final boolean driveMotorReversed = false;
             public static final boolean turningMotorReversed = false;
-            public static final int absoluteEncoderID = 0;
+            public static final int absoluteEncoderID = 1;
             public static final double absoluteEncoderOffset = 0; 
             public static final boolean absoluteEncoderReversed = false; 
         }
 
         public static final class backLeftModule{
-            public static final int driveMotorID = 0;
-            public static final int turningMotorID = 0;
+            public static final int driveMotorID = 6;
+            public static final int turningMotorID = 7;
             public static final boolean driveMotorReversed = false;
             public static final boolean turningMotorReversed = false;
-            public static final int absoluteEncoderID = 0;
+            public static final int absoluteEncoderID = 2;
             public static final double absoluteEncoderOffset = 0; 
             public static final boolean absoluteEncoderReversed = false;
         }
 
         public static final class backRightModule{
-            public static final int driveMotorID = 0;
-            public static final int turningMotorID = 0;
+            public static final int driveMotorID = 9;
+            public static final int turningMotorID = 10;
             public static final boolean driveMotorReversed = false;
             public static final boolean turningMotorReversed = false;
-            public static final int absoluteEncoderID = 0;
+            public static final int absoluteEncoderID = 3;
             public static final double absoluteEncoderOffset = 0; 
             public static final boolean absoluteEncoderReversed = false;
         }
