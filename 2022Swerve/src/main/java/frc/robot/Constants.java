@@ -28,21 +28,21 @@ public final class Constants {
         public static final int kDriverXAxis = 0;
         public static final int kDriverRotAxis = 2;
 
-        public static final int kDriverFODButtonID = 0; //Field Oriented Drive toggle button
-        public static final int kDriveZeroButtonID = 0;
+        public static final int kDriverFODButtonID = 1; //Field Oriented Drive toggle button
+        public static final int kDriveZeroButtonID = 2;
         
     }
 
     public static final class DriveConstants{ //TODO: Update these constants with physical values
-        public static final double kPhysicalMaxSpeed = 0; //Max drivebase speed in meters per second
-        public static final double kPhysicalMaxAngularSpeed = 0; //Max drivebase angular speed in radians per second
-        public static final double kMaxAcceleration = 0; //Max allowed acceleration in units per second (Not a physical value)
-        public static final double kMaxAngluarAcceleration = 0; //Max allowed angluar acceleration in units per second (Not a physical value)
+        public static final double kPhysicalMaxSpeed = 1; //Max drivebase speed in meters per second
+        public static final double kPhysicalMaxAngularSpeed = 1; //Max drivebase angular speed in radians per second
+        public static final double kMaxAcceleration = 1; //Max allowed acceleration in units per second (Not a physical value)
+        public static final double kMaxAngluarAcceleration = 1; //Max allowed angluar acceleration in units per second (Not a physical value)
         public static final double kSpeedFactor = 4;  //Factor to divide the physical max speed by to use as max speed in mapping
         public static final double kAngularSpeedFactor = 4; //Factor to divide the physical max speed by to use as max speed in mapping
 
-        public static final double kTrackWidth = Units.inchesToMeters(0); //Distance between right and left wheels
-        public static final double kWheelBase = Units.inchesToMeters(0); //Distance between front and back wheels
+        public static final double kTrackWidth = Units.inchesToMeters(36); //Distance between right and left wheels
+        public static final double kWheelBase = Units.inchesToMeters(36); //Distance between front and back wheels
         public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics( //Creates robot geometry using the locations of the 4 wheels
             new Translation2d(kWheelBase / 2, -kTrackWidth / 2), 
             new Translation2d(kWheelBase / 2, kTrackWidth /2),
@@ -55,7 +55,7 @@ public final class Constants {
             public static final boolean driveMotorReversed = false;
             public static final boolean turningMotorReversed = false;
             public static final int absoluteEncoderID = 0;
-            public static final double absoluteEncoderOffset = 0; 
+            public static final double absoluteEncoderOffset = 0;
             public static final boolean absoluteEncoderReversed = false;
         }
 

@@ -47,6 +47,8 @@ public class SimulationSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
+    m_odometry.update(swerveSubsystem.getRotation2d(), swerveSubsystem.getModuleStates());
+
     m_field.setRobotPose(m_odometry.getPoseMeters());
     SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
     SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());

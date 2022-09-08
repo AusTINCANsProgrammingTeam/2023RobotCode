@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
@@ -98,5 +97,16 @@ public class SwerveSubsystem extends SubsystemBase{
         backLeft.setDesiredState(desiredStates[2]);
         backRight.setDesiredState(desiredStates[3]);
     }
+
+    public SwerveModuleState[] getModuleStates() {
+        SwerveModuleState[] swerveModuleArray = new SwerveModuleState[4];
+        swerveModuleArray[0] = frontLeft.getState();
+        swerveModuleArray[1] = frontRight.getState();
+        swerveModuleArray[2] = backLeft.getState();
+        swerveModuleArray[3] = backRight.getState();
+
+        return swerveModuleArray;
+    }
+    
 
 }
