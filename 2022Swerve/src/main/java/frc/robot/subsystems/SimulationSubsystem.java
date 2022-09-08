@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -48,6 +49,8 @@ public class SimulationSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
 
     m_odometry.update(swerveSubsystem.getRotation2d(), swerveSubsystem.getModuleStates());
+    //ChassisSpeeds chassisSpeeds = m_kinematics.toChassisSpeeds(swerveSubsystem.getModuleStates()); 
+
 
     m_field.setRobotPose(m_odometry.getPoseMeters());
     SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
