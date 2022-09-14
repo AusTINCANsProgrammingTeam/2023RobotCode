@@ -4,12 +4,15 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,7 +30,8 @@ public class SimulationSubsystem extends SubsystemBase {
   private final SwerveSubsystem swerveSubsystem;
   private final SwerveDriveKinematics m_kinematics;
   private final SwerveDriveOdometry m_odometry;
-    
+  private int navXSim = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
+  private double simYaw = 0;
   /** Creates a new SimulationSubsystem. */
   public SimulationSubsystem(SwerveSubsystem swerveSubsystem) {
     this.swerveSubsystem = swerveSubsystem;
@@ -45,7 +49,7 @@ public class SimulationSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
+  public void simulationPeriodic() {
     // This method will be called once per scheduler run
 
     m_odometry.update(swerveSubsystem.getRotation2d(), swerveSubsystem.getModuleStates());
@@ -56,5 +60,12 @@ public class SimulationSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
     SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
     SmartDashboard.putNumber("Pose Rotation", m_odometry.getPoseMeters().getRotation().getDegrees());
+
+    var chassisSpeed = m_kinematics.toChassisSpeeds(swerveSubsystem.getModuleStates());
+    double chassisRotationSpeed = chassisSpeed.omegaRadiansPerSecond;
+
+    simYaw += chassisRotationSpeed * 0.02;
+    SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
+    angle.set(-Units.radiansToDegrees(simYaw));
   }
 }

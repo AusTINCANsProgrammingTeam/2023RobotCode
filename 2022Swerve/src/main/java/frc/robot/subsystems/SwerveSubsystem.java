@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -55,6 +56,7 @@ public class SwerveSubsystem extends SubsystemBase{
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
 
+
     public SwerveSubsystem() {
         new Thread(() -> {
             try {
@@ -81,6 +83,11 @@ public class SwerveSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Robot Heading", getHeading());
+    }
+
+    @Override
+    public void simulationPeriodic() {
+
     }
 
     public void stopModules(){
