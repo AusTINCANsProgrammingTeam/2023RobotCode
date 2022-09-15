@@ -38,8 +38,8 @@ public final class Constants {
         public static final double kPhysicalMaxAngularSpeed = 1; //Max drivebase angular speed in radians per second
         public static final double kMaxAcceleration = 1; //Max allowed acceleration in units per second (Not a physical value)
         public static final double kMaxAngluarAcceleration = 1; //Max allowed angluar acceleration in units per second (Not a physical value)
-        public static final double kSpeedFactor = 4;  //Factor to divide the physical max speed by to use as max speed in mapping
-        public static final double kAngularSpeedFactor = 4; //Factor to divide the physical max speed by to use as max speed in mapping
+        public static final double kSpeedFactor = 2;  //Factor to divide the physical max speed by to use as max speed in mapping
+        public static final double kAngularSpeedFactor = 1; //Factor to divide the physical max speed by to use as max speed in mapping
 
         public static final double kTrackWidth = Units.inchesToMeters(36); //Distance between right and left wheels
         public static final double kWheelBase = Units.inchesToMeters(36); //Distance between front and back wheels
