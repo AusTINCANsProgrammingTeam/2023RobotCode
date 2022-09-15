@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -10,6 +14,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.classes.RelativeEncoderSim;
@@ -50,7 +56,7 @@ public class SwerveModule extends SubsystemBase {
         
           private final FlywheelSim moduleThrottleSimModel = new FlywheelSim(
                   LinearSystemId.identifyVelocitySystem(2, 1.24),
-                  DCMotor.getFalcon500(1),
+                  DCMotor.getNEO(1),
                   8.16
           );
 
@@ -143,14 +149,18 @@ public class SwerveModule extends SubsystemBase {
         moduleRotationSimModel.setInputVoltage(turnOutput  * RobotController.getBatteryVoltage());
         moduleThrottleSimModel.setInputVoltage(driveOutput * RobotController.getBatteryVoltage());
 
-        moduleRotationSimModel.update(0.02);
-        moduleThrottleSimModel.update(0.02);
+        moduleRotationSimModel.update(Robot.kDefaultPeriod);
+        moduleThrottleSimModel.update(Robot.kDefaultPeriod);
 
-        simTurningEncoderDistance += moduleRotationSimModel.getAngularVelocityRadPerSec() * 0.02;
+        if (moduleRotationSimModel.getAngularVelocityRadPerSec() >= Constants.kSimVelocityDeadzone) {
+            simTurningEncoderDistance += moduleRotationSimModel.getAngularVelocityRadPerSec() * Robot.kDefaultPeriod;
+        }
         simTurningEncoder.setPosition(simTurningEncoderDistance);
         simTurningEncoder.setSimVelocity(moduleRotationSimModel.getAngularVelocityRadPerSec());
 
-        simDriveEncoderDistance += moduleThrottleSimModel.getAngularVelocityRadPerSec() * 0.02;
+        if (moduleThrottleSimModel.getAngularVelocityRadPerSec() >= Constants.kSimVelocityDeadzone) {
+            simDriveEncoderDistance += moduleThrottleSimModel.getAngularVelocityRadPerSec() * Robot.kDefaultPeriod;
+        }
         simDriveEncoder.setPosition(simDriveEncoderDistance);
         simDriveEncoder.setSimVelocity(moduleThrottleSimModel.getAngularVelocityRadPerSec());
   }

@@ -3,6 +3,7 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/LiveWindow/SimulationSubsystem": "Subsystem",
+      "/LiveWindow/SwerveModule": "Subsystem",
       "/LiveWindow/SwerveSubsystem": "Subsystem",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",

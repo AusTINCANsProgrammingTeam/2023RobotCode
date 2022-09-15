@@ -21,7 +21,7 @@ public final class Constants {
     public static final class OIConstants{
         //Constants for Operator Interface
         public static final double kDeadband = 0;
-
+        
         public static final int kDriverControllerPort = 0;
 
         public static final int kDriverYAxis = 1;
@@ -33,6 +33,7 @@ public final class Constants {
         
     }
 
+    //Drive Constants
     public static final class DriveConstants{ //TODO: Update these constants with physical values
         public static final double kPhysicalMaxSpeed = 1; //Max drivebase speed in meters per second
         public static final double kPhysicalMaxAngularSpeed = 1; //Max drivebase angular speed in radians per second
@@ -41,8 +42,8 @@ public final class Constants {
         public static final double kSpeedFactor = 2;  //Factor to divide the physical max speed by to use as max speed in mapping
         public static final double kAngularSpeedFactor = 1; //Factor to divide the physical max speed by to use as max speed in mapping
 
-        public static final double kTrackWidth = Units.inchesToMeters(36); //Distance between right and left wheels
-        public static final double kWheelBase = Units.inchesToMeters(36); //Distance between front and back wheels
+        public static final double kTrackWidth = Units.inchesToMeters(28); //Distance between right and left wheels
+        public static final double kWheelBase = Units.inchesToMeters(38); //Distance between front and back wheels
         public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics( //Creates robot geometry using the locations of the 4 wheels
             new Translation2d(kWheelBase / 2, -kTrackWidth / 2), 
             new Translation2d(kWheelBase / 2, kTrackWidth /2),
@@ -100,4 +101,6 @@ public final class Constants {
         public static final double kTurningEncoderRPMFactor = kTurningEncoderRotFactor / 60; //Conersion factor converting the Turn Encoder's RPM to radians per second
         public static final double kPTurning = 1; //P gain for the turning motor
     }
+
+    public static final double kSimVelocityDeadzone = 0.001;
 }
