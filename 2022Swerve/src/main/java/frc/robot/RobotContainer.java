@@ -37,7 +37,11 @@ public class RobotContainer {
       () -> -driverJoystick.getRawAxis(OIConstants.kDriverXAxis),
       () -> driverJoystick.getRawAxis(OIConstants.kDriverRotAxis),
       () -> !driverJoystick.getRawButton(OIConstants.kDriverFODButtonID)));
+      
+      
+    if (simSub == new SimulationSubsystem(swerveSubsystem)) {}
 
+      
     // Configure the button bindings    
     configureButtonBindings();
   }
