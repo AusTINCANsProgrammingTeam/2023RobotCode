@@ -11,6 +11,7 @@ import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -55,7 +56,7 @@ public class SimulationSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Pose Rotation", m_odometry.getPoseMeters().getRotation().getDegrees());
 
     //Gets the Chassis Speeds (Combined Speeds) from the module states
-    var chassisSpeed = Constants.DriveConstants.kDriveKinematics.toChassisSpeeds(swerveSubsystem.getModuleStates());
+    ChassisSpeeds chassisSpeed = Constants.DriveConstants.kDriveKinematics.toChassisSpeeds(swerveSubsystem.getModuleStates());
 
     //Assigns the chassisRotationSpeed Value to a variable
     double chassisRotationSpeed = chassisSpeed.omegaRadiansPerSecond;

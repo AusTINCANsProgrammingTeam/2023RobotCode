@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -10,15 +9,6 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-=======
-package frc.robot.commands;
-
-import java.util.function.Supplier;
-
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
->>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -46,13 +36,9 @@ public class SwerveTeleopCommand extends CommandBase {
     }
 
     @Override
-<<<<<<< HEAD
     public void initialize() {
 
     }
-=======
-    public void initialize() {}
->>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
 
     @Override
     public void execute() {
@@ -85,11 +71,8 @@ public class SwerveTeleopCommand extends CommandBase {
         SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
 
         swerveSubsystem.setModuleStates(moduleStates);
-<<<<<<< HEAD
 
         SmartDashboard.putNumber( "xSpeedFunction", xSpeedFunction.get());
-=======
->>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
     }
 
     @Override

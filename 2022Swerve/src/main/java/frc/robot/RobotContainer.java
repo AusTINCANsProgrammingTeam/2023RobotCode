@@ -9,10 +9,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.SwerveTeleopCommand;
-<<<<<<< HEAD
 import frc.robot.subsystems.SimulationSubsystem;
-=======
->>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
 import frc.robot.subsystems.SwerveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -28,19 +25,14 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
   private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
-<<<<<<< HEAD
 
-  //WHY IS THIS NOT USED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   private final SimulationSubsystem simSub = new SimulationSubsystem(swerveSubsystem);
-=======
->>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
       () -> -driverJoystick.getRawAxis(OIConstants.kDriverYAxis),
-<<<<<<< HEAD
       () -> -driverJoystick.getRawAxis(OIConstants.kDriverXAxis),
       () -> driverJoystick.getRawAxis(OIConstants.kDriverRotAxis),
       () -> !driverJoystick.getRawButton(OIConstants.kDriverFODButtonID)));
@@ -49,12 +41,6 @@ public class RobotContainer {
     if (simSub == new SimulationSubsystem(swerveSubsystem)) {}
 
       
-=======
-      () -> driverJoystick.getRawAxis(OIConstants.kDriverXAxis),
-      () -> driverJoystick.getRawAxis(OIConstants.kDriverRotAxis),
-      () -> !driverJoystick.getRawButton(OIConstants.kDriverFODButtonID)));
-
->>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
     // Configure the button bindings    
     configureButtonBindings();
   }
