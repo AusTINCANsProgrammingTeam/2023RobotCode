@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.Robot;
 
 public enum AbsoluteEncoders {
     //Swerve Modules
@@ -21,21 +22,15 @@ public enum AbsoluteEncoders {
         this.ID = ID;
         this.reversed = reversed;
         this.offset = offset;
-        encoder = new AnalogInput(this.ID);
+        encoder = Robot.isSimulation() ? null : new AnalogInput(this.ID);
     }
 
     AbsoluteEncoders(int ID, boolean reversed){
-        this.ID = ID;
-        this.reversed = reversed;
-        this.offset = 0;
-        encoder = new AnalogInput(this.ID);
+        this(ID, reversed, 0);
     }
 
     AbsoluteEncoders(int ID){
-        this.ID = ID;
-        this.reversed = false;
-        this.offset = 0;
-        encoder = new AnalogInput(this.ID);
+        this(ID, false, 0);
     }
 
     private double calculateAngleRadians(){ 
