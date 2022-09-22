@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+=======
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -11,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+<<<<<<< HEAD
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 
@@ -69,6 +73,50 @@ public class SwerveSubsystem extends SubsystemBase{
             }
         }).start();
         
+=======
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.hardware.AbsoluteEncoders;
+import frc.robot.hardware.MotorControllers;
+
+public class SwerveSubsystem extends SubsystemBase{
+    private final SwerveModule frontLeft = new SwerveModule(
+        MotorControllers.FrontLeftModuleDrive.getMotor(),
+        MotorControllers.FrontLeftModuleTurn.getMotor(),
+        AbsoluteEncoders.FrontLeftModule.getAngleSupplier(),
+        "FL");
+
+    private final SwerveModule frontRight = new SwerveModule(
+        MotorControllers.FrontRightModuleDrive.getMotor(),
+        MotorControllers.FrontRightModuleTurn.getMotor(),
+        AbsoluteEncoders.FrontRightModule.getAngleSupplier(),
+        "FR");
+
+    private final SwerveModule backLeft = new SwerveModule(
+        MotorControllers.BackLeftModuleDrive.getMotor(),
+        MotorControllers.BackLeftModuleTurn.getMotor(),
+        AbsoluteEncoders.BackLeftModule.getAngleSupplier(),
+        "BL");
+
+    private final SwerveModule backRight = new SwerveModule(
+        MotorControllers.BackRightModuleDrive.getMotor(),
+        MotorControllers.BackRightModuleTurn.getMotor(),
+        AbsoluteEncoders.BackRightModule.getAngleSupplier(),
+        "BR");
+
+    private AHRS gyro = new AHRS(SPI.Port.kMXP);
+
+    public SwerveSubsystem() {
+        new WaitUntilCommand(this::gyroReady)
+        .andThen(new InstantCommand(this::zeroHeading,this))
+        .schedule();
+    }
+
+    public boolean gyroReady() {
+        return !gyro.isCalibrating();
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
     }
 
     public void zeroHeading() {
@@ -88,11 +136,14 @@ public class SwerveSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Robot Heading", getHeading());
     }
 
+<<<<<<< HEAD
     @Override
     public void simulationPeriodic() {
 
     }
 
+=======
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
     public void stopModules(){
         frontLeft.stop();
         frontRight.stop();
@@ -108,6 +159,7 @@ public class SwerveSubsystem extends SubsystemBase{
         backRight.setDesiredState(desiredStates[3]);
     }
 
+<<<<<<< HEAD
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] swerveModuleArray = new SwerveModuleState[4];
         swerveModuleArray[0] = frontLeft.getState();
@@ -119,4 +171,6 @@ public class SwerveSubsystem extends SubsystemBase{
     }
     
 
+=======
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
 }

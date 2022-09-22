@@ -2,6 +2,7 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+<<<<<<< HEAD
       "/LiveWindow/SimulationSubsystem": "Subsystem",
       "/LiveWindow/SwerveModule": "Subsystem",
       "/LiveWindow/SwerveSubsystem": "Subsystem",
@@ -38,6 +39,10 @@
         "open": true
       },
       "open": true
+=======
+      "/LiveWindow/ExampleSubsystem": "Subsystem",
+      "/LiveWindow/Ungrouped/Scheduler": "Scheduler"
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
     }
   }
 }

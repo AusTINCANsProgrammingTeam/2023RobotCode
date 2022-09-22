@@ -1,12 +1,16 @@
+<<<<<<< HEAD
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+=======
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+<<<<<<< HEAD
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -32,11 +36,27 @@ public class SwerveModule extends SubsystemBase {
     private final RelativeEncoderSim simDriveEncoder;
     private final RelativeEncoderSim simTurningEncoder;
 
+=======
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.SwerveModuleConstants;
+
+import java.util.function.Supplier;
+
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+
+public class SwerveModule {
+    private final CANSparkMax driveMotor;
+    private final CANSparkMax turningMotor;
+
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
     private final RelativeEncoder driveEncoder;
     private final RelativeEncoder turningEncoder;
 
     private final PIDController turningPIDController;
 
+<<<<<<< HEAD
     private final AnalogInput absoluteEncoder;
     private final boolean absoluteEncoderReversed;
     private final double absoluteEncoderOffsetRad; //The amount that the absolute encoder is offset from the wheel position, in radians
@@ -75,6 +95,23 @@ public class SwerveModule extends SubsystemBase {
 
         driveEncoder = driveMotor.getEncoder();
         turningEncoder = turningMotor.getEncoder();
+=======
+    private final Supplier<Double> encoderSupplier;
+
+    private final String ID;
+
+    public SwerveModule(CANSparkMax driveMotor, CANSparkMax turningMotor, Supplier<Double> encoderSupplier, String ID) {
+
+        this.ID = ID;
+
+        this.encoderSupplier = encoderSupplier;
+
+        this.driveMotor = driveMotor;
+        this.turningMotor = turningMotor;
+
+        driveEncoder = this.driveMotor.getEncoder();
+        turningEncoder = this.turningMotor.getEncoder();
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
 
         driveEncoder.setPositionConversionFactor(SwerveModuleConstants.kDriveEncoderRotFactor);
         driveEncoder.setVelocityConversionFactor(SwerveModuleConstants.kDriveEncoderRPMFactor);
@@ -84,12 +121,15 @@ public class SwerveModule extends SubsystemBase {
         turningPIDController = new PIDController(SwerveModuleConstants.kPTurning, 0, 0);
         turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
+<<<<<<< HEAD
         simDriveEncoder = new RelativeEncoderSim(driveMotor);
         simTurningEncoder = new RelativeEncoderSim(turningMotor);
 
         simTurningEncoderDistance = 0;
         simDriveEncoderDistance = 0;
 
+=======
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
         resetEncoders();
     }
 
@@ -102,6 +142,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public double getDriveVelocity() {
+<<<<<<< HEAD
         return simDriveEncoder.getVelocity();
     }
 
@@ -114,11 +155,22 @@ public class SwerveModule extends SubsystemBase {
         angle *= 2.0 * Math.PI;
         angle -= absoluteEncoderOffsetRad;
         return angle * (absoluteEncoderReversed ? -1.0 : 1.0);
+=======
+        return driveEncoder.getVelocity();
+    }
+
+    public double getTurningVelocity() {
+        return turningEncoder.getVelocity();
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
     }
 
     public void resetEncoders() {
         driveEncoder.setPosition(0);
+<<<<<<< HEAD
         turningEncoder.setPosition(getAbsoluteEncoderRad());
+=======
+        turningEncoder.setPosition(encoderSupplier.get());
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
     }
 
     public SwerveModuleState getState() {
@@ -131,17 +183,24 @@ public class SwerveModule extends SubsystemBase {
             return;
         }
         state = SwerveModuleState.optimize(state, getState().angle);
+<<<<<<< HEAD
         turnOutput = turningPIDController.calculate(getTurningPosition(), state.angle.getRadians());
         driveOutput = state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeed;
         driveMotor.set(driveOutput);
         turningMotor.set(turnOutput);
         SmartDashboard.putString("Swerve[" + absoluteEncoder.getChannel() + "] state", state.toString());
+=======
+        driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeed);
+        turningMotor.set(turningPIDController.calculate(getTurningPosition(), state.angle.getRadians()));
+        SmartDashboard.putString("Swerve[" + ID + "] state", state.toString());
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa
     }
 
     public void stop() {
         driveMotor.set(0);
         turningMotor.set(0);
     }
+<<<<<<< HEAD
 
     @Override
     public void simulationPeriodic() {
@@ -165,3 +224,6 @@ public class SwerveModule extends SubsystemBase {
         simDriveEncoder.setSimVelocity(moduleThrottleSimModel.getAngularVelocityRadPerSec());
   }
 }
+=======
+}
+>>>>>>> cc1a296ffd5ef6ed657219fb8db009d6b26b76fa

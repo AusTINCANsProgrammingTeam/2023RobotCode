@@ -33,6 +33,13 @@ public final class Constants {
         
     }
 
+    public static final class MotorDefaults{
+        //Constants to use as default values for Motor Controllers
+        public static final int kCurrentLimit = 40;
+        public static final double kOpenLoopRampRate = 0.2;
+    }
+
+
     public static final class DriveConstants{ //TODO: Update these constants with physical values
         public static final double kPhysicalMaxSpeed = 1; //Max drivebase speed in meters per second
         public static final double kPhysicalMaxAngularSpeed = 1; //Max drivebase angular speed in radians per second
@@ -41,59 +48,19 @@ public final class Constants {
         public static final double kSpeedFactor = 2;  //Factor to divide the physical max speed by to use as max speed in mapping
         public static final double kAngularSpeedFactor = 1; //Factor to divide the physical max speed by to use as max speed in mapping
 
-        public static final double kTrackWidth = Units.inchesToMeters(34); //Distance between right and left wheels
-        public static final double kWheelBase = Units.inchesToMeters(40); //Distance between front and back wheels
+        public static final double kTrackWidth = Units.inchesToMeters(18.75); //Distance between right and left wheels
+        public static final double kWheelBase = Units.inchesToMeters(18.75); //Distance between front and back wheels
         public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics( //Creates robot geometry using the locations of the 4 wheels
             new Translation2d(kWheelBase / 2, -kTrackWidth / 2), 
             new Translation2d(kWheelBase / 2, kTrackWidth /2),
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2));
-
-        public static final class frontLeftModule{
-            public static final int driveMotorID = 0;
-            public static final int turningMotorID = 1;
-            public static final boolean driveMotorReversed = false;
-            public static final boolean turningMotorReversed = false;
-            public static final int absoluteEncoderID = 0;
-            public static final double absoluteEncoderOffset = 0;
-            public static final boolean absoluteEncoderReversed = false;
-        }
-
-        public static final class frontRightModule{
-            public static final int driveMotorID = 3;
-            public static final int turningMotorID = 4;
-            public static final boolean driveMotorReversed = false;
-            public static final boolean turningMotorReversed = false;
-            public static final int absoluteEncoderID = 1;
-            public static final double absoluteEncoderOffset = 0; 
-            public static final boolean absoluteEncoderReversed = false; 
-        }
-
-        public static final class backLeftModule{
-            public static final int driveMotorID = 6;
-            public static final int turningMotorID = 7;
-            public static final boolean driveMotorReversed = false;
-            public static final boolean turningMotorReversed = false;
-            public static final int absoluteEncoderID = 2;
-            public static final double absoluteEncoderOffset = 0; 
-            public static final boolean absoluteEncoderReversed = false;
-        }
-
-        public static final class backRightModule{
-            public static final int driveMotorID = 9;
-            public static final int turningMotorID = 10;
-            public static final boolean driveMotorReversed = false;
-            public static final boolean turningMotorReversed = false;
-            public static final int absoluteEncoderID = 3;
-            public static final double absoluteEncoderOffset = 0; 
-            public static final boolean absoluteEncoderReversed = false;
-        }
     }
 
     public static final class SwerveModuleConstants{ //TODO: Update these constants with physical values
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
         public static final double kDriveMotorGearRatio = 6.75 / 1;
-        public static final double kTurningMotorGearRatio = (150/7) / 1;
+        public static final double kTurningMotorGearRatio = 6.75 / 1;
         public static final double kDriveEncoderRotFactor = kDriveMotorGearRatio * Math.PI * kWheelDiameterMeters; //Conversion factor converting the Drive Encoder's rotations to meters
         public static final double kDriveEncoderRPMFactor = kDriveEncoderRotFactor / 60; //Conversion factor converting the Drive Encoder's RPM to meters per second
         public static final double kTurningEncoderRotFactor = kTurningMotorGearRatio * 2 * Math.PI; //Conversion factor converting the Turn Encoder's rotations to Radians
