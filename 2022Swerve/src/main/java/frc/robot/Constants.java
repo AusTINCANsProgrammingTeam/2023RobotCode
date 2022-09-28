@@ -29,7 +29,7 @@ public final class Constants {
         public static final int kDriverRotAxis = 0;
 
         public static final int kDriverFODButtonID = 0; //Field Oriented Drive toggle button
-        public static final int kDriveZeroButtonID = 0;
+        public static final int kDriverZeroButtonID = 0;
         
     }
 

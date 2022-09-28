@@ -31,8 +31,7 @@ public class RobotContainer {
       swerveSubsystem, 
       () -> -driverJoystick.getRawAxis(OIConstants.kDriverYAxis),
       () -> driverJoystick.getRawAxis(OIConstants.kDriverXAxis),
-      () -> driverJoystick.getRawAxis(OIConstants.kDriverRotAxis),
-      () -> !driverJoystick.getRawButton(OIConstants.kDriverFODButtonID)));
+      () -> driverJoystick.getRawAxis(OIConstants.kDriverRotAxis)));
 
     // Configure the button bindings    
     configureButtonBindings();
@@ -45,7 +44,8 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(driverJoystick, OIConstants.kDriveZeroButtonID).whenPressed(() -> swerveSubsystem.zeroHeading());
+    new JoystickButton(driverJoystick, OIConstants.kDriverZeroButtonID).whenPressed(() -> swerveSubsystem.zeroHeading());
+    new JoystickButton(driverJoystick, OIConstants.kDriverFODButtonID).whenPressed(() -> swerveSubsystem.toggleOrientation());
   }
 
   /**
