@@ -33,12 +33,9 @@ public class RobotContainer {
     swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
       () -> -driverJoystick.getRawAxis(OIConstants.kDriverYAxis),
-      () -> -driverJoystick.getRawAxis(OIConstants.kDriverXAxis),
-      () -> driverJoystick.getRawAxis(OIConstants.kDriverRotAxis),
-      () -> !driverJoystick.getRawButton(OIConstants.kDriverFODButtonID)));
-      
-      
-    if (simSub == new SimulationSubsystem(swerveSubsystem)) {}
+      () -> driverJoystick.getRawAxis(OIConstants.kDriverXAxis),
+      () -> driverJoystick.getRawAxis(OIConstants.kDriverRotAxis)));
+      if (simSub == new SimulationSubsystem(swerveSubsystem)) {}
 
       
     // Configure the button bindings    
@@ -52,7 +49,8 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(driverJoystick, OIConstants.kDriveZeroButtonID).whenPressed(() -> swerveSubsystem.zeroHeading());
+    new JoystickButton(driverJoystick, OIConstants.kDriverZeroButtonID).whenPressed(() -> swerveSubsystem.zeroHeading());
+    new JoystickButton(driverJoystick, OIConstants.kDriverFODButtonID).whenPressed(() -> swerveSubsystem.toggleOrientation());
   }
 
   /**
