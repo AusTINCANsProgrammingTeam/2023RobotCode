@@ -130,6 +130,8 @@ public class SwerveModule extends SubsystemBase {
     public void stop() {
         driveMotor.set(0);
         turningMotor.set(0);
+        turnOutput = 0;
+        driveOutput = 0;
     }
 
     @Override
@@ -141,13 +143,13 @@ public class SwerveModule extends SubsystemBase {
         moduleRotationSimModel.update(Robot.kDefaultPeriod);
         moduleThrottleSimModel.update(Robot.kDefaultPeriod);
 
-        if (moduleRotationSimModel.getAngularVelocityRadPerSec() >= Constants.kSimVelocityDeadzone) {
+        if (Math.abs(moduleRotationSimModel.getAngularVelocityRadPerSec()) >= Constants.kSimVelocityDeadzone) {
             simTurningEncoderDistance += moduleRotationSimModel.getAngularVelocityRadPerSec() * Robot.kDefaultPeriod;
         }
         simTurningEncoder.setPosition(simTurningEncoderDistance);
         simTurningEncoder.setSimVelocity(moduleRotationSimModel.getAngularVelocityRadPerSec());
 
-        if (moduleThrottleSimModel.getAngularVelocityRadPerSec() >= Constants.kSimVelocityDeadzone) {
+        if (Math.abs(moduleThrottleSimModel.getAngularVelocityRadPerSec()) >= Constants.kSimVelocityDeadzone) {
             simDriveEncoderDistance += moduleThrottleSimModel.getAngularVelocityRadPerSec() * Robot.kDefaultPeriod;
         }
         simDriveEncoder.setPosition(simDriveEncoderDistance);
