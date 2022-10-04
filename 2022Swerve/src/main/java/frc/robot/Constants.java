@@ -67,6 +67,4 @@ public final class Constants {
         public static final double kTurningEncoderRPMFactor = kTurningEncoderRotFactor / 60; //Conersion factor converting the Turn Encoder's RPM to radians per second
         public static final double kPTurning = 1; //P gain for the turning motor
     }
-
-    public static final double kSimVelocityDeadzone = 0.001;
 }
