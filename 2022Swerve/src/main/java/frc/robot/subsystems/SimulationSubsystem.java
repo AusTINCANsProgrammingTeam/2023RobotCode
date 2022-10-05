@@ -1,9 +1,6 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-//This code belongs to Asher123456789
-
-
 
 package frc.robot.subsystems;
 
@@ -18,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 
 public class SimulationSubsystem extends SubsystemBase {
 
@@ -61,10 +59,10 @@ public class SimulationSubsystem extends SubsystemBase {
     //Assigns the chassisRotationSpeed Value to a variable
     double chassisRotationSpeed = chassisSpeed.omegaRadiansPerSecond;
 
-    // Adds the Chassis Rotation Speed + 0.02 to SimYaw
-    simYaw += chassisRotationSpeed * 0.02;
+    //Update simYaw distance
+    simYaw += chassisRotationSpeed *  Robot.kDefaultPeriod;
 
-    //
+    //Updating Sim NavX
     SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
     angle.set(-Units.radiansToDegrees(simYaw));
   }

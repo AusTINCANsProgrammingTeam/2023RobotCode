@@ -23,10 +23,9 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+  private final SimulationSubsystem simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
 
   private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
-
-  private final SimulationSubsystem simSub = new SimulationSubsystem(swerveSubsystem);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -35,7 +34,6 @@ public class RobotContainer {
       () -> -driverJoystick.getRawAxis(OIConstants.kDriverYAxis),
       () -> driverJoystick.getRawAxis(OIConstants.kDriverXAxis),
       () -> driverJoystick.getRawAxis(OIConstants.kDriverRotAxis)));
-      if (simSub == new SimulationSubsystem(swerveSubsystem)) {}
 
       
     // Configure the button bindings    
