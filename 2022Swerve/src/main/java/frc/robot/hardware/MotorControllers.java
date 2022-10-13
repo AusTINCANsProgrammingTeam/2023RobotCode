@@ -31,43 +31,23 @@ public enum MotorControllers {
     }
 
     MotorControllers(int ID, int currentLimit, double openLoopRampRate){
-        this.ID = ID;
-        this.currentLimit = currentLimit;
-        this.openLoopRampRate = openLoopRampRate;
-        this.reversed = false;
-        initializeMotor();
+        this(ID, currentLimit, openLoopRampRate, false);
     }
 
     MotorControllers(int ID, int currentLimit, boolean reversed){
-        this.ID = ID;
-        this.currentLimit = currentLimit;
-        this.openLoopRampRate = MotorDefaults.kOpenLoopRampRate;
-        this.reversed = reversed;
-        initializeMotor();
+        this(ID, currentLimit, MotorDefaults.kOpenLoopRampRate, reversed);
     }
 
     MotorControllers(int ID, int currentLimit){
-        this.ID = ID;
-        this.currentLimit = currentLimit;
-        this.openLoopRampRate = MotorDefaults.kOpenLoopRampRate;
-        this.reversed = false;
-        initializeMotor();
+        this(ID, currentLimit, MotorDefaults.kOpenLoopRampRate, false);
     }
 
     MotorControllers(int ID, boolean reversed){
-        this.ID = ID;
-        this.currentLimit = MotorDefaults.kCurrentLimit;
-        this.openLoopRampRate = MotorDefaults.kOpenLoopRampRate;
-        this.reversed = reversed;
-        initializeMotor();
+        this(ID, MotorDefaults.kCurrentLimit, MotorDefaults.kOpenLoopRampRate, reversed);
     }
 
     MotorControllers(int ID){
-        this.ID = ID;
-        this.currentLimit = MotorDefaults.kCurrentLimit;
-        this.openLoopRampRate = MotorDefaults.kOpenLoopRampRate;
-        this.reversed = false;
-        initializeMotor();
+        this(ID, MotorDefaults.kCurrentLimit, MotorDefaults.kOpenLoopRampRate, false);
     }
 
     private void initializeMotor(){
