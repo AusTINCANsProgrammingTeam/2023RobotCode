@@ -20,7 +20,10 @@ import frc.robot.Robot;
 public class SimulationSubsystem extends SubsystemBase {
 
   private final Field2d m_field;
-  
+  private final double kfieldInitialX = 8.210/2;
+  private final double kfieldInitialY = 15.980/2;
+  private final Rotation2d kfieldInitialRotation = new Rotation2d(Math.PI/2);
+
   private final SwerveSubsystem swerveSubsystem;
   private final SwerveDriveOdometry m_odometry;
   private int navXSim = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
@@ -30,7 +33,7 @@ public class SimulationSubsystem extends SubsystemBase {
     this.swerveSubsystem = swerveSubsystem;
 
     //This defines m_odometry with the DriveKinematics, Rotation of the swerve, and the robot's position
-    m_odometry = new SwerveDriveOdometry(Constants.DriveConstants.kDriveKinematics, swerveSubsystem.getRotation2d(), new Pose2d(8.210/2, 15.980/2, new Rotation2d(Math.PI/2)));
+    m_odometry = new SwerveDriveOdometry(Constants.DriveConstants.kDriveKinematics, swerveSubsystem.getRotation2d(), new Pose2d(kfieldInitialX, kfieldInitialY, kfieldInitialRotation));
 
     m_field = new Field2d(); 
 
