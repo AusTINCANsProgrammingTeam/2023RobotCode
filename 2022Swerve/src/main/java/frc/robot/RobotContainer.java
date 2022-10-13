@@ -5,14 +5,11 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.Constants.OIConstants;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -25,15 +22,13 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
   private final SimulationSubsystem simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
 
-  private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
-      () -> -driverJoystick.getRawAxis(OIConstants.kDriverYAxis),
-      () -> driverJoystick.getRawAxis(OIConstants.kDriverXAxis),
-      () -> driverJoystick.getRawAxis(OIConstants.kDriverRotAxis)));
+      OI.Driver.getXTranslationSupplier(),
+      OI.Driver.getYTranslationSupplier(),
+      OI.Driver.getRotationSupplier()));
 
       
     // Configure the button bindings    
@@ -47,8 +42,8 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(driverJoystick, OIConstants.kDriverZeroButtonID).whenPressed(() -> swerveSubsystem.zeroHeading());
-    new JoystickButton(driverJoystick, OIConstants.kDriverFODButtonID).whenPressed(() -> swerveSubsystem.toggleOrientation());
+    OI.Driver.getOrientationButton().whenPressed(() -> swerveSubsystem.toggleOrientation());
+    OI.Driver.getZeroButton().whenPressed(() -> swerveSubsystem.zeroHeading());
   }
 
   /**

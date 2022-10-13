@@ -8,7 +8,6 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
@@ -20,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.hardware.AbsoluteEncoders;
 import frc.robot.hardware.MotorControllers;
 
@@ -82,23 +81,6 @@ public class SwerveSubsystem extends SubsystemBase{
         return Rotation2d.fromDegrees(getHeading());
     }
 
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("Robot Heading", getHeading());
-    }
-
-    @Override
-    public void simulationPeriodic() {
-
-    }
-
-    public void stopModules(){
-        frontLeft.stop();
-        frontRight.stop();
-        backLeft.stop();
-        backRight.stop();
-    }
-
     public void toggleOrientation(){
         //Toggle control orientation from FOD/ROD
         controlOrientationIsFOD = !controlOrientationIsFOD;
@@ -108,19 +90,14 @@ public class SwerveSubsystem extends SubsystemBase{
     public SwerveModuleState[] convertToModuleStates(double xTranslation, double yTranslation, double rotation) {
         //Takes axis input from joysticks and returns an array of swerve module states
 
-        double x = xTranslation;
-        double y = yTranslation;
+        double x = yTranslation; //Intentional, x in swerve kinematics is y on the joystick
+        double y = xTranslation;
         double r = rotation;
 
-        //Apply deadband
-        x = Math.abs(x) > OIConstants.kDeadband ? x : 0.0;
-        y = Math.abs(y) > OIConstants.kDeadband ? y : 0.0;
-        r = Math.abs(r) > OIConstants.kDeadband ? r : 0.0;
-
         //Map to speeds in meters/radians per second
-        x *= (DriveConstants.kPhysicalMaxSpeed / DriveConstants.kSpeedFactor);
-        y *= (DriveConstants.kPhysicalMaxSpeed / DriveConstants.kSpeedFactor);
-        r *= (DriveConstants.kPhysicalMaxAngularSpeed / DriveConstants.kAngularSpeedFactor);
+        x *= DriveConstants.kPhysicalMaxSpeed;
+        y *= DriveConstants.kPhysicalMaxSpeed;
+        r *= DriveConstants.kPhysicalMaxAngularSpeed;
 
         //Log speeds used to construct chassis speeds
         translationXOutputLog.append(x);
@@ -141,8 +118,32 @@ public class SwerveSubsystem extends SubsystemBase{
         return DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);  
     }
 
+    private void normalizeDrive(SwerveModuleState[] desiredStates, ChassisSpeeds speeds){
+        //Find magnitude of translation input, map to a scale of 1 in order to be comparable to rotation
+        double translationalK = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) / DriveConstants.kPhysicalMaxSpeed;
+        //Find magnitude of rotation input, map to a scale of 1 in order to be comparable to translation
+        double rotationalK = Math.abs(speeds.omegaRadiansPerSecond) / DriveConstants.kPhysicalMaxAngularSpeed;
+        //Use the larger of the two magnitudes for scaling
+        double k = Math.max(translationalK, rotationalK);
+      
+        //Find the how fast the fastest spinning drive motor is spinning                                       
+        double realMaxSpeed = 0.0;
+        for (SwerveModuleState moduleState : desiredStates) {
+          realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speedMetersPerSecond));
+        }
+      
+        //Map input magnitude back to speed in meters per second, divide by real speed to create scale
+        double scale = Math.min(k * SwerveModuleConstants.kPhysicalMaxSpeed / realMaxSpeed, 1);
+        //Desaturate speeds using that scale
+        for (SwerveModuleState moduleState : desiredStates) {
+          moduleState.speedMetersPerSecond *= scale;
+        }
+    }
+
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeed);
+        /*desatureWheelSpeeds fully saturates a module in many combinations of rotation and translation input, 
+        while this custom normalization avoids fully saturating a module to make the drive more controllable*/
+        this.normalizeDrive(desiredStates, DriveConstants.kDriveKinematics.toChassisSpeeds(desiredStates));
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
         backLeft.setDesiredState(desiredStates[2]);
@@ -158,6 +159,16 @@ public class SwerveSubsystem extends SubsystemBase{
 
         return swerveModuleArray;
     }
-    
 
+    public void stopModules(){
+        frontLeft.stop();
+        frontRight.stop();
+        backLeft.stop();
+        backRight.stop();
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Robot Heading", getHeading());
+    }
 }
