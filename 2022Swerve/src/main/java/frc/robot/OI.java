@@ -19,16 +19,18 @@ public class OI {
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
 
-        private static final ControlCurve kXTranslationCurve = new ControlCurve(0,0,0,0);
-        private static final ControlCurve kYTranslationCurve = new ControlCurve(0,0,0,0);
-        private static final ControlCurve kRotationCurve = new ControlCurve(0,0,0,0);
+        private static final ControlCurve kXTranslationCurve = new ControlCurve(1,0,0,0);
+        private static final ControlCurve kYTranslationCurve = new ControlCurve(1,0,0,0);
+        private static final ControlCurve kRotationCurve = new ControlCurve(1,0,0,0);
 
         public static Supplier<Double> getXTranslationSupplier(){
-            return () -> kXTranslationCurve.calculate(kJoystick.getRawAxis(kXTranslationAxis));
+            //This axis is inverted
+            return () -> kXTranslationCurve.calculate(-kJoystick.getRawAxis(kXTranslationAxis));
         }
 
         public static Supplier<Double> getYTranslationSupplier(){
-            return () -> kYTranslationCurve.calculate(kJoystick.getRawAxis(kYTranslationAxis));
+            //This axis is inverted
+            return () -> kYTranslationCurve.calculate(-kJoystick.getRawAxis(kYTranslationAxis));
         }
 
         public static Supplier<Double> getRotationSupplier(){

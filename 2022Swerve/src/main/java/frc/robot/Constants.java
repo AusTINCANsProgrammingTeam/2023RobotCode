@@ -39,7 +39,7 @@ public final class Constants {
     }
 
     public static final class SwerveModuleConstants{ //TODO: Update these constants with physical values
-        public static final double kPhysicalMaxSpeed = 0; //Max module speed in meters per second
+        public static final double kPhysicalMaxSpeed = 1; //Max module speed in meters per second
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
         public static final double kDriveMotorGearRatio = 6.75 / 1;
         public static final double kTurningMotorGearRatio = (150/7) / 1;

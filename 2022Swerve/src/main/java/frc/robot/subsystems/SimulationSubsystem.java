@@ -30,7 +30,7 @@ public class SimulationSubsystem extends SubsystemBase {
     this.swerveSubsystem = swerveSubsystem;
 
     //This defines m_odometry with the DriveKinematics, Rotation of the swerve, and the robot's position
-    m_odometry = new SwerveDriveOdometry(Constants.DriveConstants.kDriveKinematics, swerveSubsystem.getRotation2d(), new Pose2d(0, 0, new Rotation2d()));
+    m_odometry = new SwerveDriveOdometry(Constants.DriveConstants.kDriveKinematics, swerveSubsystem.getRotation2d(), new Pose2d(8.210/2, 15.980/2, new Rotation2d(Math.PI/2)));
 
     m_field = new Field2d(); 
 
