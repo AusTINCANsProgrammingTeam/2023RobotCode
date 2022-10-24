@@ -21,31 +21,31 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.hardware.AbsoluteEncoders;
-import frc.robot.hardware.MotorControllers;
+import frc.robot.hardware.MotorController.MotorConfig;
 
 public class SwerveSubsystem extends SubsystemBase{
     private final SwerveModule frontLeft = new SwerveModule(
-        MotorControllers.FrontLeftModuleDrive.getMotor(),
-        MotorControllers.FrontLeftModuleTurn.getMotor(),
-        AbsoluteEncoders.FrontLeftModule.getAngleSupplier(),
+        MotorConfig.FrontLeftModuleDrive,
+        MotorConfig.FrontLeftModuleTurn,
+        AbsoluteEncoders.FrontLeftModule,
         "FL");
 
     private final SwerveModule frontRight = new SwerveModule(
-        MotorControllers.FrontRightModuleDrive.getMotor(),
-        MotorControllers.FrontRightModuleTurn.getMotor(),
-        AbsoluteEncoders.FrontRightModule.getAngleSupplier(),
+        MotorConfig.FrontRightModuleDrive,
+        MotorConfig.FrontRightModuleTurn,
+        AbsoluteEncoders.FrontRightModule,
         "FR");
 
     private final SwerveModule backLeft = new SwerveModule(
-        MotorControllers.BackLeftModuleDrive.getMotor(),
-        MotorControllers.BackLeftModuleTurn.getMotor(),
-        AbsoluteEncoders.BackLeftModule.getAngleSupplier(),
+        MotorConfig.BackLeftModuleDrive,
+        MotorConfig.BackLeftModuleTurn,
+        AbsoluteEncoders.BackLeftModule,
         "BL");
 
     private final SwerveModule backRight = new SwerveModule(
-        MotorControllers.BackRightModuleDrive.getMotor(),
-        MotorControllers.BackRightModuleTurn.getMotor(),
-        AbsoluteEncoders.BackRightModule.getAngleSupplier(),
+        MotorConfig.BackRightModuleDrive,
+        MotorConfig.BackRightModuleTurn,
+        AbsoluteEncoders.BackRightModule,
         "BR");
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
