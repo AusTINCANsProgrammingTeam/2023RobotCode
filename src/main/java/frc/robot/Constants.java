@@ -50,5 +50,12 @@ public final class Constants {
         public static final double kPTurning = 1; //P gain for the turning motor
     }
 
-    
+    public static final class AutonConstants {
+        public static final double kMaxSpeed = DriveConstants.kPhysicalMaxSpeed / 4; //Maximum speed allowed in auton, in meters per second
+        public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
+
+        public static final double kXTranslationP = 1.5;
+        public static final double kYTranslationP = 1.5;
+        public static final double kRotationP = 3;
+    }
 }

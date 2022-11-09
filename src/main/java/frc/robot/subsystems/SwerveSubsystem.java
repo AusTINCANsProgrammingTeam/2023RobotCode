@@ -6,8 +6,10 @@ package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
@@ -49,6 +51,7 @@ public class SwerveSubsystem extends SubsystemBase{
         "BR");
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
+    private SwerveDriveOdometry odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, new Rotation2d(0));
 
     private DataLog datalog = DataLogManager.getLog();
     private DoubleLogEntry translationXOutputLog = new DoubleLogEntry(datalog, "/swerve/txout"); //Logs x translation state output
@@ -79,6 +82,14 @@ public class SwerveSubsystem extends SubsystemBase{
 
     public Rotation2d getRotation2d() {
         return Rotation2d.fromDegrees(getHeading());
+    }
+
+    public Pose2d getPose() {
+        return odometer.getPoseMeters();
+    }
+
+    public void resetOdometry(Pose2d pose) {
+        odometer.resetPosition(pose, getRotation2d());
     }
 
     public void toggleOrientation(){
@@ -127,16 +138,18 @@ public class SwerveSubsystem extends SubsystemBase{
         double k = Math.max(translationalK, rotationalK);
       
         //Find the how fast the fastest spinning drive motor is spinning                                       
-        double realMaxSpeed = 0.0;
+        double realMaxSpeed = 0;
         for (SwerveModuleState moduleState : desiredStates) {
           realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speedMetersPerSecond));
         }
-      
-        //Map input magnitude back to speed in meters per second, divide by real speed to create scale
-        double scale = Math.min(k * SwerveModuleConstants.kPhysicalMaxSpeed / realMaxSpeed, 1);
-        //Desaturate speeds using that scale
-        for (SwerveModuleState moduleState : desiredStates) {
-          moduleState.speedMetersPerSecond *= scale;
+        
+        if(realMaxSpeed != 0){
+            //Map input magnitude back to speed in meters per second, divide by real speed to create scale
+            double scale = Math.min(k * SwerveModuleConstants.kPhysicalMaxSpeed / realMaxSpeed, 1);
+            //Desaturate speeds using that scale
+            for (SwerveModuleState moduleState : desiredStates) {
+              moduleState.speedMetersPerSecond *= scale;
+            }
         }
     }
 
@@ -169,6 +182,8 @@ public class SwerveSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
+        odometer.update(getRotation2d(), getModuleStates());
         SmartDashboard.putNumber("Robot Heading", getHeading());
+        SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
     }
 }
