@@ -1,0 +1,23 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+  },
+     // Configure tool-specific properties.
+    "customizations": {
+        // Configure properties specific to VS Code.
+        "vscode": {
+            // Add the IDs of extensions you want installed when the container is created.
+            "extensions": [
+                "GitHub.vscode-pull-request-github",
+                "GitHub.codespaces",
+                "GitHub.github-vscode-theme",
+                "GitHub.vscode-pull-request-github",
+                "ms-vscode.cpptools",
+                "ms-vsliveshare.vsliveshare",
+                "redhat.java",
+                "vscjava.vscode-java-debug",
+                "vscjava.vscode-java-dependency",
+                "wpilibsuite.vscode-wpilib"
+            ]
+        }
+}
