@@ -1,9 +1,8 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "features": {
-  },
+	"name": "Default Linux Universal",
+	"image": "mcr.microsoft.com/devcontainers/universal:2-linux",
      // Configure tool-specific properties.
-    "customizations": {
+  "customizations": {
         // Configure properties specific to VS Code.
         "vscode": {
             // Add the IDs of extensions you want installed when the container is created.
@@ -20,4 +19,5 @@
                 "wpilibsuite.vscode-wpilib"
             ]
         }
+  }
 }
