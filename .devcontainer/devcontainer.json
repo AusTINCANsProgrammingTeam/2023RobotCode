@@ -19,7 +19,7 @@
                 "vscjava.vscode-java-dependency",
 
                 // WPILib Extension
-                "wpilibsuite.vscode-wpilib",
+                "wpilibsuite.vscode-wpilib"
             ]
         }
   }
