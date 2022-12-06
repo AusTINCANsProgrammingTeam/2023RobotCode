@@ -1,0 +1,26 @@
+{
+	"name": "Default Linux Universal",
+	"image": "mcr.microsoft.com/devcontainers/universal:2-linux",
+     // Configure tool-specific properties.
+  "customizations": {
+        // Configure properties specific to VS Code.
+        "vscode": {
+            // Add the IDs of extensions you want installed when the container is created.
+            "extensions": [
+                // GitHub extensions
+                "GitHub.vscode-pull-request-github",
+                "GitHub.codespaces",
+                "GitHub.github-vscode-theme",
+
+                // Java/C++ dependancies
+                "ms-vscode.cpptools",
+                "redhat.java",
+                "vscjava.vscode-java-debug",
+                "vscjava.vscode-java-dependency",
+
+                // WPILib Extension
+                "wpilibsuite.vscode-wpilib"
+            ]
+        }
+  }
+}
