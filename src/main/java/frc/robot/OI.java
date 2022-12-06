@@ -19,9 +19,9 @@ public class OI {
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
 
-        private static final ControlCurve kXTranslationCurve = new ControlCurve(1,0,0,0);
-        private static final ControlCurve kYTranslationCurve = new ControlCurve(1,0,0,0);
-        private static final ControlCurve kRotationCurve = new ControlCurve(1,0,0,0);
+        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.5,0,0,0.1);
+        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.5,0,0,0.1);
+        private static final ControlCurve kRotationCurve = new ControlCurve(1,0,0,0.1);
 
         public static Supplier<Double> getXTranslationSupplier(){
             //This axis is inverted

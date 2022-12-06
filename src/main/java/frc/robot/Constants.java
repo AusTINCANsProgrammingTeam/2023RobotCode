@@ -47,7 +47,7 @@ public final class Constants {
         public static final double kDriveEncoderRPMFactor = kDriveEncoderRotFactor / 60; //Conversion factor converting the Drive Encoder's RPM to meters per second
         public static final double kTurningEncoderRotFactor = kTurningMotorGearRatio * 2 * Math.PI; //Conversion factor converting the Turn Encoder's rotations to Radians
         public static final double kTurningEncoderRPMFactor = kTurningEncoderRotFactor / 60; //Conersion factor converting the Turn Encoder's RPM to radians per second
-        public static final double kPTurning = 1; //P gain for the turning motor
+        public static final double kPTurning = 0.03; //P gain for the turning motor
     }
 
     public static final class AutonConstants {
