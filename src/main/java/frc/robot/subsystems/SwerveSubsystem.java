@@ -120,6 +120,7 @@ public class SwerveSubsystem extends SubsystemBase{
         ChassisSpeeds chassisSpeeds;
         if(controlOrientationIsFOD){
             //Field Oriented Drive
+            //TODO: test on real hardware, adding to gyro is supposed to eliminate skew of movement when rotating
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, r, this.getRotation2d().plus(new Rotation2d((r * Robot.kDefaultPeriod)/2)));
         } else {
             //Robot Oriented Drive
