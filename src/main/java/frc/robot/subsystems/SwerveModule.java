@@ -141,4 +141,9 @@ public class SwerveModule extends SubsystemBase {
         simTurningEncoder.setPosition(simTurningEncoder.getPosition() + simTurningMotor.getAngularVelocityRadPerSec() * Robot.kDefaultPeriod);
         simTurningEncoder.setSimVelocity(simTurningMotor.getAngularVelocityRadPerSec());
   }
+
+    @Override
+    public void periodic(){
+        SmartDashboard.putNumber("Swerve[" + ID + "] encoder position", encoderSupplier.get());
+    }
 }
