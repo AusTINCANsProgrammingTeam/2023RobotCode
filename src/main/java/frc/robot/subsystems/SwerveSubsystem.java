@@ -78,6 +78,7 @@ public class SwerveSubsystem extends SubsystemBase{
     }
 
     public double getHeading() {
+        //The math for this remainder is gyro - (360 * Math.round(gyro/360))
         return Math.IEEEremainder(gyro.getAngle(), 360); //Clamps angle output between -180 and 180 degrees
     }
 
