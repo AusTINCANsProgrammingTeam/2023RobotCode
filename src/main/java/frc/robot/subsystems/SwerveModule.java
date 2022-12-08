@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,12 +18,12 @@ import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.classes.RelativeEncoderSim;
-import frc.robot.hardware.AbsoluteEncoders;
+import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.MotorController;
+import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
-import java.util.function.Supplier;
-
+import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 
@@ -42,17 +42,15 @@ public class SwerveModule extends SubsystemBase {
 
     private final PIDController turningPIDController;
 
-    private final AnalogInput absoluteEncoder;
-    private final Supplier<Double> encoderSupplier;
+    private final WPI_CANCoder absoluteEncoder;
 
     private final String ID;
 
-    public SwerveModule(MotorConfig driveMotorConfig, MotorConfig turningMotorConfig, AbsoluteEncoders absoluteEncoderConfig, String ID) {
+    public SwerveModule(MotorConfig driveMotorConfig, MotorConfig turningMotorConfig, EncoderConfig absoluteEncoderConfig, String ID) {
 
         this.ID = ID;
 
-        absoluteEncoder = Robot.isSimulation() ? null : new AnalogInput(absoluteEncoderConfig.getID());
-        encoderSupplier = () -> absoluteEncoderConfig.convertVoltageToRadians(absoluteEncoder.getVoltage());
+        absoluteEncoder = Robot.isSimulation() ? null : AbsoluteEncoder.constructEncoder(absoluteEncoderConfig);
 
         driveMotor = MotorController.constructMotor(driveMotorConfig);
         turningMotor = MotorController.constructMotor(turningMotorConfig);
@@ -104,7 +102,7 @@ public class SwerveModule extends SubsystemBase {
 
     public void resetEncoders() {
         driveEncoder.setPosition(0);
-        turningEncoder.setPosition(Robot.isSimulation() ? 0 : encoderSupplier.get());
+        turningEncoder.setPosition(Robot.isSimulation() ? 0 : Units.degreesToRotations(absoluteEncoder.getAbsolutePosition()));
     }
 
     public SwerveModuleState getState() {

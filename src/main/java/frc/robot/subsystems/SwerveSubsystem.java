@@ -23,32 +23,32 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SwerveModuleConstants;
-import frc.robot.hardware.AbsoluteEncoders;
+import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
 public class SwerveSubsystem extends SubsystemBase{
     private final SwerveModule frontLeft = new SwerveModule(
         MotorConfig.FrontLeftModuleDrive,
         MotorConfig.FrontLeftModuleTurn,
-        AbsoluteEncoders.FrontLeftModule,
+        EncoderConfig.FrontLeftModule,
         "FL");
 
     private final SwerveModule frontRight = new SwerveModule(
         MotorConfig.FrontRightModuleDrive,
         MotorConfig.FrontRightModuleTurn,
-        AbsoluteEncoders.FrontRightModule,
+        EncoderConfig.FrontRightModule,
         "FR");
 
     private final SwerveModule backLeft = new SwerveModule(
         MotorConfig.BackLeftModuleDrive,
         MotorConfig.BackLeftModuleTurn,
-        AbsoluteEncoders.BackLeftModule,
+        EncoderConfig.BackLeftModule,
         "BL");
 
     private final SwerveModule backRight = new SwerveModule(
         MotorConfig.BackRightModuleDrive,
         MotorConfig.BackRightModuleTurn,
-        AbsoluteEncoders.BackRightModule,
+        EncoderConfig.BackRightModule,
         "BR");
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
