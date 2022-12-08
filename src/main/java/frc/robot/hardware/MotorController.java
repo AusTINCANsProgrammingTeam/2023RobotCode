@@ -8,12 +8,12 @@ import frc.robot.Constants.MotorDefaults;
 public class MotorController {
     public static enum MotorConfig {
         //Swerve Modules
-        FrontLeftModuleDrive(1, 50),
-        FrontLeftModuleTurn(2),
-        FrontRightModuleDrive(3, 50),
-        FrontRightModuleTurn(4),
-        BackLeftModuleDrive(5, 50),
-        BackLeftModuleTurn(6),
+        FrontLeftModuleDrive(4, 50),
+        FrontLeftModuleTurn(3),
+        FrontRightModuleDrive(2, 50),
+        FrontRightModuleTurn(1),
+        BackLeftModuleDrive(6, 50),
+        BackLeftModuleTurn(5),
         BackRightModuleDrive(7, 50),
         BackRightModuleTurn(8);
 
