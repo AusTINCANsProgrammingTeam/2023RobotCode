@@ -142,6 +142,6 @@ public class SwerveModule extends SubsystemBase {
 
     @Override
     public void periodic(){
-        SmartDashboard.putNumber("Swerve[" + ID + "] encoder position", encoderSupplier.get());
+        SmartDashboard.putNumber("Swerve[" + ID + "] encoder position", Units.degreesToRadians(absoluteEncoder.getAbsolutePosition()));
     }
 }
