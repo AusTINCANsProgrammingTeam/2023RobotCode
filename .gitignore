@@ -163,3 +163,4 @@ bin/
 
 simgui.json
 simgui-ds.json
+*.wpilog

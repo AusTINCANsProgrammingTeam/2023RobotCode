@@ -6,6 +6,10 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.SwerveTeleopCommand;
+import frc.robot.subsystems.AutonSubsytem;
+import frc.robot.subsystems.SimulationSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,13 +22,25 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
+  private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
+  private final SimulationSubsystem simulationSubsystem = Robot.isSimulation() ? new SimulationSubsystem(swerveSubsystem) : null;
+  
+  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Configure the button bindings
+    swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
+      swerveSubsystem, 
+      OI.Driver.getXTranslationSupplier(),
+      OI.Driver.getYTranslationSupplier(),
+      OI.Driver.getRotationSupplier()));
+
+      
+    // Configure the button bindings    
+
     configureButtonBindings();
   }
 
@@ -34,7 +50,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+    OI.Driver.getOrientationButton().whenPressed(() -> swerveSubsystem.toggleOrientation());
+    OI.Driver.getZeroButton().whenPressed(() -> swerveSubsystem.zeroHeading());
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -42,7 +61,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    return autonSubsytem.getAutonCommand();
   }
 }
