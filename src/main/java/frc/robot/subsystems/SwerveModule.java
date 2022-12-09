@@ -10,6 +10,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -43,6 +46,10 @@ public class SwerveModule extends SubsystemBase {
     private final PIDController turningPIDController;
 
     private final WPI_CANCoder absoluteEncoder;
+
+    private DataLog datalog = DataLogManager.getLog();
+    private DoubleLogEntry desiredSpeedLog;
+    private DoubleLogEntry desiredAngleLog;
 
     private final String ID;
 
@@ -81,6 +88,9 @@ public class SwerveModule extends SubsystemBase {
         turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();
+
+        desiredAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setAngle"); //Logs desired angle in radians
+        desiredSpeedLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setSpeed"); //Logs desired angle in meters per second
     }
 
     public double getDrivePosition() {
@@ -118,6 +128,8 @@ public class SwerveModule extends SubsystemBase {
         driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeed);
         turningMotor.set(turningPIDController.calculate(getTurningPosition(), state.angle.getRadians()));
         SmartDashboard.putString("Swerve[" + ID + "] state", state.toString());
+        desiredAngleLog.append(state.angle.getRadians());
+        desiredSpeedLog.append(state.speedMetersPerSecond);
     }
 
     public void stop() {
