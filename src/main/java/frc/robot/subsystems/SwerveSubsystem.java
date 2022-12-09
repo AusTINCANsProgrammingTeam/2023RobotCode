@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
@@ -127,7 +126,7 @@ public class SwerveSubsystem extends SubsystemBase{
             //Robot Oriented Drive
             chassisSpeeds = new ChassisSpeeds(x, y, r);
         }
-
+        SmartDashboard.putString("chassis speeds",chassisSpeeds.toString());
         //Convert Chassis Speeds to individual module states
         return DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);  
     }
@@ -148,7 +147,7 @@ public class SwerveSubsystem extends SubsystemBase{
         
         if(realMaxSpeed != 0){
             //Map input magnitude back to speed in meters per second, divide by real speed to create scale
-            double scale = Math.min(k * SwerveModuleConstants.kPhysicalMaxSpeed / realMaxSpeed, 1);
+            double scale = Math.min(k * DriveConstants.kPhysicalMaxSpeed / realMaxSpeed, 1);
             //Desaturate speeds using that scale
             for (SwerveModuleState moduleState : desiredStates) {
               moduleState.speedMetersPerSecond *= scale;

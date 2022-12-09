@@ -24,8 +24,8 @@ public final class Constants {
         public static final double kOpenLoopRampRate = 0.2;
     }
     
-    public static final class DriveConstants{ //TODO: Update these constants with physical values
-        public static final double kPhysicalMaxSpeed = 1; //Max drivebase speed in meters per second
+    public static final class DriveConstants{
+        public static final double kPhysicalMaxSpeed = Units.feetToMeters(14.5);; //Max drivebase speed in meters per second
         public static final double kPhysicalMaxAngularSpeed = 1; //Max drivebase angular speed in radians per second
 
         public static final double kTrackWidth = Units.inchesToMeters(18.75); //Distance between right and left wheels
@@ -37,8 +37,7 @@ public final class Constants {
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2));
     }
 
-    public static final class SwerveModuleConstants{ //TODO: Update these constants with physical values
-        public static final double kPhysicalMaxSpeed = Units.feetToMeters(14.5); //Max module speed in meters per second
+    public static final class SwerveModuleConstants{
         public static final double kWheelDiameterMeters = Units.inchesToMeters(3.5);
         public static final double kDriveMotorGearRatio = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
         public static final double kTurningMotorGearRatio = (14.0 / 50.0) * (10.0 / 60.0);
