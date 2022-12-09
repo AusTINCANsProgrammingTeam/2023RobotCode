@@ -112,7 +112,7 @@ public class SwerveModule extends SubsystemBase {
 
     public void resetEncoders() {
         driveEncoder.setPosition(0);
-        turningEncoder.setPosition(Robot.isSimulation() ? 0 : Units.degreesToRotations(absoluteEncoder.getAbsolutePosition()));
+        turningEncoder.setPosition(Robot.isSimulation() ? 0 : Units.degreesToRadians(absoluteEncoder.getAbsolutePosition()));
     }
 
     public SwerveModuleState getState() {
