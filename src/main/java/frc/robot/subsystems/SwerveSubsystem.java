@@ -158,7 +158,8 @@ public class SwerveSubsystem extends SubsystemBase{
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         /*desatureWheelSpeeds fully saturates a module in many combinations of rotation and translation input, 
         while this custom normalization avoids fully saturating a module to make the drive more controllable*/
-        this.normalizeDrive(desiredStates, DriveConstants.kDriveKinematics.toChassisSpeeds(desiredStates));
+        //this.normalizeDrive(desiredStates, DriveConstants.kDriveKinematics.toChassisSpeeds(desiredStates));
+        
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
         backLeft.setDesiredState(desiredStates[2]);
