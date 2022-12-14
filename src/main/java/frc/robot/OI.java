@@ -26,7 +26,7 @@ public class OI {
 
         public static Supplier<Double> getXTranslationSupplier(){
             //This axis is inverted
-            return () -> kXTranslationCurve.calculate(-kJoystick.getRawAxis(kXTranslationAxis));
+            return () -> kXTranslationCurve.calculate(kJoystick.getRawAxis(kXTranslationAxis));
         }
 
         public static Supplier<Double> getYTranslationSupplier(){

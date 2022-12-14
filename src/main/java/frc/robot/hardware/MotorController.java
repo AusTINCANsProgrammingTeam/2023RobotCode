@@ -12,10 +12,10 @@ public class MotorController {
         FrontLeftModuleTurn(3),
         FrontRightModuleDrive(2, 50),
         FrontRightModuleTurn(1),
-        BackLeftModuleDrive(6, 50),
-        BackLeftModuleTurn(5),
-        BackRightModuleDrive(7, 50),
-        BackRightModuleTurn(8);
+        BackLeftModuleDrive(7, 50),
+        BackLeftModuleTurn(8),
+        BackRightModuleDrive(6, 50),
+        BackRightModuleTurn(5);
 
         private int ID;
         private int currentLimit;
@@ -68,9 +68,10 @@ public class MotorController {
 
     public static CANSparkMax constructMotor(MotorConfig config){
         CANSparkMax motor = new CANSparkMax(config.getID(), MotorType.kBrushless);
+        motor.restoreFactoryDefaults();
         motor.setSmartCurrentLimit(config.getCurrentLimit());
-        motor.setOpenLoopRampRate(motor.getOpenLoopRampRate());
-        motor.setInverted(motor.getInverted());
+        motor.setOpenLoopRampRate(config.getOpenLoopRampRate());
+        motor.setInverted(config.getReversed());
         return motor;
     }
 }

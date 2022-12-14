@@ -8,10 +8,10 @@ import edu.wpi.first.math.util.Units;
 public class AbsoluteEncoder {
     public enum EncoderConfig {
         //Swerve Modules
-        FrontLeftModule(11, false, 2.177),
-        FrontRightModule(12, false, 2.046),
-        BackLeftModule(9, false, 3.12),
-        BackRightModule(10, false, 1.533);
+        FrontLeftModule(12, false, -1.12),
+        FrontRightModule(11, false, -1.078),
+        BackLeftModule(10, false, -3.911),
+        BackRightModule(9, false, -4.686);
         
         private int ID;
         private boolean reversed;

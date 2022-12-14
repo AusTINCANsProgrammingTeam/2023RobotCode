@@ -49,7 +49,10 @@ public class SwerveModule extends SubsystemBase {
 
     private DataLog datalog = DataLogManager.getLog();
     private DoubleLogEntry desiredSpeedLog;
+    private DoubleLogEntry actualSpeedLog;
     private DoubleLogEntry desiredAngleLog;
+    private DoubleLogEntry actualAbsoluteAngleLog;
+    private DoubleLogEntry actualRelativeAngleLog;
 
     private final String ID;
 
@@ -89,8 +92,11 @@ public class SwerveModule extends SubsystemBase {
 
         resetEncoders();
 
+        desiredSpeedLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setSpeed"); //Logs desired speed in meters per second
+        actualSpeedLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setSpeed"); //Logs actual speed in meters per second
         desiredAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setAngle"); //Logs desired angle in radians
-        desiredSpeedLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setSpeed"); //Logs desired angle in meters per second
+        actualAbsoluteAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualAbsAngle"); //Logs actual absolute angle in radians
+        actualRelativeAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualRelAngle"); //Logs actual relative angle in radians
     }
 
     public double getDrivePosition() {
@@ -124,7 +130,7 @@ public class SwerveModule extends SubsystemBase {
             stop();
             return;
         }
-        state = SwerveModuleState.optimize(state, getState().angle);
+        //state = SwerveModuleState.optimize(state, getState().angle);
         driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeed);
         turningMotor.set(turningPIDController.calculate(getTurningPosition(), state.angle.getRadians()));
         SmartDashboard.putString("Swerve[" + ID + "] state", state.toString());
@@ -154,6 +160,12 @@ public class SwerveModule extends SubsystemBase {
 
     @Override
     public void periodic(){
-        SmartDashboard.putNumber("Swerve[" + ID + "] encoder position", Units.degreesToRadians(Robot.isSimulation() ? 0 : absoluteEncoder.getAbsolutePosition()));
+        SmartDashboard.putNumber("Swerve[" + ID + "] absolute encoder position", Units.degreesToRadians(Robot.isSimulation() ? 0 : absoluteEncoder.getAbsolutePosition()));
+        SmartDashboard.putNumber("Swerve[" + ID + "] absolute encoder position degrees", Robot.isSimulation() ? 0 : absoluteEncoder.getAbsolutePosition());
+        SmartDashboard.putNumber("Swerve[" + ID + "] relative encoder position", turningEncoder.getPosition());
+        SmartDashboard.putData(ID + " PID", turningPIDController);
+        actualSpeedLog.append(driveEncoder.getVelocity());
+        actualAbsoluteAngleLog.append(Units.degreesToRadians(absoluteEncoder.getAbsolutePosition()));
+        actualRelativeAngleLog.append(turningEncoder.getPosition());
     }
 }
