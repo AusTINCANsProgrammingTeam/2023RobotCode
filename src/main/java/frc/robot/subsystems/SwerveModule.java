@@ -104,7 +104,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public double getTurningPosition() {
-        return turningEncoder.getPosition();
+        return Math.IEEEremainder(turningEncoder.getPosition(), Math.PI * 2);
     }
 
     public double getDriveVelocity() {
@@ -118,6 +118,7 @@ public class SwerveModule extends SubsystemBase {
 
     public void resetEncoders() {
         driveEncoder.setPosition(0);
+        SmartDashboard.putNumber(ID + " encoders resetting to", Units.degreesToRadians(absoluteEncoder.getAbsolutePosition()));
         turningEncoder.setPosition(Robot.isSimulation() ? 0 : Units.degreesToRadians(absoluteEncoder.getAbsolutePosition()));
     }
 
@@ -130,7 +131,7 @@ public class SwerveModule extends SubsystemBase {
             stop();
             return;
         }
-        //state = SwerveModuleState.optimize(state, getState().angle);
+        state = SwerveModuleState.optimize(state, getState().angle);
         driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeed);
         turningMotor.set(turningPIDController.calculate(getTurningPosition(), state.angle.getRadians()));
         SmartDashboard.putString("Swerve[" + ID + "] state", state.toString());
@@ -162,10 +163,10 @@ public class SwerveModule extends SubsystemBase {
     public void periodic(){
         SmartDashboard.putNumber("Swerve[" + ID + "] absolute encoder position", Units.degreesToRadians(Robot.isSimulation() ? 0 : absoluteEncoder.getAbsolutePosition()));
         SmartDashboard.putNumber("Swerve[" + ID + "] absolute encoder position degrees", Robot.isSimulation() ? 0 : absoluteEncoder.getAbsolutePosition());
-        SmartDashboard.putNumber("Swerve[" + ID + "] relative encoder position", turningEncoder.getPosition());
+        SmartDashboard.putNumber("Swerve[" + ID + "] relative encoder position", getTurningPosition());
         SmartDashboard.putData(ID + " PID", turningPIDController);
         actualSpeedLog.append(driveEncoder.getVelocity());
         actualAbsoluteAngleLog.append(Units.degreesToRadians(absoluteEncoder.getAbsolutePosition()));
-        actualRelativeAngleLog.append(turningEncoder.getPosition());
+        actualRelativeAngleLog.append(getTurningPosition());
     }
 }

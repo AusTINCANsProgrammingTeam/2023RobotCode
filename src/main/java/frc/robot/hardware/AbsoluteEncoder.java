@@ -49,7 +49,7 @@ public class AbsoluteEncoder {
         WPI_CANCoder encoder = new WPI_CANCoder(config.getID());
         encoder.configFactoryDefault();
         encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-        encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
         encoder.configSensorDirection(config.getReversed());
         encoder.configMagnetOffset(Units.radiansToDegrees(config.getOffset()));
         return encoder;

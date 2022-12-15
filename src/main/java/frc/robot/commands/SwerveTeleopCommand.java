@@ -32,14 +32,14 @@ public class SwerveTeleopCommand extends CommandBase {
 
     @Override
     public void execute() {
-        //SwerveModuleState[] moduleStates = 
-        //    swerveSubsystem.convertToModuleStates(xJoystick.get(), yJoystick.get(), rJoystick.get());
+        SwerveModuleState[] moduleStates = 
+            swerveSubsystem.convertToModuleStates(xJoystick.get(), yJoystick.get(), rJoystick.get());
 
-        SwerveModuleState states[] = { new SwerveModuleState(.25, new Rotation2d(Math.PI / 4)),
+        /*SwerveModuleState states[] = { new SwerveModuleState(.25, new Rotation2d(Math.PI / 4)),
             new SwerveModuleState(.25, new Rotation2d(Math.PI / 4)),
             new SwerveModuleState(.25, new Rotation2d(Math.PI / 4)),
-            new SwerveModuleState(.25, new Rotation2d(Math.PI / 4))};
-        swerveSubsystem.setModuleStates(states);
+            new SwerveModuleState(.25, new Rotation2d(Math.PI / 4))};*/
+        swerveSubsystem.setModuleStates(moduleStates);
 
     }
 

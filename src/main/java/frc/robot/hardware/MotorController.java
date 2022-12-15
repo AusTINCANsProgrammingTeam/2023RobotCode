@@ -9,13 +9,13 @@ public class MotorController {
     public static enum MotorConfig {
         //Swerve Modules
         FrontLeftModuleDrive(4, 50),
-        FrontLeftModuleTurn(3),
+        FrontLeftModuleTurn(3, true),
         FrontRightModuleDrive(2, 50),
-        FrontRightModuleTurn(1),
+        FrontRightModuleTurn(1, true),
         BackLeftModuleDrive(7, 50),
-        BackLeftModuleTurn(8),
+        BackLeftModuleTurn(8, true),
         BackRightModuleDrive(6, 50),
-        BackRightModuleTurn(5);
+        BackRightModuleTurn(5, true);
 
         private int ID;
         private int currentLimit;
