@@ -107,6 +107,10 @@ public class SwerveModule extends SubsystemBase {
         return Math.IEEEremainder(turningEncoder.getPosition(), Math.PI * 2);
     }
 
+    public double getAbsoluteTurningPosition(){
+        return Units.degreesToRadians(Robot.isSimulation() ? 0 : absoluteEncoder.getAbsolutePosition());
+    }
+
     public double getDriveVelocity() {
         return Robot.isSimulation() ? simDriveEncoder.getVelocity() : driveEncoder.getVelocity();
     }
@@ -118,8 +122,7 @@ public class SwerveModule extends SubsystemBase {
 
     public void resetEncoders() {
         driveEncoder.setPosition(0);
-        SmartDashboard.putNumber(ID + " encoders resetting to", Units.degreesToRadians(absoluteEncoder.getAbsolutePosition()));
-        turningEncoder.setPosition(Robot.isSimulation() ? 0 : Units.degreesToRadians(absoluteEncoder.getAbsolutePosition()));
+        turningEncoder.setPosition(getAbsoluteTurningPosition());
     }
 
     public SwerveModuleState getState() {
@@ -161,12 +164,11 @@ public class SwerveModule extends SubsystemBase {
 
     @Override
     public void periodic(){
-        SmartDashboard.putNumber("Swerve[" + ID + "] absolute encoder position", Units.degreesToRadians(Robot.isSimulation() ? 0 : absoluteEncoder.getAbsolutePosition()));
-        SmartDashboard.putNumber("Swerve[" + ID + "] absolute encoder position degrees", Robot.isSimulation() ? 0 : absoluteEncoder.getAbsolutePosition());
+        SmartDashboard.putNumber("Swerve[" + ID + "] absolute encoder position", getAbsoluteTurningPosition());
         SmartDashboard.putNumber("Swerve[" + ID + "] relative encoder position", getTurningPosition());
         SmartDashboard.putData(ID + " PID", turningPIDController);
         actualSpeedLog.append(driveEncoder.getVelocity());
-        actualAbsoluteAngleLog.append(Units.degreesToRadians(absoluteEncoder.getAbsolutePosition()));
+        actualAbsoluteAngleLog.append(getAbsoluteTurningPosition());
         actualRelativeAngleLog.append(getTurningPosition());
     }
 }
