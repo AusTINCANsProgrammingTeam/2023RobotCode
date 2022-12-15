@@ -17,9 +17,7 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
@@ -62,14 +60,14 @@ public class SwerveSubsystem extends SubsystemBase{
     public boolean controlOrientationIsFOD;
 
     public SwerveSubsystem() {
-        new WaitUntilCommand(this::gyroReady)
-        .andThen(new InstantCommand(this::zeroHeading,this))
-        .schedule();
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                zeroHeading();
+            } catch (Exception e) {
+            }
+        }).start();
         controlOrientationIsFOD = true;
-    }
-
-    private boolean gyroReady() {
-        return !gyro.isCalibrating();
     }
 
     public void zeroHeading() {
