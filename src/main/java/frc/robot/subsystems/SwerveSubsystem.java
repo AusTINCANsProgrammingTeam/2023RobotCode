@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
@@ -76,8 +75,7 @@ public class SwerveSubsystem extends SubsystemBase{
     }
 
     public double getHeading() {
-        //The math for this remainder is gyro - (360 * Math.round(gyro/360))
-        return gyro.getYaw(); //Clamps angle output between -180 and 180 degrees
+        return gyro.getYaw();
     }
 
     public Rotation2d getRotation2d() {
@@ -119,8 +117,7 @@ public class SwerveSubsystem extends SubsystemBase{
         ChassisSpeeds chassisSpeeds;
         if(controlOrientationIsFOD){
             //Field Oriented Drive
-            //TODO: test on real hardware, adding to gyro is supposed to eliminate skew of movement when rotating 
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, r, this.getRotation2d().minus(new Rotation2d(r * Robot.kDefaultPeriod)));
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, r, this.getRotation2d());
         } else {
             //Robot Oriented Drive
             chassisSpeeds = new ChassisSpeeds(x, y, r);
