@@ -132,11 +132,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     private double calculateSetpoint(double stateAngle){
-        double error = stateAngle - getTurningPosition();
-        if(Math.abs(error) > Math.PI){
-            error = Math.IEEEremainder(error, 2 * Math.PI);
-        }
-        return turningEncoder.getPosition() + error; 
+        return turningEncoder.getPosition() + Math.IEEEremainder(stateAngle - getTurningPosition(), 2 * Math.PI); 
     }
 
     public void setDesiredState(SwerveModuleState state) {
