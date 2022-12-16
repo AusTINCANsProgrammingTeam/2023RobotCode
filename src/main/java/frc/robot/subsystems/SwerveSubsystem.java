@@ -9,6 +9,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
@@ -76,7 +77,7 @@ public class SwerveSubsystem extends SubsystemBase{
 
     public double getHeading() {
         //The math for this remainder is gyro - (360 * Math.round(gyro/360))
-        return Math.IEEEremainder(gyro.getAngle(), 360); //Clamps angle output between -180 and 180 degrees
+        return gyro.getYaw(); //Clamps angle output between -180 and 180 degrees
     }
 
     public Rotation2d getRotation2d() {
@@ -118,8 +119,8 @@ public class SwerveSubsystem extends SubsystemBase{
         ChassisSpeeds chassisSpeeds;
         if(controlOrientationIsFOD){
             //Field Oriented Drive
-            //TODO: test on real hardware, adding to gyro is supposed to eliminate skew of movement when rotating
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, r, this.getRotation2d().plus(new Rotation2d((r * Robot.kDefaultPeriod)/2)));
+            //TODO: test on real hardware, adding to gyro is supposed to eliminate skew of movement when rotating 
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, r, this.getRotation2d().minus(new Rotation2d(r * Robot.kDefaultPeriod)));
         } else {
             //Robot Oriented Drive
             chassisSpeeds = new ChassisSpeeds(x, y, r);
@@ -129,35 +130,8 @@ public class SwerveSubsystem extends SubsystemBase{
         return DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);  
     }
 
-    private void normalizeDrive(SwerveModuleState[] desiredStates, ChassisSpeeds speeds){
-        //Find magnitude of translation input, map to a scale of 1 in order to be comparable to rotation
-        double translationalK = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) / DriveConstants.kPhysicalMaxSpeed;
-        //Find magnitude of rotation input, map to a scale of 1 in order to be comparable to translation
-        double rotationalK = Math.abs(speeds.omegaRadiansPerSecond) / DriveConstants.kPhysicalMaxAngularSpeed;
-        //Use the larger of the two magnitudes for scaling
-        double k = Math.max(translationalK, rotationalK);
-      
-        //Find the how fast the fastest spinning drive motor is spinning                                       
-        double realMaxSpeed = 0;
-        for (SwerveModuleState moduleState : desiredStates) {
-          realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speedMetersPerSecond));
-        }
-        
-        if(realMaxSpeed != 0){
-            //Map input magnitude back to speed in meters per second, divide by real speed to create scale
-            double scale = Math.min(k * DriveConstants.kPhysicalMaxSpeed / realMaxSpeed, 1);
-            //Desaturate speeds using that scale
-            for (SwerveModuleState moduleState : desiredStates) {
-              moduleState.speedMetersPerSecond *= scale;
-            }
-        }
-    }
-
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        /*desatureWheelSpeeds fully saturates a module in many combinations of rotation and translation input, 
-        while this custom normalization avoids fully saturating a module to make the drive more controllable*/
-        //this.normalizeDrive(desiredStates, DriveConstants.kDriveKinematics.toChassisSpeeds(desiredStates));
-        
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeed);
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
         backLeft.setDesiredState(desiredStates[2]);
