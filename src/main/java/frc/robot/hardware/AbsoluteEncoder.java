@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units;
 public class AbsoluteEncoder {
     public enum EncoderConfig {
         //Swerve Modules
+        //Offsets determined by manually turning all modules to 0 (forward) and recording their positions
         FrontLeftModule(12, false, -1.12),
         FrontRightModule(11, false, -1.078),
         BackLeftModule(10, false, -3.911),
