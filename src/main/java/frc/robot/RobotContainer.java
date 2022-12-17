@@ -24,13 +24,19 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
   private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
-  private final SimulationSubsystem simulationSubsystem = Robot.isSimulation() ? new SimulationSubsystem(swerveSubsystem) : null;
+  private final SimulationSubsystem simulationSubsystem;
   
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    if(Robot.isSimulation()){
+      simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
+    } else{
+      simulationSubsystem = null;
+    }
+
     swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
       OI.Driver.getXTranslationSupplier(),
