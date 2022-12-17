@@ -135,18 +135,18 @@ public class SwerveModule extends SubsystemBase {
         return turningEncoder.getPosition() + Math.IEEEremainder(stateAngle - getTurningPosition(), 2 * Math.PI); 
     }
 
-    public void setDesiredState(SwerveModuleState state) {
-        if (Math.abs(state.speedMetersPerSecond) == 0) { //Prevent wheels to returning to heading of 0 when controls released
+    public void setDesiredState(SwerveModuleState desiredState) {
+        if (Math.abs(desiredState.speedMetersPerSecond) == 0) { //Prevent wheels to returning to heading of 0 when controls released
             stop();
             return;
         }
-        state = SwerveModuleState.optimize(state, getState().angle);
-        driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeed);
-        turningPIDController.setReference(calculateSetpoint(state.angle.getRadians()), ControlType.kPosition);
+        desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
+        driveMotor.set(desiredState.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeed);
+        turningPIDController.setReference(calculateSetpoint(desiredState.angle.getRadians()), ControlType.kPosition);
 
-        SmartDashboard.putString("Swerve[" + ID + "] state", state.toString());
-        desiredAngleLog.append(state.angle.getRadians());
-        desiredSpeedLog.append(state.speedMetersPerSecond);
+        SmartDashboard.putString("Swerve[" + ID + "] state", desiredState.toString());
+        desiredAngleLog.append(desiredState.angle.getRadians());
+        desiredSpeedLog.append(desiredState.speedMetersPerSecond);
     }
 
     public void stop() {
