@@ -26,11 +26,19 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.AutonConstants;
-import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.SwerveSubsystem.SwerveConstants;
 
 
 public class AutonSubsytem extends SubsystemBase{
+    public static final class AutonConstants {
+        public static final double kMaxSpeed = SwerveConstants.kPhysicalMaxSpeed / 4; //Maximum speed allowed in auton, in meters per second
+        public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
+
+        public static final double kXTranslationP = 1.5;
+        public static final double kYTranslationP = 1.5;
+        public static final double kRotationP = 3;
+    }
+
     private enum AutonModes{
         FORWARD, // Go forward 2 meters
         BACKWARD, // Wait 3 seconds, go backward 2 meters
@@ -104,7 +112,7 @@ public class AutonSubsytem extends SubsystemBase{
         return new PPSwerveControllerCommand(
             trajectory,
             swerveSubsystem::getPose, 
-            DriveConstants.kDriveKinematics, 
+            SwerveConstants.kDriveKinematics, 
             xController, 
             yController, 
             rotationController, 

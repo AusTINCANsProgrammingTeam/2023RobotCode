@@ -11,8 +11,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.subsystems.SwerveSubsystem.SwerveConstants;
 
 public class SimulationSubsystem extends SubsystemBase {
 
@@ -39,7 +39,7 @@ public class SimulationSubsystem extends SubsystemBase {
     m_field.setRobotPose(swerveSubsystem.getPose());
 
     //Gets the Chassis Speeds (Combined Speeds) from the module states
-    ChassisSpeeds chassisSpeed = Constants.DriveConstants.kDriveKinematics.toChassisSpeeds(swerveSubsystem.getModuleStates());
+    ChassisSpeeds chassisSpeed = SwerveConstants.kDriveKinematics.toChassisSpeeds(swerveSubsystem.getModuleStates());
 
     //Assigns the chassisRotationSpeed Value to a variable
     double chassisRotationSpeed = chassisSpeed.omegaRadiansPerSecond;

@@ -17,13 +17,12 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.classes.RelativeEncoderSim;
 import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
+import frc.robot.subsystems.SwerveSubsystem.SwerveConstants;
 
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.revrobotics.CANSparkMax;
@@ -32,6 +31,17 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 
 public class SwerveModule extends SubsystemBase {
+    public static final class SwerveModuleConstants{
+        public static final double kWheelDiameterMeters = Units.inchesToMeters(3.5);
+        public static final double kDriveMotorGearRatio = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+        public static final double kTurningMotorGearRatio = (14.0 / 50.0) * (10.0 / 60.0);
+        public static final double kDriveEncoderRotFactor = kDriveMotorGearRatio * Math.PI * kWheelDiameterMeters; //Conversion factor converting the Drive Encoder's rotations to meters
+        public static final double kDriveEncoderRPMFactor = kDriveEncoderRotFactor / 60; //Conversion factor converting the Drive Encoder's RPM to meters per second
+        public static final double kTurningEncoderRotFactor = kTurningMotorGearRatio * 2 * Math.PI; //Conversion factor converting the Turn Encoder's rotations to Radians
+        public static final double kTurningEncoderRPMFactor = kTurningEncoderRotFactor / 60; //Conersion factor converting the Turn Encoder's RPM to radians per second
+        public static final double kPTurning = 0.4; //P gain for the turning motor
+    }
+
     private final CANSparkMax driveMotor;
     private final CANSparkMax turningMotor;
 
@@ -141,7 +151,7 @@ public class SwerveModule extends SubsystemBase {
             return;
         }
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
-        driveMotor.set(desiredState.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeed);
+        driveMotor.set(desiredState.speedMetersPerSecond / SwerveConstants.kPhysicalMaxSpeed);
         turningPIDController.setReference(calculateSetpoint(desiredState.angle.getRadians()), ControlType.kPosition);
 
         SmartDashboard.putString("Swerve[" + ID + "] state", desiredState.toString());

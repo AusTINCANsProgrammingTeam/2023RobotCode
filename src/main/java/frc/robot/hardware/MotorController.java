@@ -3,9 +3,13 @@ package frc.robot.hardware;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import frc.robot.Constants.MotorDefaults;
-
 public class MotorController {
+    public static final class MotorDefaults{
+        //Constants to use as default values for Motor Controllers
+        public static final int kCurrentLimit = 40;
+        public static final double kOpenLoopRampRate = 0.2;
+    }
+
     public static enum MotorConfig {
         //Swerve Modules
         FrontLeftModuleDrive(4, 50),

@@ -8,10 +8,12 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
@@ -21,11 +23,23 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
 public class SwerveSubsystem extends SubsystemBase{
+    public static final class SwerveConstants{
+        public static final double kPhysicalMaxSpeed = Units.feetToMeters(14.5);; //Max drivebase speed in meters per second
+        public static final double kPhysicalMaxAngularSpeed = 2 * Math.PI; //Max drivebase angular speed in radians per second
+
+        public static final double kTrackWidth = Units.inchesToMeters(18.75); //Distance between right and left wheels
+        public static final double kWheelBase = Units.inchesToMeters(18.75); //Distance between front and back wheels
+        public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics( //Creates robot geometry using the locations of the 4 wheels
+            new Translation2d(kWheelBase / 2, kTrackWidth / 2), 
+            new Translation2d(kWheelBase / 2, -kTrackWidth /2),
+            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+    }
+
     private final SwerveModule frontLeft = new SwerveModule(
         MotorConfig.FrontLeftModuleDrive,
         MotorConfig.FrontLeftModuleTurn,
@@ -51,7 +65,7 @@ public class SwerveSubsystem extends SubsystemBase{
         "BR");
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
-    private SwerveDriveOdometry odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, new Rotation2d(0));
+    private SwerveDriveOdometry odometer = new SwerveDriveOdometry(SwerveConstants.kDriveKinematics, new Rotation2d(0));
 
     private DataLog datalog = DataLogManager.getLog();
     private DoubleLogEntry translationXOutputLog = new DoubleLogEntry(datalog, "/swerve/txout"); //Logs x translation state output
@@ -102,9 +116,9 @@ public class SwerveSubsystem extends SubsystemBase{
         double r = rotation;
 
         //Map to speeds in meters/radians per second
-        x *= DriveConstants.kPhysicalMaxSpeed;
-        y *= DriveConstants.kPhysicalMaxSpeed;
-        r *= DriveConstants.kPhysicalMaxAngularSpeed;
+        x *= SwerveConstants.kPhysicalMaxSpeed;
+        y *= SwerveConstants.kPhysicalMaxSpeed;
+        r *= SwerveConstants.kPhysicalMaxAngularSpeed;
 
         //Log speeds used to construct chassis speeds
         translationXOutputLog.append(x);
@@ -122,11 +136,11 @@ public class SwerveSubsystem extends SubsystemBase{
         }
         SmartDashboard.putString("chassis speeds",chassisSpeeds.toString());
         //Convert Chassis Speeds to individual module states
-        return DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);  
+        return SwerveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);  
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SwerveConstants.kPhysicalMaxSpeed);
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
         backLeft.setDesiredState(desiredStates[2]);
