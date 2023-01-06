@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
+import frc.robot.subsystems.AutonSubsytem.AutonConstants;
 
 public class SwerveSubsystem extends SubsystemBase{
     public static final class SwerveConstants{
@@ -76,9 +78,14 @@ public class SwerveSubsystem extends SubsystemBase{
 
     public boolean controlOrientationIsFOD;
 
+    public Integer rotationHold; 
+    public PIDController rotationPIDController;
+
     public SwerveSubsystem() {
         zeroHeading();
         controlOrientationIsFOD = true;
+        rotationPIDController = new PIDController(AutonConstants.kRotationP, 0, AutonConstants.kRotationD);
+        rotationPIDController.enableContinuousInput(-180, 180);
     }
 
     public void zeroHeading() {
@@ -108,12 +115,28 @@ public class SwerveSubsystem extends SubsystemBase{
         controlOrientationLog.append(controlOrientationIsFOD);
     }
 
+    public void enableRotationHold(int angle){
+        //Set the angle to automatically align the drive to in degrees -180 to 180
+        rotationHold = angle;
+    }
+
+    public void disableRotationHold(){
+        rotationHold = null;
+    }
+
     public SwerveModuleState[] convertToModuleStates(double xTranslation, double yTranslation, double rotation) {
         //Takes axis input from joysticks and returns an array of swerve module states
 
         double x = yTranslation; //Intentional, x in swerve kinematics is y on the joystick
         double y = xTranslation;
         double r = rotation;
+
+        if (Math.abs(r) > 0){
+            disableRotationHold();
+        }
+        else if(rotationHold != null){
+            r = rotationPIDController.calculate(getHeading(), rotationHold);
+        }
 
         //Map to speeds in meters/radians per second
         x *= SwerveConstants.kPhysicalMaxSpeed;

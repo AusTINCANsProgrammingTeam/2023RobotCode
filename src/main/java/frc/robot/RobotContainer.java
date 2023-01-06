@@ -59,6 +59,10 @@ public class RobotContainer {
   private void configureButtonBindings() {
     OI.Driver.getOrientationButton().whenPressed(() -> swerveSubsystem.toggleOrientation());
     OI.Driver.getZeroButton().whenPressed(() -> swerveSubsystem.zeroHeading());
+    OI.Driver.getUpPOV().whenPressed(() -> swerveSubsystem.enableRotationHold(0));
+    OI.Driver.getDownPOV().whenPressed(() -> swerveSubsystem.enableRotationHold(180));
+    OI.Driver.getLeftPOV().whenPressed(() -> swerveSubsystem.enableRotationHold(90));
+    OI.Driver.getRightPOV().whenPressed(() -> swerveSubsystem.enableRotationHold(-90));
   }
 
   /**

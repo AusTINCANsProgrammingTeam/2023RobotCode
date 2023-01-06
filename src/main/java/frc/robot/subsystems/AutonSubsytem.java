@@ -36,7 +36,8 @@ public class AutonSubsytem extends SubsystemBase{
 
         public static final double kXTranslationP = 1.5;
         public static final double kYTranslationP = 1.5;
-        public static final double kRotationP = 3;
+        public static final double kRotationP = 0.015;
+        public static final double kRotationD = 0.0005;
     }
 
     private enum AutonModes{
