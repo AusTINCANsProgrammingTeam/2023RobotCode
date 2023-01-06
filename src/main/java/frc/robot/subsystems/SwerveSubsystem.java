@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
@@ -82,11 +81,11 @@ public class SwerveSubsystem extends SubsystemBase{
     }
 
     public void zeroHeading() {
+        if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");}
         gyro.reset();
     }
 
-    public double getHeading() {
-        if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");} 
+    public double getHeading() { 
         return gyro.getYaw();
     }
 
@@ -129,7 +128,7 @@ public class SwerveSubsystem extends SubsystemBase{
         ChassisSpeeds chassisSpeeds;
         if(controlOrientationIsFOD){
             //Field Oriented Drive
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, r, this.getRotation2d().plus(new Rotation2d(r * Robot.kDefaultPeriod / 2)));
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, r, this.getRotation2d());
         } else {
             //Robot Oriented Drive
             chassisSpeeds = new ChassisSpeeds(x, y, r);
