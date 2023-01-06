@@ -24,7 +24,7 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
   private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
-  private final SimulationSubsystem simulationSubsystem;
+  private SimulationSubsystem simulationSubsystem;
   
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
