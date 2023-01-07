@@ -187,6 +187,14 @@ public class SwerveSubsystem extends SubsystemBase{
         backRight.stop();
     }
 
+    public void characterizeModules(){
+        //Prepare all modules for characterization
+        frontLeft.characterize();
+        frontRight.characterize();
+        backLeft.characterize();
+        backRight.characterize();
+    }
+
     @Override
     public void periodic() {
         odometer.update(getRotation2d(), getModuleStates());
