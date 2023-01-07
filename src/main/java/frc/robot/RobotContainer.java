@@ -33,8 +33,6 @@ public class RobotContainer {
   public RobotContainer() {
     if(Robot.isSimulation()){
       simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
-    } else{
-      simulationSubsystem = null;
     }
 
     swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
