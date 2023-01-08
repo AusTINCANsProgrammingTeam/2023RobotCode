@@ -10,6 +10,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,6 +49,12 @@ public class SwerveModule extends SubsystemBase {
 
     private final String ID;
 
+    private DataLog SwerveModuledatalog = DataLogManager.getLog();
+    private DoubleLogEntry speedLog;
+    private DoubleLogEntry rotationLog;
+    private DoubleLogEntry setSpeedLog;
+    private DoubleLogEntry setRotationLog;
+
     public SwerveModule(MotorConfig driveMotorConfig, MotorConfig turningMotorConfig, EncoderConfig absoluteEncoderConfig, String ID) {
 
         this.ID = ID;
@@ -81,6 +90,11 @@ public class SwerveModule extends SubsystemBase {
         turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();
+
+        speedLog = new DoubleLogEntry(SwerveModuledatalog, "/swerveMod/" + ID + "/speed");
+        rotationLog = new DoubleLogEntry(SwerveModuledatalog, "/swerveMod/" + ID + "/rotation");
+        setSpeedLog = new DoubleLogEntry(SwerveModuledatalog, "/swerveMod/" + ID + "/setSpeed");
+        setRotationLog = new DoubleLogEntry(SwerveModuledatalog, "/swerveMod/" + ID + "/setRotation");
     }
 
     public double getDrivePosition() {
@@ -92,12 +106,16 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public double getDriveVelocity() {
-        return Robot.isSimulation() ? simDriveEncoder.getVelocity() : driveEncoder.getVelocity();
+        double currentSpeed = Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
+        speedLog.append(currentSpeed);
+        return currentSpeed;
     }
     
 
     public double getTurningVelocity() {
-        return Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
+        double currentRotation = Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
+        rotationLog.append(currentRotation);
+        return currentRotation;
     }
 
     public void resetEncoders() {
@@ -115,9 +133,14 @@ public class SwerveModule extends SubsystemBase {
             return;
         }
         state = SwerveModuleState.optimize(state, getState().angle);
-        driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeed);
-        turningMotor.set(turningPIDController.calculate(getTurningPosition(), state.angle.getRadians()));
-        SmartDashboard.putString("Swerve[" + ID + "] state", state.toString());
+        double setSpeed = state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeed;
+        driveMotor.set(setSpeed);
+        setSpeedLog.append(setSpeed);
+
+        double setRotation = turningPIDController.calculate(getTurningPosition(), state.angle.getRadians());
+        turningMotor.set(setRotation);
+        setRotationLog.append(setRotation);
+        // SmartDashboard.putString("Swerve[" + ID + "] state", state.toString());
     }
 
     public void stop() {
