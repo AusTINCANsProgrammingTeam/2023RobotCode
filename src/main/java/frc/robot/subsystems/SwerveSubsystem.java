@@ -55,14 +55,11 @@ public class SwerveSubsystem extends SubsystemBase{
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
     private SwerveDriveOdometry odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, new Rotation2d(0));
 
-    private DataLog loopCountlog = DataLogManager.getLog();
-    private StringLogEntry loopCount = new StringLogEntry(loopCountlog, "/robot/loopCount");
-
-    private DataLog SwerveSubsystemdatalog = DataLogManager.getLog();
-    private DoubleLogEntry translationXOutputLog = new DoubleLogEntry(SwerveSubsystemdatalog, "/swerve/txout"); //Logs x translation state output
-    private DoubleLogEntry translationYOutputLog = new DoubleLogEntry(SwerveSubsystemdatalog, "/swerve/tyout"); //Logs y translation state output
-    private DoubleLogEntry rotationOutputLog = new DoubleLogEntry(SwerveSubsystemdatalog, "/swerve/rotout"); //Logs rotation state output
-    private BooleanLogEntry controlOrientationLog = new BooleanLogEntry(SwerveSubsystemdatalog, "/swerve/orientation"); //Logs if robot is in FOD/ROD
+    private DataLog dataLog = DataLogManager.getLog();
+    private DoubleLogEntry translationXOutputLog = new DoubleLogEntry(dataLog, "/swerve/txout"); //Logs x translation state output
+    private DoubleLogEntry translationYOutputLog = new DoubleLogEntry(dataLog, "/swerve/tyout"); //Logs y translation state output
+    private DoubleLogEntry rotationOutputLog = new DoubleLogEntry(dataLog, "/swerve/rotout"); //Logs rotation state output
+    private BooleanLogEntry controlOrientationLog = new BooleanLogEntry(dataLog, "/swerve/orientation"); //Logs if robot is in FOD/ROD
 
     public boolean controlOrientationIsFOD;
 
@@ -189,7 +186,6 @@ public class SwerveSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        loopCount.append("loopCount");
         odometer.update(getRotation2d(), getModuleStates());
         SmartDashboard.putNumber("Robot Heading", getHeading());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());

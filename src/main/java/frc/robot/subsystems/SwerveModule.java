@@ -49,7 +49,7 @@ public class SwerveModule extends SubsystemBase {
 
     private final String ID;
 
-    private DataLog SwerveModuledatalog = DataLogManager.getLog();
+    private DataLog dataLog = DataLogManager.getLog();
     private DoubleLogEntry speedLog;
     private DoubleLogEntry rotationLog;
     private DoubleLogEntry setSpeedLog;
@@ -91,10 +91,10 @@ public class SwerveModule extends SubsystemBase {
 
         resetEncoders();
 
-        speedLog = new DoubleLogEntry(SwerveModuledatalog, "/swerveMod/" + ID + "/speed");
-        rotationLog = new DoubleLogEntry(SwerveModuledatalog, "/swerveMod/" + ID + "/rotation");
-        setSpeedLog = new DoubleLogEntry(SwerveModuledatalog, "/swerveMod/" + ID + "/setSpeed");
-        setRotationLog = new DoubleLogEntry(SwerveModuledatalog, "/swerveMod/" + ID + "/setRotation");
+        speedLog = new DoubleLogEntry(dataLog, "/swerveMod/" + ID + "/speed");
+        rotationLog = new DoubleLogEntry(dataLog, "/swerveMod/" + ID + "/rotation");
+        setSpeedLog = new DoubleLogEntry(dataLog, "/swerveMod/" + ID + "/setSpeed");
+        setRotationLog = new DoubleLogEntry(dataLog, "/swerveMod/" + ID + "/setRotation");
     }
 
     public double getDrivePosition() {
@@ -140,7 +140,6 @@ public class SwerveModule extends SubsystemBase {
         double setRotation = turningPIDController.calculate(getTurningPosition(), state.angle.getRadians());
         turningMotor.set(setRotation);
         setRotationLog.append(setRotation);
-        // SmartDashboard.putString("Swerve[" + ID + "] state", state.toString());
     }
 
     public void stop() {
