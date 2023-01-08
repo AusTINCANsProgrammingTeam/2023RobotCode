@@ -55,5 +55,4 @@ public class AbsoluteEncoder {
         encoder.configMagnetOffset(Units.radiansToDegrees(config.getOffset()));
         return encoder;
     }
-
 }

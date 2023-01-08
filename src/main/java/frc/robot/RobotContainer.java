@@ -41,7 +41,6 @@ public class RobotContainer {
       OI.Driver.getYTranslationSupplier(),
       OI.Driver.getRotationSupplier()));
 
-
       
     // Configure the button bindings    
 
