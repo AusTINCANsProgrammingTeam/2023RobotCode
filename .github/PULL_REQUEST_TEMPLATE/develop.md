@@ -29,5 +29,3 @@
 
 - [ ] My code follows the code style of this project.
 - [ ] My code has been tested on the Robot OR includes simulation code to prove functionality.
-- [ ] I have updated the documentation accordingly.
-- [ ] I have added tests to cover my changes, and all previous tests pass.
