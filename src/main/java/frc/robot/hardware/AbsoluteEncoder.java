@@ -1,6 +1,7 @@
 package frc.robot.hardware;
 
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 import edu.wpi.first.math.util.Units;
@@ -8,10 +9,11 @@ import edu.wpi.first.math.util.Units;
 public class AbsoluteEncoder {
     public enum EncoderConfig {
         //Swerve Modules
-        FrontLeftModule(9),
-        FrontRightModule(10),
-        BackLeftModule(11),
-        BackRightModule(12);
+        //Offsets determined by manually turning all modules to 0 (forward) and recording their positions
+        FrontLeftModule(12, false, -1.12),
+        FrontRightModule(11, false, -1.078),
+        BackLeftModule(10, false, -3.911),
+        BackRightModule(9, false, -4.686);
         
         private int ID;
         private boolean reversed;
@@ -46,7 +48,9 @@ public class AbsoluteEncoder {
 
     public static WPI_CANCoder constructEncoder(EncoderConfig config){
         WPI_CANCoder encoder = new WPI_CANCoder(config.getID());
-        encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        encoder.configFactoryDefault();
+        encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+        encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
         encoder.configSensorDirection(config.getReversed());
         encoder.configMagnetOffset(Units.radiansToDegrees(config.getOffset()));
         return encoder;

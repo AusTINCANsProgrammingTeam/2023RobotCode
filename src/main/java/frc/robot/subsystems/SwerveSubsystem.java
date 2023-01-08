@@ -8,25 +8,35 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.Robot;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
 public class SwerveSubsystem extends SubsystemBase{
+    public static final double kPhysicalMaxSpeed = Units.feetToMeters(14.5);; //Max drivebase speed in meters per second
+    public static final double kPhysicalMaxAngularSpeed = 2 * Math.PI; //Max drivebase angular speed in radians per second
+
+    public static final double kTrackWidth = Units.inchesToMeters(18.75); //Distance between right and left wheels
+    public static final double kWheelBase = Units.inchesToMeters(18.75); //Distance between front and back wheels
+    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics( //Creates robot geometry using the locations of the 4 wheels
+        new Translation2d(kWheelBase / 2, kTrackWidth / 2), 
+        new Translation2d(kWheelBase / 2, -kTrackWidth /2),
+        new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+        new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+
     private final SwerveModule frontLeft = new SwerveModule(
         MotorConfig.FrontLeftModuleDrive,
         MotorConfig.FrontLeftModuleTurn,
@@ -52,34 +62,29 @@ public class SwerveSubsystem extends SubsystemBase{
         "BR");
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
-    private SwerveDriveOdometry odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, new Rotation2d(0));
+    private SwerveDriveOdometry odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0));
 
     private DataLog datalog = DataLogManager.getLog();
     private DoubleLogEntry translationXOutputLog = new DoubleLogEntry(datalog, "/swerve/txout"); //Logs x translation state output
     private DoubleLogEntry translationYOutputLog = new DoubleLogEntry(datalog, "/swerve/tyout"); //Logs y translation state output
     private DoubleLogEntry rotationOutputLog = new DoubleLogEntry(datalog, "/swerve/rotout"); //Logs rotation state output
     private BooleanLogEntry controlOrientationLog = new BooleanLogEntry(datalog, "/swerve/orientation"); //Logs if robot is in FOD/ROD
+    private StringLogEntry errors = new StringLogEntry(datalog, "/swerve/errors"); //Logs any hardware errors
 
     public boolean controlOrientationIsFOD;
 
     public SwerveSubsystem() {
-        new WaitUntilCommand(this::gyroReady)
-        .andThen(new InstantCommand(this::zeroHeading,this))
-        .schedule();
+        zeroHeading();
         controlOrientationIsFOD = true;
     }
 
-    private boolean gyroReady() {
-        return !gyro.isCalibrating();
-    }
-
     public void zeroHeading() {
+        if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");}
         gyro.reset();
     }
 
-    public double getHeading() {
-        //The math for this remainder is gyro - (360 * Math.round(gyro/360))
-        return Math.IEEEremainder(gyro.getAngle(), 360); //Clamps angle output between -180 and 180 degrees
+    public double getHeading() { 
+        return gyro.getYaw();
     }
 
     public Rotation2d getRotation2d() {
@@ -108,9 +113,9 @@ public class SwerveSubsystem extends SubsystemBase{
         double r = rotation;
 
         //Map to speeds in meters/radians per second
-        x *= DriveConstants.kPhysicalMaxSpeed;
-        y *= DriveConstants.kPhysicalMaxSpeed;
-        r *= DriveConstants.kPhysicalMaxAngularSpeed;
+        x *= kPhysicalMaxSpeed;
+        y *= kPhysicalMaxSpeed;
+        r *= kPhysicalMaxAngularSpeed;
 
         //Log speeds used to construct chassis speeds
         translationXOutputLog.append(x);
@@ -121,45 +126,18 @@ public class SwerveSubsystem extends SubsystemBase{
         ChassisSpeeds chassisSpeeds;
         if(controlOrientationIsFOD){
             //Field Oriented Drive
-            //TODO: test on real hardware, adding to gyro is supposed to eliminate skew of movement when rotating
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, r, this.getRotation2d().plus(new Rotation2d((r * Robot.kDefaultPeriod)/2)));
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, r, this.getRotation2d());
         } else {
             //Robot Oriented Drive
             chassisSpeeds = new ChassisSpeeds(x, y, r);
         }
-
+        SmartDashboard.putString("chassis speeds",chassisSpeeds.toString());
         //Convert Chassis Speeds to individual module states
-        return DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);  
-    }
-
-    private void normalizeDrive(SwerveModuleState[] desiredStates, ChassisSpeeds speeds){
-        //Find magnitude of translation input, map to a scale of 1 in order to be comparable to rotation
-        double translationalK = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) / DriveConstants.kPhysicalMaxSpeed;
-        //Find magnitude of rotation input, map to a scale of 1 in order to be comparable to translation
-        double rotationalK = Math.abs(speeds.omegaRadiansPerSecond) / DriveConstants.kPhysicalMaxAngularSpeed;
-        //Use the larger of the two magnitudes for scaling
-        double k = Math.max(translationalK, rotationalK);
-      
-        //Find the how fast the fastest spinning drive motor is spinning                                       
-        double realMaxSpeed = 0;
-        for (SwerveModuleState moduleState : desiredStates) {
-          realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speedMetersPerSecond));
-        }
-        
-        if(realMaxSpeed != 0){
-            //Map input magnitude back to speed in meters per second, divide by real speed to create scale
-            double scale = Math.min(k * SwerveModuleConstants.kPhysicalMaxSpeed / realMaxSpeed, 1);
-            //Desaturate speeds using that scale
-            for (SwerveModuleState moduleState : desiredStates) {
-              moduleState.speedMetersPerSecond *= scale;
-            }
-        }
+        return kDriveKinematics.toSwerveModuleStates(chassisSpeeds);  
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        /*desatureWheelSpeeds fully saturates a module in many combinations of rotation and translation input, 
-        while this custom normalization avoids fully saturating a module to make the drive more controllable*/
-        this.normalizeDrive(desiredStates, DriveConstants.kDriveKinematics.toChassisSpeeds(desiredStates));
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, kPhysicalMaxSpeed);
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
         backLeft.setDesiredState(desiredStates[2]);
