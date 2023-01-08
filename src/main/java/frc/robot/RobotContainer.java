@@ -38,15 +38,11 @@ public class RobotContainer {
       simulationSubsystem = null;
     }
 
-    if(Robot.isCharacterizationMode){
-      swerveSubsystem.setDefaultCommand(new InstantCommand(swerveSubsystem::characterizeModules));
-    } else{
-      swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
-        swerveSubsystem, 
-        OI.Driver.getXTranslationSupplier(),
-        OI.Driver.getYTranslationSupplier(),
-        OI.Driver.getRotationSupplier()));
-    }
+    swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
+      swerveSubsystem, 
+      OI.Driver.getXTranslationSupplier(),
+      OI.Driver.getYTranslationSupplier(),
+      OI.Driver.getRotationSupplier()));
 
 
       

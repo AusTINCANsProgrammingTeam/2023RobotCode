@@ -86,6 +86,9 @@ public class SwerveSubsystem extends SubsystemBase{
         controlOrientationIsFOD = true;
         rotationPIDController = new PIDController(AutonConstants.kRotationP, 0, AutonConstants.kRotationD);
         rotationPIDController.enableContinuousInput(-180, 180);
+        if(Robot.isCharacterizationMode){
+            characterizeModules();
+        }
     }
 
     public void zeroHeading() {

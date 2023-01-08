@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
-  public static final boolean isCharacterizationMode = false; //Robot will prepare for drivebase for characterization once enabled
+  public static final boolean isCharacterizationMode = true; //Robot will prepare for drivebase for characterization once enabled
 
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
