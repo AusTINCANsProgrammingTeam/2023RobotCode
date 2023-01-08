@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,11 +24,11 @@ import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
-import frc.robot.subsystems.AutonSubsytem.AutonConstants;
 
 public class SwerveSubsystem extends SubsystemBase{
     public static final class SwerveConstants{
@@ -40,6 +42,11 @@ public class SwerveSubsystem extends SubsystemBase{
             new Translation2d(kWheelBase / 2, -kTrackWidth /2),
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+    
+        public static final double kXTranslationP = 1.5;
+        public static final double kYTranslationP = 1.5;
+        public static final double kRotationP = 0.015;
+        public static final double kRotationD = 0.0005;
     }
 
     private final SwerveModule frontLeft = new SwerveModule(
@@ -75,17 +82,26 @@ public class SwerveSubsystem extends SubsystemBase{
     private DoubleLogEntry rotationOutputLog = new DoubleLogEntry(datalog, "/swerve/rotout"); //Logs rotation state output
     private BooleanLogEntry controlOrientationLog = new BooleanLogEntry(datalog, "/swerve/orientation"); //Logs if robot is in FOD/ROD
     private StringLogEntry errors = new StringLogEntry(datalog, "/swerve/errors"); //Logs any hardware errors
+    private StringLogEntry trajectoryLog = new StringLogEntry(datalog, "/auton/trajectory"); //Logs autonomous trajectory following
 
     public boolean controlOrientationIsFOD;
 
-    public Integer rotationHold; 
-    public PIDController rotationPIDController;
+    public Double rotationHold;
+
+    private PIDController xController;
+    private PIDController yController;
+    private PIDController rotationController;
 
     public SwerveSubsystem() {
         zeroHeading();
         controlOrientationIsFOD = true;
-        rotationPIDController = new PIDController(AutonConstants.kRotationP, 0, AutonConstants.kRotationD);
-        rotationPIDController.enableContinuousInput(-180, 180);
+
+        //Define PID controllers for tracking trajectory
+        xController = new PIDController(SwerveConstants.kXTranslationP, 0, 0);
+        yController = new PIDController(SwerveConstants.kYTranslationP, 0, 0);
+        rotationController = new PIDController(SwerveConstants.kRotationP, 0, SwerveConstants.kRotationD);
+        rotationController.enableContinuousInput(-Math.PI, Math.PI);
+
         if(Robot.isCharacterizationMode){
             characterizeModules();
         }
@@ -119,8 +135,8 @@ public class SwerveSubsystem extends SubsystemBase{
     }
 
     public void enableRotationHold(int angle){
-        //Set the angle to automatically align the drive to in degrees -180 to 180
-        rotationHold = angle;
+        //Set the angle to automatically align the drive to using degrees -180 to 180
+        rotationHold = Units.degreesToRadians(angle);
     }
 
     public void disableRotationHold(){
@@ -138,7 +154,7 @@ public class SwerveSubsystem extends SubsystemBase{
             disableRotationHold();
         }
         else if(rotationHold != null){
-            r = rotationPIDController.calculate(getHeading(), rotationHold);
+            r = rotationController.calculate(Units.degreesToRadians(getHeading()), rotationHold);
         }
 
         //Map to speeds in meters/radians per second
@@ -203,5 +219,20 @@ public class SwerveSubsystem extends SubsystemBase{
         odometer.update(getRotation2d(), getModuleStates());
         SmartDashboard.putNumber("Robot Heading", getHeading());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+    }
+
+    public Command followTrajectory(String name, PathPlannerTrajectory trajectory){
+        //For use with trajectories generated from a list of poses
+        return new PPSwerveControllerCommand(
+            trajectory,
+            this::getPose, 
+            SwerveConstants.kDriveKinematics, 
+            xController, 
+            yController, 
+            rotationController, 
+            this::setModuleStates, 
+            this
+        ).beforeStarting(() -> trajectoryLog.append("Following trajectory " + name)
+        ).andThen(() -> trajectoryLog.append("Trajectory " + name +  " Ended"));
     }
 }

@@ -6,9 +6,6 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-
-import edu.wpi.first.math.controller.PIDController;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -33,11 +30,6 @@ public class AutonSubsytem extends SubsystemBase{
     public static final class AutonConstants {
         public static final double kMaxSpeed = SwerveConstants.kPhysicalMaxSpeed / 4; //Maximum speed allowed in auton, in meters per second
         public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
-
-        public static final double kXTranslationP = 1.5;
-        public static final double kYTranslationP = 1.5;
-        public static final double kRotationP = 0.015;
-        public static final double kRotationD = 0.0005;
     }
 
     private enum AutonModes{
@@ -52,14 +44,9 @@ public class AutonSubsytem extends SubsystemBase{
     private SendableChooser<AutonModes> modeChooser = new SendableChooser<>();
 
     private DataLog datalog = DataLogManager.getLog();
-    private StringLogEntry trajectoryLog = new StringLogEntry(datalog, "/auton/trajectory"); //Logs x translation state output
     private StringLogEntry commandLog = new StringLogEntry(datalog, "/auton/command"); //Logs x translation state output
 
     private SwerveSubsystem swerveSubsystem;
-
-    private PIDController xController;
-    private PIDController yController;
-    private PIDController rotationController;
 
     private PathConstraints pathConstraints;
 
@@ -74,12 +61,6 @@ public class AutonSubsytem extends SubsystemBase{
         }
         modeChooser.setDefaultOption(kDefaultAutonMode.toString(), kDefaultAutonMode);
         configTab.add("Auton mode", modeChooser);
-
-        //Define PID controllers for tracking trajectory
-        xController = new PIDController(AutonConstants.kXTranslationP, 0, 0);
-        yController = new PIDController(AutonConstants.kYTranslationP, 0, 0);
-        rotationController = new PIDController(AutonConstants.kRotationP, 0, 0);
-        rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
         pathConstraints = new PathConstraints(AutonConstants.kMaxSpeed, AutonConstants.kMaxAcceleration);
     }
@@ -99,28 +80,6 @@ public class AutonSubsytem extends SubsystemBase{
             secondPoint,
             points
         );
-    }
-
-    private Command followTrajectory(String name) throws NullPointerException{
-        //For use with trajectories generated from pathplanner
-        PathPlannerTrajectory trajectory = getTrajectory(name);
-        if(Objects.isNull(trajectory)){throw new NullPointerException();}
-        return followTrajectory(name, trajectory);
-    }
-
-    private Command followTrajectory(String name, PathPlannerTrajectory trajectory){
-        //For use with trajectories generated from a list of poses
-        return new PPSwerveControllerCommand(
-            trajectory,
-            swerveSubsystem::getPose, 
-            SwerveConstants.kDriveKinematics, 
-            xController, 
-            yController, 
-            rotationController, 
-            swerveSubsystem::setModuleStates, 
-            swerveSubsystem
-        ).beforeStarting(() -> trajectoryLog.append("Following trajectory " + name)
-        ).andThen(() -> trajectoryLog.append("Trajectory " + name +  " Ended"));
     }
 
     private Command resetOdometry(String initialTrajectory) throws NullPointerException{
@@ -143,20 +102,20 @@ public class AutonSubsytem extends SubsystemBase{
                return 
                     new SequentialCommandGroup(
                         resetOdometry("Forward"),
-                        followTrajectory("Forward")
+                        swerveSubsystem.followTrajectory("Forward", getTrajectory("Forward"))
                     );
             case BACKWARD:
                 return
                     new SequentialCommandGroup(
                         resetOdometry("Backward"),
                         delay(3),
-                        followTrajectory("Backward")
+                        swerveSubsystem.followTrajectory("Backward", getTrajectory("Backward"))
                     );
             case FORWARD180:
                 return
                     new SequentialCommandGroup(
                         resetOdometry("Forward180"),
-                        followTrajectory("Forward180")
+                        swerveSubsystem.followTrajectory("Forward180", getTrajectory("Forward180"))
                     );
             default:
                 return null;
@@ -170,7 +129,7 @@ public class AutonSubsytem extends SubsystemBase{
     private Command getBackupSequence(){
         //Backup sequence in case a trajectory fails to load
         return new SequentialCommandGroup(
-            followTrajectory(
+            swerveSubsystem.followTrajectory(
                 "Up",
                 generateTrajectory(
                     constructPoint(0, 0, 0, 90),
