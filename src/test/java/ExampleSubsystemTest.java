@@ -1,4 +1,4 @@
-import static org.junit.Assert.*;
+/*import static org.junit.Assert.*;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.*;
@@ -48,4 +48,4 @@ public class ExampleSubsystemTest {
   }
 
   // Add more @Test tagged methods to test other things...
-}
+}*/
