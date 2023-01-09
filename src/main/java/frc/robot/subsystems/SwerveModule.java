@@ -109,12 +109,16 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(driveEncoder.getPosition(), Rotation2d.fromRadians(getTurningPosition()));
+        return new SwerveModulePosition(getDrivePosition(), Rotation2d.fromRadians(getTurningPosition()));
+    }
+
+    public double getDrivePosition() {
+        return Robot.isSimulation() ? simDriveEncoder.getPosition() : driveEncoder.getPosition();
     }
 
     public double getTurningPosition() {
         //The math for this remainder is position - (2pi * Math.round(position/2pi))
-        return Math.IEEEremainder(turningEncoder.getPosition(), Math.PI * 2);
+        return Robot.isSimulation() ? Math.IEEEremainder(simTurningEncoder.getPosition(), Math.PI * 2) : Math.IEEEremainder(turningEncoder.getPosition(), Math.PI * 2);
     }
 
     public double getAbsoluteTurningPosition(){
@@ -125,7 +129,6 @@ public class SwerveModule extends SubsystemBase {
         return Robot.isSimulation() ? simDriveEncoder.getVelocity() : driveEncoder.getVelocity();
     }
     
-
     public double getTurningVelocity() {
         return Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
     }
