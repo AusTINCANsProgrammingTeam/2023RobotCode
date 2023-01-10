@@ -28,6 +28,7 @@ import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxPIDControllerSim;
 import com.revrobotics.CANSparkMax.ControlType;
 
 public class SwerveModule extends SubsystemBase {
@@ -93,10 +94,17 @@ public class SwerveModule extends SubsystemBase {
             kTurningMotorGearRatio
         );
 
+
         simDriveEncoder = new RelativeEncoderSim(driveMotor);
         simTurningEncoder = new RelativeEncoderSim(turningMotor);
         
-        turningPIDController = turningMotor.getPIDController();
+        if (Robot.isReal()) {
+            turningPIDController = turningMotor.getPIDController();
+        } else {
+            turningPIDController = new SparkMaxPIDControllerSim(turningMotor, simTurningEncoder);
+
+        }
+
         turningPIDController.setP(kPTurning);
 
         resetEncoders();
@@ -167,6 +175,9 @@ public class SwerveModule extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
+
+        turningPIDController.getP();
+
         simDriveMotor.setInputVoltage(driveMotor.get() * RobotController.getBatteryVoltage());
         simTurningMotor.setInputVoltage(turningMotor.get()  * RobotController.getBatteryVoltage());
 
