@@ -12,17 +12,17 @@ public class OI {
     public static final class Driver{
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
 
-        private static final int kOrientationButtonID = 1; //Toggle swerve orientation
-        private static final int kZeroButtonID = 2; //Zero the gyroscope
+        private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
+        private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
 
         //TODO: Tune curves to driver preference
-        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.5,0,0,0.1);
-        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.5,0,0,0.1);
-        private static final ControlCurve kRotationCurve = new ControlCurve(1,0,0,0.1);
+        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
+        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
+        private static final ControlCurve kRotationCurve = new ControlCurve(1,0,1,0.1);
 
         public static Supplier<Double> getXTranslationSupplier(){
             //This axis is inverted
@@ -35,7 +35,8 @@ public class OI {
         }
 
         public static Supplier<Double> getRotationSupplier(){
-            return () -> kRotationCurve.calculate(kJoystick.getRawAxis(kRotationAxis));
+            //This axis is inverted
+            return () -> kRotationCurve.calculate(-kJoystick.getRawAxis(kRotationAxis));
         }
 
         public static JoystickButton getOrientationButton(){
@@ -65,7 +66,8 @@ public class OI {
         }
 
         public double calculate(double input){
-            /* Two equations, separated by a ternary
+            /* https://www.desmos.com/calculator/w6ovblmmqj
+            Two equations, separated by a ternary
             The first is the deadzone
             y = 0 {|x| < d}
             The second is the curve

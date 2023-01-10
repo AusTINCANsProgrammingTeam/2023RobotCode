@@ -3,19 +3,23 @@ package frc.robot.hardware;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import frc.robot.Constants.MotorDefaults;
-
 public class MotorController {
+    public static final class MotorDefaults{
+        //Constants to use as default values for Motor Controllers
+        public static final int kCurrentLimit = 40;
+        public static final double kOpenLoopRampRate = 0.2;
+    }
+
     public static enum MotorConfig {
         //Swerve Modules
-        FrontLeftModuleDrive(1, 50),
-        FrontLeftModuleTurn(2),
-        FrontRightModuleDrive(3, 50),
-        FrontRightModuleTurn(4),
-        BackLeftModuleDrive(5, 50),
-        BackLeftModuleTurn(6),
-        BackRightModuleDrive(7, 50),
-        BackRightModuleTurn(8);
+        FrontLeftModuleDrive(4, 50),
+        FrontLeftModuleTurn(3, true),
+        FrontRightModuleDrive(2, 50),
+        FrontRightModuleTurn(1, true),
+        BackLeftModuleDrive(7, 50),
+        BackLeftModuleTurn(8, true),
+        BackRightModuleDrive(6, 50),
+        BackRightModuleTurn(5, true);
 
         private int ID;
         private int currentLimit;
@@ -68,9 +72,10 @@ public class MotorController {
 
     public static CANSparkMax constructMotor(MotorConfig config){
         CANSparkMax motor = new CANSparkMax(config.getID(), MotorType.kBrushless);
+        motor.restoreFactoryDefaults();
         motor.setSmartCurrentLimit(config.getCurrentLimit());
-        motor.setOpenLoopRampRate(motor.getOpenLoopRampRate());
-        motor.setInverted(motor.getInverted());
+        motor.setOpenLoopRampRate(config.getOpenLoopRampRate());
+        motor.setInverted(config.getReversed());
         return motor;
     }
 }

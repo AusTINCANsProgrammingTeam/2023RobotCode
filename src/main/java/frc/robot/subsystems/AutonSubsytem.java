@@ -13,7 +13,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -26,11 +26,16 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.AutonConstants;
-import frc.robot.Constants.DriveConstants;
 
 
 public class AutonSubsytem extends SubsystemBase{
+    public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed / 4; //Maximum speed allowed in auton, in meters per second
+    public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
+
+    public static final double kXTranslationP = 1.5;
+    public static final double kYTranslationP = 1.5;
+    public static final double kRotationP = 3;
+
     private enum AutonModes{
         FORWARD, // Go forward 2 meters
         BACKWARD, // Wait 3 seconds, go backward 2 meters
@@ -39,7 +44,7 @@ public class AutonSubsytem extends SubsystemBase{
     private final AutonModes kDefaultAutonMode = AutonModes.FORWARD;
 
     private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
-    private NetworkTableEntry delayEntry = configTab.add("Auton Delay", 0.0).getEntry();
+    private GenericEntry delayEntry = configTab.add("Auton Delay", 0.0).getEntry();
     private SendableChooser<AutonModes> modeChooser = new SendableChooser<>();
 
     private DataLog datalog = DataLogManager.getLog();
@@ -67,12 +72,12 @@ public class AutonSubsytem extends SubsystemBase{
         configTab.add("Auton mode", modeChooser);
 
         //Define PID controllers for tracking trajectory
-        xController = new PIDController(AutonConstants.kXTranslationP, 0, 0);
-        yController = new PIDController(AutonConstants.kYTranslationP, 0, 0);
-        rotationController = new PIDController(AutonConstants.kRotationP, 0, 0);
+        xController = new PIDController(kXTranslationP, 0, 0);
+        yController = new PIDController(kYTranslationP, 0, 0);
+        rotationController = new PIDController(kRotationP, 0, 0);
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
-        pathConstraints = new PathConstraints(AutonConstants.kMaxSpeed, AutonConstants.kMaxAcceleration);
+        pathConstraints = new PathConstraints(kMaxSpeed, kMaxAcceleration);
     }
 
     private PathPlannerTrajectory getTrajectory(String name) throws NullPointerException{
@@ -104,7 +109,7 @@ public class AutonSubsytem extends SubsystemBase{
         return new PPSwerveControllerCommand(
             trajectory,
             swerveSubsystem::getPose, 
-            DriveConstants.kDriveKinematics, 
+            SwerveSubsystem.kDriveKinematics, 
             xController, 
             yController, 
             rotationController, 
