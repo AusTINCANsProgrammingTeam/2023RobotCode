@@ -6,11 +6,10 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -23,14 +22,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.subsystems.SwerveSubsystem.SwerveConstants;
 
 
 public class AutonSubsytem extends SubsystemBase{
-    public static final class AutonConstants {
-        public static final double kMaxSpeed = SwerveConstants.kPhysicalMaxSpeed / 4; //Maximum speed allowed in auton, in meters per second
-        public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
-    }
+    public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed / 4; //Maximum speed allowed in auton, in meters per second
+    public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
 
     private enum AutonModes{
         FORWARD, // Go forward 2 meters
@@ -40,7 +36,7 @@ public class AutonSubsytem extends SubsystemBase{
     private final AutonModes kDefaultAutonMode = AutonModes.FORWARD;
 
     private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
-    private NetworkTableEntry delayEntry = configTab.add("Auton Delay", 0.0).getEntry();
+    private GenericEntry delayEntry = configTab.add("Auton Delay", 0.0).getEntry();
     private SendableChooser<AutonModes> modeChooser = new SendableChooser<>();
 
     private DataLog datalog = DataLogManager.getLog();
@@ -62,7 +58,7 @@ public class AutonSubsytem extends SubsystemBase{
         modeChooser.setDefaultOption(kDefaultAutonMode.toString(), kDefaultAutonMode);
         configTab.add("Auton mode", modeChooser);
 
-        pathConstraints = new PathConstraints(AutonConstants.kMaxSpeed, AutonConstants.kMaxAcceleration);
+        pathConstraints = new PathConstraints(kMaxSpeed, kMaxAcceleration);
     }
 
     private PathPlannerTrajectory getTrajectory(String name) throws NullPointerException{

@@ -1,11 +1,12 @@
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*; 
+
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.*;
 
 import java.util.Random;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 import frc.robot.subsystems.ExampleSubsystem;
 
@@ -22,14 +23,14 @@ public class ExampleSubsystemTest {
 
   private PWMSim simMotor;
 
-  @Before // this method will run before each test
+  @BeforeEach // this method will run before each test
   public void setup() {
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
     dut = new ExampleSubsystem();
     simMotor = new PWMSim(0); // create our simulation PWM motor controller as an example
   }
 
-  @After // this method will run after each test
+  @AfterEach // this method will run after each test
   public void shutdown() throws Exception {
     dut.close(); // destroy our subsystem object so we do each test from a clean slate
     simMotor.resetData();

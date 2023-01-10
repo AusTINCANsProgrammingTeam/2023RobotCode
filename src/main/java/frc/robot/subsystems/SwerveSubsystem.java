@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
@@ -31,23 +32,21 @@ import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
 public class SwerveSubsystem extends SubsystemBase{
-    public static final class SwerveConstants{
-        public static final double kPhysicalMaxSpeed = Units.feetToMeters(14.5);; //Max drivebase speed in meters per second
-        public static final double kPhysicalMaxAngularSpeed = 2 * Math.PI; //Max drivebase angular speed in radians per second
+    public static final double kPhysicalMaxSpeed = Units.feetToMeters(14.5);; //Max drivebase speed in meters per second
+    public static final double kPhysicalMaxAngularSpeed = 2 * Math.PI; //Max drivebase angular speed in radians per second
 
-        public static final double kTrackWidth = Units.inchesToMeters(18.75); //Distance between right and left wheels
-        public static final double kWheelBase = Units.inchesToMeters(18.75); //Distance between front and back wheels
-        public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics( //Creates robot geometry using the locations of the 4 wheels
-            new Translation2d(kWheelBase / 2, kTrackWidth / 2), 
-            new Translation2d(kWheelBase / 2, -kTrackWidth /2),
-            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
-    
-        public static final double kXTranslationP = 1.5;
-        public static final double kYTranslationP = 1.5;
-        public static final double kRotationP = 0.015;
-        public static final double kRotationD = 0.0005;
-    }
+    public static final double kTrackWidth = Units.inchesToMeters(18.75); //Distance between right and left wheels
+    public static final double kWheelBase = Units.inchesToMeters(18.75); //Distance between front and back wheels
+    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics( //Creates robot geometry using the locations of the 4 wheels
+        new Translation2d(kWheelBase / 2, kTrackWidth / 2), 
+        new Translation2d(kWheelBase / 2, -kTrackWidth /2),
+        new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+        new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+        
+    public static final double kXTranslationP = 1.5;
+    public static final double kYTranslationP = 1.5;
+    public static final double kRotationP = 0.015;
+    public static final double kRotationD = 0.0005;    
 
     private final SwerveModule frontLeft = new SwerveModule(
         MotorConfig.FrontLeftModuleDrive,
@@ -74,7 +73,7 @@ public class SwerveSubsystem extends SubsystemBase{
         "BR");
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
-    private SwerveDriveOdometry odometer = new SwerveDriveOdometry(SwerveConstants.kDriveKinematics, new Rotation2d(0));
+    private SwerveDriveOdometry odometer = new SwerveDriveOdometry(kDriveKinematics, getRotation2d(), getModulePositions());
 
     private DataLog datalog = DataLogManager.getLog();
     private DoubleLogEntry translationXOutputLog = new DoubleLogEntry(datalog, "/swerve/txout"); //Logs x translation state output
@@ -97,9 +96,9 @@ public class SwerveSubsystem extends SubsystemBase{
         controlOrientationIsFOD = true;
 
         //Define PID controllers for tracking trajectory
-        xController = new PIDController(SwerveConstants.kXTranslationP, 0, 0);
-        yController = new PIDController(SwerveConstants.kYTranslationP, 0, 0);
-        rotationController = new PIDController(SwerveConstants.kRotationP, 0, SwerveConstants.kRotationD);
+        xController = new PIDController(kXTranslationP, 0, 0);
+        yController = new PIDController(kYTranslationP, 0, 0);
+        rotationController = new PIDController(kRotationP, 0, kRotationD);
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
         if(Robot.isCharacterizationMode){
@@ -108,11 +107,11 @@ public class SwerveSubsystem extends SubsystemBase{
     }
 
     public void zeroHeading() {
+        if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");} 
         gyro.reset();
     }
 
     public double getHeading() {
-        if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");} 
         return gyro.getYaw();
     }
 
@@ -125,7 +124,7 @@ public class SwerveSubsystem extends SubsystemBase{
     }
 
     public void resetOdometry(Pose2d pose) {
-        odometer.resetPosition(pose, getRotation2d());
+        odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
     }
 
     public void toggleOrientation(){
@@ -158,9 +157,9 @@ public class SwerveSubsystem extends SubsystemBase{
         }
 
         //Map to speeds in meters/radians per second
-        x *= SwerveConstants.kPhysicalMaxSpeed;
-        y *= SwerveConstants.kPhysicalMaxSpeed;
-        r *= SwerveConstants.kPhysicalMaxAngularSpeed;
+        x *= kPhysicalMaxSpeed;
+        y *= kPhysicalMaxSpeed;
+        r *= kPhysicalMaxAngularSpeed;
 
         //Log speeds used to construct chassis speeds
         translationXOutputLog.append(x);
@@ -171,18 +170,18 @@ public class SwerveSubsystem extends SubsystemBase{
         ChassisSpeeds chassisSpeeds;
         if(controlOrientationIsFOD){
             //Field Oriented Drive
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, r, this.getRotation2d().plus(new Rotation2d(r * Robot.kDefaultPeriod / 2)));
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, r, this.getRotation2d());
         } else {
             //Robot Oriented Drive
             chassisSpeeds = new ChassisSpeeds(x, y, r);
         }
         SmartDashboard.putString("chassis speeds",chassisSpeeds.toString());
         //Convert Chassis Speeds to individual module states
-        return SwerveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);  
+        return kDriveKinematics.toSwerveModuleStates(chassisSpeeds);  
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SwerveConstants.kPhysicalMaxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, kPhysicalMaxSpeed);
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
         backLeft.setDesiredState(desiredStates[2]);
@@ -198,6 +197,16 @@ public class SwerveSubsystem extends SubsystemBase{
 
         return swerveModuleArray;
     }
+
+    public SwerveModulePosition[] getModulePositions() {
+        SwerveModulePosition[] swerveModuleArray = new SwerveModulePosition[4];
+        swerveModuleArray[0] = frontLeft.getPosition();
+        swerveModuleArray[1] = frontRight.getPosition();
+        swerveModuleArray[2] = backLeft.getPosition();
+        swerveModuleArray[3] = backRight.getPosition();
+
+        return swerveModuleArray;
+    }  
 
     public void stopModules(){
         frontLeft.stop();
@@ -216,7 +225,7 @@ public class SwerveSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        odometer.update(getRotation2d(), getModuleStates());
+        odometer.update(getRotation2d(), getModulePositions());
         SmartDashboard.putNumber("Robot Heading", getHeading());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
     }
@@ -226,7 +235,7 @@ public class SwerveSubsystem extends SubsystemBase{
         return new PPSwerveControllerCommand(
             trajectory,
             this::getPose, 
-            SwerveConstants.kDriveKinematics, 
+            SwerveSubsystem.kDriveKinematics, 
             xController, 
             yController, 
             rotationController, 
