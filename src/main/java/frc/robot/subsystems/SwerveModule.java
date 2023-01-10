@@ -102,6 +102,7 @@ public class SwerveModule extends SubsystemBase {
         turningPIDController = turningMotor.getPIDController();
         turningPIDController.setP(kPTurning);
         simTurningPIDController = new PIDController(turningPIDController.getP(), turningPIDController.getI(), turningPIDController.getD());
+        simTurningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();
 
