@@ -2,14 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-//Spoofing the package so that the SparkMaxPIDController constructor is visible
-// to make inheritance possible
-package com.revrobotics;
+package frc.robot.classes;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.classes.RelativeEncoderSim;
 
 /** Add your docs here. */
 public class SparkMaxPIDControllerSim extends SubsystemBase {
@@ -18,8 +19,8 @@ public class SparkMaxPIDControllerSim extends SubsystemBase {
     double setPoint = 0;
 
     double error, lastError, sumError = 0;
-    CANSparkMax max;
-    SparkMaxPIDController ctrl;
+    CANSparkMax motorCtrl;
+    SparkMaxPIDController pidCtrl;
 
     /**
      * Constructs a SparkMaxPIDControllerSim from a CANSparkMax object
@@ -28,13 +29,13 @@ public class SparkMaxPIDControllerSim extends SubsystemBase {
      * @return Current relative position of the motor in Rotations 
     */
     public SparkMaxPIDControllerSim(CANSparkMax spark, RelativeEncoderSim encoder) {
-        ctrl = spark.getPIDController();
+        pidCtrl = spark.getPIDController();
         pos = encoder;
-        max = spark;
+        motorCtrl = spark;
     }
 
     /**
-     * Sets the set point for the PID loop target.
+     * Sets the setpoint for the PID loop target.
      * Only supports position ControlType.
      *
      * @return kNotImplemented if ControlType is not kPosition, kOK otherwise
@@ -58,7 +59,7 @@ public class SparkMaxPIDControllerSim extends SubsystemBase {
         sumError += error;
 
         // Calculate next motor setting
-        max.set(ctrl.getFF() + ctrl.getP()*error + ctrl.getI()*sumError + ctrl.getD()*(error - lastError));
+        motorCtrl.set(pidCtrl.getFF() + pidCtrl.getP()*error + pidCtrl.getI()*sumError + pidCtrl.getD()*(error - lastError));
 
     }
 }
