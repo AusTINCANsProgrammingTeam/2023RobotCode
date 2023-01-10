@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -19,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.classes.RelativeEncoderSim;
-import frc.robot.classes.SparkMaxPIDControllerSim;
 import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
@@ -54,7 +54,7 @@ public class SwerveModule extends SubsystemBase {
     private final RelativeEncoderSim simTurningEncoder;
 
     private final SparkMaxPIDController turningPIDController;
-    private final SparkMaxPIDControllerSim simTurningPIDController;
+    private final PIDController simTurningPIDController;
 
     private final WPI_CANCoder absoluteEncoder;
 
@@ -101,7 +101,7 @@ public class SwerveModule extends SubsystemBase {
         
         turningPIDController = turningMotor.getPIDController();
         turningPIDController.setP(kPTurning);
-        simTurningPIDController = new SparkMaxPIDControllerSim(turningMotor, simTurningEncoder);
+        simTurningPIDController = new PIDController(turningPIDController.getP(), turningPIDController.getI(), turningPIDController.getD());
 
         resetEncoders();
 
@@ -160,7 +160,7 @@ public class SwerveModule extends SubsystemBase {
         double setpoint = calculateSetpoint(desiredState.angle.getRadians());
         turningPIDController.setReference(setpoint, ControlType.kPosition);
         if (Robot.isSimulation()) {
-            simTurningPIDController.setReference(setpoint, ControlType.kPosition);
+            turningMotor.set(simTurningPIDController.calculate(getTurningPosition(), setpoint));
         }
 
         SmartDashboard.putString("Swerve[" + ID + "] state", desiredState.toString());
