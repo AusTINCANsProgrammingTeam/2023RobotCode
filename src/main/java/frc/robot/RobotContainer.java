@@ -13,6 +13,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -54,8 +55,8 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    OI.Driver.getOrientationButton().whenPressed(() -> swerveSubsystem.toggleOrientation());
-    OI.Driver.getZeroButton().whenPressed(() -> swerveSubsystem.zeroHeading());
+    OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
+    OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
   }
 
   /**

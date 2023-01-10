@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -107,13 +108,17 @@ public class SwerveModule extends SubsystemBase {
         actualRelativeAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualRelAngle"); //Logs actual relative angle in radians
     }
 
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(getDrivePosition(), Rotation2d.fromRadians(getTurningPosition()));
+    }
+
     public double getDrivePosition() {
-        return driveEncoder.getPosition();
+        return Robot.isSimulation() ? simDriveEncoder.getPosition() : driveEncoder.getPosition();
     }
 
     public double getTurningPosition() {
         //The math for this remainder is position - (2pi * Math.round(position/2pi))
-        return Math.IEEEremainder(turningEncoder.getPosition(), Math.PI * 2);
+        return Robot.isSimulation() ? Math.IEEEremainder(simTurningEncoder.getPosition(), Math.PI * 2) : Math.IEEEremainder(turningEncoder.getPosition(), Math.PI * 2);
     }
 
     public double getAbsoluteTurningPosition(){
@@ -124,7 +129,6 @@ public class SwerveModule extends SubsystemBase {
         return Robot.isSimulation() ? simDriveEncoder.getVelocity() : driveEncoder.getVelocity();
     }
     
-
     public double getTurningVelocity() {
         return Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
     }

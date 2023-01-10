@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
@@ -62,7 +63,7 @@ public class SwerveSubsystem extends SubsystemBase{
         "BR");
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
-    private SwerveDriveOdometry odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0));
+    private SwerveDriveOdometry odometer = new SwerveDriveOdometry(kDriveKinematics, getRotation2d(), getModulePositions());
 
     private DataLog datalog = DataLogManager.getLog();
     private DoubleLogEntry translationXOutputLog = new DoubleLogEntry(datalog, "/swerve/txout"); //Logs x translation state output
@@ -96,7 +97,7 @@ public class SwerveSubsystem extends SubsystemBase{
     }
 
     public void resetOdometry(Pose2d pose) {
-        odometer.resetPosition(pose, getRotation2d());
+        odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
     }
 
     public void toggleOrientation(){
@@ -154,6 +155,16 @@ public class SwerveSubsystem extends SubsystemBase{
         return swerveModuleArray;
     }
 
+    public SwerveModulePosition[] getModulePositions() {
+        SwerveModulePosition[] swerveModuleArray = new SwerveModulePosition[4];
+        swerveModuleArray[0] = frontLeft.getPosition();
+        swerveModuleArray[1] = frontRight.getPosition();
+        swerveModuleArray[2] = backLeft.getPosition();
+        swerveModuleArray[3] = backRight.getPosition();
+
+        return swerveModuleArray;
+    }  
+
     public void stopModules(){
         frontLeft.stop();
         frontRight.stop();
@@ -163,7 +174,7 @@ public class SwerveSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        odometer.update(getRotation2d(), getModuleStates());
+        odometer.update(getRotation2d(), getModulePositions());
         SmartDashboard.putNumber("Robot Heading", getHeading());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
     }

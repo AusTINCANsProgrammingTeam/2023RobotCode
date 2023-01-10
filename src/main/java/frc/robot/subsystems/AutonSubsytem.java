@@ -13,7 +13,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -44,7 +44,7 @@ public class AutonSubsytem extends SubsystemBase{
     private final AutonModes kDefaultAutonMode = AutonModes.FORWARD;
 
     private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
-    private NetworkTableEntry delayEntry = configTab.add("Auton Delay", 0.0).getEntry();
+    private GenericEntry delayEntry = configTab.add("Auton Delay", 0.0).getEntry();
     private SendableChooser<AutonModes> modeChooser = new SendableChooser<>();
 
     private DataLog datalog = DataLogManager.getLog();
