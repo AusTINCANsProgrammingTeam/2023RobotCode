@@ -6,12 +6,8 @@
 // to make inheritance possible
 package com.revrobotics;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
-
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.classes.RelativeEncoderSim;
 
 /** Add your docs here. */
@@ -24,17 +20,37 @@ public class SparkMaxPIDControllerSim extends SparkMaxPIDController {
     double error, lastError, sumError = 0;
     CANSparkMax max;
 
+    /**
+     * Constructs a SparkMaxPIDControllerSim from a CANSparkMax object
+     * and the RelativeEncoderSim that tracks the motor's position in simulation
+     *
+     * @return Current relative position of the motor in Rotations 
+    */
     public SparkMaxPIDControllerSim(CANSparkMax spark, RelativeEncoderSim encoder) {
         super(spark);
         pos = encoder;
         max = spark;
     }
 
+    /**
+     * Sets the proportional term in PID 
+     * for the simulation
+     *
+     * @return kOK
+    */
+    @Override
     public REVLibError setP(double gain) {
         p = gain;
         return REVLibError.kOk;
     }
 
+    /**
+     * Sets the set point for the PID loop target.
+     * Only supports position ControlType.
+     *
+     * @return kNotImplemented if ControlType is not kPosition, kOK otherwise
+    */
+    @Override
     public REVLibError setReference(double value, ControlType ctrl) {
         if (ctrl != ControlType.kPosition) {
             DriverStation.reportError("SparkMaxPIDControllerSim ControlType not supported", true);
@@ -46,12 +62,22 @@ public class SparkMaxPIDControllerSim extends SparkMaxPIDController {
     }
 
 
-    // Actually runs the PIDF and updates the motor. Needed innocuous method to override for simulation to work with inheritance
+    /**
+     * Hijacked getP method to run the next iteration of the PID loop.
+     * Needed an innocuous method that already existed in the parent class.
+     *
+     * @return proportional coefficent of PID
+    */
+    @Override
     public double getP() {
+        // Update error values
         lastError = error;
         error = setPoint - pos.getPosition();
         sumError += error;
+
+        // Calculate next motor setting
         max.set(ff + p*error + i*sumError + d*(error - lastError));
+
         return p;
 
 
