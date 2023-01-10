@@ -95,7 +95,6 @@ public class SwerveModule extends SubsystemBase {
             kTurningMotorGearRatio
         );
 
-
         simDriveEncoder = new RelativeEncoderSim(driveMotor);
         simTurningEncoder = new RelativeEncoderSim(turningMotor);
         
