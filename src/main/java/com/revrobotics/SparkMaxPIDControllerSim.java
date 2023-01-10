@@ -8,17 +8,18 @@ package com.revrobotics;
 
 import com.revrobotics.CANSparkMax.ControlType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.classes.RelativeEncoderSim;
 
 /** Add your docs here. */
-public class SparkMaxPIDControllerSim extends SparkMaxPIDController {
+public class SparkMaxPIDControllerSim extends SubsystemBase {
 
-    double p,i,d,ff = 0;
     RelativeEncoderSim pos;
     double setPoint = 0;
 
     double error, lastError, sumError = 0;
     CANSparkMax max;
+    SparkMaxPIDController ctrl;
 
     /**
      * Constructs a SparkMaxPIDControllerSim from a CANSparkMax object
@@ -27,21 +28,9 @@ public class SparkMaxPIDControllerSim extends SparkMaxPIDController {
      * @return Current relative position of the motor in Rotations 
     */
     public SparkMaxPIDControllerSim(CANSparkMax spark, RelativeEncoderSim encoder) {
-        super(spark);
+        ctrl = spark.getPIDController();
         pos = encoder;
         max = spark;
-    }
-
-    /**
-     * Sets the proportional term in PID 
-     * for the simulation
-     *
-     * @return kOK
-    */
-    @Override
-    public REVLibError setP(double gain) {
-        p = gain;
-        return REVLibError.kOk;
     }
 
     /**
@@ -50,7 +39,6 @@ public class SparkMaxPIDControllerSim extends SparkMaxPIDController {
      *
      * @return kNotImplemented if ControlType is not kPosition, kOK otherwise
     */
-    @Override
     public REVLibError setReference(double value, ControlType ctrl) {
         if (ctrl != ControlType.kPosition) {
             DriverStation.reportError("SparkMaxPIDControllerSim ControlType not supported", true);
@@ -62,24 +50,15 @@ public class SparkMaxPIDControllerSim extends SparkMaxPIDController {
     }
 
 
-    /**
-     * Hijacked getP method to run the next iteration of the PID loop.
-     * Needed an innocuous method that already existed in the parent class.
-     *
-     * @return proportional coefficent of PID
-    */
     @Override
-    public double getP() {
+    public void simulationPeriodic() {
         // Update error values
         lastError = error;
         error = setPoint - pos.getPosition();
         sumError += error;
 
         // Calculate next motor setting
-        max.set(ff + p*error + i*sumError + d*(error - lastError));
-
-        return p;
-
+        max.set(ctrl.getFF() + ctrl.getP()*error + ctrl.getI()*sumError + ctrl.getD()*(error - lastError));
 
     }
 }

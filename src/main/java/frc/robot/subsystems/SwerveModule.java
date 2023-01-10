@@ -54,6 +54,7 @@ public class SwerveModule extends SubsystemBase {
     private final RelativeEncoderSim simTurningEncoder;
 
     private final SparkMaxPIDController turningPIDController;
+    private final SparkMaxPIDControllerSim simTurningPIDController;
 
     private final WPI_CANCoder absoluteEncoder;
 
@@ -98,14 +99,9 @@ public class SwerveModule extends SubsystemBase {
         simDriveEncoder = new RelativeEncoderSim(driveMotor);
         simTurningEncoder = new RelativeEncoderSim(turningMotor);
         
-        if (Robot.isReal()) {
-            turningPIDController = turningMotor.getPIDController();
-        } else {
-            turningPIDController = new SparkMaxPIDControllerSim(turningMotor, simTurningEncoder);
-
-        }
-
+        turningPIDController = turningMotor.getPIDController();
         turningPIDController.setP(kPTurning);
+        simTurningPIDController = new SparkMaxPIDControllerSim(turningMotor, simTurningEncoder);
 
         resetEncoders();
 
@@ -161,7 +157,11 @@ public class SwerveModule extends SubsystemBase {
         }
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
         driveMotor.set(desiredState.speedMetersPerSecond / SwerveSubsystem.kPhysicalMaxSpeed);
-        turningPIDController.setReference(calculateSetpoint(desiredState.angle.getRadians()), ControlType.kPosition);
+        double setpoint = calculateSetpoint(desiredState.angle.getRadians());
+        turningPIDController.setReference(setpoint, ControlType.kPosition);
+        if (Robot.isSimulation()) {
+            simTurningPIDController.setReference(setpoint, ControlType.kPosition);
+        }
 
         SmartDashboard.putString("Swerve[" + ID + "] state", desiredState.toString());
         desiredAngleLog.append(desiredState.angle.getRadians());
