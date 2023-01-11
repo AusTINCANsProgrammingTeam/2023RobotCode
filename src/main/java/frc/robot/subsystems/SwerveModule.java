@@ -137,9 +137,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public double getDriveVelocity() {
-        double currentSpeed = Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
-        speedLog.append(currentSpeed);
-        return currentSpeed;
+        return Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
     }
     
     public double getTurningVelocity() {
