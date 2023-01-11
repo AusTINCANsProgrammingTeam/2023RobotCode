@@ -49,11 +49,11 @@ public class MotorController {
         }
 
         MotorConfig(int ID, int currentLimit, boolean reversed){
-            this(ID, MotorDefaults.kCurrentLimit, IdleMode.kCoast, MotorDefaults.kOpenLoopRampRate, reversed);
+            this(ID, currentLimit, IdleMode.kCoast, MotorDefaults.kOpenLoopRampRate, reversed);
         }
 
         MotorConfig(int ID, int currentLimit){
-            this(ID, MotorDefaults.kCurrentLimit, IdleMode.kCoast, MotorDefaults.kOpenLoopRampRate, false);
+            this(ID, currentLimit, IdleMode.kCoast, MotorDefaults.kOpenLoopRampRate, false);
         }
 
         MotorConfig(int ID, boolean reversed){
