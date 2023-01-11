@@ -137,30 +137,6 @@ public class SwerveSubsystem extends SubsystemBase{
         return kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
     }
 
-    private void normalizeDrive(SwerveModuleState[] desiredStates, ChassisSpeeds speeds){
-        //Find magnitude of translation input, map to a scale of 1 in order to be comparable to rotation
-        double translationalK = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) / kPhysicalMaxSpeed;
-        //Find magnitude of rotation input, map to a scale of 1 in order to be comparable to translation
-        double rotationalK = Math.abs(speeds.omegaRadiansPerSecond) / kPhysicalMaxAngularSpeed;
-        //Use the larger of the two magnitudes for scaling
-        double k = Math.max(translationalK, rotationalK);
-      
-        //Find the how fast the fastest spinning drive motor is spinning                                       
-        double realMaxSpeed = 0;
-        for (SwerveModuleState moduleState : desiredStates) {
-          realMaxSpeed = Math.max(realMaxSpeed, Math.abs(moduleState.speedMetersPerSecond));
-        }
-        
-        if(realMaxSpeed != 0){
-            //Map input magnitude back to speed in meters per second, divide by real speed to create scale
-            double scale = Math.min(k * kPhysicalMaxSpeed / realMaxSpeed, 1);
-            //Desaturate speeds using that scale
-            for (SwerveModuleState moduleState : desiredStates) {
-              moduleState.speedMetersPerSecond *= scale;
-            }
-        }
-    }
-
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, kPhysicalMaxSpeed);
         frontLeft.setDesiredState(desiredStates[0]);

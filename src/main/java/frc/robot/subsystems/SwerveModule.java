@@ -65,14 +65,9 @@ public class SwerveModule extends SubsystemBase {
     private DoubleLogEntry desiredAngleLog;
     private DoubleLogEntry actualAbsoluteAngleLog;
     private DoubleLogEntry actualRelativeAngleLog;
+    private DoubleLogEntry rotationSpeedLog;
 
     private final String ID;
-
-    private DataLog dataLog = DataLogManager.getLog();
-    private DoubleLogEntry speedLog;
-    private DoubleLogEntry rotationLog;
-    private DoubleLogEntry setSpeedLog;
-    private DoubleLogEntry setRotationLog;
 
     public SwerveModule(MotorConfig driveMotorConfig, MotorConfig turningMotorConfig, EncoderConfig absoluteEncoderConfig, String ID) {
 
@@ -142,7 +137,7 @@ public class SwerveModule extends SubsystemBase {
     
     public double getTurningVelocity() {
         double currentRotation = Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
-        rotationLog.append(currentRotation);
+        rotationSpeedLog.append(currentRotation);
         return currentRotation;
     }
 
