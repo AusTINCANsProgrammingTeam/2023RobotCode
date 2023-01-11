@@ -132,7 +132,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public double getDriveVelocity() {
-        return Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
+        return Robot.isSimulation() ? simDriveEncoder.getVelocity() : driveEncoder.getVelocity();
     }
     
     public double getTurningVelocity() {
