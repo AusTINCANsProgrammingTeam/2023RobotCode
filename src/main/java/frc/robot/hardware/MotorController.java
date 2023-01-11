@@ -1,6 +1,7 @@
 package frc.robot.hardware;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class MotorController {
@@ -76,6 +77,7 @@ public class MotorController {
         motor.setSmartCurrentLimit(config.getCurrentLimit());
         motor.setOpenLoopRampRate(config.getOpenLoopRampRate());
         motor.setInverted(config.getReversed());
+        motor.setIdleMode(IdleMode.kBrake);
         return motor;
     }
 }
