@@ -9,6 +9,8 @@
 	- TL:DR **develop** is our working base branch that feature branches will spawn off of and merge back to.  **Main** is our production branch, and release and hotfix branches are used as intermidiate branches to manage bug fixes before pushing to **main**.
 - [Git Extensions](https://gitextensions.github.io/) is our recommended Git client
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=develop&repo=528992013&machine=standardLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=EastUs)
+
 ##### Pull Requrest (PR) policies
 - Simulation of feature required before starting PR from feature branch to **develop**, 
 	- On-robot testing will be required before PR is completed if hardware is available to test on.
