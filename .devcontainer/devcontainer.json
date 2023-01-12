@@ -1,6 +1,6 @@
 {
 	"name": "Default Linux Universal",
-	"image": "mcr.microsoft.com/devcontainers/base:latest",
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
      // Configure tool-specific properties.
   "customizations": {
         // Configure properties specific to VS Code.
@@ -23,4 +23,5 @@
             ]
         }
   }
+  "postCreateCommand": "wget https://github.com/wpilibsuite/vscode-wpilib/releases/download/v2023.1.1/vscode-wpilib-2023.1.1.vsix && code --install-extension vscode-wpilib-2023.1.1.vsix && rm vscode-wpilib-2023.1.1.vsix"
 }
