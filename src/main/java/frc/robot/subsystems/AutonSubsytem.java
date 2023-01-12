@@ -31,7 +31,8 @@ public class AutonSubsytem extends SubsystemBase{
     private enum AutonModes{
         FORWARD, // Go forward 2 meters
         BACKWARD, // Wait 3 seconds, go backward 2 meters
-        FORWARD180; // Go forward 2 meters and rotate 180 degrees
+        FORWARD180, // Go forward 2 meters and rotate 180 degrees
+        CURVE; // Go forward 1 meter and left 1 meter
     }
     private final AutonModes kDefaultAutonMode = AutonModes.FORWARD;
 
@@ -112,6 +113,12 @@ public class AutonSubsytem extends SubsystemBase{
                     new SequentialCommandGroup(
                         resetOdometry("Forward180"),
                         swerveSubsystem.followTrajectory("Forward180", getTrajectory("Forward180"))
+                    );
+            case CURVE:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("Curve"),
+                        swerveSubsystem.followTrajectory("Curve", getTrajectory("Curve"))
                     );
             default:
                 return null;
