@@ -22,6 +22,6 @@
                 "wpilibsuite.vscode-wpilib"
             ]
         }
-  }
+  },
   "postCreateCommand": "wget https://github.com/wpilibsuite/vscode-wpilib/releases/download/v2023.1.1/vscode-wpilib-2023.1.1.vsix && code --install-extension vscode-wpilib-2023.1.1.vsix && rm vscode-wpilib-2023.1.1.vsix"
 }
