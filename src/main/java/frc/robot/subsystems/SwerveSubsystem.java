@@ -45,8 +45,7 @@ public class SwerveSubsystem extends SubsystemBase{
         
     public static final double kXTranslationP = 1.5;
     public static final double kYTranslationP = 1.5;
-    public static final double kRotationP = 0.015;
-    public static final double kRotationD = 0.0005;    
+    public static final double kRotationP = 0.85;
 
     private final SwerveModule frontLeft = new SwerveModule(
         MotorConfig.FrontLeftModuleDrive,
@@ -98,7 +97,7 @@ public class SwerveSubsystem extends SubsystemBase{
         //Define PID controllers for tracking trajectory
         xController = new PIDController(kXTranslationP, 0, 0);
         yController = new PIDController(kYTranslationP, 0, 0);
-        rotationController = new PIDController(kRotationP, 0, kRotationD);
+        rotationController = new PIDController(kRotationP, 0, 0);
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
         if(Robot.isCharacterizationMode){
