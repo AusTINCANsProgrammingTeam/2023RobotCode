@@ -1,6 +1,6 @@
 {
 	"name": "Default Linux Universal",
-	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+	"image": "mcr.microsoft.com/devcontainers/base:latest",
      // Configure tool-specific properties.
   "customizations": {
         // Configure properties specific to VS Code.
