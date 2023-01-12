@@ -134,7 +134,7 @@ public class SwerveSubsystem extends SubsystemBase{
         }
         SmartDashboard.putString("chassis speeds",chassisSpeeds.toString());
         //Convert Chassis Speeds to individual module states
-        return kDriveKinematics.toSwerveModuleStates(chassisSpeeds);  
+        return kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
