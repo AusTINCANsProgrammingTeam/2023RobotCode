@@ -30,8 +30,8 @@ public class AutonSubsytem extends SubsystemBase{
     public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
 
     private enum AutonModes{
-        FORWARD, // Go forward 2 meters
-        BACKWARD, // Wait 3 seconds, go backward 2 meters
+        FORWARD, // Go forward 1 meter
+        BACKWARD, // Wait 3 seconds, go backward 1 meter
         FORWARD180, // Go forward 2 meters and rotate 180 degrees
         CURVE; // Go forward 1 meter and left 1 meter
     }
