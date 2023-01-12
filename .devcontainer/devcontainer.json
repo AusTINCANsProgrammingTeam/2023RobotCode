@@ -22,7 +22,8 @@
                 "wpilibsuite.vscode-wpilib"
             ]
         }
-  },
-  "postCreateCommand": "wget https://github.com/wpilibsuite/vscode-wpilib/releases/download/v2023.1.1/vscode-wpilib-2023.1.1.vsix",
-  "postAttachCommand": "code --install-extension vscode-wpilib-2023.1.1.vsix"
+  }
+  // Latest WPILib extension can only be installed manually. Uncomment if you're desperate to get it before its on the vscode Marketplace.
+  //"postCreateCommand": "wget https://github.com/wpilibsuite/vscode-wpilib/releases/download/v2023.1.1/vscode-wpilib-2023.1.1.vsix",
+  //"postAttachCommand": "code --install-extension vscode-wpilib-2023.1.1.vsix"
 }
