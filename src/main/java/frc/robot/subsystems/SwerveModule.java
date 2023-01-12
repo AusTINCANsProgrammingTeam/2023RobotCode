@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -54,6 +55,8 @@ public class SwerveModule extends SubsystemBase {
     private final RelativeEncoderSim simTurningEncoder;
 
     private final SparkMaxPIDController turningPIDController;
+    private final PIDController simTurningPIDController;
+    private double turningSetpoint;
 
     private final WPI_CANCoder absoluteEncoder;
 
@@ -63,6 +66,7 @@ public class SwerveModule extends SubsystemBase {
     private DoubleLogEntry desiredAngleLog;
     private DoubleLogEntry actualAbsoluteAngleLog;
     private DoubleLogEntry actualRelativeAngleLog;
+    private DoubleLogEntry rotationSpeedLog;
 
     private final String ID;
 
@@ -99,6 +103,8 @@ public class SwerveModule extends SubsystemBase {
         
         turningPIDController = turningMotor.getPIDController();
         turningPIDController.setP(kPTurning);
+        simTurningPIDController = new PIDController(turningPIDController.getP(), turningPIDController.getI(), turningPIDController.getD());
+        simTurningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();
 
@@ -131,7 +137,9 @@ public class SwerveModule extends SubsystemBase {
     }
     
     public double getTurningVelocity() {
-        return Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
+        double currentRotation = Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
+        rotationSpeedLog.append(currentRotation);
+        return currentRotation;
     }
 
     public void resetEncoders() {
@@ -152,9 +160,11 @@ public class SwerveModule extends SubsystemBase {
             stop();
             return;
         }
+        
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
         driveMotor.set(desiredState.speedMetersPerSecond / SwerveSubsystem.kPhysicalMaxSpeed);
-        turningPIDController.setReference(calculateSetpoint(desiredState.angle.getRadians()), ControlType.kPosition);
+        turningSetpoint = calculateSetpoint(desiredState.angle.getRadians());
+        turningPIDController.setReference(turningSetpoint, ControlType.kPosition);
 
         SmartDashboard.putString("Swerve[" + ID + "] state", desiredState.toString());
         desiredAngleLog.append(desiredState.angle.getRadians());
@@ -185,6 +195,8 @@ public class SwerveModule extends SubsystemBase {
 
         simTurningEncoder.setPosition(simTurningEncoder.getPosition() + simTurningMotor.getAngularVelocityRadPerSec() * Robot.kDefaultPeriod);
         simTurningEncoder.setSimVelocity(simTurningMotor.getAngularVelocityRadPerSec());
+
+        turningMotor.set(simTurningPIDController.calculate(getTurningPosition(), turningSetpoint));
   }
 
     @Override
