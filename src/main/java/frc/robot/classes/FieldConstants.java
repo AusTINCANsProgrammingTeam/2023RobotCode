@@ -249,7 +249,7 @@ public final class FieldConstants {
    */
   public static Translation2d allianceFlip(Translation2d translation) {
     if (DriverStation.getAlliance() == Alliance.Red) {
-      return new Translation2d(fieldLength - translation.getX(), translation.getY());
+      return new Translation2d(translation.getX(), fieldLength - translation.getY());
     } else {
       return translation;
     }
@@ -263,9 +263,9 @@ public final class FieldConstants {
   public static Pose2d allianceFlip(Pose2d pose) {
     if (DriverStation.getAlliance() == Alliance.Red) {
       return new Pose2d(
-          fieldLength - pose.getX(),
-          pose.getY(),
-          new Rotation2d(-pose.getRotation().getCos(), pose.getRotation().getSin()));
+          pose.getX(),
+          fieldWidth - pose.getY(),
+          new Rotation2d(0));
     } else {
       return pose;
     }

@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.classes.FieldConstants;
 
 
 public class AutonSubsytem extends SubsystemBase{
@@ -82,7 +83,7 @@ public class AutonSubsytem extends SubsystemBase{
     private Command resetOdometry(String initialTrajectory) throws NullPointerException{
         //Resets odometry to the initial position of the given trajectory
         PathPlannerTrajectory trajectory = getTrajectory(initialTrajectory);
-        Pose2d initialPose = Objects.isNull(trajectory) ? new Pose2d(0, 0, new Rotation2d()) : trajectory.getInitialPose();
+        Pose2d initialPose = FieldConstants.allianceFlip(Objects.isNull(trajectory) ? new Pose2d(0, 0, new Rotation2d()) : trajectory.getInitialPose());
         return new InstantCommand(() -> swerveSubsystem.resetOdometry(initialPose));
     }
 
