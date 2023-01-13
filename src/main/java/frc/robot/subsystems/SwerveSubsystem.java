@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
@@ -99,10 +98,6 @@ public class SwerveSubsystem extends SubsystemBase{
         yController = new PIDController(kYTranslationP, 0, 0);
         rotationController = new PIDController(kRotationP, 0, 0);
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
-
-        if(Robot.isCharacterizationMode){
-            characterizeModules();
-        }
     }
 
     public void zeroHeading() {
@@ -213,15 +208,7 @@ public class SwerveSubsystem extends SubsystemBase{
         backLeft.stop();
         backRight.stop();
     }
-
-    public void characterizeModules(){
-        //Prepare all modules for characterization
-        frontLeft.characterize();
-        frontRight.characterize();
-        backLeft.characterize();
-        backRight.characterize();
-    }
-
+    
     @Override
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());
