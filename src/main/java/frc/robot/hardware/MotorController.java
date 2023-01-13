@@ -20,12 +20,15 @@ public class MotorController {
         BackLeftModuleDrive(7, 50, IdleMode.kBrake),
         BackLeftModuleTurn(8, 40, IdleMode.kBrake, true),
         BackRightModuleDrive(6, 50, IdleMode.kBrake),
-        BackRightModuleTurn(5, 40, IdleMode.kBrake, true),  
+        BackRightModuleTurn(5, 40, IdleMode.kBrake, true),
+        //Arm Modules
+        ArmBaseMotor(9, 40, IdleMode.kBrake, false),
+        ArmElbowMotor(10, 40, IdleMode.kBrake, false),  
         //Intake motors
         IntakeMotor1(13),
         IntakeMotor2(14); //TODO update to real hardware IDs
     
-
+        
         private int ID;
         private int currentLimit;
         private IdleMode idleMode;
