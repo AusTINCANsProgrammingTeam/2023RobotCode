@@ -247,7 +247,7 @@ public final class FieldConstants {
    * default, all translations and poses in {@link FieldConstants} are stored with the origin at the
    * rightmost point on the BLUE ALLIANCE wall.
    */
-  public static Translation2d allianceFlip(Translation2d translation) {
+  public static Translation2d fieldElementFlip(Translation2d translation) {
     if (DriverStation.getAlliance() == Alliance.Red) {
       return new Translation2d(translation.getX(), fieldLength - translation.getY());
     } else {
@@ -260,12 +260,36 @@ public final class FieldConstants {
    * all translations and poses in {@link FieldConstants} are stored with the origin at the
    * rightmost point on the BLUE ALLIANCE wall.
    */
-  public static Pose2d allianceFlip(Pose2d pose) {
+  public static Pose2d fieldElementFlip(Pose2d pose) {
+    if (DriverStation.getAlliance() == Alliance.Red) {
+      return new Pose2d(
+          fieldLength - pose.getX(),
+          pose.getY(),
+          new Rotation2d(0));
+    } else {
+      return pose;
+    }
+  }
+
+  public static Pose2d odometryFlip(Pose2d pose) {
     if (DriverStation.getAlliance() == Alliance.Red) {
       return new Pose2d(
           pose.getX(),
           fieldWidth - pose.getY(),
           new Rotation2d(0));
+    } else {
+      return pose;
+    }
+  }
+  
+  public static Pose3d aprilTagFlip(Pose3d pose) {
+    if (DriverStation.getAlliance() == Alliance.Red) {
+      return new Pose3d(
+          new Translation3d(
+            fieldLength - pose.getX(),
+            pose.getY(),
+            pose.getZ()),
+          new Rotation3d(0, 0, Math.PI - pose.getRotation().getZ()));
     } else {
       return pose;
     }

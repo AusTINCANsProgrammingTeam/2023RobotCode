@@ -4,17 +4,21 @@
 
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -28,6 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.classes.Photonvision;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
@@ -72,7 +77,7 @@ public class SwerveSubsystem extends SubsystemBase{
         "BR");
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
-    private SwerveDriveOdometry odometer = new SwerveDriveOdometry(kDriveKinematics, getRotation2d(), getModulePositions());
+    private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kDriveKinematics, getRotation2d(), getModulePositions(), new Pose2d());
 
     private DataLog datalog = DataLogManager.getLog();
     private DoubleLogEntry translationXOutputLog = new DoubleLogEntry(datalog, "/swerve/txout"); //Logs x translation state output
@@ -84,7 +89,7 @@ public class SwerveSubsystem extends SubsystemBase{
 
     public boolean controlOrientationIsFOD;
 
-    public Double rotationHold;
+    private Double rotationHold;
 
     private PIDController xController;
     private PIDController yController;
@@ -110,6 +115,11 @@ public class SwerveSubsystem extends SubsystemBase{
         gyro.reset();
     }
 
+    public void updateHeading() {
+        gyro.zeroYaw();
+        gyro.setAngleAdjustment(Math.IEEEremainder(poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 360));
+    }
+
     public double getHeading() {
         return gyro.getYaw();
     }
@@ -119,11 +129,24 @@ public class SwerveSubsystem extends SubsystemBase{
     }
 
     public Pose2d getPose() {
-        return odometer.getPoseMeters();
+        return poseEstimator.getEstimatedPosition();
     }
 
     public void resetOdometry(Pose2d pose) {
-        odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
+        poseEstimator.resetPosition(getRotation2d(), getModulePositions(), pose);
+    }
+
+    public void updatePoseEstimator(){
+        poseEstimator.update(getRotation2d(), getModulePositions());
+        Optional<Pair<Pose3d,Double>> visionUpdate = Photonvision.getPoseUpdate();
+        if(visionUpdate.isPresent()){
+            poseEstimator.addVisionMeasurement(
+                new Pose2d(
+                    visionUpdate.get().getFirst().getTranslation().toTranslation2d(),
+                    visionUpdate.get().getFirst().getRotation().toRotation2d()
+                ),
+                visionUpdate.get().getSecond());
+        }
     }
 
     public void toggleOrientation(){
@@ -222,13 +245,6 @@ public class SwerveSubsystem extends SubsystemBase{
         backRight.characterize();
     }
 
-    @Override
-    public void periodic() {
-        odometer.update(getRotation2d(), getModulePositions());
-        SmartDashboard.putNumber("Robot Heading", getHeading());
-        SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
-    }
-
     public Command followTrajectory(String name, PathPlannerTrajectory trajectory){
         //For use with trajectories generated from a list of poses
         return new PPSwerveControllerCommand(
@@ -242,5 +258,12 @@ public class SwerveSubsystem extends SubsystemBase{
             this
         ).beforeStarting(() -> trajectoryLog.append("Following trajectory " + name)
         ).andThen(() -> trajectoryLog.append("Trajectory " + name +  " Ended"));
+    }
+
+    @Override
+    public void periodic() {
+        updatePoseEstimator();
+        SmartDashboard.putNumber("Robot Heading", getHeading());
+        SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
     }
 }

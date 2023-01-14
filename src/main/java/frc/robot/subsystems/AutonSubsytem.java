@@ -6,6 +6,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -83,7 +84,7 @@ public class AutonSubsytem extends SubsystemBase{
     private Command resetOdometry(String initialTrajectory) throws NullPointerException{
         //Resets odometry to the initial position of the given trajectory
         PathPlannerTrajectory trajectory = getTrajectory(initialTrajectory);
-        Pose2d initialPose = FieldConstants.allianceFlip(Objects.isNull(trajectory) ? new Pose2d(0, 0, new Rotation2d()) : trajectory.getInitialPose());
+        Pose2d initialPose = FieldConstants.odometryFlip(Objects.isNull(trajectory) ? new Pose2d(0, 0, new Rotation2d()) : trajectory.getInitialPose());
         return new InstantCommand(() -> swerveSubsystem.resetOdometry(initialPose));
     }
 
@@ -100,7 +101,7 @@ public class AutonSubsytem extends SubsystemBase{
                return 
                     new SequentialCommandGroup(
                         resetOdometry("Forward"),
-                        swerveSubsystem.followTrajectory("Forward", getTrajectory("Forward"))
+                        swerveSubsystem.followTrajectory("Forward", getTrajectory("lol"))
                     );
             case BACKWARD:
                 return
@@ -134,10 +135,13 @@ public class AutonSubsytem extends SubsystemBase{
         //Backup sequence in case a trajectory fails to load
         return new SequentialCommandGroup(
             swerveSubsystem.followTrajectory(
-                "Up",
+                "Apriltag",
                 generateTrajectory(
-                    constructPoint(0, 0, 0, 90),
-                    constructPoint(0, 1, 0, 0)
+                    constructPoint(0, 0, 0, 0),
+                    constructPoint(
+                    FieldConstants.aprilTagFlip(FieldConstants.aprilTags.get(3)).getTranslation().getX(),
+                    FieldConstants.aprilTagFlip(FieldConstants.aprilTags.get(3)).getTranslation().getY(),0,0)
+
                 )
             )
         );
