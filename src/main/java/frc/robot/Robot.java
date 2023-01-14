@@ -17,9 +17,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
-  public static final boolean tuningMode = true;
+  public static final boolean isCompetition = false;
   private Command m_autonomousCommand;
-
   private RobotContainer m_robotContainer;
 
   /**
