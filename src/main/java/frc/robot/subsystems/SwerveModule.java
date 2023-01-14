@@ -30,7 +30,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
 
 public class SwerveModule extends SubsystemBase {
     public static final double kWheelDiameterMeters = Units.inchesToMeters(3.5);
@@ -174,12 +173,6 @@ public class SwerveModule extends SubsystemBase {
     public void stop() {
         driveMotor.set(0);
         turningMotor.set(0);
-    }
-
-    public void characterize(){
-        //Prepare module for characterization
-        turningPIDController.setReference(calculateSetpoint(0), ControlType.kPosition);
-        turningMotor.setIdleMode(IdleMode.kBrake);
     }
 
     @Override
