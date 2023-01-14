@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 public class OI {
     //Operator Interface (OI) class containing all control information
     private static final int kDriverJoystickPort = 0;
+    private static final int kOperatorJoystickPort = 1;
 
     public static final class Driver{
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
@@ -66,7 +67,13 @@ public class OI {
     }
 
     public static final class Operator{
+        private static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
 
+        private static final int kBuddyBalanceToggleID = 0; //B Button, toggle buddy balance
+
+        public static JoystickButton getBuddyBalanceToggleButton(){
+            return new JoystickButton(kJoystick, kBuddyBalanceToggleID);
+        }
     }
 
     public static class ControlCurve{
