@@ -71,7 +71,7 @@ public class OI {
 
         private static final int kBuddyBalanceToggleID = 0; //B Button, toggle buddy balance
 
-        public static JoystickButton getBuddyBalanceToggleButton(){
+        public static JoystickButton ToggleBuddyBalanceButton(){
             return new JoystickButton(kJoystick, kBuddyBalanceToggleID);
         }
     }
