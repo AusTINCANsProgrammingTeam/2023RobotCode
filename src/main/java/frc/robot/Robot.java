@@ -9,6 +9,7 @@ import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   public static final boolean isCharacterizationMode = true; //Robot will prepare for drivebase for characterization once enabled
+  public static final boolean isRed = DriverStation.getAlliance() == Alliance.Red;
 
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();

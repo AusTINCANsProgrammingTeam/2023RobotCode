@@ -242,6 +242,42 @@ public final class FieldConstants {
               Units.inchesToMeters(18.22),
               new Rotation3d()));
 
+  public static enum NodePosition{
+    MidLeft(false, true),
+    MidRight(false, false),
+    HighLeft(true, true),
+    HighRight(true, false);
+
+    private Translation2d[] rowArray;
+    private boolean isLeft;
+
+    private NodePosition(boolean isHigh, boolean isLeft){
+      this.rowArray = isHigh ? Grids.highTranslations : Grids.midTranslations;
+      this.isLeft = isLeft;
+    }
+
+    public Translation2d getTranslation(int aprilTagID){
+      Translation2d translation;
+      switch (aprilTagID){
+        case 1:
+        case 8:
+          translation = isLeft ? rowArray[1] : rowArray[3];
+          break;
+        case 7:
+        case 2:
+          translation = isLeft ? rowArray[4] : rowArray[6];
+          break;
+        case 3:
+        case 6:
+          translation = isLeft ? rowArray[7] : rowArray[9];
+          break;
+        default:
+          translation = null;
+          break;
+        }
+      return FieldConstants.fieldElementFlip(translation);
+    }
+  }
   /**
    * Flips a translation to the correct side of the field based on the current alliance color. By
    * default, all translations and poses in {@link FieldConstants} are stored with the origin at the

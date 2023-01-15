@@ -66,7 +66,7 @@ public class OI {
     }
 
     public static final class Operator{
-
+        
     }
 
     public static class ControlCurve{

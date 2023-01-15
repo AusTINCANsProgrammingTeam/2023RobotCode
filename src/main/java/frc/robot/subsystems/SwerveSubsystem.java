@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -30,9 +31,11 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.classes.Photonvision;
+import frc.robot.classes.FieldConstants.NodePosition;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
@@ -258,6 +261,47 @@ public class SwerveSubsystem extends SubsystemBase{
             this
         ).beforeStarting(() -> trajectoryLog.append("Following trajectory " + name)
         ).andThen(() -> trajectoryLog.append("Trajectory " + name +  " Ended"));
+    }
+
+    public Command alignToTarget(NodePosition nodePosition){
+        Integer id = Photonvision.getAprilTagID();
+        boolean isValidTag = !Objects.isNull(id) && Robot.isRed ? id < 4 : id > 5; 
+        double xOffset = 0; //Range offset 
+        double yOffset = 0; //Left/Right offset
+
+        if(isValidTag){
+            //Get pose of node to be targeted
+            Pose2d desiredPose = new Pose2d(
+                nodePosition.getTranslation(id),
+                null
+            );
+            //Apply offsets and add a rotation to get desired robot pose
+            desiredPose = new Pose2d(
+                desiredPose.getX() + xOffset, 
+                desiredPose.getY() + yOffset, 
+                Robot.isRed ? Rotation2d.fromDegrees(0) : Rotation2d.fromDegrees(180)
+            );
+            //Generate trajectory to desired pose
+            Pose2d currentPose = getPose();
+            followTrajectory(
+                "Align",
+                AutonSubsytem.generateTrajectory(
+                    AutonSubsytem.constructPoint(
+                        currentPose, 
+                        Units.radiansToDegrees(
+                            Math.atan2(
+                                desiredPose.getY() - currentPose.getY(), 
+                                desiredPose.getX() - desiredPose.getY()
+                            )
+                        )
+                    ), 
+                    AutonSubsytem.constructPoint(
+                        desiredPose,
+                        getPose().getY() > desiredPose.getY() ? -90 : 90)
+                )
+            );
+        }
+        return new InstantCommand();
     }
 
     @Override

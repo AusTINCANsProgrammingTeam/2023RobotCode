@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.photonvision.PhotonCamera;
 import org.photonvision.RobotPoseEstimator;
 import org.photonvision.RobotPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -60,5 +61,13 @@ public class Photonvision {
 
     public static Optional<Pair<Pose3d,Double>> getPoseUpdate(){
         return poseEstimator.update();
+    }
+
+    public static Integer getAprilTagID(){
+        PhotonPipelineResult result = camera.getLatestResult();
+        if(result.hasTargets()){
+            return result.getBestTarget().getFiducialId();
+        }
+        return null;
     }
 }  

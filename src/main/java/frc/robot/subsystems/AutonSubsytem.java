@@ -29,6 +29,7 @@ import frc.robot.classes.FieldConstants;
 public class AutonSubsytem extends SubsystemBase{
     public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed / 4; //Maximum speed allowed in auton, in meters per second
     public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
+    public static final PathConstraints kPathConstraints = new PathConstraints(kMaxSpeed, kMaxAcceleration);
 
     private enum AutonModes{
         FORWARD, // Go forward 1 meter
@@ -47,8 +48,6 @@ public class AutonSubsytem extends SubsystemBase{
 
     private SwerveSubsystem swerveSubsystem;
 
-    private PathConstraints pathConstraints;
-
     private AutonModes autonMode;
 
     public AutonSubsytem(SwerveSubsystem swerveSubsystem){
@@ -60,21 +59,23 @@ public class AutonSubsytem extends SubsystemBase{
         }
         modeChooser.setDefaultOption(kDefaultAutonMode.toString(), kDefaultAutonMode);
         configTab.add("Auton mode", modeChooser);
-
-        pathConstraints = new PathConstraints(kMaxSpeed, kMaxAcceleration);
     }
 
-    private PathPlannerTrajectory getTrajectory(String name) throws NullPointerException{
-        return PathPlanner.loadPath(name, pathConstraints);
+    public static PathPlannerTrajectory getTrajectory(String name) throws NullPointerException{
+        return PathPlanner.loadPath(name, kPathConstraints);
     }
 
-    private PathPoint constructPoint(double x, double y, double rotation, double heading){
+    public static PathPoint constructPoint(double x, double y, double rotation, double heading){
         return new PathPoint(new Translation2d(x, y), Rotation2d.fromDegrees(heading), Rotation2d.fromDegrees(rotation));
     }
 
-    private PathPlannerTrajectory generateTrajectory(PathPoint firstPoint, PathPoint secondPoint, PathPoint... points){
+    public static PathPoint constructPoint(Pose2d pose, double heading){
+        return new PathPoint(pose.getTranslation(), Rotation2d.fromDegrees(heading), pose.getRotation());
+    }
+
+    public static PathPlannerTrajectory generateTrajectory(PathPoint firstPoint, PathPoint secondPoint, PathPoint... points){
         return PathPlanner.generatePath(
-            pathConstraints,
+            kPathConstraints,
             firstPoint,
             secondPoint,
             points
