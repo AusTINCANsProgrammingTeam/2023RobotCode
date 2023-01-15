@@ -10,6 +10,7 @@ import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.classes.FieldConstants.NodePosition;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -61,6 +62,11 @@ public class RobotContainer {
     OI.Driver.getDownPOV().onTrue(new InstantCommand(() -> {swerveSubsystem.enableRotationHold(180);}, swerveSubsystem));
     OI.Driver.getLeftPOV().onTrue(new InstantCommand(() -> {swerveSubsystem.enableRotationHold(90);}, swerveSubsystem));
     OI.Driver.getRightPOV().onTrue(new InstantCommand(() -> {swerveSubsystem.enableRotationHold(-90);}, swerveSubsystem));
+
+    OI.Operator.getAlignMidLeftButton().whileTrue(swerveSubsystem.alignToTarget(NodePosition.MidLeft));
+    OI.Operator.getAlignMidRightButton().whileTrue(swerveSubsystem.alignToTarget(NodePosition.MidRight));
+    OI.Operator.getAlignHighLeftButton().whileTrue(swerveSubsystem.alignToTarget(NodePosition.HighLeft));
+    OI.Operator.getAlignHighRightButton().whileTrue(swerveSubsystem.alignToTarget(NodePosition.HighRight));
   }
 
   /**

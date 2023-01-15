@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 public class OI {
     //Operator Interface (OI) class containing all control information
     private static final int kDriverJoystickPort = 0;
+    private static final int kOperatorJoystickPort = 1;
 
     public static final class Driver{
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
@@ -66,7 +67,29 @@ public class OI {
     }
 
     public static final class Operator{
-        
+        private static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
+
+        //Node selection is from operator perspective
+        private static final int kAlignMidLeftButtonID = 0; //Right Trigger, align to mid left node
+        private static final int kAlignMidRightButtonID = 0; //Left Trigger, align to mid right node
+        private static final int kAlignHighLeftButtonID = 0; //Right Bumper, align to high left node
+        private static final int kAlignHighRightButtonID = 0; //Left Bumper, align to high right node
+
+        public static JoystickButton getAlignMidLeftButton(){
+            return new JoystickButton(kJoystick, kAlignMidLeftButtonID);
+        }
+
+        public static JoystickButton getAlignMidRightButton(){
+            return new JoystickButton(kJoystick, kAlignMidRightButtonID);
+        }
+
+        public static JoystickButton getAlignHighLeftButton(){
+            return new JoystickButton(kJoystick, kAlignHighLeftButtonID);
+        }
+
+        public static JoystickButton getAlignHighRightButton(){
+            return new JoystickButton(kJoystick, kAlignHighRightButtonID);
+        }
     }
 
     public static class ControlCurve{
