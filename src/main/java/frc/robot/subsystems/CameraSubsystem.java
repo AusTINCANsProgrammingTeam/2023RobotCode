@@ -15,11 +15,11 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-public class VideoOverlaySubsystem extends SubsystemBase {
+public class CameraSubsystem extends SubsystemBase {
   Thread m_visionThread;
   /** Creates a new VideoOverlaySubsystem. */
-  public VideoOverlaySubsystem() {
-    m_visionThread =
+  public CameraSubsystem() {
+    m_visionThread = 
     new Thread(
       () -> {
         UsbCamera camera = CameraServer.startAutomaticCapture();
@@ -32,7 +32,7 @@ public class VideoOverlaySubsystem extends SubsystemBase {
             outputStream.notifyError(cvSink.getError());
             continue;
           }
-          Imgproc.line(mat, new Point((mat.size().width / 2), mat.size().height), new Point((mat.size().width / 2), 0), new Scalar(0, 0, 0), 2);
+          Imgproc.line(mat, new Point((mat.size().width / 2), mat.size().height), new Point((mat.size().width / 2), 0), new Scalar(0, 0, 0), 2); // TODO: Implement sensor distance into width
           outputStream.putFrame(mat);
         }
       });
