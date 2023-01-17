@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
@@ -17,13 +18,19 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   // FIXME using PWMSparkMax because CANSparkMax doesn't have an equivalent simulation class
   // May limit how much we can do in terms of JUnit tests
+  private double P = 0.001;
+  private double I = 0.001;
+  private double D = 0.001;
   private CANSparkMax motorBase;
   private CANSparkMax motorElbow;
   //private SparkMaxPIDController motorBase;
   private final RelativeEncoder motorBaseEncoder;
   private final RelativeEncoder motorElbowEncoder;
-  private final SparkMaxPIDController armPIDController;
-  private final SparkMaxPIDController elbowPIDController;
+  //private final SparkMaxPIDController armPIDController;
+  //private final SparkMaxPIDController elbowPIDController;
+  private final PIDController basePIDController;
+  private final PIDController elbowPIDController;
+
 
   /** Creates a new ExampleSubsystem. */
   public ArmSubsystem() {
@@ -32,8 +39,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     //Encoders are not used right now, might be implemented later
     motorBaseEncoder = this.motorBase.getEncoder(); 
     motorElbowEncoder = this.motorElbow.getEncoder(); 
-    armPIDController = motorBase.getPIDController();
-    elbowPIDController = motorElbow.getPIDController();
+    basePIDController = new PIDController(P, I, D);
+    elbowPIDController = new PIDController(P, I, D);
   }
 
   @Override
@@ -42,11 +49,11 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void setBaseRef(double setpoint) {
-    armPIDController.setReference(setpoint, ControlType.kPosition);
+    motorBase.set(basePIDController.calculate(motorBaseEncoder.getPosition(), setpoint));
   }
 
    public void setElbowRef(double setpoint) {
-    armPIDController.setReference(setpoint, ControlType.kPosition);
+    motorElbow.set(elbowPIDController.calculate(motorElbowEncoder.getPosition(), setpoint));
   }
 
   @Override

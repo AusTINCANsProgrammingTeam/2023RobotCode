@@ -14,29 +14,27 @@ public class ArmAutoCommand extends CommandBase {
   private static final double secondArmLength = 144.3;
 
   private final ArmSubsystem armSubsystem;
-  private double ytheta;
-  private double xtheta;
+  private double firstArmAngle;
+  private double secondArmAngle;
 
   public ArmAutoCommand(ArmSubsystem armSubsystem, double x, double y) {
     this.armSubsystem = armSubsystem;
     getAngles(x, y);
     addRequirements(armSubsystem);
   }
-
-  private double findHypotenuse(double x, double y) {
-    return Math.sqrt((x*x)+(y*y));
-  }
   private void getAngles(double x, double y) {
-    //Get angle of the second arm relative to the first one (in radians)
-    ytheta = (
-      Math.acos(
+    //Needed to calculate the first and second arm angles
+    double prelimAngle = (
+      -1*Math.acos(
         ( (x*x) + (y*y) - (firstArmLength*firstArmLength) - (secondArmLength*secondArmLength) )/(2*firstArmLength*secondArmLength)
       )
     );
     //Get angle of the first arm (relative to a flat bottom line) (in radians)
-    xtheta = (
-            Math.atan(y/x)-Math.atan(secondArmLength*Math.sin(104.56) / (firstArmLength+(secondArmLength*Math.cos(104.56)))
+    firstArmAngle = (
+            Math.atan(y/x)-Math.atan((secondArmLength*Math.sin(prelimAngle) )/( (firstArmLength+(secondArmLength*Math.cos(prelimAngle))))
     ));
+    //Get angle of the second arm relative to the first one (in radians)
+    secondArmAngle = prelimAngle+firstArmAngle;
   }
   // Called when the command is initially scheduled.
   @Override
@@ -46,8 +44,8 @@ public class ArmAutoCommand extends CommandBase {
   @Override
   public void execute() {
     //Needs to move to points x,y
-    armSubsystem.setBaseRef(xtheta);
-    armSubsystem.setElbowRef(ytheta);
+    armSubsystem.setBaseRef(firstArmAngle);
+    armSubsystem.setElbowRef(secondArmAngle);
   }
 
   // Called once the command ends or is interrupted.

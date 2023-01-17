@@ -7,12 +7,13 @@ package frc.robot.commands;
 import frc.robot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.math.util.Units;
 
 public class ArmCommand extends CommandBase {
   private final ArmSubsystem armSubsystem;
   private final Joystick baseJoystick;
-  private final int minSetpoint = 5;
-  private final int maxSetpoint = 30;
+  private final double minSetpoint = Units.degreesToRadians(-160);
+  private final double maxSetpoint = Units.degreesToRadians(160);
 
   public ArmCommand(ArmSubsystem armSubsystem, Joystick baseJoystick) {
     this.armSubsystem = armSubsystem;
