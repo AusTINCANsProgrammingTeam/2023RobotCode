@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Preferences;
@@ -14,12 +13,21 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Robot;
 import java.util.Map;
 
 public class BatterySubsystem extends SubsystemBase {
-
+  //Constants
+  public static final double minVoltageYellow = 11.0;
+  public static final double minVoltageRed = 12.0;
+  public static final double minVoltageRedDouble = 10.0;
+  public static final int timeInSecondsSimTest = 5;
+  public static final double timeInSecondsGeneralYellow = 360.0;
+  public static final double timeInSecondsGeneralRed = 600.0;
+  public static final double timeInSecondsHighCurrentYellow = 120.0;
+  public static final double timeInSecondsHighCurrentRed = 180.0;
+  public static final double highBatteryCurrentThreshold = 10;
+  //Shuffleboard Variables
   private double storedGeneralTime;
   private double storedHighCurrentTime;
   private ShuffleboardTab btTab;
@@ -29,6 +37,7 @@ public class BatterySubsystem extends SubsystemBase {
   private GenericEntry sbTimer;
   private GenericEntry sbTimerChange;
   private GenericEntry sbTimerHighCurrent;
+
   private Timer timer = new Timer();
   private Timer currentTimer = new Timer();
   private PowerDistribution powerDistribution = new PowerDistribution();
@@ -47,32 +56,32 @@ public class BatterySubsystem extends SubsystemBase {
         .withProperties(Map.of("colorWhenTrue", "red"));
     // Color tab for the yellow voltage level
     Shuffleboard.getTab("Battery")
-        .addBoolean("Voltage Yellow", () -> getVoltage() > Constants.minVoltageYellow)
+        .addBoolean("Voltage Yellow", () -> getVoltage() > minVoltageYellow)
         .withPosition(3, 1)
         .withProperties(Map.of("colorWhenFalse", "black"))
         .withProperties(Map.of("colorWhenTrue", "yellow"));
     // Color tab for the red timer level
     Shuffleboard.getTab("Battery")
-        .addBoolean("Timer Red", () -> getGeneralTimer() > Constants.timeInSecondsGeneralRed)
+        .addBoolean("Timer Red", () -> getGeneralTimer() > timeInSecondsGeneralRed)
         .withPosition(2, 2)
         .withProperties(Map.of("colorWhenFalse", "black"))
         .withProperties(Map.of("colorWhenTrue", "light red"));
     // Color tab for the yellow timer level
     Shuffleboard.getTab("Battery")
-        .addBoolean("Timer Yellow", () -> getGeneralTimer() > Constants.timeInSecondsGeneralYellow)
+        .addBoolean("Timer Yellow", () -> getGeneralTimer() > timeInSecondsGeneralYellow)
         .withPosition(3, 2)
         .withProperties(Map.of("colorWhenFalse", "black"))
         .withProperties(Map.of("colorWhenTrue", "light yellow"));
     // Color tab for the red high current timer level
     Shuffleboard.getTab("Battery")
-        .addBoolean("HC Red", () -> getHighCurrentTimer() > Constants.timeInSecondsHighCurrentRed)
+        .addBoolean("HC Red", () -> getHighCurrentTimer() > timeInSecondsHighCurrentRed)
         .withPosition(2, 3)
         .withProperties(Map.of("colorWhenFalse", "black"))
         .withProperties(Map.of("colorWhenTrue", "red"));
     // Color tab for the yellow high current timer level
     Shuffleboard.getTab("Battery")
         .addBoolean(
-            "HC Yellow", () -> getHighCurrentTimer() > Constants.timeInSecondsHighCurrentYellow)
+            "HC Yellow", () -> getHighCurrentTimer() > timeInSecondsHighCurrentYellow)
         .withPosition(3, 3)
         .withProperties(Map.of("colorWhenFalse", "black"))
         .withProperties(Map.of("colorWhenTrue", "yellow"));
@@ -121,7 +130,7 @@ public class BatterySubsystem extends SubsystemBase {
 
   // If the current is below a certain level, stops the high current timer
   public void checkCurrent() {
-    if (getInputCurrent() < Constants.highBatteryCurrentThreshold) {
+    if (getInputCurrent() < highBatteryCurrentThreshold) {
       currentTimer.stop();
     } else {
       currentTimer.start();
@@ -134,16 +143,16 @@ public class BatterySubsystem extends SubsystemBase {
   // HCTY = High Current Timer Yellow
   // GTY = General Timer Yellow
   public boolean checkTimer() {
-    if (currentTimer.hasElapsed(Constants.timeInSecondsHighCurrentRed)) {
+    if (currentTimer.hasElapsed(timeInSecondsHighCurrentRed)) {
       DriverStation.reportWarning("Change the Battery Now! (HCTR)", false);
       return true;
-    } else if (timer.hasElapsed(Constants.timeInSecondsGeneralRed)) {
+    } else if (timer.hasElapsed(timeInSecondsGeneralRed)) {
       DriverStation.reportWarning("Change the Battery Now! (GTR)", false);
       return true;
-    } else if (currentTimer.hasElapsed(Constants.timeInSecondsHighCurrentYellow)) {
+    } else if (currentTimer.hasElapsed(timeInSecondsHighCurrentYellow)) {
       DriverStation.reportWarning("Change the Battery Soon! (HCTY)", false);
       return false;
-    } else if (timer.hasElapsed(Constants.timeInSecondsGeneralYellow)) {
+    } else if (timer.hasElapsed(timeInSecondsGeneralYellow)) {
       DriverStation.reportWarning("Change the Battery Soon! (GTY)", false);
       return false;
     }
@@ -161,16 +170,16 @@ public class BatterySubsystem extends SubsystemBase {
   }
 
   public void checkVoltage() {
-    if (getVoltage() < Constants.minVoltageRed) {
+    if (getVoltage() < minVoltageRed) {
       DriverStation.reportWarning("Change the Battery Now! (VR)", false);
-    } else if (getVoltage() < Constants.minVoltageYellow) {
+    } else if (getVoltage() < minVoltageYellow) {
       DriverStation.reportWarning("Change the Battery Soon! (VY)", false);
     } else {
     }
   }
 
   public boolean checkRedVoltage() {
-    return getVoltage() > Constants.minVoltageRed;
+    return getVoltage() > minVoltageRed;
   }
 
   public void resetTimers() {
