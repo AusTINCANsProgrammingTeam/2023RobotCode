@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package frc.robot.containers;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -10,8 +10,8 @@ import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.OI;
+import frc.robot.Robot;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -21,31 +21,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
-public class RobotContainer {
+public class IntakeContainer implements RobotContainerInterface {
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
-
-  private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
-  private SimulationSubsystem simulationSubsystem;
-  
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    if(Robot.isSimulation()){
-      simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
-    }
+  public IntakeContainer() {
 
-    swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
-      swerveSubsystem, 
-      OI.Driver.getXTranslationSupplier(),
-      OI.Driver.getYTranslationSupplier(),
-      OI.Driver.getRotationSupplier()));
-
-      
     // Configure the button bindings    
 
     configureButtonBindings();
@@ -58,8 +40,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
-    OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
     OI.Driver.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::pull));
     OI.Driver.getOuttakeButton().onTrue(new InstantCommand(intakeSubsystem::push));
 
@@ -71,6 +51,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autonSubsytem.getAutonCommand();
+    return null;
   }
 }

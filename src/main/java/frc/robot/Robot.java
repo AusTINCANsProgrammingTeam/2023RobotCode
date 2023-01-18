@@ -7,8 +7,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.containers.IntakeContainer;
+import frc.robot.containers.RobotContainer;
+import frc.robot.containers.RobotContainerInterface;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -19,7 +25,15 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  private RobotContainer m_robotContainer;
+  private enum RobotContainerEnum{
+      ROBOT, 
+      INTAKE; 
+  }
+
+  private RobotContainerInterface m_robotContainer;
+  private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
+  private SendableChooser<RobotContainerEnum> contChooser = new SendableChooser<>();
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -30,10 +44,26 @@ public class Robot extends TimedRobot {
     DataLogManager.start();
     //Automatically log joystick and Driver Station control data
     DriverStation.startDataLog(DataLogManager.getLog());
+
+    for (RobotContainerEnum x : RobotContainerEnum.values()) {
+      contChooser.addOption(x.toString(), x);
+    }
+
+    configTab.add("Container", contChooser);
+
     
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+    switch(contChooser.getSelected()) {
+      default:
+      case ROBOT:
+        // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
+        // autonomous chooser on the dashboard.
+        m_robotContainer = new RobotContainer();
+        break;
+      case INTAKE:
+        m_robotContainer = new IntakeContainer();
+        break;
+
+    }
 
     DataLogManager.start();
     //Automatically log joystick and Driver Station control data
@@ -63,7 +93,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {}
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+  /** This autonomous runs the autonomous command selected by your {@link IntakeContainer} class. */
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
