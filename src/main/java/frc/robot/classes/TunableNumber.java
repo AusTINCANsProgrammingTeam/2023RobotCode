@@ -36,8 +36,9 @@ public class TunableNumber extends SubsystemBase{
 
     public void periodic(){
         if (tuningMode || !Robot.isCompetition){
-            double newValue = numberEntry.getDouble(0);
+            double newValue = numberEntry.getDouble(value);
             if (value != newValue){
+                value = newValue;
                 consumer.accept(value);
                 numberLog.append(value);
             }
