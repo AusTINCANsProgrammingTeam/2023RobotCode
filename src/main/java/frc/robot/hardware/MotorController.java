@@ -19,7 +19,10 @@ public class MotorController {
         BackLeftModuleDrive(7, 50),
         BackLeftModuleTurn(8, true),
         BackRightModuleDrive(6, 50),
-        BackRightModuleTurn(5, true);
+        BackRightModuleTurn(5, true),
+        //Intake motors
+        IntakeMotor1(13),
+        IntakeMotor2(14, true);
 
         private int ID;
         private int currentLimit;

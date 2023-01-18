@@ -7,25 +7,31 @@ package frc.robot.subsystems;
 
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.hardware.MotorController;
+import frc.robot.hardware.MotorController.MotorConfig;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   private CANSparkMax motor;
   private CANSparkMax motor2;
-  private static final double OUTTAKE_SPEED = -1;
-  private static final double INTAKE_SPEED = 0.5;
+  public static final double OUTTAKE_SPEED = -1;
+  public static final double INTAKE_SPEED = 0.5;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
-    motor = new CANSparkMax(9, MotorType.kBrushless);
-    motor2 = new CANSparkMax(10, MotorType.kBrushless);
+    motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
+    motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
     motor.follow(motor2);
-    motor.setInverted(true);
+ShuffleboardTab tab = Shuffleboard.getTab("Intake Status");
+Shuffleboard.selectTab("Intake Status");
   }
-
+  
   private void spinWheels(double velocity) {
     motor.set(velocity);
 
@@ -37,6 +43,10 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   public void pull() {
     spinWheels(INTAKE_SPEED);
+  }
+  
+  public double getSpeed(){
+    return motor.get();
   }
   @Override
   public void periodic() {
@@ -53,6 +63,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     // This method will close all device handles used by this object and release any other dynamic memory.
     // Mostly for JUnit tests
     motor.close();
+    motor2.close();
     
   }
 }
