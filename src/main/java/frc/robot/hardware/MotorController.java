@@ -1,6 +1,7 @@
 package frc.robot.hardware;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class MotorController {
@@ -12,48 +13,58 @@ public class MotorController {
 
     public static enum MotorConfig {
         //Swerve Modules
-        FrontLeftModuleDrive(4, 50),
-        FrontLeftModuleTurn(3, true),
-        FrontRightModuleDrive(2, 50),
-        FrontRightModuleTurn(1, true),
-        BackLeftModuleDrive(7, 50),
-        BackLeftModuleTurn(8, true),
-        BackRightModuleDrive(6, 50),
-        BackRightModuleTurn(5, true),
+        FrontLeftModuleDrive(4, 50, IdleMode.kBrake),
+        FrontLeftModuleTurn(3, 40, IdleMode.kBrake, true),
+        FrontRightModuleDrive(2, 50, IdleMode.kBrake),
+        FrontRightModuleTurn(1, 40, IdleMode.kBrake, true),
+        BackLeftModuleDrive(7, 50, IdleMode.kBrake),
+        BackLeftModuleTurn(8, 40, IdleMode.kBrake, true),
+        BackRightModuleDrive(6, 50, IdleMode.kBrake),
+        BackRightModuleTurn(5, 40, IdleMode.kBrake, true);
         //Intake motors
         IntakeMotor1(13),
         IntakeMotor2(14, true);
 
         private int ID;
         private int currentLimit;
+        private IdleMode idleMode;
         private double openLoopRampRate;
         private boolean reversed;
 
-        MotorConfig(int ID, int currentLimit, double openLoopRampRate, boolean reversed){
+        MotorConfig(int ID, int currentLimit, IdleMode idleMode, double openLoopRampRate, boolean reversed){
             this.ID = ID;
             this.currentLimit = currentLimit;
+            this.idleMode = idleMode;
             this.openLoopRampRate = openLoopRampRate;
             this.reversed = reversed;
         }
 
-        MotorConfig(int ID, int currentLimit, double openLoopRampRate){
-            this(ID, currentLimit, openLoopRampRate, false);
+        MotorConfig(int ID, int currentLimit, IdleMode idleMode, double openLoopRampRate){
+            this(ID, currentLimit, idleMode, openLoopRampRate, false);
+        }
+
+        MotorConfig(int ID, int currentLimit, IdleMode idleMode, boolean reversed){
+            this(ID, currentLimit, idleMode, MotorDefaults.kOpenLoopRampRate, reversed);
+        }
+
+        MotorConfig(int ID, int currentLimit, IdleMode idleMode){
+            this(ID, currentLimit, idleMode, MotorDefaults.kOpenLoopRampRate, false);
         }
 
         MotorConfig(int ID, int currentLimit, boolean reversed){
-            this(ID, currentLimit, MotorDefaults.kOpenLoopRampRate, reversed);
+            this(ID, currentLimit, IdleMode.kCoast, MotorDefaults.kOpenLoopRampRate, reversed);
         }
 
         MotorConfig(int ID, int currentLimit){
-            this(ID, currentLimit, MotorDefaults.kOpenLoopRampRate, false);
+            this(ID, currentLimit, IdleMode.kCoast, MotorDefaults.kOpenLoopRampRate, false);
         }
 
         MotorConfig(int ID, boolean reversed){
-            this(ID, MotorDefaults.kCurrentLimit, MotorDefaults.kOpenLoopRampRate, reversed);
+            this(ID, MotorDefaults.kCurrentLimit, IdleMode.kCoast, MotorDefaults.kOpenLoopRampRate, reversed);
         }
 
         MotorConfig(int ID){
-            this(ID, MotorDefaults.kCurrentLimit, MotorDefaults.kOpenLoopRampRate, false);
+            this(ID, MotorDefaults.kCurrentLimit, IdleMode.kCoast, MotorDefaults.kOpenLoopRampRate, false);
         }
 
         public int getID(){
@@ -62,6 +73,10 @@ public class MotorController {
 
         public int getCurrentLimit(){
             return currentLimit;
+        }
+
+        public IdleMode getIdleMode(){
+            return idleMode;
         }
 
         public double getOpenLoopRampRate(){
@@ -77,6 +92,7 @@ public class MotorController {
         CANSparkMax motor = new CANSparkMax(config.getID(), MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motor.setSmartCurrentLimit(config.getCurrentLimit());
+        motor.setIdleMode(config.getIdleMode());
         motor.setOpenLoopRampRate(config.getOpenLoopRampRate());
         motor.setInverted(config.getReversed());
         return motor;

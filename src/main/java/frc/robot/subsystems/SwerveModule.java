@@ -65,6 +65,7 @@ public class SwerveModule extends SubsystemBase {
     private DoubleLogEntry desiredAngleLog;
     private DoubleLogEntry actualAbsoluteAngleLog;
     private DoubleLogEntry actualRelativeAngleLog;
+    private DoubleLogEntry rotationSpeedLog;
 
     private final String ID;
 
@@ -135,7 +136,9 @@ public class SwerveModule extends SubsystemBase {
     }
     
     public double getTurningVelocity() {
-        return Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
+        double currentRotation = Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
+        rotationSpeedLog.append(currentRotation);
+        return currentRotation;
     }
 
     public void resetEncoders() {
@@ -156,6 +159,7 @@ public class SwerveModule extends SubsystemBase {
             stop();
             return;
         }
+        
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
         driveMotor.set(desiredState.speedMetersPerSecond / SwerveSubsystem.kPhysicalMaxSpeed);
         turningSetpoint = calculateSetpoint(desiredState.angle.getRadians());

@@ -10,6 +10,7 @@ import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.BatterySubsystem;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -33,19 +34,22 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
+  private static BatterySubsystem batterySubsystem;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     if(Robot.isSimulation()){
       simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
     }
-
+    if (!Robot.isCompetition) {
+      batterySubsystem = new BatterySubsystem();
+    }
     swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
       OI.Driver.getXTranslationSupplier(),
       OI.Driver.getYTranslationSupplier(),
       OI.Driver.getRotationSupplier()));
 
-      
     // Configure the button bindings    
 
     configureButtonBindings();
