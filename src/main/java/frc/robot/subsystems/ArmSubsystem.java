@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
@@ -12,6 +13,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 
 public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
@@ -23,14 +26,21 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private double D = 0.001;
   private CANSparkMax motorBase;
   private CANSparkMax motorElbow;
-  //private SparkMaxPIDController motorBase;
   private final RelativeEncoder motorBaseEncoder;
   private final RelativeEncoder motorElbowEncoder;
-  //private final SparkMaxPIDController armPIDController;
-  //private final SparkMaxPIDController elbowPIDController;
   private final PIDController basePIDController;
   private final PIDController elbowPIDController;
 
+  // SIM VALUES:
+  private double gearing = 1;
+  private double baseArmLength = Units.inchesToMeters(40);
+  private double minAngle = Units.degreesToRadians(-160);
+  private double maxAngle = Units.degreesToRadians(160);
+  private double baseArmMass = Units.lbsToKilograms(15);
+  private final double baseArmInertia = SingleJointedArmSim.estimateMOI(baseArmLength, baseArmMass);
+
+  private final SingleJointedArmSim singleJointedArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), gearing, baseArmInertia, 
+  baseArmLength, minAngle, maxAngle, baseArmMass, false);
 
   /** Creates a new ExampleSubsystem. */
   public ArmSubsystem() {
@@ -58,7 +68,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
   } 
 
   @Override
