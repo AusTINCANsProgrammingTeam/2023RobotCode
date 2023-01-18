@@ -6,14 +6,15 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 
@@ -30,6 +31,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private final RelativeEncoder motorElbowEncoder;
   private final PIDController basePIDController;
   private final PIDController elbowPIDController;
+  private ShuffleboardTab configTab = Shuffleboard.getTab("Arm");
+  private GenericEntry armAngleSim = configTab.add("Simulation Arm Angle", 0.0).getEntry();
 
   // SIM VALUES:
   private double gearing = 1;
@@ -38,14 +41,15 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private double maxAngle = Units.degreesToRadians(160);
   private double baseArmMass = Units.lbsToKilograms(15);
   private final double baseArmInertia = SingleJointedArmSim.estimateMOI(baseArmLength, baseArmMass);
+  private double simCurrentAngle;
 
-  private final SingleJointedArmSim singleJointedArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), gearing, baseArmInertia, 
-  baseArmLength, minAngle, maxAngle, baseArmMass, false);
+  private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), gearing, baseArmInertia, baseArmLength, minAngle, maxAngle, baseArmMass, false);
 
   /** Creates a new ExampleSubsystem. */
   public ArmSubsystem() {
     motorBase = MotorController.constructMotor(MotorConfig.ArmBaseMotor);
     motorElbow = MotorController.constructMotor(MotorConfig.ArmElbowMotor);
+    
     //Encoders are not used right now, might be implemented later
     motorBaseEncoder = this.motorBase.getEncoder(); 
     motorElbowEncoder = this.motorElbow.getEncoder(); 
@@ -68,6 +72,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void simulationPeriodic() {
+    baseArmSim.setInputVoltage(1);
+    baseArmSim.update(0.02); // standard loop time of 20ms
+    simCurrentAngle = baseArmSim.getAngleRads()*(180/Math.PI); //Returns angle in degrees
+    armAngleSim.setDouble(simCurrentAngle);
   } 
 
   @Override
