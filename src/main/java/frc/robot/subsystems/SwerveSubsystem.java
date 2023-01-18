@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -268,7 +267,7 @@ public class SwerveSubsystem extends SubsystemBase{
         double xOffset = 0; //Range offset //TODO: Add constants to calculate 
         double yOffset = 0; //Left/Right offset //TODO: Add TOF sensor method to calculate
 
-        if(!Objects.isNull(id) && Robot.isRed ? id < 4 : id > 5){
+        if(id != -1 && Robot.isRed ? id < 4 : id > 5){
             //Get pose of node to be targeted
             Pose2d desiredPose = new Pose2d(
                 nodePosition.getTranslation(id),

@@ -68,6 +68,6 @@ public class Photonvision {
         if(result.hasTargets()){
             return result.getBestTarget().getFiducialId();
         }
-        return null;
+        return -1;
     }
 }  
