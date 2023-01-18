@@ -47,9 +47,6 @@ public class RobotContainer {
       OI.Driver.getYTranslationSupplier(),
       OI.Driver.getRotationSupplier()));
 
-    //Implement when SmartDashboard/Whatever system we use is ready, make sure to bind it to isCompetition in Robot.java
-    //SmartDashboard.putData(batterySubsystem);
-
     // Configure the button bindings    
 
     configureButtonBindings();
