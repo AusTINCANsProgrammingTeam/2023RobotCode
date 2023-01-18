@@ -22,9 +22,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   // FIXME using PWMSparkMax because CANSparkMax doesn't have an equivalent simulation class
   // May limit how much we can do in terms of JUnit tests
-  private double P = 0.001;
-  private double I = 0.001;
-  private double D = 0.001;
+  private double P = 0.1;
+  private double I = 0.1;
+  private double D = 0;
   private CANSparkMax motorBase;
   private CANSparkMax motorElbow;
   private final RelativeEncoder motorBaseEncoder;
@@ -72,10 +72,11 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void simulationPeriodic() {
-    baseArmSim.setInputVoltage(1);
+    baseArmSim.setInputVoltage(basePIDController.calculate(motorBaseEncoder.getPosition(), Units.degreesToRadians(5)));
     baseArmSim.update(0.02); // standard loop time of 20ms
-    simCurrentAngle = baseArmSim.getAngleRads()*(180/Math.PI); //Returns angle in degrees
+    simCurrentAngle = Units.radiansToDegrees(baseArmSim.getAngleRads()); //Returns angle in degrees
     armAngleSim.setDouble(simCurrentAngle);
+
   } 
 
   @Override
