@@ -20,7 +20,7 @@ public class MotorController {
         BackLeftModuleDrive(7, 50, IdleMode.kBrake),
         BackLeftModuleTurn(8, 40, IdleMode.kBrake, true),
         BackRightModuleDrive(6, 50, IdleMode.kBrake),
-        BackRightModuleTurn(5, 40, IdleMode.kBrake, true);
+        BackRightModuleTurn(5, 40, IdleMode.kBrake, true),  
         //Intake motors
         IntakeMotor1(13),
         IntakeMotor2(14, true);

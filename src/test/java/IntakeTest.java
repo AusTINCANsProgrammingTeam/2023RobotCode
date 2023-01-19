@@ -2,15 +2,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.simulation.*;
-
-import java.util.Random;
 
 import org.junit.jupiter.api.*;
 
-import com.revrobotics.CANSparkMax;
-
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 
@@ -19,7 +13,6 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class IntakeTest {
 
   private static final double kDelta = 1e-2;
-  private static final int kNumTests = 10;
 
   //DUT -> Device Under Test
   private IntakeSubsystem dut;
@@ -38,14 +31,14 @@ public class IntakeTest {
   @Test // marks this method as a test
   public void testPull() {
     dut.pull();
-        //JUnit Assert class provides this and many other comparision functions.
-        assertEquals(IntakeSubsystem.INTAKE_SPEED, dut.getSpeed(), kDelta); //Check that motor speed matches what we wrote
+    //JUnit Assert class provides this and many other comparision functions.
+    assertEquals(IntakeSubsystem.kIntakeSpeed, dut.getSpeed(), kDelta); //Check that motor speed matches what we wrote
   }
   @Test
   public void testPush() {
     dut.push();
-        //JUnit Assert class provides this and many other comparision functions.
-        assertEquals(IntakeSubsystem.OUTTAKE_SPEED, dut.getSpeed(), kDelta);
+    //JUnit Assert class provides this and many other comparision functions.
+    assertEquals(IntakeSubsystem.kOuttakeSpeed, dut.getSpeed(), kDelta);
   }
   // Add more @Test tagged methods to test other things...
 }
