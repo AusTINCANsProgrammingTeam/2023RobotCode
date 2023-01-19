@@ -6,10 +6,6 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-
-import edu.wpi.first.math.controller.PIDController;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -26,20 +22,27 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.classes.FieldConstants;
 
 
 public class AutonSubsytem extends SubsystemBase{
     public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed / 4; //Maximum speed allowed in auton, in meters per second
     public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
 
-    public static final double kXTranslationP = 1.5;
-    public static final double kYTranslationP = 1.5;
-    public static final double kRotationP = 3;
-
     private enum AutonModes{
-        FORWARD, // Go forward 2 meters
-        BACKWARD, // Wait 3 seconds, go backward 2 meters
-        FORWARD180; // Go forward 2 meters and rotate 180 degrees
+        FORWARD, // Go forward 1 meter
+        BACKWARD, // Wait 3 seconds, go backward 1 meter
+        FORWARD180, // Go forward 2 meters and rotate 180 degrees
+        CURVE, // Go forward 1 meter and left 1 meter
+        ONESCORECHARGETOP, // Score preloaded game piece and engage charge pad starting from top of community
+        ONESCORECHARGEMID, // Score preloaded game piece and engage charge pad starting from middle of community
+        ONESCORECHARGELOW, // Score preloaded game piece and engage charge pad starting from bottom of community
+        TWOSCORETOP, // Score preloaded game piece and score another game piece starting from top of community
+        TWOSCOREMID, // Score preloaded game piece and score another game piece starting from middle of community
+        TWOSCORELOW, // Score preloaded game piece and score another game piece starting from bottom of community
+        TWOSCORECHARGETOP, // Score preloaded game piece, score another game piece, and engage charge pad starting from top of community
+        TWOSCORECHARGEMID, // Score preloaded game piece, score another game piece, and engage charge pad starting from middle of community
+        TWOSCORECHARGELOW; // Score preloaded game piece, score another game piece, and engage charge pad starting from bottom of community
     }
     private final AutonModes kDefaultAutonMode = AutonModes.FORWARD;
 
@@ -48,14 +51,9 @@ public class AutonSubsytem extends SubsystemBase{
     private SendableChooser<AutonModes> modeChooser = new SendableChooser<>();
 
     private DataLog datalog = DataLogManager.getLog();
-    private StringLogEntry trajectoryLog = new StringLogEntry(datalog, "/auton/trajectory"); //Logs x translation state output
     private StringLogEntry commandLog = new StringLogEntry(datalog, "/auton/command"); //Logs x translation state output
 
     private SwerveSubsystem swerveSubsystem;
-
-    private PIDController xController;
-    private PIDController yController;
-    private PIDController rotationController;
 
     private PathConstraints pathConstraints;
 
@@ -70,12 +68,6 @@ public class AutonSubsytem extends SubsystemBase{
         }
         modeChooser.setDefaultOption(kDefaultAutonMode.toString(), kDefaultAutonMode);
         configTab.add("Auton mode", modeChooser);
-
-        //Define PID controllers for tracking trajectory
-        xController = new PIDController(kXTranslationP, 0, 0);
-        yController = new PIDController(kYTranslationP, 0, 0);
-        rotationController = new PIDController(kRotationP, 0, 0);
-        rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
         pathConstraints = new PathConstraints(kMaxSpeed, kMaxAcceleration);
     }
@@ -97,32 +89,10 @@ public class AutonSubsytem extends SubsystemBase{
         );
     }
 
-    private Command followTrajectory(String name) throws NullPointerException{
-        //For use with trajectories generated from pathplanner
-        PathPlannerTrajectory trajectory = getTrajectory(name);
-        if(Objects.isNull(trajectory)){throw new NullPointerException();}
-        return followTrajectory(name, trajectory);
-    }
-
-    private Command followTrajectory(String name, PathPlannerTrajectory trajectory){
-        //For use with trajectories generated from a list of poses
-        return new PPSwerveControllerCommand(
-            trajectory,
-            swerveSubsystem::getPose, 
-            SwerveSubsystem.kDriveKinematics, 
-            xController, 
-            yController, 
-            rotationController, 
-            swerveSubsystem::setModuleStates, 
-            swerveSubsystem
-        ).beforeStarting(() -> trajectoryLog.append("Following trajectory " + name)
-        ).andThen(() -> trajectoryLog.append("Trajectory " + name +  " Ended"));
-    }
-
     private Command resetOdometry(String initialTrajectory) throws NullPointerException{
         //Resets odometry to the initial position of the given trajectory
         PathPlannerTrajectory trajectory = getTrajectory(initialTrajectory);
-        Pose2d initialPose = Objects.isNull(trajectory) ? new Pose2d(0, 0, new Rotation2d()) : trajectory.getInitialPose();
+        Pose2d initialPose = FieldConstants.allianceFlip(Objects.isNull(trajectory) ? new Pose2d(0, 0, new Rotation2d()) : trajectory.getInitialPose());
         return new InstantCommand(() -> swerveSubsystem.resetOdometry(initialPose));
     }
 
@@ -139,20 +109,89 @@ public class AutonSubsytem extends SubsystemBase{
                return 
                     new SequentialCommandGroup(
                         resetOdometry("Forward"),
-                        followTrajectory("Forward")
+                        swerveSubsystem.followTrajectory("Forward", getTrajectory("Forward"))
                     );
             case BACKWARD:
                 return
                     new SequentialCommandGroup(
                         resetOdometry("Backward"),
                         delay(3),
-                        followTrajectory("Backward")
+                        swerveSubsystem.followTrajectory("Backward", getTrajectory("Backward"))
                     );
             case FORWARD180:
                 return
                     new SequentialCommandGroup(
                         resetOdometry("Forward180"),
-                        followTrajectory("Forward180")
+                        swerveSubsystem.followTrajectory("Forward180", getTrajectory("Forward180"))
+                    );
+            case CURVE:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("Curve"),
+                        swerveSubsystem.followTrajectory("Curve", getTrajectory("Curve"))
+                    );
+            case ONESCORECHARGETOP:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("1ScoreChargeTop"),
+                        swerveSubsystem.followTrajectory("1ScoreChargeTop", getTrajectory("1ScoreChargeTop"))
+                    );
+            case ONESCORECHARGEMID:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("1ScoreChargeMid"),
+                        swerveSubsystem.followTrajectory("1ScoreChargeMid", getTrajectory("1ScoreChargeMid"))
+                    );
+            case ONESCORECHARGELOW:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("1ScoreChargeLow"),
+                        swerveSubsystem.followTrajectory("1ScoreChargeLow", getTrajectory("1ScoreChargeLow"))
+                    );
+            case TWOSCORETOP:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("2ScoreTop1"),
+                        swerveSubsystem.followTrajectory("2ScoreTop1", getTrajectory("2ScoreTop1")),
+                        swerveSubsystem.followTrajectory("2ScoreTop2", getTrajectory("2ScoreTop2"))
+                    );
+            case TWOSCOREMID:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("2ScoreMid"),
+                        swerveSubsystem.followTrajectory("2ScoreMid1", getTrajectory("2ScoreMid1")),
+                        swerveSubsystem.followTrajectory("2ScoreMid2", getTrajectory("2ScoreMid2"))
+                    );
+            case TWOSCORELOW:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("2ScoreLow1"),
+                        swerveSubsystem.followTrajectory("2ScoreLow1", getTrajectory("2ScoreLow1")),
+                        swerveSubsystem.followTrajectory("2ScoreLow2", getTrajectory("2ScoreLow2"))
+                    );
+            case TWOSCORECHARGETOP:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("2ScoreChargeTop1"),
+                        swerveSubsystem.followTrajectory("2ScoreChargeTop1", getTrajectory("2ScoreChargeTop1")),
+                        swerveSubsystem.followTrajectory("2ScoreChargeTop2", getTrajectory("2ScoreChargeTop2")),
+                        swerveSubsystem.followTrajectory("2ScoreChargeTop3", getTrajectory("2ScoreChargeTop3"))
+                    );
+            case TWOSCORECHARGEMID:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("2ScoreChargeMid1"),
+                        swerveSubsystem.followTrajectory("2ScoreChargeMid1", getTrajectory("2ScoreChargeMid1")),
+                        swerveSubsystem.followTrajectory("2ScoreChargeMid2", getTrajectory("2ScoreChargeMid2")),
+                        swerveSubsystem.followTrajectory("2ScoreChargeMid3", getTrajectory("2ScoreChargeMid3"))
+                    );
+            case TWOSCORECHARGELOW:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("1ScoreChargeTop"),
+                        swerveSubsystem.followTrajectory("2ScoreChargeLow1", getTrajectory("2ScoreChargeLow1")),
+                        swerveSubsystem.followTrajectory("2ScoreChargeLow2", getTrajectory("2ScoreChargeLow2")),
+                        swerveSubsystem.followTrajectory("2ScoreChargeLow3", getTrajectory("2ScoreChargeLow3"))
                     );
             default:
                 return null;
@@ -166,7 +205,7 @@ public class AutonSubsytem extends SubsystemBase{
     private Command getBackupSequence(){
         //Backup sequence in case a trajectory fails to load
         return new SequentialCommandGroup(
-            followTrajectory(
+            swerveSubsystem.followTrajectory(
                 "Up",
                 generateTrajectory(
                     constructPoint(0, 0, 0, 90),
