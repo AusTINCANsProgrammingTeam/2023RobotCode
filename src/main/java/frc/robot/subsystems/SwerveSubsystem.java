@@ -283,7 +283,7 @@ public class SwerveSubsystem extends SubsystemBase{
                     ), 
                     AutonSubsytem.constructPoint(
                         desiredPose,
-                        getPose().getY() > desiredPose.getY() ? -90 : 90)
+                        currentPose.getY() > desiredPose.getY() ? -90 : 90)
                 )
             );
         }
