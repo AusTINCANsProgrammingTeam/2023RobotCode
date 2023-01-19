@@ -11,6 +11,7 @@ import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.classes.FieldConstants.NodePosition;
+import frc.robot.subsystems.BatterySubsystem;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,19 +32,22 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
+  private static BatterySubsystem batterySubsystem;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     if(Robot.isSimulation()){
       simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
     }
-
+    if (!Robot.isCompetition) {
+      batterySubsystem = new BatterySubsystem();
+    }
     swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
       OI.Driver.getXTranslationSupplier(),
       OI.Driver.getYTranslationSupplier(),
       OI.Driver.getRotationSupplier()));
 
-      
     // Configure the button bindings    
 
     configureButtonBindings();
@@ -58,10 +62,10 @@ public class RobotContainer {
   private void configureButtonBindings() {
     OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
     OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
-    OI.Driver.getUpPOV().onTrue(new InstantCommand(() -> {swerveSubsystem.enableRotationHold(0);}, swerveSubsystem));
-    OI.Driver.getDownPOV().onTrue(new InstantCommand(() -> {swerveSubsystem.enableRotationHold(180);}, swerveSubsystem));
-    OI.Driver.getLeftPOV().onTrue(new InstantCommand(() -> {swerveSubsystem.enableRotationHold(90);}, swerveSubsystem));
-    OI.Driver.getRightPOV().onTrue(new InstantCommand(() -> {swerveSubsystem.enableRotationHold(-90);}, swerveSubsystem));
+    OI.Driver.getAlignForwardPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
+    OI.Driver.getAlignBackPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
+    OI.Driver.getAlignLeftPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(90), swerveSubsystem));
+    OI.Driver.getAlignRightPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(-90), swerveSubsystem));
 
     OI.Operator.getAlignMidLeftButton().whileTrue(swerveSubsystem.alignToTarget(NodePosition.MidLeft));
     OI.Operator.getAlignMidRightButton().whileTrue(swerveSubsystem.alignToTarget(NodePosition.MidRight));

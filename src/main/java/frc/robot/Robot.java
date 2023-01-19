@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
-  public static final boolean isCharacterizationMode = true; //Robot will prepare for drivebase for characterization once enabled
+  public static final boolean isCompetition = true;
   public static final boolean isRed = DriverStation.getAlliance() == Alliance.Red;
 
   private Command m_autonomousCommand;

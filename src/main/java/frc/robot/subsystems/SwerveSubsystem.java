@@ -106,10 +106,6 @@ public class SwerveSubsystem extends SubsystemBase{
         yController = new PIDController(kYTranslationP, 0, 0);
         rotationController = new PIDController(kRotationP, 0, 0);
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
-
-        if(Robot.isCharacterizationMode){
-            characterizeModules();
-        }
     }
 
     public void zeroHeading() {
@@ -238,15 +234,7 @@ public class SwerveSubsystem extends SubsystemBase{
         backLeft.stop();
         backRight.stop();
     }
-
-    public void characterizeModules(){
-        //Prepare all modules for characterization
-        frontLeft.characterize();
-        frontRight.characterize();
-        backLeft.characterize();
-        backRight.characterize();
-    }
-
+    
     public Command followTrajectory(String name, PathPlannerTrajectory trajectory){
         //For use with trajectories generated from a list of poses
         return new PPSwerveControllerCommand(
