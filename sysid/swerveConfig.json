@@ -4,12 +4,10 @@
   "encoding": false,
   "gearing denominator": 1.0,
   "gearing numerator": 1.0,
-  "gyro": "Analog Gyro",
-  "gyro ctor": "0",
-  "is drivetrain": false,
+  "gyro": "NavX",
+  "gyro ctor": "I2C (MXP)",
+  "is drivetrain": true,
   "motor controllers": [
-    "SPARK MAX (Brushless)",
-    "SPARK MAX (Brushless)",
     "SPARK MAX (Brushless)",
     "SPARK MAX (Brushless)"
   ],
@@ -21,13 +19,9 @@
   ],
   "primary motor ports": [
     4,
-    2,
-    7,
-    6
+    7
   ],
   "primary motors inverted": [
-    false,
-    false,
     false,
     false
   ],
@@ -38,13 +32,9 @@
   ],
   "secondary motor ports": [
     2,
-    3,
-    5,
-    7
+    6
   ],
   "secondary motors inverted": [
-    false,
-    false,
     false,
     false
   ],
