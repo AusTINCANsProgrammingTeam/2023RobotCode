@@ -7,8 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
+import frc.robot.subsystems.AssistedBalance;
 import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
+import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
@@ -25,13 +27,16 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
   private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
-  private SimulationSubsystem simulationSubsystem;
+
+  private SimulationSubsystem simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
+
+  private final AssistedBalance assistedBalance = new AssistedBalance(swerveSubsystem, simulationSubsystem);
   
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
+  public RobotContainer() { 
     if(Robot.isSimulation()){
       simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
     }

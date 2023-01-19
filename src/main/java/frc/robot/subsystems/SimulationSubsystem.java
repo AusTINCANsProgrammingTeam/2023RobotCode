@@ -20,6 +20,8 @@ public class SimulationSubsystem extends SubsystemBase {
   private final SwerveSubsystem swerveSubsystem;
   private int navXSim = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
   private double simYaw = 0;
+  private double simPitch;
+  SimDouble pitch = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Pitch"));
   /** Creates a new SimulationSubsystem. */
   public SimulationSubsystem(SwerveSubsystem swerveSubsystem) {
     this.swerveSubsystem = swerveSubsystem;
@@ -28,6 +30,11 @@ public class SimulationSubsystem extends SubsystemBase {
 
     //This puts the field into SmartDashboard
     SmartDashboard.putData("Field", m_field); 
+
+  }
+
+  public double getPitch() {
+    return simPitch;
   }
 
   @Override
@@ -46,8 +53,12 @@ public class SimulationSubsystem extends SubsystemBase {
     //Update simYaw distance
     simYaw += chassisRotationSpeed *  Robot.kDefaultPeriod;
 
+    //Update simPitch
+    //simPitch -= 
+
     //Updating Sim NavX
     SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
     angle.set(-Units.radiansToDegrees(simYaw));
+    //pitch.set();
   }
 }
