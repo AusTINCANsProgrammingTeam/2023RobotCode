@@ -28,14 +28,14 @@ public class RobotContainer {
 
 
   private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
-  public SimulationSubsystem simulationSubsystem;
+  private SimulationSubsystem simulationSubsystem;
   
-  public final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
-  public static BatterySubsystem batterySubsystem;
+  private static BatterySubsystem batterySubsystem;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
+  private RobotContainer() {
     if(Robot.isSimulation()){
       simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
     }

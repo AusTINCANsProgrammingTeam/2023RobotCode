@@ -39,12 +39,13 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void pull() {
-    spinWheels(kOuttakeSpeed);
+    spinWheels(kIntakeSpeed);
   }
   
   public double getSpeed(){
     return motor.get();
   }
+
 
   @Override
   public void close() throws Exception {
@@ -57,9 +58,9 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-         double RPS = getSpeed();
-     intakeEntry.setDouble(RPS);
-    // This method will be called once per scheduler run
+  double RPS = getSpeed();
+  intakeEntry.setDouble(RPS);
+  // This method will be called once per scheduler run
   }
 
   @Override
