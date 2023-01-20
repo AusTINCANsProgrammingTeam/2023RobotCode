@@ -14,17 +14,22 @@ public class LedIORio implements LEDIO {
 private final AddressableLED leds;
 private final AddressableLEDBuffer buffer;
 
+//TODO Led parameters and RIO ports
+
 private static final int length = 0;
 private static final int centerLed = 0;
 private static final int halfLength = (int) Math.ceil(length / 2.0);
+private static final int port = 0;
 private static final double waveExponent = 0.4; // Controls the length of the transition
 private static final double waveLength = 40.0; // How many LEDs for a full cycle
 private static final double waveDuration = 0.25; // How long until the cycle repeats
 private static final boolean rainbowMode = false;// My Eyes...
 private static final boolean waveMode = false; //Wave effect
 
+
+
 public LedIORio() {
-    leds = new AddressableLED(0);
+    leds = new AddressableLED(port);
     buffer = new AddressableLEDBuffer(length);
     leds.setLength(length);
     leds.setData(buffer);
@@ -65,6 +70,7 @@ public LedIORio() {
           setLedsSymmetrical(i, Color.fromHSV((int) x, 255, 255));
         }
     }
+
     private void wave(Color c1, Color c2, double fullLength, double duration) {
         double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0
             * Math.PI;
