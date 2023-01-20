@@ -277,7 +277,7 @@ public class SwerveSubsystem extends SubsystemBase{
                         Units.radiansToDegrees(
                             Math.atan2(
                                 desiredPose.getY() - currentPose.getY(), 
-                                desiredPose.getX() - desiredPose.getY()
+                                desiredPose.getX() - desiredPose.getX()
                             )
                         )
                     ), 
@@ -288,6 +288,32 @@ public class SwerveSubsystem extends SubsystemBase{
             );
         }
         return new InstantCommand();
+    }
+
+    public Command goToPose(Pose2d desiredPose){
+        Pose2d currentPose = getPose();
+        return followTrajectory(
+            "goto",
+            AutonSubsytem.generateTrajectory(
+                AutonSubsytem.constructPoint(
+                    currentPose, 
+                    Units.radiansToDegrees(
+                        Math.atan2(
+                            desiredPose.getY() - currentPose.getY(), 
+                            desiredPose.getX() - desiredPose.getX()
+                        )
+                    )
+                ), 
+                AutonSubsytem.constructPoint(
+                    desiredPose,
+                    Units.radiansToDegrees(
+                        Math.atan2(
+                            desiredPose.getY() - currentPose.getY(), 
+                            desiredPose.getX() - desiredPose.getX()
+                        ) + 180
+                    ))
+            )
+        );
     }
 
     @Override
