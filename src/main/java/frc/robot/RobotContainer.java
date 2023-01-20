@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+  private SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
   private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
   private SimulationSubsystem simulationSubsystem;
@@ -32,15 +32,24 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    if(Robot.isSimulation()){
+    try {
+      swerveSubsystem = new SwerveSubsystem();
+    }
+    catch (Exception e) {
+      swerveSubsystem = null;
+    }
+
+    if(Robot.isSimulation() && swerveSubsystem != null){
       simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
     }
 
-    swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
+    if (swerveSubsystem != null) {
+      swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
       OI.Driver.getXTranslationSupplier(),
       OI.Driver.getYTranslationSupplier(),
       OI.Driver.getRotationSupplier()));
+    }
 
       
     // Configure the button bindings    
@@ -55,8 +64,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
-    OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
+    if (swerveSubsystem != null) {
+      OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
+      OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
+    }
   }
 
   /**

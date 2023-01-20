@@ -86,12 +86,17 @@ public class MotorController {
     }
 
     public static CANSparkMax constructMotor(MotorConfig config){
-        CANSparkMax motor = new CANSparkMax(config.getID(), MotorType.kBrushless);
-        motor.restoreFactoryDefaults();
-        motor.setSmartCurrentLimit(config.getCurrentLimit());
-        motor.setIdleMode(config.getIdleMode());
-        motor.setOpenLoopRampRate(config.getOpenLoopRampRate());
-        motor.setInverted(config.getReversed());
-        return motor;
+        try {
+            CANSparkMax motor = new CANSparkMax(config.getID(), MotorType.kBrushless);
+            motor.restoreFactoryDefaults();
+            motor.setSmartCurrentLimit(config.getCurrentLimit());
+            motor.setIdleMode(config.getIdleMode());
+            motor.setOpenLoopRampRate(config.getOpenLoopRampRate());
+            motor.setInverted(config.getReversed());
+            return motor;
+        }
+        catch(Exception e) {
+            return null;
+        }
     }
 }
