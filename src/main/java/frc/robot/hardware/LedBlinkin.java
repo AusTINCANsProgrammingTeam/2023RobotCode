@@ -7,13 +7,16 @@ package frc.robot.hardware;
 import java.util.HashMap;
 import java.util.Map;
 
-import frc.robot.hardware.LedDriver;
 import frc.robot.hardware.LedDriver.LedDMode;
 
 /** Maps LED mode to Blinkin patterns. */
 public class LedBlinkin implements LEDIO {
   private static final Map<LedMode, LedDMode> modeLookup =
       new HashMap<>();
+
+    /**LedMode is the modes. Used to state the current state.
+    * LedDMode is the driver which has PWM params and roboRIOSpark values.
+    */
 
   static {
     modeLookup.put(LedMode.CONE, LedDMode.CONE);
@@ -27,7 +30,7 @@ public class LedBlinkin implements LEDIO {
     blinkin = new LedDriver(0);
   }
 
-  public void setMode(LedDMode mode) {
+  public void setMode(LedDMode dmode, LedMode mode) {
     if (modeLookup.containsKey(mode)) {
       blinkin.setMode(modeLookup.get(mode));
     } else {

@@ -24,7 +24,7 @@
             public static enum LedDMode {
             CONE(-0.99), //PW 1005
             CUBE(-0.97), //PW 1015
-            DISABLED_NEUTRAL(0);
+            DISABLED_NEUTRAL(0); //TODO Absolute PWM and Spark
             private final double value;
 
             LedDMode(double value) {
