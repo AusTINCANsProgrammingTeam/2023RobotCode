@@ -14,8 +14,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.Robot;
+
 import java.util.Map;
 
 /**
@@ -284,7 +284,7 @@ public final class FieldConstants {
    * rightmost point on the BLUE ALLIANCE wall.
    */
   public static Translation2d fieldElementFlip(Translation2d translation) {
-    if (DriverStation.getAlliance() == Alliance.Red) {
+    if (Robot.isRed) {
       return new Translation2d(translation.getX(), fieldLength - translation.getY());
     } else {
       return translation;
@@ -297,7 +297,7 @@ public final class FieldConstants {
    * rightmost point on the BLUE ALLIANCE wall.
    */
   public static Pose2d fieldElementFlip(Pose2d pose) {
-    if (DriverStation.getAlliance() == Alliance.Red) {
+    if (Robot.isRed) {
       return new Pose2d(
           fieldLength - pose.getX(),
           pose.getY(),
@@ -308,7 +308,7 @@ public final class FieldConstants {
   }
 
   public static Pose2d odometryFlip(Pose2d pose) {
-    if (DriverStation.getAlliance() == Alliance.Red) {
+    if (Robot.isRed) {
       return new Pose2d(
           pose.getX(),
           fieldWidth - pose.getY(),
@@ -319,7 +319,7 @@ public final class FieldConstants {
   }
   
   public static Pose3d aprilTagFlip(Pose3d pose) {
-    if (DriverStation.getAlliance() == Alliance.Red) {
+    if (Robot.isRed) {
       return new Pose3d(
           new Translation3d(
             fieldLength - pose.getX(),
