@@ -15,18 +15,16 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
-public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
+public class EverybotIntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kOuttakeSpeed = -1;
   public static final double kIntakeSpeed = 0.5;
   private CANSparkMax motor;
-  private CANSparkMax motor2;
   private ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake Status");
   private GenericEntry intakeEntry = intakeTab.add("Intake Speed", 0.0).getEntry();
   /** Creates a new IntakeSubsystem. */
-  public IntakeSubsystem() {
+  public EverybotIntakeSubsystem() {
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
-    motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
-    motor.follow(motor2);
+  
   }
   
   private void spinWheels(double velocity) {
@@ -52,7 +50,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     // This method will close all device handles used by this object and release any other dynamic memory.
     // Mostly for JUnit tests
     motor.close();
-    motor2.close();
     
   }
 
