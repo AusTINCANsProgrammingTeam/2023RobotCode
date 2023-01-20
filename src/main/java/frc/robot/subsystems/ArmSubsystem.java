@@ -20,15 +20,16 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.commands.ArmAutoCommand;
 
 
 public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   // FIXME using PWMSparkMax because CANSparkMax doesn't have an equivalent simulation class
   // May limit how much we can do in terms of JUnit tests
-  private double P = 0;
-  private double I = 1;
-  private double D = 1;
+  private double P = 0.01;
+  private double I = 0;
+  private double D = 0.6;
   private CANSparkMax motorBase;
   private CANSparkMax motorElbow;
   private final RelativeEncoder motorBaseEncoder;
@@ -45,14 +46,14 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   // SIM VALUES:
   private double gearing = 1;
-  private double baseArmLength = Units.inchesToMeters(40);
+  private double baseArmLength = Units.inchesToMeters(37.5); //40
   private double minAngle = Units.degreesToRadians(-160);
   private double maxAngle = Units.degreesToRadians(160);
-  private double baseArmMass = Units.lbsToKilograms(15);
+  private double baseArmMass = Units.lbsToKilograms(15); //15
   private final double baseArmInertia = SingleJointedArmSim.estimateMOI(baseArmLength, baseArmMass);
   private double simCurrentAngle;
 
-  private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), gearing, baseArmInertia, baseArmLength, minAngle, maxAngle, baseArmMass, true);
+  private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), gearing, baseArmInertia, baseArmLength, minAngle, maxAngle, baseArmMass, false);
 
   /** Creates a new ExampleSubsystem. */
   public ArmSubsystem() {
@@ -64,6 +65,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     motorBaseEncoder = this.motorBase.getEncoder(); 
     motorElbowEncoder = this.motorElbow.getEncoder(); 
     basePIDController = new PIDController(P, I, D);
+    //TODO: go here: https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/combining-feedforward-feedback.html
     elbowPIDController = new PIDController(P, I, D);
   }
 
@@ -75,6 +77,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public void setBaseRef(double setpoint) {
     motorBase.set(basePIDController.calculate(motorBaseEncoder.getPosition(), setpoint));
   }
+  public double getBaseAngle() {
+    return motorBaseEncoder.getPosition() * (Math.PI*2);
+  }
 
    public void setElbowRef(double setpoint) {
     motorElbow.set(elbowPIDController.calculate(motorElbowEncoder.getPosition(), setpoint));
@@ -82,19 +87,23 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void simulationPeriodic() {
-    double setpoint = 10;
-    double pidOut = basePIDController.calculate(motorBaseEncoderSim.getPosition()*(2*Math.PI), Units.degreesToRadians(setpoint));
+    //Base arm angle
+    double baseSetpoint = ArmAutoCommand.getBaseAngle(76, 88);
+    double pidOut = basePIDController.calculate(motorBaseEncoderSim.getPosition()*(2*Math.PI), baseSetpoint);
     motorBase.set(pidOut);
-    baseArmSim.setInput(motorBase.get() * RobotController.getBatteryVoltage());
+    baseArmSim.setInputVoltage(pidOut * RobotController.getBatteryVoltage());
+  
     motorBaseEncoderSim.setPosition(baseArmSim.getAngleRads()/(2*Math.PI) * gearing);
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(baseArmSim.getCurrentDrawAmps()));
+    
     baseArmSim.update(0.02); // standard loop time of 20ms
+    //SB Return values
     simCurrentAngle = Units.radiansToDegrees(baseArmSim.getAngleRads()); //Returns angle in degrees
     armAngleSim.setDouble(simCurrentAngle);
     simEncoderPos.setDouble(motorBaseEncoderSim.getPosition()*(2*Math.PI)*(180/Math.PI));
-    simOutSet.setDouble(pidOut);
+    simOutSet.setDouble(ArmAutoCommand.getPrelimAngle(76,88));
     simError.setDouble(basePIDController.getPositionError()*(180/Math.PI));
-    simVoltage.setDouble(motorBase.getBusVoltage());
+    simVoltage.setDouble(baseArmSim.getCurrentDrawAmps());
   } 
 
   @Override
