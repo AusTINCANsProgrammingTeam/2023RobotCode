@@ -8,13 +8,12 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 
-
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
@@ -22,14 +21,15 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private CANSparkMax motor2;
   public static final double OUTTAKE_SPEED = -1;
   public static final double INTAKE_SPEED = 0.5;
+  private ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake Status");
+  private GenericEntry intakeEntry = intakeTab.add("Intake Speed", 0.0).getEntry();
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
     motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
     motor.follow(motor2);
-ShuffleboardTab tab = Shuffleboard.getTab("Intake Status");
-Shuffleboard.selectTab("Intake Status");
+
   }
   
   private void spinWheels(double velocity) {
@@ -50,6 +50,8 @@ Shuffleboard.selectTab("Intake Status");
   }
   @Override
   public void periodic() {
+     double RPS = getSpeed();
+     intakeEntry.setDouble(RPS);
     // This method will be called once per scheduler run
   }
 
