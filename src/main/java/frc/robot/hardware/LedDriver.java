@@ -17,16 +17,17 @@
             pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
         }
 
-        public void setMode(LedMode mode) {
+        public void setMode(LedDMode mode) {
             pwm.setSpeed(mode.value);
         }
 
-            public static enum LedMode {
+            public static enum LedDMode {
             CONE(-0.99), //PW 1005
-            CUBE(-0.97); //PW 1015
+            CUBE(-0.97), //PW 1015
+            DISABLED_NEUTRAL(0);
             private final double value;
 
-            LedMode(double value) {
+            LedDMode(double value) {
                     this.value = value;
             }
         }
