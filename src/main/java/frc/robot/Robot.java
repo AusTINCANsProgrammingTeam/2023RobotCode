@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+<<<<<<< HEAD
+=======
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.IntegerLogEntry;
+>>>>>>> 0b0a69c7cbf7613ac7354ff4830263d15cfe3c7a
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -17,10 +22,22 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
+<<<<<<< HEAD
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
 
+=======
+  public static final boolean isCompetition = true;
+  private Command m_autonomousCommand;
+  private DataLog loopCountlog = DataLogManager.getLog();
+  private IntegerLogEntry loopCountEntry = new IntegerLogEntry(loopCountlog, "/robot/loopCount");
+
+  private RobotContainer m_robotContainer;
+
+  private int loopCount = 0;
+
+>>>>>>> 0b0a69c7cbf7613ac7354ff4830263d15cfe3c7a
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -49,6 +66,8 @@ public class Robot extends TimedRobot {
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
+    loopCount++;
+    loopCountEntry.append(loopCount);
     CommandScheduler.getInstance().run();
   }
 

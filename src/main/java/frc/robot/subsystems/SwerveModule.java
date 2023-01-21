@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.classes.RelativeEncoderSim;
+import frc.robot.classes.TunableNumber;
 import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
@@ -67,6 +68,7 @@ public class SwerveModule extends SubsystemBase {
     private DoubleLogEntry desiredAngleLog;
     private DoubleLogEntry actualAbsoluteAngleLog;
     private DoubleLogEntry actualRelativeAngleLog;
+    private DoubleLogEntry rotationSpeedLog;
 
     private String ID;
 
@@ -121,6 +123,7 @@ public class SwerveModule extends SubsystemBase {
             desiredAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setAngle"); //Logs desired angle in radians
             actualAbsoluteAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualAbsAngle"); //Logs actual absolute angle in radians
             actualRelativeAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualRelAngle"); //Logs actual relative angle in radians
+            rotationSpeedLog = new DoubleLogEntry(datalog, "/swerve" + ID + "/rotationSpeed");
         } catch(Exception e){
            moduleCaughtExeption = "Swerve Module Caught Exception: " + e.getMessage();
            System.out.println(moduleCaughtExeption);
@@ -155,7 +158,9 @@ public class SwerveModule extends SubsystemBase {
     }
     
     public double getTurningVelocity() {
-        return Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
+        double currentRotation = Robot.isSimulation() ? simTurningEncoder.getVelocity() : turningEncoder.getVelocity();
+        rotationSpeedLog.append(currentRotation);
+        return currentRotation;
     }
 
     public void resetEncoders() {
@@ -176,6 +181,7 @@ public class SwerveModule extends SubsystemBase {
             stop();
             return;
         }
+        
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
         driveMotor.set(desiredState.speedMetersPerSecond / SwerveSubsystem.kPhysicalMaxSpeed);
         turningSetpoint = calculateSetpoint(desiredState.angle.getRadians());
@@ -210,10 +216,10 @@ public class SwerveModule extends SubsystemBase {
 
     @Override
     public void periodic(){
-            SmartDashboard.putNumber("Swerve[" + ID + "] absolute encoder position", getAbsoluteTurningPosition());
-            SmartDashboard.putNumber("Swerve[" + ID + "] relative encoder position", getTurningPosition());
-            actualSpeedLog.append(driveEncoder.getVelocity());
-            actualAbsoluteAngleLog.append(getAbsoluteTurningPosition());
-            actualRelativeAngleLog.append(getTurningPosition());
+        SmartDashboard.putNumber("Swerve[" + ID + "] absolute encoder position", getAbsoluteTurningPosition());
+        SmartDashboard.putNumber("Swerve[" + ID + "] relative encoder position", getTurningPosition());
+        actualSpeedLog.append(driveEncoder.getVelocity());
+        actualAbsoluteAngleLog.append(getAbsoluteTurningPosition());
+        actualRelativeAngleLog.append(getTurningPosition());
     }
 }
