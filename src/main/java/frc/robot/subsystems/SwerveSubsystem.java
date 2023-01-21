@@ -208,6 +208,14 @@ public class SwerveSubsystem extends SubsystemBase{
         backLeft.stop();
         backRight.stop();
     }
+
+    public void parkModules(){
+        frontLeft.park(true);
+        frontRight.park(false);
+        backLeft.park(false);
+        backRight.park(true);
+    }
+
     
     public Command followTrajectory(String name, PathPlannerTrajectory trajectory){
         //For use with trajectories generated from a list of poses

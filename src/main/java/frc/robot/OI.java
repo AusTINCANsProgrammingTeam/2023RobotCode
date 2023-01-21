@@ -15,7 +15,7 @@ public class OI {
 
         private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
         private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
-
+        private static final int kParkButtonID = 5; //5 Button, park the robot
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
@@ -62,6 +62,9 @@ public class OI {
 
         public static JoystickButton getZeroButton(){
             return new JoystickButton(kJoystick, kZeroButtonID);
+        }
+        public static JoystickButton getParkButton(){
+            return new JoystickButton(kJoystick, kParkButtonID);
         }
     }
 

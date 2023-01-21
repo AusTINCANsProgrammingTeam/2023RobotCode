@@ -23,6 +23,13 @@ import frc.robot.subsystems.CameraSubsystem;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
+import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.SwerveTeleopCommand;
+import frc.robot.subsystems.AutonSubsytem;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.SimulationSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
@@ -65,6 +72,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
     OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
+    OI.Driver.getParkButton().whileTrue(new InstantCommand(swerveSubsystem::parkModules,swerveSubsystem));
     OI.Driver.getAlignForwardPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
     OI.Driver.getAlignBackPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
     OI.Driver.getAlignLeftPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(90), swerveSubsystem));
