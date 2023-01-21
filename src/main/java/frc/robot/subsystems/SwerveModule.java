@@ -4,6 +4,12 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.sensors.WPI_CANCoder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -21,15 +27,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.classes.RelativeEncoderSim;
 import frc.robot.hardware.AbsoluteEncoder;
-import frc.robot.hardware.MotorController;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
+import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
-
-import com.ctre.phoenix.sensors.WPI_CANCoder;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
 
 public class SwerveModule extends SubsystemBase {
     public static final double kWheelDiameterMeters = Units.inchesToMeters(3.5);
@@ -164,6 +164,14 @@ public class SwerveModule extends SubsystemBase {
         SmartDashboard.putString("Swerve[" + ID + "] state", desiredState.toString());
         desiredAngleLog.append(desiredState.angle.getRadians());
         desiredSpeedLog.append(desiredState.speedMetersPerSecond);
+    }
+
+    public void park(boolean reversed) {
+        if(reversed){
+          turningPIDController.setReference(-Math.PI/4, ControlType.kPosition);  
+        } else{
+            turningPIDController.setReference(Math.PI/4, ControlType.kPosition);
+        }
     }
 
     public void stop() {

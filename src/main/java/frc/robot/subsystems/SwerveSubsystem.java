@@ -172,6 +172,13 @@ public class SwerveSubsystem extends SubsystemBase{
         backRight.stop();
     }
 
+    public void parkModules(){
+        frontLeft.park(true);
+        frontRight.park(false);
+        backLeft.park(false);
+        backRight.park(true);
+    }
+
     @Override
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());
