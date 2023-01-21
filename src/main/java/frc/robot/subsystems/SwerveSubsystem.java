@@ -28,7 +28,7 @@ import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
 public class SwerveSubsystem extends SubsystemBase{
-    public boolean Dummy = false;
+    private boolean Dummy = false;
 
     public static final double kPhysicalMaxSpeed = Units.feetToMeters(14.5);; //Max drivebase speed in meters per second
     public static final double kPhysicalMaxAngularSpeed = 2 * Math.PI; //Max drivebase angular speed in radians per second
@@ -46,7 +46,7 @@ public class SwerveSubsystem extends SubsystemBase{
     private SwerveModule backLeft;
     private SwerveModule backRight;
 
-    private AHRS gyro = new AHRS(SPI.Port.kMXP);
+    private AHRS gyro;
     private SwerveDriveOdometry odometer;
 
     private DataLog datalog = DataLogManager.getLog();
@@ -63,11 +63,8 @@ public class SwerveSubsystem extends SubsystemBase{
     public boolean controlOrientationIsFOD;
 
     public SwerveSubsystem() {
-        System.out.println("Running Constructor !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         caughtExeptionLog = new StringLogEntry(errorLog, "/errors");
 
-        try{
-            System.out.println("Making Swerve Modules!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             frontLeft = new SwerveModule(
             MotorConfig.FrontLeftModuleDrive,
             MotorConfig.FrontLeftModuleTurn,
@@ -91,16 +88,23 @@ public class SwerveSubsystem extends SubsystemBase{
             MotorConfig.BackRightModuleTurn,
             EncoderConfig.BackRightModule,
             "BR");
+        try {
+            gyro = new AHRS(SPI.Port.kMXP);
             odometer = new SwerveDriveOdometry(kDriveKinematics, getRotation2d(), getModulePositions());
             zeroHeading();
             controlOrientationIsFOD = true;
         }
         catch(Exception e) {
-           System.out.println("Set Dummy Variable!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-           caughtExeption = "Caught Exception: " + e.getMessage();
+           caughtExeption = "Swerve Subsystem Caught Exception: " + e.getMessage();
            System.out.println(caughtExeption);
            caughtExeptionLog.append(caughtExeption);
            Dummy = true;
+        }
+        finally {
+            if (frontLeft.getDummy() || frontRight.getDummy() || backLeft.getDummy() || backRight.getDummy()) {
+                CommandScheduler.getInstance().unregisterSubsystem(frontLeft, frontRight, backLeft, backRight);
+                Dummy = true;
+            }
         }
     }
 
