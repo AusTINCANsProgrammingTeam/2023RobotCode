@@ -22,6 +22,7 @@ import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
@@ -38,29 +39,10 @@ public class SwerveSubsystem extends SubsystemBase{
         new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    private final SwerveModule frontLeft = new SwerveModule(
-        MotorConfig.FrontLeftModuleDrive,
-        MotorConfig.FrontLeftModuleTurn,
-        EncoderConfig.FrontLeftModule,
-        "FL");
-
-    private final SwerveModule frontRight = new SwerveModule(
-        MotorConfig.FrontRightModuleDrive,
-        MotorConfig.FrontRightModuleTurn,
-        EncoderConfig.FrontRightModule,
-        "FR");
-
-    private final SwerveModule backLeft = new SwerveModule(
-        MotorConfig.BackLeftModuleDrive,
-        MotorConfig.BackLeftModuleTurn,
-        EncoderConfig.BackLeftModule,
-        "BL");
-
-    private final SwerveModule backRight = new SwerveModule(
-        MotorConfig.BackRightModuleDrive,
-        MotorConfig.BackRightModuleTurn,
-        EncoderConfig.BackRightModule,
-        "BR");
+    private SwerveModule frontLeft;
+    private SwerveModule frontRight;
+    private SwerveModule backLeft;
+    private SwerveModule backRight;
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
     private SwerveDriveOdometry odometer = new SwerveDriveOdometry(kDriveKinematics, getRotation2d(), getModulePositions());
@@ -75,6 +57,37 @@ public class SwerveSubsystem extends SubsystemBase{
     public boolean controlOrientationIsFOD;
 
     public SwerveSubsystem() {
+        CommandScheduler.getInstance().unregisterSubsystem(this);
+        try{
+            frontLeft = new SwerveModule(
+            MotorConfig.FrontLeftModuleDrive,
+            MotorConfig.FrontLeftModuleTurn,
+            EncoderConfig.FrontLeftModule,
+            "FL");
+
+            frontRight = new SwerveModule(
+            MotorConfig.FrontRightModuleDrive,
+            MotorConfig.FrontRightModuleTurn,
+            EncoderConfig.FrontRightModule,
+            "FR");
+
+            backLeft = new SwerveModule(
+            MotorConfig.BackLeftModuleDrive,
+            MotorConfig.BackLeftModuleTurn,
+            EncoderConfig.BackLeftModule,
+            "BL");
+
+            backRight = new SwerveModule(
+            MotorConfig.BackRightModuleDrive,
+            MotorConfig.BackRightModuleTurn,
+            EncoderConfig.BackRightModule,
+            "BR");
+            CommandScheduler.getInstance().registerSubsystem(this);
+        }
+        catch(Exception e) {
+            //CommandScheduler.getInstance().unregisterSubsystem(this);
+        }
+
         zeroHeading();
         controlOrientationIsFOD = true;
     }
@@ -174,8 +187,13 @@ public class SwerveSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        odometer.update(getRotation2d(), getModulePositions());
-        SmartDashboard.putNumber("Robot Heading", getHeading());
-        SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+        try {
+            odometer.update(getRotation2d(), getModulePositions());
+            SmartDashboard.putNumber("Robot Heading", getHeading());
+            SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+        }
+        catch(Exception e) {
+            System.out.println("Error Test.");
+        }
     }
 }

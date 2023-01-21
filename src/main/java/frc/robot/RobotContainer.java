@@ -17,6 +17,8 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -46,6 +48,7 @@ public class RobotContainer {
       swerveSubsystem = new SwerveSubsystem();
     }
     catch (Exception e) {
+      CommandScheduler.getInstance().unregisterSubsystem(swerveSubsystem);
       caughtExeption = "Caught Exception: " + e.getMessage();
       System.out.println(caughtExeption);
       caughtExeptionLog.append(caughtExeption);
