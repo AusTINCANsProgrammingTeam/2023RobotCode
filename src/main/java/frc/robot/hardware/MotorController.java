@@ -17,7 +17,7 @@ public class MotorController {
         FrontLeftModuleTurn(3, 40, IdleMode.kBrake, true),
         FrontRightModuleDrive(2, 50, IdleMode.kBrake),
         FrontRightModuleTurn(1, 40, IdleMode.kBrake, true),
-        BackLeftModuleDrive(1, 50, IdleMode.kBrake), // was 7
+        BackLeftModuleDrive(7, 50, IdleMode.kBrake), // was 7
         BackLeftModuleTurn(8, 40, IdleMode.kBrake, true),
         BackRightModuleDrive(6, 50, IdleMode.kBrake),
         BackRightModuleTurn(5, 40, IdleMode.kBrake, true);
