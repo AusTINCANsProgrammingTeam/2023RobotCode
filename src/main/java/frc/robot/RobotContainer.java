@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
@@ -30,12 +34,22 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
+  private DataLog errorLog = DataLogManager.getLog();
+  private StringLogEntry caughtExeptionLog;
+  private String caughtExeption;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    caughtExeptionLog = new StringLogEntry(errorLog, "/errors");
+
     try {
       swerveSubsystem = new SwerveSubsystem();
     }
     catch (Exception e) {
+      caughtExeption = "Caught Exception: " + e.getMessage();
+      System.out.println(caughtExeption);
+      caughtExeptionLog.append(caughtExeption);
+      
       swerveSubsystem = null;
     }
 
