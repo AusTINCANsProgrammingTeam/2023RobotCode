@@ -66,8 +66,8 @@ public class RobotContainer {
     OI.Driver.getAlignBackPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
     OI.Driver.getAlignLeftPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(90), swerveSubsystem));
     OI.Driver.getAlignRightPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(-90), swerveSubsystem));
-    OI.Driver.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::pull));
-    OI.Driver.getOuttakeButton().onTrue(new InstantCommand(intakeSubsystem::push));
+    OI.Driver.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::pull, intakeSubsystem));
+    OI.Driver.getOuttakeButton().onTrue(new InstantCommand(intakeSubsystem::push, intakeSubsystem));
   }
 
   /**
