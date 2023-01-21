@@ -19,11 +19,11 @@ public class EverybotIntakeSubsystem extends SubsystemBase implements AutoClosea
   public static final double kOuttakeSpeed = -1;
   public static final double kIntakeSpeed = 0.5;
   private CANSparkMax motor;
-  private ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake Status");
-  private GenericEntry intakeEntry = intakeTab.add("Intake Speed", 0.0).getEntry();
+  private static ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake Status");
+  private static GenericEntry intakeEntry = intakeTab.add("Everybot Intake Speed", 0.0).getEntry();
   /** Creates a new IntakeSubsystem. */
   public EverybotIntakeSubsystem() {
-    motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
+    motor = MotorController.constructMotor(MotorConfig.IntakeMotor3);
   
   }
   
@@ -55,8 +55,7 @@ public class EverybotIntakeSubsystem extends SubsystemBase implements AutoClosea
 
   @Override
   public void periodic() {
-    double RPS = getSpeed();
-    intakeEntry.setDouble(RPS);
+    intakeEntry.setDouble(getSpeed());
     // This method will be called once per scheduler run
   }
 

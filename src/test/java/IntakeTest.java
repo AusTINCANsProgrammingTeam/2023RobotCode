@@ -19,8 +19,8 @@ public class IntakeTest {
 
   @BeforeEach // this method will run before each test
   public void setup() {
-    assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
     dut = new IntakeSubsystem();
+    assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
   }
 
   @AfterEach // this method will run after each test

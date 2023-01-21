@@ -23,7 +23,8 @@ public class MotorController {
         BackRightModuleTurn(5, 40, IdleMode.kBrake, true),  
         //Intake motors
         IntakeMotor1(13),
-        IntakeMotor2(14, true);
+        IntakeMotor2(14, true),
+        IntakeMotor3(15);
 
         private int ID;
         private int currentLimit;

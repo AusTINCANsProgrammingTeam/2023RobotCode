@@ -20,8 +20,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kIntakeSpeed = 0.5;
   private CANSparkMax motor;
   private CANSparkMax motor2;
-  private ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake Status");
-  private GenericEntry intakeEntry = intakeTab.add("Intake Speed", 0.0).getEntry();
+  private static ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake Status");
+  private static GenericEntry intakeEntry = intakeTab.add("Intake Speed", 0.0).getEntry();
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
@@ -58,8 +58,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    double RPS = getSpeed();
-    intakeEntry.setDouble(RPS);
+    intakeEntry.setDouble(getSpeed());
     // This method will be called once per scheduler run
   }
 
