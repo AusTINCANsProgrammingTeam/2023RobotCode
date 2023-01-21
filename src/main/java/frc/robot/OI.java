@@ -41,19 +41,19 @@ public class OI {
             return () -> kRotationCurve.calculate(-kJoystick.getRawAxis(kRotationAxis));
         }
 
-        public static POVButton getUpPOV(){
+        public static POVButton getAlignForwardPOV(){
             return new POVButton(kJoystick, 0);
         }
 
-        public static POVButton getDownPOV(){
+        public static POVButton getAlignBackPOV(){
             return new POVButton(kJoystick, 180);
         }
 
-        public static POVButton getLeftPOV(){
+        public static POVButton getAlignLeftPOV(){
             return new POVButton(kJoystick, 270);
         }
 
-        public static POVButton getRightPOV(){
+        public static POVButton getAlignRightPOV(){
             return new POVButton(kJoystick, 90);
         }
 

@@ -4,26 +4,23 @@
   "encoding": false,
   "gearing denominator": 1.0,
   "gearing numerator": 1.0,
-  "gyro": "NavX",
-  "gyro ctor": "I2C (MXP)",
-  "is drivetrain": true,
+  "gyro": "Analog Gyro",
+  "gyro ctor": "0",
+  "is drivetrain": false,
   "motor controllers": [
-    "SPARK MAX (Brushless)",
     "SPARK MAX (Brushless)"
   ],
   "number of samples per average": 1,
   "primary encoder inverted": false,
   "primary encoder ports": [
-    0,
+    12,
     1
   ],
   "primary motor ports": [
-    4,
-    7
+    3
   ],
   "primary motors inverted": [
-    false,
-    false
+    true
   ],
   "secondary encoder inverted": false,
   "secondary encoder ports": [
@@ -31,11 +28,9 @@
     3
   ],
   "secondary motor ports": [
-    2,
-    6
+    2
   ],
   "secondary motors inverted": [
-    false,
     false
   ],
   "velocity measurement period": 100

@@ -209,6 +209,21 @@ public class SwerveSubsystem extends SubsystemBase{
         backRight.stop();
     }
     
+    public Command followTrajectory(String name, PathPlannerTrajectory trajectory){
+        //For use with trajectories generated from a list of poses
+        return new PPSwerveControllerCommand(
+            trajectory,
+            this::getPose, 
+            SwerveSubsystem.kDriveKinematics, 
+            xController, 
+            yController, 
+            rotationController, 
+            this::setModuleStates, 
+            this
+        ).beforeStarting(() -> trajectoryLog.append("Following trajectory " + name)
+        ).andThen(() -> trajectoryLog.append("Trajectory " + name +  " Ended"));
+    }
+    
     @Override
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());
