@@ -10,7 +10,6 @@ import frc.robot.hardware.LEDIO.LedMode;
  * meaning it cannot be required by commands. This prevents unexpected conflicts between commands,
  * potentially impacting normal robot operation.
  */
-//FROM Mechanical-Advantage/RobotCode2022
 //TODO LedBlinkin
 //TODO Test?
 public class Leds {

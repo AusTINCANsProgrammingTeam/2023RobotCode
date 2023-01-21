@@ -46,6 +46,10 @@ public class OI {
         public static JoystickButton getZeroButton(){
             return new JoystickButton(kJoystick, kZeroButtonID);
         }
+        public static JoystickButton getButton(){
+            //TODO get button for Led
+            return new JoystickButton(kJoystick, 0);
+        }
     }
 
     public static final class Operator{
