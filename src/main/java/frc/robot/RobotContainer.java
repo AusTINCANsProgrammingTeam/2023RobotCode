@@ -10,7 +10,7 @@ import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.BBalanceSubsystem;
+import frc.robot.subsystems.BuddyBalanceSubsystem;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,7 +28,7 @@ public class RobotContainer {
   private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
   private SimulationSubsystem simulationSubsystem;
 
-  private final BBalanceSubsystem  buddyBalanceSubsystem = new BBalanceSubsystem();
+  private final BuddyBalanceSubsystem  buddyBalanceSubsystem = new BuddyBalanceSubsystem();
   
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
@@ -64,7 +64,7 @@ public class RobotContainer {
     OI.Driver.getDownPOV().onTrue(new InstantCommand(() -> {swerveSubsystem.enableRotationHold(180);}, swerveSubsystem));
     OI.Driver.getLeftPOV().onTrue(new InstantCommand(() -> {swerveSubsystem.enableRotationHold(90);}, swerveSubsystem));
     OI.Driver.getRightPOV().onTrue(new InstantCommand(() -> {swerveSubsystem.enableRotationHold(-90);}, swerveSubsystem));
-    OI.Operator.ToggleBuddyBalanceButton().onTrue(new InstantCommand(buddyBalanceSubsystem::ToggleBuddyBalance));
+    OI.Operator.toggleBuddyBalanceButton().onTrue(new InstantCommand(buddyBalanceSubsystem::toggleBuddyBalance));
   }
 
   /**
