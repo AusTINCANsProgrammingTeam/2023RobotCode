@@ -24,7 +24,8 @@ public class CameraSubsystem extends SubsystemBase {
   private StringLogEntry errors = new StringLogEntry(errorLog, "/errors");
   /** Creates a new VideoOverlaySubsystem. */
   public CameraSubsystem() {
-    // Retrieves each individual frame from the robot camera, adds a vertical black line through the middle (might be updated if LIDAR is added to intake), then puts frame into the output stream to be retrieved in Shuffleboard
+    // Retrieves each individual frame from the robot camera, adds a vertical black line through the middle (might be updated if LIDAR is added to intake), 
+    // then puts frame into the output stream to be retrieved in Shuffleboard
     // Taken from the Advanced Camera Server Program on WPILIB
     // https://docs.wpilib.org/en/stable/docs/software/vision-processing/roborio/using-the-cameraserver-on-the-roborio.html#advanced-camera-server-program
     m_visionThread = 
