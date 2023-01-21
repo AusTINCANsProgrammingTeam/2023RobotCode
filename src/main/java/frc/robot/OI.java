@@ -69,10 +69,15 @@ public class OI {
     public static final class Operator{
         private static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
 
-        private static final int kBuddyBalanceToggleID = 0; //B Button, toggle buddy balance
+        private static final int kBuddyBalanceDeployID = 0; //B Button, deploy buddy balance
+        private static final int kBuddyBalanceRetrieveID = 1; //Button TBD, moves buddy balance slightly up when engaging charge pad
 
-        public static JoystickButton toggleBuddyBalanceButton(){
-            return new JoystickButton(kJoystick, kBuddyBalanceToggleID);
+        public static JoystickButton deployBuddyBalanceButton() {
+            return new JoystickButton(kJoystick, kBuddyBalanceDeployID);
+        }
+
+        public static JoystickButton retrieveBuddyBalanceButton() {
+            return new JoystickButton(kJoystick, kBuddyBalanceRetrieveID);
         }
     }
 

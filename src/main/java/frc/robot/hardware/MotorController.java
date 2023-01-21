@@ -23,7 +23,8 @@ public class MotorController {
         BackRightModuleTurn(5, 40, IdleMode.kBrake, true),
         //BuddyBalance Motor
 
-        BBalanceRightShaftRotate(13, 40, IdleMode.kBrake); // Using placeholder values - unsure of final design
+        BBalanceRightShaftRotate(13, 40, IdleMode.kBrake),
+        BBalanceLeftShaftRotate(14, 40, IdleMode.kBrake, true);
 
         private int ID;
         private int currentLimit;
