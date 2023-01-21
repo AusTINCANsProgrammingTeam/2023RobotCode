@@ -34,6 +34,7 @@ public class LedTestCommand extends CommandBase {
   @Override
   public void execute() {
     m_led.cube(true);
+    m_led.update();
   }
 
   // Called once the command ends or is interrupted.
@@ -44,6 +45,7 @@ public class LedTestCommand extends CommandBase {
   @Override
   public boolean isFinished() {
     m_led.cube(false);
+    m_led.update();
     return false;
   }
 }
