@@ -4,10 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.util.datalog.StringLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
@@ -28,9 +24,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private SwerveSubsystem swerveSubsystem;
-  private final boolean isDummy;
+  private final boolean isSwerveDummy;
 
-  private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
+  private AutonSubsytem autonSubsytem;
   private SimulationSubsystem simulationSubsystem;
   
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
@@ -41,9 +37,9 @@ public class RobotContainer {
     CommandScheduler.getInstance().disable();
     
     swerveSubsystem = new SwerveSubsystem();
-    isDummy = swerveSubsystem.getDummy();
+    isSwerveDummy = swerveSubsystem.getDummy();
  
-    if (isDummy) {
+    if (isSwerveDummy) {
       CommandScheduler.getInstance().unregisterSubsystem(swerveSubsystem);
     } else {
       
@@ -56,6 +52,8 @@ public class RobotContainer {
       OI.Driver.getXTranslationSupplier(),
       OI.Driver.getYTranslationSupplier(),
       OI.Driver.getRotationSupplier()));
+
+      autonSubsytem = new AutonSubsytem(swerveSubsystem);
     }
     CommandScheduler.getInstance().enable();
       
@@ -71,7 +69,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    if (swerveSubsystem != null) {
+    if (!isSwerveDummy) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
       OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
     }
@@ -83,6 +81,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autonSubsytem.getAutonCommand();
+    if (isSwerveDummy) {
+      return null;
+    } else {
+      return autonSubsytem.getAutonCommand();
+    }
   }
 }

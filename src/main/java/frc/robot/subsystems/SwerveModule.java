@@ -33,7 +33,6 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 
 public class SwerveModule extends SubsystemBase {
-    private boolean isDummy = false;
 
     public static double kWheelDiameterMeters = Units.inchesToMeters(3.5);
     public static double kDriveMotorGearRatio = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
@@ -71,12 +70,14 @@ public class SwerveModule extends SubsystemBase {
 
     private String ID;
 
-    private DataLog errorLog = DataLogManager.getLog();
-    private StringLogEntry caughtExeptionLog;
-    private String caughtExeption;
+    private boolean isModuleDummy = false;
+    private DataLog ModuleErrorLog = DataLogManager.getLog();
+    private StringLogEntry moduleCaughtExeptionLog;
+    private String moduleCaughtExeption;
 
     public SwerveModule(MotorConfig driveMotorConfig, MotorConfig turningMotorConfig, EncoderConfig absoluteEncoderConfig, String ID) {
-        caughtExeptionLog = new StringLogEntry(errorLog, "/errors");
+        moduleCaughtExeptionLog = new StringLogEntry(ModuleErrorLog, "/errors");
+
         try{
             this.ID = ID;
 
@@ -121,15 +122,15 @@ public class SwerveModule extends SubsystemBase {
             actualAbsoluteAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualAbsAngle"); //Logs actual absolute angle in radians
             actualRelativeAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualRelAngle"); //Logs actual relative angle in radians
         } catch(Exception e){
-           caughtExeption = "Swerve Module Caught Exception: " + e.getMessage();
-           System.out.println(caughtExeption);
-           caughtExeptionLog.append(caughtExeption);
-           isDummy = true;
+           moduleCaughtExeption = "Swerve Module Caught Exception: " + e.getMessage();
+           System.out.println(moduleCaughtExeption);
+           moduleCaughtExeptionLog.append(moduleCaughtExeption);
+           isModuleDummy = true;
         }
     }
 
     public boolean getDummy() {
-        return isDummy;
+        return isModuleDummy;
     }
 
     public SwerveModulePosition getPosition() {

@@ -28,8 +28,6 @@ import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
 public class SwerveSubsystem extends SubsystemBase{
-    private boolean Dummy = false;
-
     public static final double kPhysicalMaxSpeed = Units.feetToMeters(14.5);; //Max drivebase speed in meters per second
     public static final double kPhysicalMaxAngularSpeed = 2 * Math.PI; //Max drivebase angular speed in radians per second
 
@@ -56,14 +54,15 @@ public class SwerveSubsystem extends SubsystemBase{
     private BooleanLogEntry controlOrientationLog = new BooleanLogEntry(datalog, "/swerve/orientation"); //Logs if robot is in FOD/ROD
     private StringLogEntry errors = new StringLogEntry(datalog, "/swerve/errors"); //Logs any hardware errors
 
-    private DataLog errorLog = DataLogManager.getLog();
-    private StringLogEntry caughtExeptionLog;
-    private String caughtExeption;
+    private boolean isSwerveDummy = false;
+    private DataLog swerveErrorLog = DataLogManager.getLog();
+    private StringLogEntry swerveCaughtExeptionLog;
+    private String swerveCaughtExeption;
 
     public boolean controlOrientationIsFOD;
 
     public SwerveSubsystem() {
-        caughtExeptionLog = new StringLogEntry(errorLog, "/errors");
+        swerveCaughtExeptionLog = new StringLogEntry(swerveErrorLog, "/errors");
 
             frontLeft = new SwerveModule(
             MotorConfig.FrontLeftModuleDrive,
@@ -95,21 +94,21 @@ public class SwerveSubsystem extends SubsystemBase{
             controlOrientationIsFOD = true;
         }
         catch(Exception e) {
-           caughtExeption = "Swerve Subsystem Caught Exception: " + e.getMessage();
-           System.out.println(caughtExeption);
-           caughtExeptionLog.append(caughtExeption);
-           Dummy = true;
+           swerveCaughtExeption = "Swerve Subsystem Caught Exception: " + e.getMessage();
+           System.out.println(swerveCaughtExeption);
+           swerveCaughtExeptionLog.append(swerveCaughtExeption);
+           isSwerveDummy = true;
         }
         finally {
             if (frontLeft.getDummy() || frontRight.getDummy() || backLeft.getDummy() || backRight.getDummy()) {
                 CommandScheduler.getInstance().unregisterSubsystem(frontLeft, frontRight, backLeft, backRight);
-                Dummy = true;
+                isSwerveDummy = true;
             }
         }
     }
 
     public boolean getDummy() {
-        return Dummy;
+        return isSwerveDummy;
     }
 
     public void zeroHeading() {
