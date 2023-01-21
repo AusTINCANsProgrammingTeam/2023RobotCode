@@ -6,7 +6,7 @@ package frc.robot.subsystems;
 
 
 import com.revrobotics.CANSparkMax;
-
+import com.revrobotics.CANSparkMax.ControlType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.MotorController;
@@ -18,8 +18,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kOuttakeSpeed = -1;
   public static final double kIntakeSpeed = 0.5;
+  public static final double kRetractPosition = -.5; //TODO measure and find position 
+  public static final double kExtendPosition = .5;
   private CANSparkMax motor;
   private CANSparkMax motor2;
+  private CANSparkMax motor3;
+  private boolean inOutArm = false;
   private static ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake Status");
   private static GenericEntry intakeEntry = intakeTab.add("Intake Speed", 0.0).getEntry();
   /** Creates a new IntakeSubsystem. */
@@ -66,4 +70,13 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
+
+public void inOutArm() {
+  inOutArm = !inOutArm; //Toggle boolean
+    if (inOutArm) {
+    motor3.getPIDController().setReference(kExtendPosition,ControlType.kPosition);
+  } else {
+    motor3.getPIDController().setReference(kRetractPosition,ControlType.kPosition);
+  }
+}
 }
