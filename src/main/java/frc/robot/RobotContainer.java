@@ -7,11 +7,12 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
-import frc.robot.subsystems.AssistedBalance;
+//import frc.robot.subsystems.AssistedBalance;
 import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.commands.AssistedBalanceCommand;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,9 +29,11 @@ public class RobotContainer {
 
   private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
 
-  private SimulationSubsystem simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
+  private SimulationSubsystem simulationSubsystem;
 
-  private final AssistedBalance assistedBalance = new AssistedBalance(swerveSubsystem, simulationSubsystem);
+  private AssistedBalanceCommand assistedBalanceCommand = null;
+
+  //private final AssistedBalance assistedBalance = new AssistedBalance(swerveSubsystem, simulationSubsystem);
   
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
@@ -39,6 +42,7 @@ public class RobotContainer {
   public RobotContainer() { 
     if(Robot.isSimulation()){
       simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
+      assistedBalanceCommand = new AssistedBalanceCommand(swerveSubsystem, simulationSubsystem);
     }
 
     swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
@@ -51,6 +55,8 @@ public class RobotContainer {
     // Configure the button bindings    
 
     configureButtonBindings();
+
+    OI.Driver.getOneButton().toggleOnTrue(assistedBalanceCommand); //C on Keyboard
   }
 
   /**

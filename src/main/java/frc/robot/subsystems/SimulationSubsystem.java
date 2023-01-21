@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -21,6 +22,7 @@ public class SimulationSubsystem extends SubsystemBase {
   private int navXSim = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
   private double simYaw = 0;
   private double simPitch;
+  public double distance = 0;
   SimDouble pitch = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Pitch"));
   /** Creates a new SimulationSubsystem. */
   public SimulationSubsystem(SwerveSubsystem swerveSubsystem) {
@@ -28,6 +30,8 @@ public class SimulationSubsystem extends SubsystemBase {
 
     m_field = new Field2d(); 
 
+    simPitch = 200;
+    
     //This puts the field into SmartDashboard
     SmartDashboard.putData("Field", m_field); 
 
@@ -35,6 +39,10 @@ public class SimulationSubsystem extends SubsystemBase {
 
   public double getPitch() {
     return simPitch;
+  }
+
+  public double getDistance() {
+    return distance;
   }
 
   @Override
@@ -54,7 +62,10 @@ public class SimulationSubsystem extends SubsystemBase {
     simYaw += chassisRotationSpeed *  Robot.kDefaultPeriod;
 
     //Update simPitch
-    //simPitch -= 
+    distance = swerveSubsystem.getVelocity() / 60;
+    SmartDashboard.putNumber("a", swerveSubsystem.getVelocity());
+    simPitch -= distance;
+    SmartDashboard.putNumber("SimPitch", simPitch);
 
     //Updating Sim NavX
     SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));

@@ -87,7 +87,6 @@ public class SwerveModule extends SubsystemBase {
             DCMotor.getNEO(1),
             kDriveMotorGearRatio
         );
-
         simTurningMotor = new FlywheelSim(
             LinearSystemId.identifyVelocitySystem(0.16, 0.0348), //TODO: Update with real SysID
             DCMotor.getNEO(1),
@@ -164,6 +163,10 @@ public class SwerveModule extends SubsystemBase {
     public void stop() {
         driveMotor.set(0);
         turningMotor.set(0);
+    }
+
+    public double getVelocity() {
+        return driveEncoder.getVelocity();
     }
 
     @Override
