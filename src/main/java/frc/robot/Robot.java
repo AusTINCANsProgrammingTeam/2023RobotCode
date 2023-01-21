@@ -4,11 +4,8 @@
 
 package frc.robot;
 
-<<<<<<< HEAD
-=======
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
->>>>>>> 0b0a69c7cbf7613ac7354ff4830263d15cfe3c7a
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -22,12 +19,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
-<<<<<<< HEAD
-  private Command m_autonomousCommand;
-
-  private RobotContainer m_robotContainer;
-
-=======
   public static final boolean isCompetition = true;
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();
@@ -37,7 +28,6 @@ public class Robot extends TimedRobot {
 
   private int loopCount = 0;
 
->>>>>>> 0b0a69c7cbf7613ac7354ff4830263d15cfe3c7a
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
