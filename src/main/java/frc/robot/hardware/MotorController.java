@@ -17,7 +17,7 @@ public class MotorController {
         FrontLeftModuleTurn(3, 40, IdleMode.kBrake, true),
         FrontRightModuleDrive(2, 50, IdleMode.kBrake),
         FrontRightModuleTurn(1, 40, IdleMode.kBrake, true),
-        BackLeftModuleDrive(7, 50, IdleMode.kBrake), // was ID 7
+        BackLeftModuleDrive(1, 50, IdleMode.kBrake), // was 7
         BackLeftModuleTurn(8, 40, IdleMode.kBrake, true),
         BackRightModuleDrive(6, 50, IdleMode.kBrake),
         BackRightModuleTurn(5, 40, IdleMode.kBrake, true);
@@ -86,6 +86,7 @@ public class MotorController {
     }
 
     public static CANSparkMax constructMotor(MotorConfig config){
+
             CANSparkMax motor = new CANSparkMax(config.getID(), MotorType.kBrushless);
             motor.restoreFactoryDefaults();
             motor.setSmartCurrentLimit(config.getCurrentLimit());
@@ -94,4 +95,6 @@ public class MotorController {
             motor.setInverted(config.getReversed());
             return motor;
         }
+
     }
+

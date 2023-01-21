@@ -18,7 +18,6 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -29,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private SwerveSubsystem swerveSubsystem;
+  private final boolean isDummy;
 
   private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
   private SimulationSubsystem simulationSubsystem;
@@ -36,38 +36,28 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
-  private DataLog errorLog = DataLogManager.getLog();
-  private StringLogEntry caughtExeptionLog;
-  private String caughtExeption;
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    caughtExeptionLog = new StringLogEntry(errorLog, "/errors");
-
-    try {
-      swerveSubsystem = new SwerveSubsystem();
-    }
-    catch (Exception e) {
-      //CommandScheduler.getInstance().unregisterSubsystem(swerveSubsystem);
-      caughtExeption = "Caught Exception: " + e.getMessage();
-      System.out.println(caughtExeption);
-      caughtExeptionLog.append(caughtExeption);
+    CommandScheduler.getInstance().disable();
+    
+    swerveSubsystem = new SwerveSubsystem();
+    isDummy = swerveSubsystem.getDummy();
+ 
+    if (isDummy) {
+      CommandScheduler.getInstance().unregisterSubsystem(swerveSubsystem);
+    } else {
       
-      swerveSubsystem = null;
-    }
+      if (!Robot.isReal()) {
+        simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
+      }
 
-    if(Robot.isSimulation() && swerveSubsystem != null){
-      simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
-    }
-
-    if (swerveSubsystem != null) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
       OI.Driver.getXTranslationSupplier(),
       OI.Driver.getYTranslationSupplier(),
       OI.Driver.getRotationSupplier()));
     }
-
+    CommandScheduler.getInstance().enable();
       
     // Configure the button bindings    
 
