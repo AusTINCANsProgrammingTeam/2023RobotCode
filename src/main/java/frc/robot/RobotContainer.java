@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+  private SwerveSubsystem swerveSubsystem;
 
   private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
   private SimulationSubsystem simulationSubsystem;
@@ -48,7 +48,7 @@ public class RobotContainer {
       swerveSubsystem = new SwerveSubsystem();
     }
     catch (Exception e) {
-      CommandScheduler.getInstance().unregisterSubsystem(swerveSubsystem);
+      //CommandScheduler.getInstance().unregisterSubsystem(swerveSubsystem);
       caughtExeption = "Caught Exception: " + e.getMessage();
       System.out.println(caughtExeption);
       caughtExeptionLog.append(caughtExeption);

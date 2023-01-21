@@ -57,8 +57,9 @@ public class SwerveSubsystem extends SubsystemBase{
     public boolean controlOrientationIsFOD;
 
     public SwerveSubsystem() {
-        CommandScheduler.getInstance().unregisterSubsystem(this);
+        System.out.println("Running Constructor !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         try{
+            System.out.println("Making Swerve Modules!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             frontLeft = new SwerveModule(
             MotorConfig.FrontLeftModuleDrive,
             MotorConfig.FrontLeftModuleTurn,
@@ -82,10 +83,10 @@ public class SwerveSubsystem extends SubsystemBase{
             MotorConfig.BackRightModuleTurn,
             EncoderConfig.BackRightModule,
             "BR");
-            CommandScheduler.getInstance().registerSubsystem(this);
         }
         catch(Exception e) {
-            //CommandScheduler.getInstance().unregisterSubsystem(this);
+            System.out.println("Unregistered SwerveSubsystem!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            CommandScheduler.getInstance().unregisterSubsystem(this);
         }
 
         zeroHeading();
