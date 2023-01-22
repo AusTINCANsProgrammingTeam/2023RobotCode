@@ -33,10 +33,10 @@ public class Photonvision {
         FieldConstants.fieldWidth
     );
 
-    private static final double cameraX = Units.inchesToMeters(0); //Distance from centerline of robot
-    private static final double cameraY = Units.inchesToMeters(0); //Distance from center of robot
+    private static final double cameraX = Units.inchesToMeters(0.25); //Distance from centerline of robot
+    private static final double cameraY = Units.inchesToMeters(12); //Distance from center of robot
     private static final double cameraZ = Units.inchesToMeters(0); //Height from ground
-    private static final double cameraRY = Units.degreesToRadians(0); //Mounting bracket angle
+    private static final double cameraRY = Units.degreesToRadians(61.8); //Mounting bracket angle
     private static final PhotonCamera camera = new PhotonCamera("OV5647");
     private static final Transform3d cameraTransform = new Transform3d(
         new Pose3d(), 
