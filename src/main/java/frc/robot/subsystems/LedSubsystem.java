@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //TODO Merge LEDIORIO
 
 
-public class Leds extends SubsystemBase {
+public class LedSubsystem extends SubsystemBase {
   private PWM pwm;
   private boolean cone = false;
   private boolean cube = false;
@@ -28,7 +28,7 @@ public class Leds extends SubsystemBase {
     CUBE, CONE, DISABLED_NEUTRAL
   }
   /** Creates a new Leds. */
-  public Leds() {
+  public LedSubsystem() {
     LedDriver(0);
     leds = new AddressableLED(port);
     buffer = new AddressableLEDBuffer(length);
