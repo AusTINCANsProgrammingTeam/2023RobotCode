@@ -9,13 +9,12 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 
+
 /** Controls LEDs directly from the RIO. */
-public class LedIORio implements LEDIO {
+public class LedIORio implements LedIO {
 private final AddressableLED leds;
 private final AddressableLEDBuffer buffer;
-
-//TODO Led parameters and RIO ports
-
+/** TODO Led parameters and RIO ports */
 private static final int length = 0;
 private static final int centerLed = 0;
 private static final int halfLength = (int) Math.ceil(length / 2.0);
@@ -25,7 +24,6 @@ private static final double waveLength = 40.0; // How many LEDs for a full cycle
 private static final double waveDuration = 0.25; // How long until the cycle repeats
 private static final boolean rainbowMode = false;// My Eyes...
 private static final boolean waveMode = false; //Wave effect
-
 
 
 public LedIORio() {

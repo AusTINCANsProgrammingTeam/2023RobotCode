@@ -7,6 +7,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
+import frc.robot.hardware.LedIO;
+import frc.robot.hardware.LedIORio;
+import frc.robot.hardware.Leds;
 import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -32,7 +35,8 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   private static BatterySubsystem batterySubsystem;
-  private final LedTestCommand m_ledtest = new LedTestCommand(m_exampleSubsystem, null);
+  private final LedIORio ledIORio = new LedIORio();
+  private final LedTestCommand ledsTest = new LedTestCommand(ledIORio);
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     if(Robot.isSimulation()){
@@ -61,7 +65,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
     OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
-    OI.Driver.getButton().onTrue(m_ledtest);
+    OI.Driver.getButton().onTrue(ledsTest);
   }
 
   /**

@@ -3,25 +3,24 @@
 // the WPILib BSD license file in the root directory of this project.
 //FROM Mechanical-Advantage/RobotCode2022
 package frc.robot.hardware;
-import frc.robot.hardware.LEDIO.LedMode;
-
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.hardware.LedIO.LedMode;
 /**
  * Manages the pattern of the LEDs based on robot state. Note: This is NOT a WPILib subsystem,
  * meaning it cannot be required by commands. This prevents unexpected conflicts between commands,
  * potentially impacting normal robot operation.
  */
-//TODO LedBlinkin
+//TODO Merge all files to single class
 //TODO Test?
 public class Leds {
 
-  private final LEDIO io;
-  // Robot state tracking
+  private final LedIORio io;
   private boolean cone = false;
   private boolean cube = false;
-  public Leds(LEDIO io) {
+  public Leds(LedIORio io) {
     this.io = io;
   }
-
   /** Updates the current LED mode based on robot state. */
   public void update() {
     // Select LED mode
@@ -34,6 +33,8 @@ public class Leds {
         mode = LedMode.DISABLED_NEUTRAL;
       }
       io.setMode(mode);
+      ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
+      ledTab.add("Mode", mode);
 }
   public void cube(boolean active) {
     cube = active;

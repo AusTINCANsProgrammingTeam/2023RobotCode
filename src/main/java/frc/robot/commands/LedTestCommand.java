@@ -4,26 +4,24 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.hardware.LedIO;
+import frc.robot.hardware.LedIORio;
 import frc.robot.hardware.Leds;
+import frc.robot.hardware.LedIO.LedMode;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /** An example command that uses an example subsystem. */
 public class LedTestCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final ExampleSubsystem m_subsystem;
-  private final Leds m_led;
+  private final LedIORio m_led;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public LedTestCommand(ExampleSubsystem subsystem, Leds led) {
-    m_subsystem = subsystem;
+  public LedTestCommand(LedIORio led) {
     m_led = led;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -33,9 +31,8 @@ public class LedTestCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_led.cube(true);
-    m_led.update();
-  }
+    m_led.setMode(LedMode.CUBE);
+    }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -44,8 +41,7 @@ public class LedTestCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    m_led.cube(false);
-    m_led.update();
+    m_led.setMode(LedMode.DISABLED_NEUTRAL);
     return false;
   }
 }
