@@ -7,16 +7,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
-import frc.robot.hardware.LedIO;
-import frc.robot.hardware.LedIORio;
-import frc.robot.hardware.Leds;
 import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BatterySubsystem;
+import frc.robot.commands.LedToggleCommand;
 import frc.robot.commands.ExampleCommand;
-import frc.robot.commands.LedTestCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.LedSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 /**
@@ -35,8 +33,10 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   private static BatterySubsystem batterySubsystem;
-  private final LedIORio ledIORio = new LedIORio();
-  private final LedTestCommand ledsTest = new LedTestCommand(ledIORio);
+  private static LedSubsystem ledSubsystem;
+  private final LedToggleCommand m_LedToggleCommand = new LedToggleCommand(ledSubsystem);
+  private final LedToggleCommand m_conecommand = new LedToggleCommand(ledSubsystem);
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     if(Robot.isSimulation()){
@@ -65,7 +65,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
     OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
-    OI.Driver.getButton().onTrue(ledsTest);
+    OI.Driver.getButton().onTrue(m_LedToggleCommand);
   }
 
   /**

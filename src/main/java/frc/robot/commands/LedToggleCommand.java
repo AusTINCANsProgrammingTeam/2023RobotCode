@@ -4,35 +4,35 @@
 
 package frc.robot.commands;
 
-import frc.robot.hardware.LedIO;
-import frc.robot.hardware.LedIORio;
-import frc.robot.hardware.Leds;
-import frc.robot.hardware.LedIO.LedMode;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.LedSubsystem;
 
-/** An example command that uses an example subsystem. */
-public class LedTestCommand extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final LedIORio m_led;
-
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
-  public LedTestCommand(LedIORio led) {
-    m_led = led;
+public class LedToggleCommand extends CommandBase {
+  private final LedSubsystem m_ledSubsystem;
+  /** Creates a new LedCommand. */
+  public LedToggleCommand(LedSubsystem ledSubsystem) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    m_ledSubsystem = ledSubsystem;
+    addRequirements(ledSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    if (LedSubsystem.cube){
+      LedSubsystem.cone(true);
+      LedSubsystem.cube(false);
+    }else if (LedSubsystem.cone){
+      LedSubsystem.cube(true);
+      LedSubsystem.cone(false);
+    }
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_led.setMode(LedMode.CUBE);
-    }
+    LedSubsystem.cone(true);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -41,7 +41,6 @@ public class LedTestCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    m_led.setMode(LedMode.DISABLED_NEUTRAL);
     return false;
   }
 }

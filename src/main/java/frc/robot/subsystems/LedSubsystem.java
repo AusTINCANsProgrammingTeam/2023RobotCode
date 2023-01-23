@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LedSubsystem extends SubsystemBase {
   private PWM pwm;
-  private boolean cone = false;
-  private boolean cube = false;
+  public static boolean cone = false;
+  public static boolean cube = false;
   private final AddressableLED leds;
   private final AddressableLEDBuffer buffer;
   /** TODO Led parameters and RIO ports */
@@ -29,7 +29,7 @@ public class LedSubsystem extends SubsystemBase {
   }
   /** Creates a new Leds. */
   public LedSubsystem() {
-    LedDriver(0);
+    LedDriver(0); //Setchannel
     leds = new AddressableLED(port);
     buffer = new AddressableLEDBuffer(length);
     leds.setLength(length);
@@ -44,14 +44,12 @@ public class LedSubsystem extends SubsystemBase {
         mode = LedMode.CONE;
       } else if (cube) {
         mode = LedMode.CUBE;
-      } else {
-        mode = LedMode.DISABLED_NEUTRAL;
       }
       setMode(mode);
       ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
       ledTab.add("Mode", mode);
   }
-  /** Sends data to Led blinkin */
+  /** Sends to Led blinkin */
   public void setMode(LedMode mode){
       switch (mode) {
           case CUBE: 
@@ -65,12 +63,13 @@ public class LedSubsystem extends SubsystemBase {
           break;
       }
       leds.setData(buffer);
+      pwm.setSpeed(-0.99);
   }
   /* Toggles Mode */
-  public void cube(boolean active) {
+  public static void cube(boolean active) {
     cube = active;
   }
-  public void cone(boolean active) {
+  public static void cone(boolean active) {
     cone = active; 
   }
   private void solid(Color color) {
@@ -80,15 +79,16 @@ public class LedSubsystem extends SubsystemBase {
   }
   public void LedDriver(int channel) { //Creates PWM channel for Led.
     pwm = new PWM(channel);
-    pwm.setBounds(0, 0, 0, 0, 0);
+    pwm.setBounds(0, 0, 0, 0, 0); /*TODO Setbounds */
     pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
   }
   @Override
   public void periodic() {
-  // This method will be called once per scheduler run
+    update();
   }
 
 /* If we are using a light strip
+
   private static final int centerLed = 0;
   private static final int halfLength = (int) Math.ceil(length / 2.0);
 
