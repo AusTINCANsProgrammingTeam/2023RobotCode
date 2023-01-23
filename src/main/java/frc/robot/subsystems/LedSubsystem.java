@@ -25,8 +25,8 @@ public class LedSubsystem extends SubsystemBase {
   private PWM pwm;
   public static boolean LedGPMode = true; //True = Cone, False = Cube
   private final AddressableLEDBuffer buffer;
-  /** TODO Led parameters and RIO ports */
-  private static final int length = 0;
+  // TODO Led parameters and RIO ports
+  private static final int length = 1; //Amount of Leds in strip light. Or one if we are using a single light
   private static final int port = 0;
   public final static AddressableLED leds = new AddressableLED(port);
   public static enum LedMode {
@@ -69,7 +69,8 @@ public class LedSubsystem extends SubsystemBase {
         buffer.setLED(i, color);
     }
   }
-  public void LedDriver(int channel) { //Creates PWM channel for Led.
+  /* Makes Pwm Channel */
+  public void LedDriver(int channel) {
     pwm = new PWM(channel);
     pwm.setBounds(1,1, 1, 1, 1); /*TODO Setbounds */
     pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);

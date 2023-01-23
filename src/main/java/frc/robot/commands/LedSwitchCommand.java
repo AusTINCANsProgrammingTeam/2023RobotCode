@@ -9,6 +9,7 @@ import frc.robot.subsystems.LedSubsystem;
 
 public class LedSwitchCommand extends CommandBase {
   private final LedSubsystem m_ledSubsystem;
+  //Controller Port 1 Button 2
   /** Creates a new LedCommand. */
   public LedSwitchCommand(LedSubsystem ledSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
