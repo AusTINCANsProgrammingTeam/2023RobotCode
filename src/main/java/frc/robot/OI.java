@@ -8,12 +8,17 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class OI {
     //Operator Interface (OI) class containing all control information
     private static final int kDriverJoystickPort = 0;
+    private static final int kTeleopJoystickPort = 1;
 
     public static final class Driver{
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
+        private static final Joystick kTeleopJoystick = new Joystick(OI.kTeleopJoystickPort);
 
         private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
         private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
+
+        private static final int kLedToggleID = 1; //Toggles Leds
+        private static final int kLedSwtichID = 2;
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -46,9 +51,11 @@ public class OI {
         public static JoystickButton getZeroButton(){
             return new JoystickButton(kJoystick, kZeroButtonID);
         }
-        public static JoystickButton getButton(){
-            //TODO get button for Led
-            return new JoystickButton(kJoystick, 0);
+        public static JoystickButton getLedToggleButton(){
+            return new JoystickButton(kTeleopJoystick, kLedToggleID);
+        }
+        public static JoystickButton getLedSwitchButton(){
+            return new JoystickButton(kTeleopJoystick, kLedSwtichID);
         }
     }
 
