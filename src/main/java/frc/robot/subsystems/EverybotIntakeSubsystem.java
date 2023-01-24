@@ -23,13 +23,13 @@ public class EverybotIntakeSubsystem extends SubsystemBase implements AutoClosea
   private static GenericEntry intakeEntry = intakeTab.add("Everybot Intake Speed", 0.0).getEntry();
   /** Creates a new IntakeSubsystem. */
   public EverybotIntakeSubsystem() {
-    motor = MotorController.constructMotor(MotorConfig.IntakeMotor3);
+    motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
   
   }
   
   private void spinWheels(double velocity) {
     motor.set(velocity);
-
+    intakeEntry.setDouble(velocity);
   }
 
   public void push() {
@@ -55,7 +55,6 @@ public class EverybotIntakeSubsystem extends SubsystemBase implements AutoClosea
 
   @Override
   public void periodic() {
-    intakeEntry.setDouble(getSpeed());
     // This method will be called once per scheduler run
   }
 
