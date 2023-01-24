@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
-//import frc.robot.subsystems.AssistedBalance;
 import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveModule;
@@ -32,8 +31,6 @@ public class RobotContainer {
   private SimulationSubsystem simulationSubsystem;
 
   private AssistedBalanceCommand assistedBalanceCommand = null;
-
-  //private final AssistedBalance assistedBalance = new AssistedBalance(swerveSubsystem, simulationSubsystem);
   
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
@@ -56,7 +53,7 @@ public class RobotContainer {
 
     configureButtonBindings();
 
-    OI.Driver.getOneButton().toggleOnTrue(assistedBalanceCommand); //C on Keyboard
+    OI.Driver.getBalanceButton().toggleOnTrue(assistedBalanceCommand); //C on Keyboard
   }
 
   /**

@@ -136,10 +136,6 @@ public class SwerveSubsystem extends SubsystemBase{
         return kDriveKinematics.toSwerveModuleStates(chassisSpeeds);  
     }
 
-    public double getVelocity() {
-        return frontRight.getVelocity();
-    }
-
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, kPhysicalMaxSpeed);
         frontLeft.setDesiredState(desiredStates[0]);

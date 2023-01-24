@@ -18,7 +18,7 @@ public class OI {
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
-        private static final int kOneButtonID = 3;
+        private static final int kToggleBalanceButton = 3;
 
         //TODO: Tune curves to driver preference
         private static final ControlCurve kXTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
@@ -48,8 +48,8 @@ public class OI {
             return new JoystickButton(kJoystick, kZeroButtonID);
         }
 
-        public static JoystickButton getOneButton(){
-            return new JoystickButton(kJoystick, kOneButtonID);
+        public static JoystickButton getBalanceButton(){
+            return new JoystickButton(kJoystick, kToggleBalanceButton);
         }
     }
 

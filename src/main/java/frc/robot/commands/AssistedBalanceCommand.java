@@ -9,14 +9,14 @@ import frc.robot.subsystems.SwerveSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-/** An example command that uses an example subsystem. */
+/** An AssistedBalaceCommand command that uses SwerveSubsystem and SimulationSubsystemd */
 public class AssistedBalanceCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveSubsystem swerve_subsystem;
   private final SimulationSubsystem simulation_subsystem;
 
   /**
-   * Creates a new ExampleCommand.
+   * Creates a new AssistedBalanceCommand
    *
    * @param subsystem The subsystem used by this command.
    */
@@ -36,25 +36,33 @@ public class AssistedBalanceCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-                    
-    //if (gyro.getPitch() != 0) {
-                        
-      if (simulation_subsystem.getPitch() < 360.0 && simulation_subsystem.getPitch() > 179.0) {
+
+
+    if (swerve_subsystem.getPose().getY() > 4.0 && swerve_subsystem.getPose().getY() < 6.0) {
+      
+    }
+
+      if (simulation_subsystem.getPitch() > 4.0 && simulation_subsystem.getPitch() < 181.0) {
         SmartDashboard.putString("Direction", "Forward");
-        swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(0.0, 1.0, 0.0));
+        swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(-1.0, 0.0, 0.0));
       }  
-      else if (simulation_subsystem.getPitch() > 179 && simulation_subsystem.getPitch() < 181) {
-        swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(0.0, 0.0, 0.0));
+      else if (swerve_subsystem.getPose().getX() > 3.0 && swerve_subsystem.getPose().getX() < 4.0) {
+        swerve_subsystem.stopModules();
       }
-      else {
-        swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(0.0, -1.0, 0.0)); 
+      else if (simulation_subsystem.getPitch() > -172.0 && simulation_subsystem.getPitch() < 3.0) {
+        swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(1.0, 0.0, 0.0)); 
         SmartDashboard.putString("Direction", "Backward");
+    }
+    else {
+      swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(0.0, 0.0, 0.0));
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    //TODO: Lock when wheels are balanced
+  }
 
   // Returns true when the command should end.
   @Override
