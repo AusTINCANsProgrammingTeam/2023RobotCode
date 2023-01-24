@@ -210,6 +210,7 @@ public class SwerveSubsystem extends SubsystemBase{
     }
 
     public void parkModules(){
+        //this tells the method in swerve module which wheels should be 45 degrees and which ones should be -45 degrees
         frontLeft.park(true);
         frontRight.park(false);
         backLeft.park(false);
