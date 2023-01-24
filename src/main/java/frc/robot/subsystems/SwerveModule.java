@@ -197,8 +197,6 @@ public class SwerveModule extends SubsystemBase {
 
     @Override
     public void periodic(){
-        SmartDashboard.putNumber("Swerve[" + ID + "] absolute encoder position", getAbsoluteTurningPosition());
-        SmartDashboard.putNumber("Swerve[" + ID + "] relative encoder position", getTurningPosition());
         actualSpeedLog.append(driveEncoder.getVelocity());
         actualAbsoluteAngleLog.append(getAbsoluteTurningPosition());
         actualRelativeAngleLog.append(getTurningPosition());
