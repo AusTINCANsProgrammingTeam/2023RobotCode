@@ -252,19 +252,12 @@ public class SwerveSubsystem extends SubsystemBase{
 
     public Command alignToTarget(NodePosition nodePosition){
         Integer id = Photonvision.getAprilTagID();
-        double xOffset = 0; //Range offset //TODO: Add constants to calculate 
-        double yOffset = 0; //Left/Right offset //TODO: Add TOF sensor method to calculate
+        Translation2d offset = new Translation2d(0,0); // TODO: calculate offsets
 
-        if(id != -1 && Robot.isRed ? id < 4 : id > 5){
+        if(id != -1 && Robot.isRed ? id <= 4 : id > 4){
             //Get pose of node to be targeted
             Pose2d desiredPose = new Pose2d(
-                nodePosition.getTranslation(id),
-                null
-            );
-            //Apply offsets and add a rotation to get desired robot pose
-            desiredPose = new Pose2d(
-                desiredPose.getX() + xOffset, 
-                desiredPose.getY() + yOffset, 
+                nodePosition.getTranslation(id).plus(offset),
                 Robot.isRed ? Rotation2d.fromDegrees(0) : Rotation2d.fromDegrees(180)
             );
             //Generate trajectory to desired pose
