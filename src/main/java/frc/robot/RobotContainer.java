@@ -72,8 +72,8 @@ public class RobotContainer {
     OI.Driver.getAlignBackPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
     OI.Driver.getAlignLeftPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(90), swerveSubsystem));
     OI.Driver.getAlignRightPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(-90), swerveSubsystem));
-    OI.Operator.deployBuddyBalanceButton().onTrue(new InstantCommand(buddyBalanceSubsystem::deployBuddyBalance));
-    OI.Operator.retrieveBuddyBalanceButton().onTrue(new InstantCommand(buddyBalanceSubsystem::retrieveBuddy));
+    OI.Operator.deployBuddyBalanceButton().onTrue(new InstantCommand(buddyBalanceSubsystem::deployBuddyBalance, buddyBalanceSubsystem));
+    OI.Operator.retrieveBuddyBalanceButton().onTrue(new InstantCommand(buddyBalanceSubsystem::retrieveBuddy, buddyBalanceSubsystem));
   }
 
   /**

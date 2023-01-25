@@ -24,7 +24,7 @@ public class MotorController {
         //BuddyBalance Motor
 
         BBalanceRightShaftRotate(13, 40, IdleMode.kBrake),
-        BBalanceLeftShaftRotate(14, 40, IdleMode.kBrake, true);
+        BBalanceLeftShaftRotate(14, 40, IdleMode.kBrake, true); // TODO: update IDs for buddy balance motors when robot is finalized
 
         private int ID;
         private int currentLimit;
