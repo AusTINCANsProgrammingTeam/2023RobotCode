@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.classes.RelativeEncoderSim;
-import frc.robot.classes.TunableNumber;
 import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
@@ -54,7 +53,6 @@ public class SwerveModule extends SubsystemBase {
     private final RelativeEncoderSim simDriveEncoder;
     private final RelativeEncoderSim simTurningEncoder;
 
-    private final TunableNumber tunableP;
     private final SparkMaxPIDController turningPIDController;
     private final PIDController simTurningPIDController;
     private double turningSetpoint;
@@ -106,7 +104,6 @@ public class SwerveModule extends SubsystemBase {
         turningPIDController.setP(kPTurning);
         simTurningPIDController = new PIDController(turningPIDController.getP(), turningPIDController.getI(), turningPIDController.getD());
         simTurningPIDController.enableContinuousInput(-Math.PI, Math.PI);
-        tunableP = new TunableNumber("Swerve " + ID + " P", kPTurning, turningPIDController::setP);
 
         resetEncoders();
 
