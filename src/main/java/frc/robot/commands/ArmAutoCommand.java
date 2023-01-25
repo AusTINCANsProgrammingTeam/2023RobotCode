@@ -22,6 +22,8 @@ public class ArmAutoCommand extends CommandBase {
   public ArmAutoCommand(ArmSubsystem armSubsystem, double x, double y) {
     this.armSubsystem = armSubsystem;
     getAngles(x, y);
+    currentX = x;
+    currentY= y;
     addRequirements(armSubsystem);
   }
   private void getAngles(double x, double y) {
@@ -76,6 +78,7 @@ public class ArmAutoCommand extends CommandBase {
   @Override
   public void execute() {
     //Needs to move to points x,y
+    getAngles(currentX, currentY);
     armSubsystem.setBaseRef(firstArmAngle);
     armSubsystem.setElbowRef(secondArmAngle);
   }
