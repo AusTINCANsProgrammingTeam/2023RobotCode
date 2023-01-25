@@ -80,6 +80,7 @@ public class SwerveSubsystem extends SubsystemBase{
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
     private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kDriveKinematics, getRotation2d(), getModulePositions(), new Pose2d());
+    private double timeSinceLast = 0;
 
     private DataLog datalog = DataLogManager.getLog();
     private DoubleLogEntry translationXOutputLog = new DoubleLogEntry(datalog, "/swerve/txout"); //Logs x translation state output
@@ -138,12 +139,20 @@ public class SwerveSubsystem extends SubsystemBase{
         poseEstimator.update(getRotation2d(), getModulePositions());
         Optional<Pair<Pose3d,Double>> visionUpdate = Photonvision.getPoseUpdate();
         if(visionUpdate.isPresent()){
-            poseEstimator.addVisionMeasurement(
-                new Pose2d(
-                    visionUpdate.get().getFirst().getTranslation().toTranslation2d(),
-                    visionUpdate.get().getFirst().getRotation().toRotation2d()
-                ),
-                visionUpdate.get().getSecond());
+            if (timeSinceLast < 1500 && timeSinceLast > 0){
+                poseEstimator.addVisionMeasurement(
+                    new Pose2d(
+                        visionUpdate.get().getFirst().getTranslation().toTranslation2d(),
+                        visionUpdate.get().getFirst().getRotation().toRotation2d()
+                    ),
+                    visionUpdate.get().getSecond()); 
+            }
+            else{
+                poseEstimator.resetPosition(getRotation2d(), getModulePositions(), visionUpdate.get().getFirst().toPose2d());
+            }
+            timeSinceLast = 0;
+        } else{
+            timeSinceLast += 20;
         }
     }
 
