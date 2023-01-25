@@ -4,8 +4,9 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -13,20 +14,18 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class AssistedBalanceCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveSubsystem swerve_subsystem;
-  private final SimulationSubsystem simulation_subsystem;
+  PIDController pidController = new PIDController(0.2, 0, 0);
 
   /**
    * Creates a new AssistedBalanceCommand
    *
    * @param subsystem The subsystem used by this command.
    */
-  public AssistedBalanceCommand(SwerveSubsystem swerveSubsystem, SimulationSubsystem simulationSubsystem) {
+  public AssistedBalanceCommand(SwerveSubsystem swerveSubsystem) {
     swerve_subsystem = swerveSubsystem;
-    simulation_subsystem = simulationSubsystem;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveSubsystem);
-    addRequirements(simulationSubsystem);
+    addRequirements(swerveSubsystem); 
   }
 
   // Called when the command is initially scheduled.
@@ -37,25 +36,22 @@ public class AssistedBalanceCommand extends CommandBase {
   @Override
   public void execute() {
 
+    swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(pidController.calculate(swerve_subsystem.getPitch(), 0.0), 0.0, 0.0));
 
-    if (swerve_subsystem.getPose().getY() > 4.0 && swerve_subsystem.getPose().getY() < 6.0) {
-      
-    }
-
-      if (simulation_subsystem.getPitch() > 4.0 && simulation_subsystem.getPitch() < 181.0) {
+     /* if (swerve_subsystem.getPitch() > Units.degreesToRadians(2) && swerve_subsystem.getPitch() < 180.0) {
         SmartDashboard.putString("Direction", "Forward");
         swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(-1.0, 0.0, 0.0));
       }  
-      else if (swerve_subsystem.getPose().getX() > 3.0 && swerve_subsystem.getPose().getX() < 4.0) {
+      else if (swerve_subsystem.getPitch() > Units.degreesToRadians(-2) && swerve_subsystem.getPitch() < Units.degreesToRadians(2)) {
         swerve_subsystem.stopModules();
       }
-      else if (simulation_subsystem.getPitch() > -172.0 && simulation_subsystem.getPitch() < 3.0) {
+      else if (swerve_subsystem.getPitch() > -180.0 && swerve_subsystem.getPitch() < Units.degreesToRadians(-2)) {
         swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(1.0, 0.0, 0.0)); 
         SmartDashboard.putString("Direction", "Backward");
     }
     else {
       swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(0.0, 0.0, 0.0));
-    }
+    }*/
   }
 
   // Called once the command ends or is interrupted.

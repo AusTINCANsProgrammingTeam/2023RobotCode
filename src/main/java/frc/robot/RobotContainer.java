@@ -30,7 +30,7 @@ public class RobotContainer {
 
   private SimulationSubsystem simulationSubsystem;
 
-  private AssistedBalanceCommand assistedBalanceCommand = null;
+  private AssistedBalanceCommand assistedBalanceCommand;
   
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
@@ -39,7 +39,7 @@ public class RobotContainer {
   public RobotContainer() { 
     if(Robot.isSimulation()){
       simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
-      assistedBalanceCommand = new AssistedBalanceCommand(swerveSubsystem, simulationSubsystem);
+      assistedBalanceCommand = new AssistedBalanceCommand(swerveSubsystem);
     }
 
     swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(

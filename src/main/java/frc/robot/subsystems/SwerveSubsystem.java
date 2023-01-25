@@ -87,6 +87,10 @@ public class SwerveSubsystem extends SubsystemBase{
         return gyro.getYaw();
     }
 
+    public double getPitch() {
+        return gyro.getPitch();
+    }
+
     public Rotation2d getRotation2d() {
         return Rotation2d.fromDegrees(getHeading());
     }

@@ -22,7 +22,6 @@ public class SimulationSubsystem extends SubsystemBase {
   private double simYaw = 0;
   private double simPitch;
   private double swerveX;
-  SimDouble pitch = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Pitch"));
   /** Creates a new SimulationSubsystem. */
   public SimulationSubsystem(SwerveSubsystem swerveSubsystem) {
     this.swerveSubsystem = swerveSubsystem;
@@ -34,10 +33,6 @@ public class SimulationSubsystem extends SubsystemBase {
     //This puts the field into SmartDashboard
     SmartDashboard.putData("Field", m_field); 
 
-  }
-
-  public double getPitch() {
-    return simPitch;
   }
 
   @Override
@@ -58,9 +53,22 @@ public class SimulationSubsystem extends SubsystemBase {
 
     //Update simPitch
     swerveX = swerveSubsystem.getPose().getX();
-    simPitch = (swerveX + 6) * (0.005);
+    
+    if (swerveX >= 0 && swerveX <= Units.feetToMeters(4)) {
+      simPitch = Units.degreesToRadians((swerveX * (22/Units.feetToMeters(4))) - 11);
+    }
+    else {
+      simPitch = 0;
+    }
+
     SmartDashboard.putNumber("PoseX", swerveX);
     SmartDashboard.putNumber("SimPitch", simPitch);
+
+    SimDouble pitch = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Pitch"));
+    pitch.set(simPitch);
+    
+    SmartDashboard.putNumber("GyroPitch", swerveSubsystem.getPitch());
+
 
     //Updating Sim NavX
     SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
