@@ -5,7 +5,10 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -22,6 +25,7 @@ import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
@@ -36,6 +40,10 @@ public class SwerveSubsystem extends SubsystemBase{
         new Translation2d(kWheelBase / 2, -kTrackWidth /2),
         new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+        
+    public static final double kXTranslationP = 1.5;
+    public static final double kYTranslationP = 1.5;
+    public static final double kRotationP = 0.85;
 
     private final SwerveModule frontLeft = new SwerveModule(
         MotorConfig.FrontLeftModuleDrive,
@@ -70,20 +78,33 @@ public class SwerveSubsystem extends SubsystemBase{
     private DoubleLogEntry rotationOutputLog = new DoubleLogEntry(datalog, "/swerve/rotout"); //Logs rotation state output
     private BooleanLogEntry controlOrientationLog = new BooleanLogEntry(datalog, "/swerve/orientation"); //Logs if robot is in FOD/ROD
     private StringLogEntry errors = new StringLogEntry(datalog, "/swerve/errors"); //Logs any hardware errors
+    private StringLogEntry trajectoryLog = new StringLogEntry(datalog, "/auton/trajectory"); //Logs autonomous trajectory following
 
     public boolean controlOrientationIsFOD;
+
+    public Double rotationHold;
+
+    private PIDController xController;
+    private PIDController yController;
+    private PIDController rotationController;
 
     public SwerveSubsystem() {
         zeroHeading();
         controlOrientationIsFOD = true;
+
+        //Define PID controllers for tracking trajectory
+        xController = new PIDController(kXTranslationP, 0, 0);
+        yController = new PIDController(kYTranslationP, 0, 0);
+        rotationController = new PIDController(kRotationP, 0, 0);
+        rotationController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     public void zeroHeading() {
-        if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");}
+        if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");} 
         gyro.reset();
     }
 
-    public double getHeading() { 
+    public double getHeading() {
         return gyro.getYaw();
     }
 
@@ -109,12 +130,28 @@ public class SwerveSubsystem extends SubsystemBase{
         controlOrientationLog.append(controlOrientationIsFOD);
     }
 
+    public void enableRotationHold(int angle){
+        //Set the angle to automatically align the drive to using degrees -180 to 180
+        rotationHold = Units.degreesToRadians(angle);
+    }
+
+    public void disableRotationHold(){
+        rotationHold = null;
+    }
+
     public SwerveModuleState[] convertToModuleStates(double xTranslation, double yTranslation, double rotation) {
         //Takes axis input from joysticks and returns an array of swerve module states
 
         double x = yTranslation; //Intentional, x in swerve kinematics is y on the joystick
         double y = xTranslation;
         double r = rotation;
+
+        if (Math.abs(r) > 0){
+            disableRotationHold();
+        }
+        else if(rotationHold != null){
+            r = rotationController.calculate(Units.degreesToRadians(getHeading()), rotationHold);
+        }
 
         //Map to speeds in meters/radians per second
         x *= kPhysicalMaxSpeed;
@@ -137,7 +174,7 @@ public class SwerveSubsystem extends SubsystemBase{
         }
         SmartDashboard.putString("chassis speeds",chassisSpeeds.toString());
         //Convert Chassis Speeds to individual module states
-        return kDriveKinematics.toSwerveModuleStates(chassisSpeeds);  
+        return kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -174,7 +211,22 @@ public class SwerveSubsystem extends SubsystemBase{
         backLeft.stop();
         backRight.stop();
     }
-
+    
+    public Command followTrajectory(String name, PathPlannerTrajectory trajectory){
+        //For use with trajectories generated from a list of poses
+        return new PPSwerveControllerCommand(
+            trajectory,
+            this::getPose, 
+            SwerveSubsystem.kDriveKinematics, 
+            xController, 
+            yController, 
+            rotationController, 
+            this::setModuleStates, 
+            this
+        ).beforeStarting(() -> trajectoryLog.append("Following trajectory " + name)
+        ).andThen(() -> trajectoryLog.append("Trajectory " + name +  " Ended"));
+    }
+    
     @Override
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());

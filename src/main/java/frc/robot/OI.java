@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 public class OI {
     //Operator Interface (OI) class containing all control information
@@ -38,6 +39,22 @@ public class OI {
         public static Supplier<Double> getRotationSupplier(){
             //This axis is inverted
             return () -> kRotationCurve.calculate(-kJoystick.getRawAxis(kRotationAxis));
+        }
+
+        public static POVButton getAlignForwardPOV(){
+            return new POVButton(kJoystick, 0);
+        }
+
+        public static POVButton getAlignBackPOV(){
+            return new POVButton(kJoystick, 180);
+        }
+
+        public static POVButton getAlignLeftPOV(){
+            return new POVButton(kJoystick, 270);
+        }
+
+        public static POVButton getAlignRightPOV(){
+            return new POVButton(kJoystick, 90);
         }
 
         public static JoystickButton getOrientationButton(){
