@@ -32,6 +32,10 @@ public class RobotContainer {
   private AutonSubsytem autonSubsytem;
   private SimulationSubsystem simulationSubsystem;
   
+  private final CameraSubsystem cameraSubsystem = new CameraSubsystem();
+
+  private static BatterySubsystem batterySubsystem;
+  
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
@@ -49,17 +53,16 @@ public class RobotContainer {
       if (!Robot.isReal()) {
         simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
       }
-
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
-      swerveSubsystem, 
-      OI.Driver.getXTranslationSupplier(),
-      OI.Driver.getYTranslationSupplier(),
-      OI.Driver.getRotationSupplier()));
+        swerveSubsystem, 
+        OI.Driver.getXTranslationSupplier(),
+        OI.Driver.getYTranslationSupplier(),
+        OI.Driver.getRotationSupplier()));
 
       autonSubsytem = new AutonSubsytem(swerveSubsystem);
     }
     CommandScheduler.getInstance().enable();
-      
+
     // Configure the button bindings    
 
     configureButtonBindings();

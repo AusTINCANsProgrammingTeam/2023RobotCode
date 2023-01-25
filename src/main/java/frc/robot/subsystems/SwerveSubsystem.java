@@ -55,7 +55,6 @@ public class SwerveSubsystem extends SubsystemBase{
     public static final double kYTranslationP = 1.5;
     public static final double kRotationP = 0.85;
 
-
     public Double rotationHold;
 
     private PIDController xController;
@@ -69,41 +68,38 @@ public class SwerveSubsystem extends SubsystemBase{
     private BooleanLogEntry controlOrientationLog = new BooleanLogEntry(datalog, "/swerve/orientation"); //Logs if robot is in FOD/ROD
     private StringLogEntry errors = new StringLogEntry(datalog, "/swerve/errors"); //Logs any hardware errors
     private StringLogEntry trajectoryLog = new StringLogEntry(datalog, "/auton/trajectory"); //Logs autonomous trajectory following
-
+    private StringLogEntry swerveCaughtExeptionLog = new StringLogEntry(datalog, "/errors");
 
     private boolean isSwerveDummy = false;
-    private DataLog swerveErrorLog = DataLogManager.getLog();
-    private StringLogEntry swerveCaughtExeptionLog;
     private String swerveCaughtExeption;
 
     public boolean controlOrientationIsFOD;
 
     public SwerveSubsystem() {
-        swerveCaughtExeptionLog = new StringLogEntry(swerveErrorLog, "/errors");
 
             frontLeft = new SwerveModule(
-            MotorConfig.FrontLeftModuleDrive,
-            MotorConfig.FrontLeftModuleTurn,
-            EncoderConfig.FrontLeftModule,
-            "FL");
+                MotorConfig.FrontLeftModuleDrive,
+                MotorConfig.FrontLeftModuleTurn,
+                EncoderConfig.FrontLeftModule,
+                "FL");
 
             frontRight = new SwerveModule(
-            MotorConfig.FrontRightModuleDrive,
-            MotorConfig.FrontRightModuleTurn,
-            EncoderConfig.FrontRightModule,
-            "FR");
+                MotorConfig.FrontRightModuleDrive,
+                MotorConfig.FrontRightModuleTurn,
+                EncoderConfig.FrontRightModule,
+                "FR");
 
             backLeft = new SwerveModule(
-            MotorConfig.BackLeftModuleDrive,
-            MotorConfig.BackLeftModuleTurn,
-            EncoderConfig.BackLeftModule,
-            "BL");
+                MotorConfig.BackLeftModuleDrive,
+                MotorConfig.BackLeftModuleTurn,
+                EncoderConfig.BackLeftModule,
+                "BL");
 
             backRight = new SwerveModule(
-            MotorConfig.BackRightModuleDrive,
-            MotorConfig.BackRightModuleTurn,
-            EncoderConfig.BackRightModule,
-            "BR");
+                MotorConfig.BackRightModuleDrive,
+                MotorConfig.BackRightModuleTurn,
+                EncoderConfig.BackRightModule,
+                "BR");
         try {
             gyro = new AHRS(SPI.Port.kMXP);
             odometer = new SwerveDriveOdometry(kDriveKinematics, getRotation2d(), getModulePositions());

@@ -15,6 +15,7 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,14 +36,14 @@ import com.revrobotics.CANSparkMax.ControlType;
 
 public class SwerveModule extends SubsystemBase {
 
-    public static double kWheelDiameterMeters = Units.inchesToMeters(3.5);
-    public static double kDriveMotorGearRatio = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
-    public static double kTurningMotorGearRatio = (14.0 / 50.0) * (10.0 / 60.0);
-    public static double kDriveEncoderRotFactor = kDriveMotorGearRatio * Math.PI * kWheelDiameterMeters; //Conversion factor converting the Drive Encoder's rotations to meters
-    public static double kDriveEncoderRPMFactor = kDriveEncoderRotFactor / 60; //Conversion factor converting the Drive Encoder's RPM to meters per second
-    public static double kTurningEncoderRotFactor = kTurningMotorGearRatio * 2 * Math.PI; //Conversion factor converting the Turn Encoder's rotations to Radians
-    public static double kTurningEncoderRPMFactor = kTurningEncoderRotFactor / 60; //Conersion factor converting the Turn Encoder's RPM to radians per second
-    public static double kPTurning = 0.4; //P gain for the turning motor
+    public static final double kWheelDiameterMeters = Units.inchesToMeters(3.5);
+    public static final double kDriveMotorGearRatio = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+    public static final double kTurningMotorGearRatio = (14.0 / 50.0) * (10.0 / 60.0);
+    public static final double kDriveEncoderRotFactor = kDriveMotorGearRatio * Math.PI * kWheelDiameterMeters; //Conversion factor converting the Drive Encoder's rotations to meters
+    public static final double kDriveEncoderRPMFactor = kDriveEncoderRotFactor / 60; //Conversion factor converting the Drive Encoder's RPM to meters per second
+    public static final double kTurningEncoderRotFactor = kTurningMotorGearRatio * 2 * Math.PI; //Conversion factor converting the Turn Encoder's rotations to Radians
+    public static final double kTurningEncoderRPMFactor = kTurningEncoderRotFactor / 60; //Conersion factor converting the Turn Encoder's RPM to radians per second
+    public static final double kPTurning = 0.4; //P gain for the turning motor
 
     private CANSparkMax driveMotor;
     private CANSparkMax turningMotor;
@@ -50,11 +51,16 @@ public class SwerveModule extends SubsystemBase {
     private RelativeEncoder driveEncoder;
     private RelativeEncoder turningEncoder;
 
-    private FlywheelSim simTurningMotor;
-    private FlywheelSim simDriveMotor;
-
-    private RelativeEncoderSim simDriveEncoder;
-    private RelativeEncoderSim simTurningEncoder;
+    private FlywheelSim simDriveMotor = new FlywheelSim(
+        LinearSystemId.identifyVelocitySystem(2, 1.24), //TODO: Update with real SysID
+        DCMotor.getNEO(1),
+        kDriveMotorGearRatio
+    );
+    private FlywheelSim simTurningMotor = new FlywheelSim(
+        LinearSystemId.identifyVelocitySystem(0.16, 0.0348), //TODO: Update with real SysID
+        DCMotor.getNEO(1),
+        kTurningMotorGearRatio
+    );
 
     private SparkMaxPIDController turningPIDController;
     private PIDController simTurningPIDController;
@@ -69,22 +75,25 @@ public class SwerveModule extends SubsystemBase {
     private DoubleLogEntry actualAbsoluteAngleLog;
     private DoubleLogEntry actualRelativeAngleLog;
     private DoubleLogEntry rotationSpeedLog;
+    private StringLogEntry moduleCaughtExeptionLog;
 
     private String ID;
 
     private boolean isModuleDummy = false;
-    private DataLog ModuleErrorLog = DataLogManager.getLog();
-    private StringLogEntry moduleCaughtExeptionLog;
     private String moduleCaughtExeption;
 
+    private RelativeEncoderSim simDriveEncoder;
+    private RelativeEncoderSim simTurningEncoder;
+
+    private TunableNumber tunableP;
+
     public SwerveModule(MotorConfig driveMotorConfig, MotorConfig turningMotorConfig, EncoderConfig absoluteEncoderConfig, String ID) {
-        moduleCaughtExeptionLog = new StringLogEntry(ModuleErrorLog, "/errors");
+        moduleCaughtExeptionLog = new StringLogEntry(datalog, "/errors");
 
         try{
             this.ID = ID;
 
             absoluteEncoder = Robot.isSimulation() ? null : AbsoluteEncoder.constructEncoder(absoluteEncoderConfig);
-
 
             driveMotor = MotorController.constructMotor(driveMotorConfig);
             turningMotor = MotorController.constructMotor(turningMotorConfig);
@@ -96,25 +105,15 @@ public class SwerveModule extends SubsystemBase {
             driveEncoder.setVelocityConversionFactor(kDriveEncoderRPMFactor);
             turningEncoder.setPositionConversionFactor(kTurningEncoderRotFactor);
             turningEncoder.setVelocityConversionFactor(kTurningEncoderRPMFactor);
-
-            simDriveMotor = new FlywheelSim(
-                LinearSystemId.identifyVelocitySystem(2, 1.24), //TODO: Update with real SysID
-                DCMotor.getNEO(1),
-                kDriveMotorGearRatio
-            );
-            simTurningMotor = new FlywheelSim(
-                LinearSystemId.identifyVelocitySystem(0.16, 0.0348), //TODO: Update with real SysID
-                DCMotor.getNEO(1),
-                kTurningMotorGearRatio
-            );
-
-            simDriveEncoder = new RelativeEncoderSim(driveMotor);
-            simTurningEncoder = new RelativeEncoderSim(turningMotor);
             
             turningPIDController = turningMotor.getPIDController();
             turningPIDController.setP(kPTurning);
             simTurningPIDController = new PIDController(turningPIDController.getP(), turningPIDController.getI(), turningPIDController.getD());
             simTurningPIDController.enableContinuousInput(-Math.PI, Math.PI);
+            tunableP = new TunableNumber("Swerve " + ID + " P", kPTurning, turningPIDController::setP);
+
+            simDriveEncoder = new RelativeEncoderSim(driveMotor);
+            simTurningEncoder = new RelativeEncoderSim(turningMotor);
 
             resetEncoders();
 
@@ -125,10 +124,10 @@ public class SwerveModule extends SubsystemBase {
             actualRelativeAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualRelAngle"); //Logs actual relative angle in radians
             rotationSpeedLog = new DoubleLogEntry(datalog, "/swerve" + ID + "/rotationSpeed");
         } catch(Exception e){
-           moduleCaughtExeption = "Swerve Module Caught Exception: " + e.getMessage();
-           System.out.println(moduleCaughtExeption);
-           moduleCaughtExeptionLog.append(moduleCaughtExeption);
-           isModuleDummy = true;
+            moduleCaughtExeption = "Swerve Module " + ID + " Caught Exception: " + e.getMessage();
+            DriverStation.reportWarning(moduleCaughtExeption, false);
+            moduleCaughtExeptionLog.append(moduleCaughtExeption);
+            isModuleDummy = true;
         }
     }
 
