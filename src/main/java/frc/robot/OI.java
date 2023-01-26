@@ -70,14 +70,17 @@ public class OI {
         private static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
 
         private static final int kBuddyBalanceDeployID = 0; //B Button, deploy buddy balance
-        private static final int kBuddyBalanceRetrieveID = 1; //Button TBD, moves buddy balance slightly up when engaging charge pad
 
-        public static JoystickButton deployBuddyBalanceButton() {
-            return new JoystickButton(kJoystick, kBuddyBalanceDeployID);
+        public static JoystickButton getConfirmBuddyBalanceButton() {
+            return new JoystickButton(kJoystick, kBuddyBalanceDeployID); // This button must be held in order for the buddy balance to function
         }
 
-        public static JoystickButton retrieveBuddyBalanceButton() {
-            return new JoystickButton(kJoystick, kBuddyBalanceRetrieveID);
+        public static POVButton getDownBuddyBalanceButton() {
+            return new POVButton(kJoystick, 180); // This button will deploy the buddy balance if the confirm button is also held, and also move the lift to the deployed position if it was in the balanced position
+        }
+
+        public static POVButton getUpBuddyBalanceButton() {
+            return new POVButton(kJoystick, 0); // This button will move the lift to the balanced position if it was in the deployed position
         }
     }
 
