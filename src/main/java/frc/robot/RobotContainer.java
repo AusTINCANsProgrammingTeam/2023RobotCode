@@ -12,8 +12,6 @@ import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BatterySubsystem;
-import frc.robot.subsystems.EverybotIntakeSubsystem;
-import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.CameraSubsystem;
@@ -32,10 +30,6 @@ public class RobotContainer {
 
   private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
   private SimulationSubsystem simulationSubsystem;
-  
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   
   private final CameraSubsystem cameraSubsystem = new CameraSubsystem();
 
