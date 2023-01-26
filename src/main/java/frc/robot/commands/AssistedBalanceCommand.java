@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.robot.classes.TunableNumber;
 import frc.robot.subsystems.SwerveSubsystem;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
@@ -14,7 +15,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class AssistedBalanceCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveSubsystem swerve_subsystem;
-  PIDController pidController = new PIDController(0.2, 0, 0);
+  private double kPBalancing = 0.2;
+  private PIDController pidController = new PIDController(0.2, 0, 0);
+  TunableNumber tunableP = new TunableNumber("Balancing P", kPBalancing, pidController::setP);
 
   /**
    * Creates a new AssistedBalanceCommand
@@ -36,33 +39,18 @@ public class AssistedBalanceCommand extends CommandBase {
   @Override
   public void execute() {
 
-    swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(pidController.calculate(swerve_subsystem.getPitch(), 0.0), 0.0, 0.0));
-
-     /* if (swerve_subsystem.getPitch() > Units.degreesToRadians(2) && swerve_subsystem.getPitch() < 180.0) {
-        SmartDashboard.putString("Direction", "Forward");
-        swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(-1.0, 0.0, 0.0));
-      }  
-      else if (swerve_subsystem.getPitch() > Units.degreesToRadians(-2) && swerve_subsystem.getPitch() < Units.degreesToRadians(2)) {
-        swerve_subsystem.stopModules();
-      }
-      else if (swerve_subsystem.getPitch() > -180.0 && swerve_subsystem.getPitch() < Units.degreesToRadians(-2)) {
-        swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(1.0, 0.0, 0.0)); 
-        SmartDashboard.putString("Direction", "Backward");
-    }
-    else {
-      swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(0.0, 0.0, 0.0));
-    }*/
+    swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(pidController.calculate(swerve_subsystem.getPitch(), 0.0), 0.0, 0.0));  
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    //TODO: Lock when wheels are balanced
+    swerve_subsystem.stopModules();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return swerve_subsystem.getPitch() != 0 ? false : true;
   }
 }

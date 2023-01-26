@@ -61,7 +61,6 @@ public class RobotContainer {
 
     configureButtonBindings();
 
-    OI.Driver.getBalanceButton().toggleOnTrue(assistedBalanceCommand); //C on Keyboard
   }
 
   /**
@@ -77,6 +76,7 @@ public class RobotContainer {
     OI.Driver.getAlignBackPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
     OI.Driver.getAlignLeftPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(90), swerveSubsystem));
     OI.Driver.getAlignRightPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(-90), swerveSubsystem));
+    OI.Driver.getBalanceButton().toggleOnTrue(assistedBalanceCommand); //C on Keyboard
   }
 
   /**

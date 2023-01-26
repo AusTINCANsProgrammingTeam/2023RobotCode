@@ -178,10 +178,6 @@ public class SwerveModule extends SubsystemBase {
         turningMotor.set(0);
     }
 
-    public double getVelocity() {
-        return driveEncoder.getVelocity();
-    }
-
     @Override
     public void simulationPeriodic() {
         simDriveMotor.setInputVoltage(driveMotor.get() * RobotController.getBatteryVoltage());

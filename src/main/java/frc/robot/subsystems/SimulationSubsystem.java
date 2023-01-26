@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.lang.reflect.Field;
+
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.classes.FieldConstants;
 
 public class SimulationSubsystem extends SubsystemBase {
 
@@ -27,8 +30,6 @@ public class SimulationSubsystem extends SubsystemBase {
     this.swerveSubsystem = swerveSubsystem;
 
     m_field = new Field2d(); 
-
-    simPitch = 100;
     
     //This puts the field into SmartDashboard
     SmartDashboard.putData("Field", m_field); 
@@ -54,15 +55,12 @@ public class SimulationSubsystem extends SubsystemBase {
     //Update simPitch
     swerveX = swerveSubsystem.getPose().getX();
     
-    if (swerveX >= 0 && swerveX <= Units.feetToMeters(4)) {
-      simPitch = Units.degreesToRadians((swerveX * (22/Units.feetToMeters(4))) - 11);
+    if (swerveX >= 0 && swerveX <= FieldConstants.Community.chargingStationWidth) {
+      simPitch = Units.degreesToRadians((swerveX * (22/FieldConstants.Community.chargingStationWidth)) - 11);
     }
     else {
       simPitch = 0;
     }
-
-    SmartDashboard.putNumber("PoseX", swerveX);
-    SmartDashboard.putNumber("SimPitch", simPitch);
 
     SimDouble pitch = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Pitch"));
     pitch.set(simPitch);
