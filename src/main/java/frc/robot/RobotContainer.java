@@ -25,14 +25,13 @@ import frc.robot.subsystems.CameraSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-
+  private final CameraSubsystem cameraSubsystem = new CameraSubsystem();
   private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
+  
   private SimulationSubsystem simulationSubsystem;
   
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
-  
-  private final CameraSubsystem cameraSubsystem = new CameraSubsystem();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
