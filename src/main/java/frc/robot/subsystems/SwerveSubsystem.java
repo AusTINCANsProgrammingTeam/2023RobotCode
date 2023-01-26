@@ -44,7 +44,7 @@ public class SwerveSubsystem extends SubsystemBase{
         
     public static final double kXTranslationP = 1.5;
     public static final double kYTranslationP = 1.5;
-    public static final double kRotationP = 0.85;
+    public static final double kRotationP = 0.575;
 
     private final SwerveModule frontLeft = new SwerveModule(
         MotorConfig.FrontLeftModuleDrive,
