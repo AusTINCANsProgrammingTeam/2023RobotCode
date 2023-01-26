@@ -14,6 +14,7 @@ import frc.robot.subsystems.BatterySubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.CameraSubsystem;
+import frc.robot.subsystems.EverybotIntakeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -24,6 +25,8 @@ import frc.robot.subsystems.CameraSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+  private final EverybotIntakeSubsystem intakeSubsystem = new EverybotIntakeSubsystem();
+
 
   private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
   private SimulationSubsystem simulationSubsystem;
@@ -64,6 +67,8 @@ public class RobotContainer {
     OI.Driver.getAlignBackPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
     OI.Driver.getAlignLeftPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(90), swerveSubsystem));
     OI.Driver.getAlignRightPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(-90), swerveSubsystem));
+    OI.Driver.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::pull, intakeSubsystem));
+    OI.Driver.getOuttakeButton().onTrue(new InstantCommand(intakeSubsystem::push, intakeSubsystem));
   }
 
   /**
