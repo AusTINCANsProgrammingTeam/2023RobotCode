@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
   // TODO Led parameters and RIO ports
-  // TODO Add to ShuffleBoard
 public class LedSubsystem extends SubsystemBase {
   private final AddressableLEDBuffer buffer;
   private final AddressableLED leds = new AddressableLED(port);
