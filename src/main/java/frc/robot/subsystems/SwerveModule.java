@@ -175,10 +175,12 @@ public class SwerveModule extends SubsystemBase {
 
     public void park(boolean reversed) {
         if(reversed){
-          turningPIDController.setReference(-Math.PI/4, ControlType.kPosition);  
+            //not using calculateSetpoint because these are less than one full rotation
+            turningPIDController.setReference(-Math.PI/4, ControlType.kPosition);  
         } else{
             turningPIDController.setReference(Math.PI/4, ControlType.kPosition);
         }
+        stop();
     }
 
     public void stop() {

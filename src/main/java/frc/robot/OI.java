@@ -15,7 +15,12 @@ public class OI {
 
         private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
         private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
-        private static final int kParkButtonID = 5; //5 Button, park the robot
+        private static final int kParkButtonID = 5; //left bumper, park the robot
+        /*for reference "button" 5 is the left bumper
+         * "button" 6 is the right bumper
+         * "button" 7 is the left trigger
+         * and "button" 8 is the right trigger
+        */
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
