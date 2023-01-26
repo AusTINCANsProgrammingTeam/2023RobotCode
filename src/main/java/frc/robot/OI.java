@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 public class OI {
     //Operator Interface (OI) class containing all control information
@@ -14,7 +13,9 @@ public class OI {
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
 
         private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
-        private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
+        private static final int kZeroButtonID = 3; //3 Button, Zero the gyroscope
+        private static final int kAlignForwardButtonID = 4; //4 Button, Align forwards
+        private static final int kAlignBackwardButtonID = 2; //2 Button, Align backwards
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -40,28 +41,20 @@ public class OI {
             return () -> kRotationCurve.calculate(-kJoystick.getRawAxis(kRotationAxis));
         }
 
-        public static POVButton getAlignForwardPOV(){
-            return new POVButton(kJoystick, 0);
-        }
-
-        public static POVButton getAlignBackPOV(){
-            return new POVButton(kJoystick, 180);
-        }
-
-        public static POVButton getAlignLeftPOV(){
-            return new POVButton(kJoystick, 270);
-        }
-
-        public static POVButton getAlignRightPOV(){
-            return new POVButton(kJoystick, 90);
-        }
-
         public static JoystickButton getOrientationButton(){
             return new JoystickButton(kJoystick, kOrientationButtonID);
         }
 
         public static JoystickButton getZeroButton(){
             return new JoystickButton(kJoystick, kZeroButtonID);
+        }
+
+        public static JoystickButton getAlignForwardButton(){
+            return new JoystickButton(kJoystick, kAlignForwardButtonID);
+        }
+
+        public static JoystickButton getAlignBackButton(){
+            return new JoystickButton(kJoystick, kAlignBackwardButtonID);
         }
     }
 
