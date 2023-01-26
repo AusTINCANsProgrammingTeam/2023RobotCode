@@ -30,15 +30,13 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   // FIXME using PWMSparkMax because CANSparkMax doesn't have an equivalent simulation class
   // FIXME https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
   // May limit how much we can do in terms of JUnit tests
-  private double P = 0.01;
+  private double P = 1;
   private double I = 0;
   private double D = 0.6;
   private CANSparkMax motorBaseOne;
   private CANSparkMax motorBaseTwo;
   private CANSparkMax motorElbow;
   private final Encoder motorBaseOneEncoder;
-  //private final RelativeEncoder motorBaseOneEncoder;
-  //private final RelativeEncoderSim motorBaseOneEncoderSim;
   private final EncoderSim motorBaseOneEncoderSim;
   private final RelativeEncoder motorElbowEncoder;
   private final RelativeEncoderSim motorElbowEncoderSim;
@@ -67,7 +65,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), baseGearing, baseArmInertia, baseArmLength, minAngle, maxAngle, baseArmMass, false);
   private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), elbowGearing, elbowArmInertia, elbowArmLength, minAngle, maxAngle, elbowArmMass, false);
 
-  /** Creates a new ExampleSubsystem. */
   public ArmSubsystem() {
     motorBaseOne = MotorController.constructMotor(MotorConfig.ArmBaseMotor1);
     motorBaseTwo = MotorController.constructMotor(MotorConfig.ArmBaseMotor2);
@@ -75,7 +72,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     motorElbow = MotorController.constructMotor(MotorConfig.ArmElbowMotor);
 
     motorElbowEncoderSim = new RelativeEncoderSim(motorElbow);
-    //motorBaseOneEncoder = this.motorBaseOne.getEncoder(); 
     //TODO: Place real values for channels
     motorBaseOneEncoder = new Encoder(0,1);
     motorBaseOneEncoder.setDistancePerPulse(1./15.); //Amount of distance per rotation of the motor, basically a gear ratio measurement
@@ -109,19 +105,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     double baseSetpoint = ArmAutoCommand.getBaseAngle(simulationXCoord, simulationYCoord);
     double elbowSetpoint = ArmAutoCommand.getElbowAngle(simulationXCoord, simulationYCoord);
     double basePidOut = basePIDController.calculate(motorBaseOneEncoderSim.getDistance(), baseSetpoint);
-    //double basePidOut = basePIDController.calculate(motorBaseOneEncoderSim.getDistance()*(2*Math.PI), baseSetpoint);
     double elbowPidOut = elbowPIDController.calculate(motorElbowEncoderSim.getPosition()*(2*Math.PI), elbowSetpoint);
     baseArmSim.setInputVoltage(basePidOut * RobotController.getBatteryVoltage());
-    //baseArmSim.setInputVoltage(0.1);
     elbowArmSim.setInputVoltage(elbowPidOut * RobotController.getBatteryVoltage());
-  
-    //motorBaseOneEncoderSim.setDistance((Units.radiansToDegrees(baseArmSim.getAngleRads()) * gearing)/360);
-    //motorBaseOneEncoderSim.setDistance(2);
-    //motorBaseOneEncoderSim.setDistance(baseArmSim.getAngleRads()/(2*Math.PI));
-    //Double m1EncoderSimCountDouble = baseArmSim.getAngleRads()/(2*Math.PI);
-    //int m1EncoderSimCountInteger = m1EncoderSimCountDouble.intValue();
-    //motorBaseOneEncoderSim.setCount(m1EncoderSimCountInteger);
-
     motorBaseOneEncoderSim.setDistance(baseArmSim.getAngleRads());
     motorElbowEncoderSim.setPosition(elbowArmSim.getAngleRads()/(2*Math.PI) * elbowGearing);
   
@@ -131,9 +117,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     //SB Return values
     simCurrentAngle = Units.radiansToDegrees(baseArmSim.getAngleRads()); //Returns angle in degrees
     armAngleSim.setDouble(simCurrentAngle);
-    //simEncoderPos.setDouble(motorBaseOneEncoderSim.getDistance()*(2*Math.PI)*(180/Math.PI));
     simEncoderPos.setDouble(motorBaseOneEncoderSim.getDistance()*(180/Math.PI));
-    //simOutSet.setDouble(ArmAutoCommand.getBaseAngle(simulationXCoord,simulationYCoord)*(180/Math.PI));
     simOutSet.setDouble(basePidOut);
     simError.setDouble(basePIDController.getPositionError()*(180/Math.PI));
     simVoltage.setDouble(baseArmSim.getCurrentDrawAmps());
