@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.classes.FieldConstants;
 
 
-public class AutonSubsytem extends SubsystemBase{
+public class AutonSubsystem extends SubsystemBase{
     public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed / 4; //Maximum speed allowed in auton, in meters per second
     public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
 
@@ -59,7 +59,7 @@ public class AutonSubsytem extends SubsystemBase{
 
     private AutonModes autonMode;
 
-    public AutonSubsytem(SwerveSubsystem swerveSubsystem){
+    public AutonSubsystem(SwerveSubsystem swerveSubsystem){
         this.swerveSubsystem = swerveSubsystem;
 
         //Add auton modes to chooser

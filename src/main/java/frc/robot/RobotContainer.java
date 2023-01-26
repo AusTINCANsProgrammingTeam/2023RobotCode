@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
-import frc.robot.subsystems.AutonSubsytem;
+import frc.robot.subsystems.AutonSubsystem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.ExampleCommand;
@@ -26,8 +26,8 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
   private final CameraSubsystem cameraSubsystem = new CameraSubsystem();
-  private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
-  
+  private final AutonSubsystem autonSubsystem = new AutonSubsystem(swerveSubsystem);
+
   private SimulationSubsystem simulationSubsystem;
   
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
@@ -72,6 +72,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autonSubsytem.getAutonCommand();
+    return autonSubsystem.getAutonCommand();
   }
 }
