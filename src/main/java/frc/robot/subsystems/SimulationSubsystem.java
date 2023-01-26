@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.lang.reflect.Field;
-
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -55,8 +53,8 @@ public class SimulationSubsystem extends SubsystemBase {
     //Update simPitch
     swerveX = swerveSubsystem.getPose().getX();
     
-    if (swerveX >= 0 && swerveX <= FieldConstants.Community.chargingStationWidth) {
-      simPitch = Units.degreesToRadians((swerveX * (22/FieldConstants.Community.chargingStationWidth)) - 11);
+    if (swerveX >= 0 && swerveX <= FieldConstants.Community.chargingStationLength) {
+      simPitch = Units.degreesToRadians((swerveX * ((FieldConstants.Community.chargingStationAngle * 2) / FieldConstants.Community.chargingStationLength)) - FieldConstants.Community.chargingStationAngle);
     }
     else {
       simPitch = 0;
@@ -64,9 +62,6 @@ public class SimulationSubsystem extends SubsystemBase {
 
     SimDouble pitch = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Pitch"));
     pitch.set(simPitch);
-    
-    SmartDashboard.putNumber("GyroPitch", swerveSubsystem.getPitch());
-
 
     //Updating Sim NavX
     SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
