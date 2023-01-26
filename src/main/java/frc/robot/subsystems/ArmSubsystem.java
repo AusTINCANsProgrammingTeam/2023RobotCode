@@ -52,19 +52,20 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private GenericEntry simVoltage = configTab.add("Simulation Motor Voltage", 0.0).getEntry();
 
   // SIM VALUES:
-  private double gearing = 1;
-  private double baseArmLength = Units.inchesToMeters(37.5);
-  private double elbowArmLength = Units.inchesToMeters(37.5);
-  private double minAngle = Units.degreesToRadians(-160);
-  private double maxAngle = Units.degreesToRadians(160);
+  private double baseGearing = 15;
+  private double elbowGearing = 1;
+  public static double baseArmLength = Units.inchesToMeters(43.5);
+  public static double elbowArmLength = Units.inchesToMeters(37.5);
+  private double minAngle = Units.degreesToRadians(45);
+  private double maxAngle = Units.degreesToRadians(91);
   private double baseArmMass = Units.lbsToKilograms(15); //15
   private double elbowArmMass = Units.lbsToKilograms(15);
   private final double baseArmInertia = SingleJointedArmSim.estimateMOI(baseArmLength, baseArmMass);
   private final double elbowArmInertia = SingleJointedArmSim.estimateMOI(elbowArmLength, elbowArmMass);
   private double simCurrentAngle;
 
-  private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), gearing, baseArmInertia, baseArmLength, minAngle, maxAngle, baseArmMass, false);
-  private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), gearing, elbowArmInertia, elbowArmLength, minAngle, maxAngle, elbowArmMass, false);
+  private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), baseGearing, baseArmInertia, baseArmLength, minAngle, maxAngle, baseArmMass, false);
+  private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), elbowGearing, elbowArmInertia, elbowArmLength, minAngle, maxAngle, elbowArmMass, false);
 
   /** Creates a new ExampleSubsystem. */
   public ArmSubsystem() {
@@ -72,13 +73,12 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     motorBaseTwo = MotorController.constructMotor(MotorConfig.ArmBaseMotor2);
     motorBaseTwo.follow(motorBaseOne);
     motorElbow = MotorController.constructMotor(MotorConfig.ArmElbowMotor);
-    
-    //Encoders are not used right now, might be implemented later
-    //motorBaseOneEncoderSim = new RelativeEncoderSim(motorBaseOne);
+
     motorElbowEncoderSim = new RelativeEncoderSim(motorElbow);
     //motorBaseOneEncoder = this.motorBaseOne.getEncoder(); 
     //TODO: Place real values for channels
     motorBaseOneEncoder = new Encoder(0,1);
+    motorBaseOneEncoder.setDistancePerPulse(1./15.); //Amount of distance per rotation of the motor, basically a gear ratio measurement
     motorBaseOneEncoderSim = new EncoderSim(motorBaseOneEncoder);
     motorElbowEncoder = this.motorElbow.getEncoder(); 
     basePIDController = new PIDController(P, I, D);
@@ -104,22 +104,27 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   @Override
   public void simulationPeriodic() {
     //Base arm angle
-    double baseSetpoint = ArmAutoCommand.getBaseAngle(76, 88);
-    double elbowSetpoint = ArmAutoCommand.getElbowAngle(76, 88);
-    double basePidOut = basePIDController.calculate(motorBaseOneEncoderSim.getDistance()*(2*Math.PI), baseSetpoint);
+    double simulationXCoord = 100*Units.inchesToMeters(45.8);
+    double simulationYCoord = 100*Units.inchesToMeters(26.9);
+    double baseSetpoint = ArmAutoCommand.getBaseAngle(simulationXCoord, simulationYCoord);
+    double elbowSetpoint = ArmAutoCommand.getElbowAngle(simulationXCoord, simulationYCoord);
+    double basePidOut = basePIDController.calculate(motorBaseOneEncoderSim.getDistance(), baseSetpoint);
+    //double basePidOut = basePIDController.calculate(motorBaseOneEncoderSim.getDistance()*(2*Math.PI), baseSetpoint);
     double elbowPidOut = elbowPIDController.calculate(motorElbowEncoderSim.getPosition()*(2*Math.PI), elbowSetpoint);
-    //motorBaseOne.set(basePidOut);
-    //motorBaseOne.set(0);
-    motorElbow.set(elbowPidOut);
-    //baseArmSim.setInputVoltage(basePidOut * RobotController.getBatteryVoltage());
-    baseArmSim.setInputVoltage(0.1);
+    baseArmSim.setInputVoltage(basePidOut * RobotController.getBatteryVoltage());
+    //baseArmSim.setInputVoltage(0.1);
     elbowArmSim.setInputVoltage(elbowPidOut * RobotController.getBatteryVoltage());
   
     //motorBaseOneEncoderSim.setDistance((Units.radiansToDegrees(baseArmSim.getAngleRads()) * gearing)/360);
     //motorBaseOneEncoderSim.setDistance(2);
     //motorBaseOneEncoderSim.setDistance(baseArmSim.getAngleRads()/(2*Math.PI));
-    //motorBaseOneEncoderSim.setDistance(0.1);
-    motorElbowEncoderSim.setPosition(elbowArmSim.getAngleRads()/(2*Math.PI) * gearing);
+    //Double m1EncoderSimCountDouble = baseArmSim.getAngleRads()/(2*Math.PI);
+    //int m1EncoderSimCountInteger = m1EncoderSimCountDouble.intValue();
+    //motorBaseOneEncoderSim.setCount(m1EncoderSimCountInteger);
+
+    motorBaseOneEncoderSim.setDistance(baseArmSim.getAngleRads());
+    motorElbowEncoderSim.setPosition(elbowArmSim.getAngleRads()/(2*Math.PI) * elbowGearing);
+  
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(baseArmSim.getCurrentDrawAmps()));
     
     baseArmSim.update(0.02); // standard loop time of 20ms
@@ -127,17 +132,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     simCurrentAngle = Units.radiansToDegrees(baseArmSim.getAngleRads()); //Returns angle in degrees
     armAngleSim.setDouble(simCurrentAngle);
     //simEncoderPos.setDouble(motorBaseOneEncoderSim.getDistance()*(2*Math.PI)*(180/Math.PI));
-
-
-    motorBaseOneEncoderSim.setDistance(1.1);
-    simEncoderPos.setDouble(motorBaseOneEncoderSim.getDistance());
-    //simEncoderPos.setDouble(0.1);
-
-    //System.out.println(motorBaseOneEncoderSim.getDistance());
-
-
-
-    //simOutSet.setDouble(ArmAutoCommand.getPrelimAngle(76,88)*(180/Math.PI));
+    simEncoderPos.setDouble(motorBaseOneEncoderSim.getDistance()*(180/Math.PI));
+    //simOutSet.setDouble(ArmAutoCommand.getBaseAngle(simulationXCoord,simulationYCoord)*(180/Math.PI));
     simOutSet.setDouble(basePidOut);
     simError.setDouble(basePIDController.getPositionError()*(180/Math.PI));
     simVoltage.setDouble(baseArmSim.getCurrentDrawAmps());

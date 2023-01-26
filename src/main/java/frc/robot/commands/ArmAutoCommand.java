@@ -5,13 +5,13 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.ArmSubsystem;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import java.lang.Math;
 
 public class ArmAutoCommand extends CommandBase {
-  //TODO: Move these to a constants file, all measurements are in cm
-  private static final double firstArmLength = 95.25;
-  private static final double secondArmLength = 100;
+  private static final double firstArmLength = 110;
+  private static final double secondArmLength = 94;
 
   private final ArmSubsystem armSubsystem;
   private double firstArmAngle;
