@@ -32,7 +32,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   // May limit how much we can do in terms of JUnit tests
   private double P = 1;
   private double I = 0;
-  private double D = 0.6;
+  private double D = 0.1;
   private CANSparkMax motorBaseOne;
   private CANSparkMax motorBaseTwo;
   private CANSparkMax motorElbow;
@@ -119,6 +119,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     armAngleSim.setDouble(simCurrentAngle);
     simEncoderPos.setDouble(motorBaseOneEncoderSim.getDistance()*(180/Math.PI));
     simOutSet.setDouble(basePidOut);
+    //simOutSet.setDouble(ArmAutoCommand.getBaseAngle(simulationXCoord, simulationYCoord)*(180/Math.PI));
     simError.setDouble(basePIDController.getPositionError()*(180/Math.PI));
     simVoltage.setDouble(baseArmSim.getCurrentDrawAmps());
   } 
