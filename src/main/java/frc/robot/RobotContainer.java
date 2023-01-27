@@ -68,7 +68,7 @@ public class RobotContainer {
     OI.Driver.getAlignBackPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
     OI.Driver.getAlignLeftPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(90), swerveSubsystem));
     OI.Driver.getAlignRightPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(-90), swerveSubsystem));
-    OI.Driver.getHomeButton().whileTrue(swerveSubsystem.goToPose(new Pose2d(3, 3, Rotation2d.fromDegrees(180))));
+    OI.Driver.getHomeButton().onTrue(new InstantCommand(() -> swerveSubsystem.goToPose(new Pose2d(3, 3, Rotation2d.fromDegrees(180)))));
 
     OI.Operator.getAlignMidLeftButton().whileTrue(swerveSubsystem.alignToTarget(NodePosition.MidLeft));
     OI.Operator.getAlignMidRightButton().whileTrue(swerveSubsystem.alignToTarget(NodePosition.MidRight));

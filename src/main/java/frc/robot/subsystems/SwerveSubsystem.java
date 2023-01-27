@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.OI;
 import frc.robot.Robot;
 import frc.robot.classes.Photonvision;
 import frc.robot.classes.FieldConstants.NodePosition;
@@ -263,11 +264,11 @@ public class SwerveSubsystem extends SubsystemBase{
         Integer id = Photonvision.getAprilTagID();
         Translation2d offset = new Translation2d(0,0); // TODO: calculate offsets
 
-        if(id != -1 && Robot.isRed ? id <= 4 : id > 4){
+        if(id != -1 && Robot.isRed() ? id <= 4 : id > 4){
             //Get pose of node to be targeted
             Pose2d desiredPose = new Pose2d(
                 nodePosition.getTranslation(id).plus(offset),
-                Robot.isRed ? Rotation2d.fromDegrees(0) : Rotation2d.fromDegrees(180)
+                Robot.isRed() ? Rotation2d.fromDegrees(0) : Rotation2d.fromDegrees(180)
             );
             //Generate trajectory to desired pose
             Pose2d currentPose = getPose();
@@ -279,7 +280,7 @@ public class SwerveSubsystem extends SubsystemBase{
                         Units.radiansToDegrees(
                             Math.atan2(
                                 desiredPose.getY() - currentPose.getY(), 
-                                desiredPose.getX() - desiredPose.getX()
+                                desiredPose.getX() - currentPose.getX()
                             )
                         )
                     ), 
@@ -292,9 +293,9 @@ public class SwerveSubsystem extends SubsystemBase{
         return new InstantCommand();
     }
 
-    public Command goToPose(Pose2d desiredPose){
+    public void goToPose(Pose2d desiredPose){
         Pose2d currentPose = getPose();
-        return followTrajectory(
+        followTrajectory(
             "goto",
             AutonSubsytem.generateTrajectory(
                 AutonSubsytem.constructPoint(
@@ -302,7 +303,7 @@ public class SwerveSubsystem extends SubsystemBase{
                     Units.radiansToDegrees(
                         Math.atan2(
                             desiredPose.getY() - currentPose.getY(), 
-                            desiredPose.getX() - desiredPose.getX()
+                            desiredPose.getX() - currentPose.getX()
                         )
                     )
                 ), 
@@ -311,11 +312,11 @@ public class SwerveSubsystem extends SubsystemBase{
                     Units.radiansToDegrees(
                         Math.atan2(
                             desiredPose.getY() - currentPose.getY(), 
-                            desiredPose.getX() - desiredPose.getX()
-                        ) + 180
+                            desiredPose.getX() - currentPose.getX()
+                        ) + Math.PI
                     ))
             )
-        );
+        ).until(() -> !OI.Driver.getHomeButton().getAsBoolean()).schedule();
     }
 
     @Override
