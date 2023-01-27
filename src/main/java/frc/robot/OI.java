@@ -75,10 +75,10 @@ public class OI {
         private static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
 
         //Node selection is from operator perspective
-        private static final int kAlignMidLeftButtonID = 0; //Right Trigger, align to mid left node
-        private static final int kAlignMidRightButtonID = 0; //Left Trigger, align to mid right node
-        private static final int kAlignHighLeftButtonID = 0; //Right Bumper, align to high left node
-        private static final int kAlignHighRightButtonID = 0; //Left Bumper, align to high right node
+        private static final int kAlignMidLeftButtonID = 8; //Right Trigger, align to mid left node
+        private static final int kAlignMidRightButtonID = 7; //Left Trigger, align to mid right node
+        private static final int kAlignHighLeftButtonID = 6; //Right Bumper, align to high left node
+        private static final int kAlignHighRightButtonID = 5; //Left Bumper, align to high right node
 
         public static JoystickButton getAlignMidLeftButton(){
             return new JoystickButton(kJoystick, kAlignMidLeftButtonID);
