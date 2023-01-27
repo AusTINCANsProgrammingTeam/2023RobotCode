@@ -15,6 +15,8 @@ public class OI {
 
         private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
         private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
+        private static final int kIntakeButtonID = 3; //3 Button, run intake
+        private static final int kOuttakeButtonID = 4; //4 Button, run outtake
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -67,6 +69,14 @@ public class OI {
 
         public static JoystickButton getBalanceButton(){
             return new JoystickButton(kJoystick, kToggleBalanceButton);
+        }
+
+        public static JoystickButton getIntakeButton(){
+            return new JoystickButton(kJoystick, kIntakeButtonID);
+        }
+        
+        public static JoystickButton getOuttakeButton(){
+            return new JoystickButton(kJoystick, kOuttakeButtonID);
         }
     }
 
