@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   public static final boolean isCompetition = true;
-  public static final boolean isRed = DriverStation.getAlliance() == Alliance.Red;
 
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();
@@ -44,6 +43,10 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+  }
+
+  public static boolean isRed(){
+    return DriverStation.getAlliance() == Alliance.Red;
   }
 
   /**

@@ -284,7 +284,7 @@ public final class FieldConstants {
    * rightmost point on the BLUE ALLIANCE wall.
    */
   public static Translation2d fieldElementFlip(Translation2d translation) {
-    if (Robot.isRed) {
+    if (Robot.isRed()) {
       return new Translation2d(translation.getX(), fieldLength - translation.getY());
     } else {
       return translation;
@@ -297,7 +297,7 @@ public final class FieldConstants {
    * rightmost point on the BLUE ALLIANCE wall.
    */
   public static Pose2d fieldElementFlip(Pose2d pose) {
-    if (Robot.isRed) {
+    if (Robot.isRed()) {
       return new Pose2d(
           fieldLength - pose.getX(),
           pose.getY(),
@@ -308,18 +308,18 @@ public final class FieldConstants {
   }
 
   public static Pose2d odometryFlip(Pose2d pose) {
-    if (Robot.isRed) {
+    if (Robot.isRed()) {
       return new Pose2d(
           pose.getX(),
           fieldWidth - pose.getY(),
-          new Rotation2d(0));
+          pose.getRotation());
     } else {
       return pose;
     }
   }
   
   public static Pose3d aprilTagFlip(Pose3d pose) {
-    if (Robot.isRed) {
+    if (Robot.isRed()) {
       return new Pose3d(
           new Translation3d(
             fieldLength - pose.getX(),
