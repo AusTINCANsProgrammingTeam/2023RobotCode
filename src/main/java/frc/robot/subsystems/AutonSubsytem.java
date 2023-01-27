@@ -206,16 +206,6 @@ public class AutonSubsytem extends SubsystemBase{
     private Command getBackupSequence(){
         //Backup sequence in case a trajectory fails to load
         return new SequentialCommandGroup(
-            swerveSubsystem.followTrajectory(
-                "Apriltag",
-                generateTrajectory(
-                    constructPoint(0, 0, 0, 0),
-                    constructPoint(
-                    FieldConstants.aprilTagFlip(FieldConstants.aprilTags.get(3)).getTranslation().getX(),
-                    FieldConstants.aprilTagFlip(FieldConstants.aprilTags.get(3)).getTranslation().getY(),0,0)
-
-                )
-            )
         );
     }
 
