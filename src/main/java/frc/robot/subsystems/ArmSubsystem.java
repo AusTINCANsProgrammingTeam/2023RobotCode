@@ -33,9 +33,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private double BI = 0;
   private double BD = 0.1;
   //Elbow arm PID values
-  private double EP = 0.05;
-  private double EI = 0;
-  private double ED = 0.2;
+  private double EP = 0.025;
+  private double EI = 0.02;
+  private double ED = 0.175;
   private CANSparkMax motorBaseOne;
   private CANSparkMax motorBaseTwo;
   private CANSparkMax motorElbow;
@@ -119,8 +119,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     //Base arm angle
     double simulationXCoord = 100*Units.inchesToMeters(45.8);
     double simulationYCoord = 100*Units.inchesToMeters(26.9);
-    double baseSetpoint = ArmAutoCommand.getBaseAngle(simulationXCoord, simulationYCoord)+Units.degreesToRadians(0);
-    double elbowSetpoint = ArmAutoCommand.getElbowAngle(simulationXCoord, simulationYCoord)+Units.degreesToRadians(0);
+    double baseSetpoint = ArmAutoCommand.getBaseAngle(simulationXCoord, simulationYCoord);
+    double elbowSetpoint = ArmAutoCommand.getElbowAngle(simulationXCoord, simulationYCoord);
     double basePidOut = basePIDController.calculate(motorBaseOneEncoderSim.getDistance(), baseSetpoint);
     double elbowPidOut = elbowPIDController.calculate(motorElbowEncoderSim.getDistance(), elbowSetpoint);
     baseArmSim.setInputVoltage(basePidOut * RobotController.getBatteryVoltage());
@@ -145,8 +145,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     simECurrentAngle = Units.radiansToDegrees(elbowArmSim.getAngleRads()); //Returns angle in degrees
     simEArmAngle.setDouble(simECurrentAngle);
     simEEncoderPos.setDouble(motorElbowEncoderSim.getDistance()*(180/Math.PI));
-    simEOutSet.setDouble(basePidOut);
-    //simEOutSet.setDouble(ArmAutoCommand.getElbowAngle(simulationXCoord, simulationYCoord)*(180/Math.PI));
+    //simEOutSet.setDouble(basePidOut);
+    simEOutSet.setDouble(ArmAutoCommand.getElbowAngle(simulationXCoord, simulationYCoord)*(180/Math.PI));
     simEError.setDouble(elbowPIDController.getPositionError()*(180/Math.PI));
     simEVoltage.setDouble(elbowArmSim.getCurrentDrawAmps());
   } 
