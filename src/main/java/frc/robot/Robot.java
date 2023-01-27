@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
   public static final boolean everybotIntakeSubsystem = true;
   public static final boolean intakeSubsystem = true;
   public static final boolean simulationSubsystem = true;
-  public static final boolean Swerve = false;
+  public static final boolean Swerve = true;
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();
   private IntegerLogEntry loopCountEntry = new IntegerLogEntry(loopCountlog, "/robot/loopCount");
