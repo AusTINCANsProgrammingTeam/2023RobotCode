@@ -79,7 +79,7 @@ public class ArmAutoCommand extends CommandBase {
   public void execute() {
     //Needs to move to points x,y
     getAngles(currentX, currentY);
-    armSubsystem.setBaseRef(firstArmAngle);
+    armSubsystem.setBaseRef(firstArmAngle+1);
     armSubsystem.setElbowRef(secondArmAngle);
   }
   public void setBaseArmAngle(double angle) {
