@@ -261,15 +261,15 @@ public final class FieldConstants {
       switch (aprilTagID){
         case 1:
         case 8:
-          translation = isLeft ? rowArray[1] : rowArray[3];
+          translation = isLeft ? rowArray[0] : rowArray[2];
           break;
         case 7:
         case 2:
-          translation = isLeft ? rowArray[4] : rowArray[6];
+          translation = isLeft ? rowArray[3] : rowArray[5];
           break;
         case 3:
         case 6:
-          translation = isLeft ? rowArray[7] : rowArray[9];
+          translation = isLeft ? rowArray[6] : rowArray[8];
           break;
         default:
           translation = null;
