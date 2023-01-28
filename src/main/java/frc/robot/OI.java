@@ -69,9 +69,9 @@ public class OI {
     public static final class Operator{
         private static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
 
-        private static final int kBuddyBalanceDeployID = 0; //B Button, deploy buddy balance
+        private static final int kBuddyBalanceDeployID = 1; //B Button, deploy buddy balance
 
-        public static JoystickButton getConfirmBuddyBalanceButton() {
+        public static JoystickButton getActivateBuddyBalanceButton() {
             return new JoystickButton(kJoystick, kBuddyBalanceDeployID); // This button must be held in order for the buddy balance to function
         }
 

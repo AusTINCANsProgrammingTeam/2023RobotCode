@@ -10,23 +10,23 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
-import frc.robot.OI;
 import frc.robot.classes.TunableNumber;
-
-import javax.management.relation.Relation;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
-public class BuddyBalanceSubsystem extends SubsystemBase { // TODO: Find a permanent name for buddy balance subsystem - BBalance is ambiguous
-  public static double buddyBalanceRefPointDocked;
-  public static double buddyBalanceRefPointBalanced;
-  public static double buddyBalanceRefPointDeployed;
+public class BuddyBalanceSubsystem extends SubsystemBase {
+  // public static double kDockedPosition; // Docked position may or may not be used depending on final design of buddy balance
+  public static double kBalancedPosition; // Buddy balance PID reference point when lifting a robot and engaging charge station
+  public static double kDeployedPosition; // Buddy balance PID reference point when setting down a robot/initial position when deployed
+  // TODO: Make the reference point constants final when they are done being tuned with TunableNumbers
+  public static final double kDefaultMotorP = 0.000001;
+  public static final double kDefaultMotorI = 0;
+  public static final double kDefaultMotorD = 0.000001;
   private TunableNumber refPointDockedTuner;
   private TunableNumber refPointBalancedTuner;
   private TunableNumber refPointDeployedTuner;
@@ -51,47 +51,51 @@ public class BuddyBalanceSubsystem extends SubsystemBase { // TODO: Find a perma
   private TunableNumber tNumBuddyBalanceLeftD;
 
   public BuddyBalanceSubsystem() {
-    rightMotor = MotorController.constructMotor(MotorConfig.BBalanceRightShaftRotate);
-    leftMotor = MotorController.constructMotor(MotorConfig.BBalanceLeftShaftRotate);
+    rightMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceRight);
+    leftMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft);
     rightPIDController = rightMotor.getPIDController();
     leftPIDController = leftMotor.getPIDController();
+    rightPIDController.setP(kDefaultMotorP);
+    rightPIDController.setI(kDefaultMotorI);
+    rightPIDController.setD(kDefaultMotorD);
+    leftPIDController.setP(kDefaultMotorP);
+    leftPIDController.setI(kDefaultMotorI);
+    leftPIDController.setD(kDefaultMotorD);
     rightEncoder = rightMotor.getEncoder();
     leftEncoder = leftMotor.getEncoder();
-    rightPIDController.setReference(buddyBalanceRefPointDocked, CANSparkMax.ControlType.kPosition);
-    leftPIDController.setReference(buddyBalanceRefPointDocked, CANSparkMax.ControlType.kPosition);
 
-    tNumBuddyBalanceRightP = new TunableNumber("Buddy Balance Right Motor P", 0.000001, rightPIDController::setP);
-    tNumBuddyBalanceRightI = new TunableNumber("Buddy Balance Right Motor I", 0, rightPIDController::setI);
-    tNumBuddyBalanceRightD = new TunableNumber("Buddy Balance Right Motor D", 0.000001, rightPIDController::setD);
-    tNumBuddyBalanceLeftP = new TunableNumber("Buddy Balance Left Motor P", 0.000001, leftPIDController::setP);
-    tNumBuddyBalanceLeftI = new TunableNumber("Buddy Balance Left Motor I", 0, leftPIDController::setI);
-    tNumBuddyBalanceLeftD = new TunableNumber("Buddy Balance Left Motor D", 0.000001, leftPIDController::setD);
+    tNumBuddyBalanceRightP = new TunableNumber("Buddy Balance Right Motor P", kDefaultMotorP, rightPIDController::setP);
+    tNumBuddyBalanceRightI = new TunableNumber("Buddy Balance Right Motor I", kDefaultMotorI, rightPIDController::setI);
+    tNumBuddyBalanceRightD = new TunableNumber("Buddy Balance Right Motor D", kDefaultMotorD, rightPIDController::setD);
+    tNumBuddyBalanceLeftP = new TunableNumber("Buddy Balance Left Motor P", kDefaultMotorP, leftPIDController::setP);
+    tNumBuddyBalanceLeftI = new TunableNumber("Buddy Balance Left Motor I", kDefaultMotorI, leftPIDController::setI);
+    tNumBuddyBalanceLeftD = new TunableNumber("Buddy Balance Left Motor D", kDefaultMotorD, leftPIDController::setD);
 
-    refPointDockedTuner = new TunableNumber("Ref Point Docked", 50, (a) -> {buddyBalanceRefPointDocked = a;});
-    refPointBalancedTuner = new TunableNumber("Ref Point Balanced", 15, (a) -> {buddyBalanceRefPointBalanced = a;});
-    refPointDeployedTuner = new TunableNumber("Ref Point Deployed", 0, (a) -> {buddyBalanceRefPointDeployed = a;});
+    // refPointDockedTuner = new TunableNumber("Ref Point Docked", 50, (a) -> {kDockedPosition = a;});
+    refPointBalancedTuner = new TunableNumber("Ref Point Balanced", 15, (a) -> {kBalancedPosition = a;});
+    refPointDeployedTuner = new TunableNumber("Ref Point Deployed", 0, (a) -> {kDeployedPosition = a;});
 
     positionEntry = buddyBalanceTab.add("Buddy Balance Position", 0).getEntry();
   }
 
   public void deployBuddyBalance() {
-    OI.Operator.getDownBuddyBalanceButton().onTrue(new InstantCommand(() -> {
+    if(!isDeployed) {
       // TODO: Find out what mechanism will deploy the buddy balance and program the deploying
       isDeployed = true;
-    }));
-  }
-
-  public void retrieveBuddy() {
-    if(isDeployed) {
-      rightPIDController.setReference(buddyBalanceRefPointBalanced, CANSparkMax.ControlType.kPosition);
-      leftPIDController.setReference(buddyBalanceRefPointBalanced, CANSparkMax.ControlType.kPosition);
     }
   }
 
-  public void releaseBuddy() {
+  public void retrieveBuddy() { // Used to pick up the buddy robot while the lift is already underneath it
     if(isDeployed) {
-      rightPIDController.setReference(buddyBalanceRefPointDeployed, CANSparkMax.ControlType.kPosition);
-      leftPIDController.setReference(buddyBalanceRefPointDeployed, CANSparkMax.ControlType.kPosition);
+      rightPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition);
+      leftPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition);
+    }
+  }
+
+  public void releaseBuddy() { // Used to set down the robot
+    if(isDeployed) {
+      rightPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition);
+      leftPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition);
     }
   }
 
