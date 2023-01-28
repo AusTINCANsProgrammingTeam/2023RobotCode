@@ -38,32 +38,28 @@ public class RobotContainer {
   private Auton auton;
 
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
-  private StringLogEntry swerveEnabledLog = new StringLogEntry(robotSubsystemsLog, "Swerve Enabled");
-  private StringLogEntry simulationEnabledLog = new StringLogEntry(robotSubsystemsLog, "Simulation Enabled");
-  private StringLogEntry intakeEnabledLog = new StringLogEntry(robotSubsystemsLog, "Inatake Enabled");
-  private StringLogEntry cameraEnabledLog = new StringLogEntry(robotSubsystemsLog, "Camera Enabled");
-  private StringLogEntry batteryEnabledLog = new StringLogEntry(robotSubsystemsLog, "Battery Enabled");
+  private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/");
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    swerveSubsystem = Robot.SwerveEnabled ? new SwerveSubsystem() : null;
-    swerveEnabledLog.append(swerveSubsystem == null ? "Disabled" : "Enabled");
+    swerveSubsystem = Robot.swerveEnabled ? new SwerveSubsystem() : null;
+    subsystemEnabledLog.append(swerveSubsystem == null ? "Swerve: Disabled" : "Swerve: Enabled");
 
     simulationSubsystem = Robot.isSimulation() ? new SimulationSubsystem(swerveSubsystem) : null;
-    simulationEnabledLog.append(simulationSubsystem == null ? "Disabled" : "Enalbed");
+    subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
 
     intakeSubsystem = Robot.intakeEnabled ? new EverybotIntakeSubsystem() : null;
-    intakeEnabledLog.append(intakeSubsystem == null ? "Disabled" : "Enabled");
+    subsystemEnabledLog.append(intakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
 
     cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
-    cameraEnabledLog.append(cameraSubsystem == null ? "Disabled" : "Enabled");
+    subsystemEnabledLog.append(cameraSubsystem == null ? "Camera: Disabled" : "Camera: Enabled");
 
     batterySubsystem = Robot.batteryEnabled && !Robot.isCompetition ? new BatterySubsystem() : null;
-    batteryEnabledLog.append(batterySubsystem == null ? "Disabled" : "Enabled");
+    subsystemEnabledLog.append(batterySubsystem == null ? "Battery: Disabled" : "Battery: Enabled");
 
-    auton = Robot.SwerveEnabled ? new Auton(swerveSubsystem) : null;
+    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
 
-    if (Robot.SwerveEnabled) {
+    if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
         swerveSubsystem, 
         OI.Driver.getXTranslationSupplier(),
@@ -83,7 +79,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    if (Robot.SwerveEnabled) {
+    if (Robot.swerveEnabled) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
       OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
       OI.Driver.getAlignForwardPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
