@@ -16,6 +16,8 @@ public class OI {
         private static final int kZeroButtonID = 3; //3 Button, Zero the gyroscope
         private static final int kAlignForwardButtonID = 4; //4 Button, Align forwards
         private static final int kAlignBackwardButtonID = 2; //2 Button, Align backwards
+        private static final int kIntakeButtonID = 7; //Right Trigger, run intake
+        private static final int kOuttakeButtonID = 6; //Right Bumper, run outtake
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -55,6 +57,14 @@ public class OI {
 
         public static JoystickButton getAlignBackButton(){
             return new JoystickButton(kJoystick, kAlignBackwardButtonID);
+        }
+
+        public static JoystickButton getIntakeButton(){
+            return new JoystickButton(kJoystick, kIntakeButtonID);
+        }
+        
+        public static JoystickButton getOuttakeButton(){
+            return new JoystickButton(kJoystick, kOuttakeButtonID);
         }
     }
 
