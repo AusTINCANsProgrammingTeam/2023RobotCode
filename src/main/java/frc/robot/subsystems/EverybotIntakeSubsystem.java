@@ -43,7 +43,10 @@ public class EverybotIntakeSubsystem extends SubsystemBase implements AutoClosea
   public double getSpeed(){
     return motor.get();
   }
-
+  
+  public void stop() {
+    spinWheels(0);
+  }
 
   @Override
   public void close() throws Exception {

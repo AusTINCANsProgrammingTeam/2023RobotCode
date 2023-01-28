@@ -23,6 +23,7 @@ public class MotorController {
         BackRightModuleTurn(5, 40, IdleMode.kBrake, true),  
         //Intake motors
         IntakeMotor1(13),
+        
         IntakeMotor2(14); //TODO update to real hardware IDs
     
 
