@@ -13,15 +13,17 @@ public class OI {
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
 
         private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
-        private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
+        private static final int kZeroButtonID = 3; //3 Button, Zero the gyroscope
+        private static final int kAlignForwardButtonID = 4; //4 Button, Align forwards
+        private static final int kAlignBackwardButtonID = 2; //2 Button, Align backwards
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
 
         //TODO: Tune curves to driver preference
-        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
-        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
+        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
+        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
         private static final ControlCurve kRotationCurve = new ControlCurve(1,0,1,0.1);
 
         public static Supplier<Double> getXTranslationSupplier(){
@@ -45,6 +47,14 @@ public class OI {
 
         public static JoystickButton getZeroButton(){
             return new JoystickButton(kJoystick, kZeroButtonID);
+        }
+
+        public static JoystickButton getAlignForwardButton(){
+            return new JoystickButton(kJoystick, kAlignForwardButtonID);
+        }
+
+        public static JoystickButton getAlignBackButton(){
+            return new JoystickButton(kJoystick, kAlignBackwardButtonID);
         }
     }
 
