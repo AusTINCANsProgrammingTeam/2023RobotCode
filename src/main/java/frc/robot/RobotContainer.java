@@ -6,8 +6,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.classes.Auton;
 import frc.robot.commands.SwerveTeleopCommand;
-import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BatterySubsystem;
@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.EverybotIntakeSubsystem;
+import frc.robot.classes.Auton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -27,16 +28,17 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
   private final EverybotIntakeSubsystem intakeSubsystem = new EverybotIntakeSubsystem();
 
-
-  private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
   private SimulationSubsystem simulationSubsystem;
   
   private final CameraSubsystem cameraSubsystem = new CameraSubsystem();
 
   private static BatterySubsystem batterySubsystem;
 
+  private Auton auton = new Auton(swerveSubsystem);
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
     if(Robot.isSimulation()){
       simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
     }
@@ -77,6 +79,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autonSubsytem.getAutonCommand();
+    return auton.getAutonCommand();
   }
 }
