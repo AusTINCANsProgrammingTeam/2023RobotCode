@@ -4,8 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.classes.Auton;
 import frc.robot.commands.SwerveTeleopCommand;
@@ -26,20 +29,41 @@ import frc.robot.classes.Auton;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem swerveSubsystem = Robot.Swerve ? new SwerveSubsystem() : null;
-  private final SimulationSubsystem simulationSubsystem = Robot.isSimulation() ? new SimulationSubsystem(swerveSubsystem) : null;
+  private final SwerveSubsystem swerveSubsystem;
+  private final SimulationSubsystem simulationSubsystem;
+  private final EverybotIntakeSubsystem intakeSubsystem;
+  private final CameraSubsystem cameraSubsystem;
+  private static BatterySubsystem batterySubsystem;
 
-  private final EverybotIntakeSubsystem intakeSubsystem = Robot.intakeSubsystem ? new EverybotIntakeSubsystem() : null;
+  private Auton auton;
 
-  private final CameraSubsystem cameraSubsystem = Robot.cameraSubsystem ? new CameraSubsystem() : null;
-
-  private static BatterySubsystem batterySubsystem = Robot.batterySubsystem && !Robot.isCompetition ? new BatterySubsystem() : null;
-
-  private Auton auton = new Auton(swerveSubsystem);
+  private DataLog robotSubsystemsLog = DataLogManager.getLog();
+  private StringLogEntry swerveEnabledLog = new StringLogEntry(robotSubsystemsLog, "Swerve Enabled");
+  private StringLogEntry simulationEnabledLog = new StringLogEntry(robotSubsystemsLog, "Simulation Enabled");
+  private StringLogEntry intakeEnabledLog = new StringLogEntry(robotSubsystemsLog, "Inatake Enabled");
+  private StringLogEntry cameraEnabledLog = new StringLogEntry(robotSubsystemsLog, "Camera Enabled");
+  private StringLogEntry batteryEnabledLog = new StringLogEntry(robotSubsystemsLog, "Battery Enabled");
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    if (Robot.Swerve) {
+    swerveSubsystem = Robot.SwerveEnabled ? new SwerveSubsystem() : null;
+    swerveEnabledLog.append(swerveSubsystem == null ? "Disabled" : "Enabled");
+
+    simulationSubsystem = Robot.isSimulation() ? new SimulationSubsystem(swerveSubsystem) : null;
+    simulationEnabledLog.append(simulationSubsystem == null ? "Disabled" : "Enalbed");
+
+    intakeSubsystem = Robot.intakeEnabled ? new EverybotIntakeSubsystem() : null;
+    intakeEnabledLog.append(intakeSubsystem == null ? "Disabled" : "Enabled");
+
+    cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
+    cameraEnabledLog.append(cameraSubsystem == null ? "Disabled" : "Enabled");
+
+    batterySubsystem = Robot.batteryEnabled && !Robot.isCompetition ? new BatterySubsystem() : null;
+    batteryEnabledLog.append(batterySubsystem == null ? "Disabled" : "Enabled");
+
+    auton = Robot.SwerveEnabled ? new Auton(swerveSubsystem) : null;
+
+    if (Robot.SwerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
         swerveSubsystem, 
         OI.Driver.getXTranslationSupplier(),
@@ -59,7 +83,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    if (Robot.Swerve) {
+    if (Robot.SwerveEnabled) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
       OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
       OI.Driver.getAlignForwardPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
@@ -67,7 +91,7 @@ public class RobotContainer {
       OI.Driver.getAlignLeftPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(90), swerveSubsystem));
       OI.Driver.getAlignRightPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(-90), swerveSubsystem));
     }
-    if (Robot.intakeSubsystem) {
+    if (Robot.intakeEnabled) {
       OI.Driver.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::pull, intakeSubsystem));
       OI.Driver.getOuttakeButton().onTrue(new InstantCommand(intakeSubsystem::push, intakeSubsystem));
     }
