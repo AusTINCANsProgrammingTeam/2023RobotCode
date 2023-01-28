@@ -6,6 +6,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.classes.Auton;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.subsystems.SimulationSubsystem;
@@ -71,6 +73,11 @@ public class RobotContainer {
     OI.Driver.getAlignRightPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(-90), swerveSubsystem));
     OI.Driver.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::pull, intakeSubsystem));
     OI.Driver.getOuttakeButton().onTrue(new InstantCommand(intakeSubsystem::push, intakeSubsystem));
+
+    // Shuffleboard.getTab("Drive")
+    // .add("Max Speed", 1)
+    // .withWidget(SingleTypeWidget) // specify the widget here
+    // .getEntry();
   }
 
   /**
