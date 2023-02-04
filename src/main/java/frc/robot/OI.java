@@ -14,9 +14,11 @@ public class OI {
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
 
         private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
-        private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
-        private static final int kIntakeButtonID = 3; //3 Button, run intake
-        private static final int kOuttakeButtonID = 4; //4 Button, run outtake
+        private static final int kZeroButtonID = 3; //3 Button, Zero the gyroscope
+        private static final int kAlignForwardButtonID = 4; //4 Button, Align forwards
+        private static final int kAlignBackwardButtonID = 2; //2 Button, Align backwards
+        private static final int kIntakeButtonID = 7; //Right Trigger, run intake
+        private static final int kOuttakeButtonID = 6; //Right Bumper, run outtake
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -65,6 +67,14 @@ public class OI {
 
         public static JoystickButton getZeroButton(){
             return new JoystickButton(kJoystick, kZeroButtonID);
+        }
+
+        public static JoystickButton getAlignForwardButton(){
+            return new JoystickButton(kJoystick, kAlignForwardButtonID);
+        }
+
+        public static JoystickButton getAlignBackButton(){
+            return new JoystickButton(kJoystick, kAlignBackwardButtonID);
         }
 
         public static JoystickButton getBalanceButton(){
