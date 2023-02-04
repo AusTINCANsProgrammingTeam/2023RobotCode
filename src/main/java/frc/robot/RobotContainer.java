@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.classes.Auton;
@@ -23,26 +27,39 @@ import frc.robot.subsystems.EverybotIntakeSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-  private final EverybotIntakeSubsystem intakeSubsystem = new EverybotIntakeSubsystem();
-  private final CameraSubsystem cameraSubsystem = new CameraSubsystem();
+  private final SwerveSubsystem swerveSubsystem;
+  private final SimulationSubsystem simulationSubsystem;
+  private final EverybotIntakeSubsystem everybotIntakeSubsystem;
+  private final CameraSubsystem cameraSubsystem;
 
-  private SimulationSubsystem simulationSubsystem;
-  
-  private Auton auton = new Auton(swerveSubsystem);
+  private Auton auton;
+
+  private DataLog robotSubsystemsLog = DataLogManager.getLog();
+  private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/");
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    swerveSubsystem = Robot.swerveEnabled ? new SwerveSubsystem() : null;
+    subsystemEnabledLog.append(swerveSubsystem == null ? "Swerve: Disabled" : "Swerve: Enabled");
 
-    if(Robot.isSimulation()){
-      simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
-    }
+    simulationSubsystem = Robot.isSimulation() && Robot.simulationEnabled && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
+    subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
 
-    swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
+    everybotIntakeSubsystem = Robot.intakeEnabled ? new EverybotIntakeSubsystem() : null;
+    subsystemEnabledLog.append(everybotIntakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
+
+    cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
+    subsystemEnabledLog.append(cameraSubsystem == null ? "Camera: Disabled" : "Camera: Enabled");
+
+    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
+
+    if (Robot.swerveEnabled) {
+      swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
       OI.Driver.getXTranslationSupplier(),
       OI.Driver.getYTranslationSupplier(),
       OI.Driver.getRotationSupplier()));
+    }
 
       
     // Configure the button bindings    
@@ -57,12 +74,16 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation, swerveSubsystem));
-    OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading, swerveSubsystem));
-    OI.Driver.getAlignForwardButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
-    OI.Driver.getAlignBackButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
-    OI.Driver.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::pull, intakeSubsystem));
-    OI.Driver.getOuttakeButton().onTrue(new InstantCommand(intakeSubsystem::push, intakeSubsystem));
+    if (Robot.swerveEnabled) {
+      OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
+      OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
+      OI.Driver.getAlignForwardButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
+      OI.Driver.getAlignBackButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
+    }
+    if (Robot.intakeEnabled) {
+      OI.Driver.getIntakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::pull, everybotIntakeSubsystem));
+      OI.Driver.getOuttakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::push, everybotIntakeSubsystem));
+    }
   }
 
   /**
@@ -71,6 +92,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return auton.getAutonCommand();
+    return auton != null ? auton.getAutonCommand() : null;
   }
 }
