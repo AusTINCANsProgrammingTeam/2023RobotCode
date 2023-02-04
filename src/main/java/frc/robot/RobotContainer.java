@@ -45,7 +45,7 @@ public class RobotContainer {
     swerveSubsystem = Robot.swerveEnabled ? new SwerveSubsystem() : null;
     subsystemEnabledLog.append(swerveSubsystem == null ? "Swerve: Disabled" : "Swerve: Enabled");
 
-    simulationSubsystem = Robot.isSimulation() ? new SimulationSubsystem(swerveSubsystem) : null;
+    simulationSubsystem = Robot.isSimulation() && Robot.simulationEnabled && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
     subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
 
     everybotIntakeSubsystem = Robot.intakeEnabled ? new EverybotIntakeSubsystem() : null;
@@ -61,10 +61,10 @@ public class RobotContainer {
 
     if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
-        swerveSubsystem, 
-        OI.Driver.getXTranslationSupplier(),
-        OI.Driver.getYTranslationSupplier(),
-        OI.Driver.getRotationSupplier()));
+      swerveSubsystem, 
+      OI.Driver.getXTranslationSupplier(),
+      OI.Driver.getYTranslationSupplier(),
+      OI.Driver.getRotationSupplier()));
     }
 
     // Configure the button bindings    
@@ -99,6 +99,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return auton.getAutonCommand();
+    return auton != null ? auton.getAutonCommand() : null;
   }
 }
