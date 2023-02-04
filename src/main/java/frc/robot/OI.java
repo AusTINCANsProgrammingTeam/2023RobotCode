@@ -1,22 +1,63 @@
 package frc.robot;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 public class OI {
     //Operator Interface (OI) class containing all control information
+
     private static final int kDriverJoystickPort = 0;
 
     public static final class Driver{
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
 
-        private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
-        private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
-        private static final int kIntakeButtonID = 3; //3 Button, run intake
-        private static final int kOuttakeButtonID = 4; //4 Button, run outtake
+        public enum DriverButtons {
+            X (1, null),
+            A (2, null),
+            B (3, null),
+            Y (4, null),
+            LB (5, null),
+            RB (6, null),
+            LT (7, null),
+            RT (8, null),
+            Back (9, null),
+            Start (10, null),
+            LJ (11, null),
+            RJ (12, null);
+            
+            private final int buttonID; 
+            private String buttonName;
+          
+            DriverButtons(int ID, String N) {
+              this.buttonID = ID;
+              this.buttonName = N;
+            }
+          
+            private int getButtonID(){
+              return this.buttonID;
+            };
+
+            private String getButtonName(){
+                return this.buttonName;
+            }
+
+            private void setButtonName(String name){
+                this.buttonName = name;
+            }
+          };
+      
+
+        private static final DriverButtons kOrientationButton = DriverButtons.X; //1 Button, Toggle swerve orientation
+        private static final DriverButtons kZeroButton = DriverButtons.A; //2 Button, Zero the gyroscope
+        private static final DriverButtons kIntakeButton = DriverButtons.B; //3 Button, run intake
+        private static final DriverButtons kOuttakeButton = DriverButtons.Y; //4 Button, run outtake
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -59,29 +100,85 @@ public class OI {
         }
 
         public static JoystickButton getOrientationButton(){
-            return new JoystickButton(kJoystick, kOrientationButtonID);
+            kOrientationButton.setButtonName("Orientation Button");
+            return new JoystickButton(kJoystick, kOrientationButton.getButtonID());
         }
-
         public static JoystickButton getZeroButton(){
-            return new JoystickButton(kJoystick, kZeroButtonID);
+            kZeroButton.setButtonName("Zero Button");
+            return new JoystickButton(kJoystick, kZeroButton.getButtonID());
         }
         public static JoystickButton getIntakeButton(){
-            return new JoystickButton(kJoystick, kIntakeButtonID);
+            kIntakeButton.setButtonName("Intake Button");
+            return new JoystickButton(kJoystick, kIntakeButton.getButtonID());
         }
         public static JoystickButton getOuttakeButton(){
-            return new JoystickButton(kJoystick, kOuttakeButtonID);
+            kOuttakeButton.setButtonName("Outtake Button");
+            return new JoystickButton(kJoystick, kOuttakeButton.getButtonID());
         }
     }
 
     public static final class Operator{
+        public enum OperatorButtons {
+            X (1, null),
+            A (2, null),
+            B (3, null),
+            Y (4, null),
+            LB (5, null),
+            RB (6, null),
+            LT (7, null),
+            RT (8, null),
+            Back (9, null),
+            Start (10, null),
+            LJ (11, null),
+            RJ (12, null);
+            
+            private final int buttonID; 
+            private String buttonName;
+          
+            OperatorButtons(int ID, String N) {
+              this.buttonID = ID;
+              this.buttonName = N;
+            }
+          
+            private int getButtonID(){
+              return this.buttonID;
+            };
 
+            private String getButtonName(){
+                return this.buttonName;
+            }
+
+            private void setButtonName(String name){
+                this.buttonName = name;
+            }
+        };
+    }
+
+    public static void putControllerButtons(){
+        ShuffleboardLayout sbDriverButtons = Shuffleboard.getTab("Controller Buttons")
+        .getLayout("Driver Buttons", BuiltInLayouts.kList)
+        .withSize(2, 5)
+        .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for Variables;
+
+        ShuffleboardLayout sbOperatorButtons = Shuffleboard.getTab("Controller Buttons")
+        .getLayout("Operator Buttons", BuiltInLayouts.kList)
+        .withSize(2, 5)
+        .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for Variables;
+
+        for (Driver.DriverButtons button : Driver.DriverButtons.values()) {
+            sbDriverButtons.add(String.valueOf(button.getButtonID()), "Button " + button.toString() + ": " + button.getButtonName());
+        }
+
+        for (Operator.OperatorButtons button : Operator.OperatorButtons.values()) {
+            sbOperatorButtons.add(String.valueOf(button.getButtonID()+12), "Button " + button.toString() + ": " + button.getButtonName());
+        }
     }
 
     public static class ControlCurve{
-        private double ySaturation; //Maximum output, in percentage of possible output
-        private double yIntercept; //Minimum output, in percentage of saturation
-        private double curvature; //Curvature shift between linear and cubic
-        private double deadzone; //Range of input that will always return zero output
+        private double ySaturation; // Maximum output, in percentage of possible output
+        private double yIntercept; // Minimum output, in percentage of saturation
+        private double curvature; // Curvature shift between linear and cubic
+        private double deadzone; // Range of input that will always return zero output
 
         public ControlCurve(double ySaturation, double yIntercept, double curvature, double deadzone){
             this.ySaturation = ySaturation;

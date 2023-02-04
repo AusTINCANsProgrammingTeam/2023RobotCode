@@ -4,14 +4,8 @@
 
 package frc.robot;
 
-import java.util.Map;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.classes.Auton;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.subsystems.SimulationSubsystem;
@@ -42,12 +36,6 @@ public class RobotContainer {
 
   private Auton auton = new Auton(swerveSubsystem);
 
-  private String[] ControllerButtonsList = new String[] {"Test", "Test"};
-  ShuffleboardLayout ControllerButtons = Shuffleboard.getTab("Controller")
-  .getLayout("Controller Buttons", BuiltInLayouts.kList)
-  .withSize(2, 2)
-  .addStringArray("Buttons", ControllerButtonsList);
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
@@ -64,7 +52,6 @@ public class RobotContainer {
       OI.Driver.getRotationSupplier()));
 
     // Configure the button bindings    
-
     configureButtonBindings();
   }
 
@@ -84,8 +71,7 @@ public class RobotContainer {
     OI.Driver.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::pull, intakeSubsystem));
     OI.Driver.getOuttakeButton().onTrue(new InstantCommand(intakeSubsystem::push, intakeSubsystem));
 
-    String[] ControllerButtons = new String[] {"Test", "Test"};
-    SmartDashboard.putStringArray("Controller Buttons", ControllerButtons);
+    OI.putControllerButtons();
   }
 
   /**
