@@ -20,7 +20,13 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   public static final boolean isCompetition = true;
-
+  public static final boolean batteryEnabled = true;
+  public static final boolean cameraEnabled = true;
+  public static final boolean everybotIntakeEnabled = true;
+  public static final boolean intakeEnabled = true;
+  public static final boolean simulationEnabled = true;
+  public static final boolean swerveEnabled = true;
+  
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();
   private IntegerLogEntry loopCountEntry = new IntegerLogEntry(loopCountlog, "/robot/loopCount");
