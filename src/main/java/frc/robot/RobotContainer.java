@@ -11,7 +11,7 @@ import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BatterySubsystem;
-import frc.robot.subsystems.LedSubsystem;
+import frc.robot.subsystems.led.LedSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -58,8 +58,8 @@ public class RobotContainer {
   private void configureButtonBindings() {
     OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
     OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
-    OI.Driver.getLedToggleButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
-    OI.Driver.getLedSwitchButton().onTrue(new StartEndCommand(ledSubsystem::startLed, ledSubsystem::stopLed, ledSubsystem));
+    OI.Operator.getLedToggleButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
+    OI.Operator.getLedSwitchButton().onTrue(new StartEndCommand(ledSubsystem::startLed, ledSubsystem::stopLed, ledSubsystem));
   }
 
   /**

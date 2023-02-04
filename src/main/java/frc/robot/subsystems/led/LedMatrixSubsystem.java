@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.led;
 
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -38,7 +38,7 @@ public class LedMatrixSubsystem {
     }
 
 private final AddressableLEDBuffer buffer;
-private final AddressableLED leds = new AddressableLED(1);
+private final AddressableLED leds = new AddressableLED(2);
 
     public LedMatrixSubsystem() {
         buffer = new AddressableLEDBuffer(256);

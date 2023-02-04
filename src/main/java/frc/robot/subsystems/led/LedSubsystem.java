@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.led;
 
 import java.util.Map;
 
@@ -18,12 +18,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
   // TODO Led parameters and RIO ports
 public class LedSubsystem extends SubsystemBase {
   private final AddressableLEDBuffer buffer;
-  private final AddressableLED leds = new AddressableLED(port);
+  private final AddressableLED leds = new AddressableLED(1);
   private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
   private GenericEntry ledState = ledTab.add("OnOff", false).getEntry();
   private SimpleWidget ledGamePiece = ledTab.add("Color", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow"));
   private static final int length = 1; //Amount of Leds in strip light. Or one if we are using a single light
-  private static final int port = 0;
   private static enum LedMode {
     CONE, CUBE;
   }

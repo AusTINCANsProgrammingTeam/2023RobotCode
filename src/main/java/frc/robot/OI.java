@@ -12,13 +12,9 @@ public class OI {
 
     public static final class Driver{
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
-        private static final Joystick kTeleopJoystick = new Joystick(OI.kTeleopJoystickPort);
-
+        
         private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
         private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
-
-        private static final int kLedToggleID = 1; //Toggles Leds
-        private static final int kLedSwtichID = 2;
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -51,16 +47,21 @@ public class OI {
         public static JoystickButton getZeroButton(){
             return new JoystickButton(kJoystick, kZeroButtonID);
         }
+    }
+
+    public static final class Operator{
+        private static final Joystick kTeleopJoystick = new Joystick(OI.kTeleopJoystickPort);
+
+        
+        private static final int kLedToggleID = 1; //Turns Leds on and off
+        private static final int kLedSwtichID = 2; //Switch the color of the led to yellow or purple. 
+
         public static JoystickButton getLedToggleButton(){
             return new JoystickButton(kTeleopJoystick, kLedToggleID);
         }
         public static JoystickButton getLedSwitchButton(){
             return new JoystickButton(kTeleopJoystick, kLedSwtichID);
         }
-    }
-
-    public static final class Operator{
-
     }
 
     public static class ControlCurve{
