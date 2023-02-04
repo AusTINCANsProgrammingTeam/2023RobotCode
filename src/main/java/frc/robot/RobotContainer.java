@@ -14,12 +14,10 @@ import frc.robot.classes.Auton;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.BatterySubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.EverybotIntakeSubsystem;
-import frc.robot.classes.Auton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -33,7 +31,6 @@ public class RobotContainer {
   private final SimulationSubsystem simulationSubsystem;
   private final EverybotIntakeSubsystem everybotIntakeSubsystem;
   private final CameraSubsystem cameraSubsystem;
-  private static BatterySubsystem batterySubsystem;
 
   private Auton auton;
 
@@ -54,9 +51,6 @@ public class RobotContainer {
     cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
     subsystemEnabledLog.append(cameraSubsystem == null ? "Camera: Disabled" : "Camera: Enabled");
 
-    batterySubsystem = Robot.batteryEnabled && !Robot.isCompetition ? new BatterySubsystem() : null;
-    subsystemEnabledLog.append(batterySubsystem == null ? "Battery: Disabled" : "Battery: Enabled");
-
     auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
 
     if (Robot.swerveEnabled) {
@@ -67,6 +61,7 @@ public class RobotContainer {
       OI.Driver.getRotationSupplier()));
     }
 
+      
     // Configure the button bindings    
 
     configureButtonBindings();
@@ -82,10 +77,8 @@ public class RobotContainer {
     if (Robot.swerveEnabled) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
       OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
-      OI.Driver.getAlignForwardPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
-      OI.Driver.getAlignBackPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
-      OI.Driver.getAlignLeftPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(90), swerveSubsystem));
-      OI.Driver.getAlignRightPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(-90), swerveSubsystem));
+      OI.Driver.getAlignForwardButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
+      OI.Driver.getAlignBackButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
     }
     if (Robot.intakeEnabled) {
       OI.Driver.getIntakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::pull, everybotIntakeSubsystem));
