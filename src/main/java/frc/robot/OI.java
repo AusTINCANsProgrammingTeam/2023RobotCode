@@ -165,13 +165,11 @@ public class OI {
         .withSize(2, 5)
         .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for Variables;
 
-        for (Driver.DriverButtons button : Driver.DriverButtons.values()) {
-            sbDriverButtons.add(String.valueOf(button.getButtonID()), "Button " + button.toString() + ": " + button.getButtonName());
-        }
-
-        for (Operator.OperatorButtons button : Operator.OperatorButtons.values()) {
-            sbOperatorButtons.add(String.valueOf(button.getButtonID()+12), "Button " + button.toString() + ": " + button.getButtonName());
-        }
+        for (Driver.DriverButtons button : Driver.DriverButtons.values()) 
+        sbDriverButtons.add(String.valueOf(button.getButtonID()), "Button " + button.toString() + ": " + button.getButtonName());
+        
+        for (Operator.OperatorButtons button : Operator.OperatorButtons.values()) 
+        sbOperatorButtons.add(String.valueOf(button.getButtonID()+12), "Button " + button.toString() + ": " + button.getButtonName());
     }
 
     public static class ControlCurve{
