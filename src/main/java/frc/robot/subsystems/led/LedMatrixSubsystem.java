@@ -1,40 +1,24 @@
 package frc.robot.subsystems.led;
 
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import frc.robot.hardware.LedDriver;
 
-public class LedMatrixSubsystem {
-    public static Color[][] colors = {
-        // 'CanMan_Left', 16x16px
-{ Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kBlack, Color.kYellow, Color.kYellow, Color.kBlack, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kYellow, Color.kYellow, Color.kBlack, Color.kYellow, Color.kYellow, Color.kBlack, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kYellow, Color.kWhite, Color.kWhite, Color.kYellow, Color.kBlack, Color.kBlack, Color.kYellow, Color.kYellow, Color.kBlack, Color.kYellow, Color.kBlack, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kYellow, Color.kWhite, Color.kYellow, Color.kWhite, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kBlack, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kWhite, Color.kBlack, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kYellow, Color.kYellow, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kYellow, Color.kYellow, Color.kBlack, Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kYellow, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kYellow, Color.kYellow, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kYellow, Color.kYellow, Color.kBlack, Color.kBlack, Color.kYellow, Color.kYellow, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kYellow, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite }, 
-{ Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kBlack, Color.kBlack, Color.kBlack, Color.kYellow, Color.kYellow, Color.kYellow, Color.kBlack, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite, Color.kWhite }
-};
+public class LedMatrixSubsystem extends SubsystemBase{
 
-    //Scale color brightness
-    private Color scaleColor(Color color, double scale) {
-        double scaledRed = color.red / scale;
-        double scaledGreen = color.green / scale;
-        double scaledBlue = color.blue / scale;
-        return new Color(scaledRed, scaledGreen, scaledBlue);
+    String[][] colors = LedDriver.canman;
+
+    public static Color hex2Rgb(String colorStr) {
+        return new Color(
+            Integer.valueOf( colorStr.substring( 1, 3 ), 16 ) / 2,
+            Integer.valueOf( colorStr.substring( 3, 5 ), 16 ) / 2,
+            Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) / 2 );
     }
 
 private final AddressableLEDBuffer buffer;
@@ -44,6 +28,7 @@ private final AddressableLED leds = new AddressableLED(2);
         buffer = new AddressableLEDBuffer(256);
         leds.setLength(256);
         leds.setData(buffer);
+        leds.start();
     }
 
     public void setLed(){
@@ -52,9 +37,24 @@ private final AddressableLED leds = new AddressableLED(2);
         };
         for (int i=0; i<colors.length; i++) { 
             for (int j=0; j<colors[i].length; j++){
-                buffer.setLED((16*i)+j, scaleColor(colors[i][j], 0.5));
+                buffer.setLED((16*i)+j, hex2Rgb(colors[i][j]));
+                System.out.print(hex2Rgb(colors[i][j]));
             }
         }
         leds.setData(buffer);
+    }
+    int instance = 0;
+    public void setRainbowLed(){
+        for (int j = 0; j < 255; j++) {
+            for (int i = 0, h = 0; i < 256; i++, h++) {
+              buffer.setHSV(i, (instance + h) / 200, 255, 255); /* The higher the value 4 the less fade there is and vice versa */ 
+            }
+            instance = instance + 1;
+        }
+        leds.setData(buffer);
+    }
+    @Override
+    public void periodic() {
+        setRainbowLed();
     }
 }

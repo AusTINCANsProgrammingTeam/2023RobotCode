@@ -1,16 +1,16 @@
 package frc.robot.subsystems.led;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.hardware.BlinkinDriver;
-import frc.robot.hardware.BlinkinDriver.BlinkinLedMode;
+import frc.robot.hardware.LedDriver;
+import frc.robot.hardware.LedDriver.BlinkinLedMode;
 // TODO Led parameters and RIO ports
 public class BlinkinLedSubsystem extends SubsystemBase {
     private static final int port = 0; //TODO setport
-    private final BlinkinDriver blinkin;
+    private final LedDriver blinkin;
     private BlinkinLedMode mode = BlinkinLedMode.SOLID_YELLOW;
 
     public BlinkinLedSubsystem() {
-        blinkin = new BlinkinDriver(port);
+        blinkin = new LedDriver(port);
     }
 
     public void blinkinStopLed(){

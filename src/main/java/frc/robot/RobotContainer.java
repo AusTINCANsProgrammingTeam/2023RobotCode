@@ -11,10 +11,9 @@ import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BatterySubsystem;
-import frc.robot.subsystems.led.LedSubsystem;
+import frc.robot.subsystems.led.LedMatrixSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -29,7 +28,7 @@ public class RobotContainer {
   private SimulationSubsystem simulationSubsystem;
 
   private static BatterySubsystem batterySubsystem;
-  private LedSubsystem ledSubsystem = new LedSubsystem();
+  private LedMatrixSubsystem ledMatrixSubsystem = new LedMatrixSubsystem();
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     if(Robot.isSimulation()){
@@ -58,8 +57,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
     OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
-    OI.Operator.getLedToggleButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
-    OI.Operator.getLedSwitchButton().onTrue(new StartEndCommand(ledSubsystem::startLed, ledSubsystem::stopLed, ledSubsystem));
+    OI.Operator.getLedToggleButton().onTrue(new InstantCommand(ledMatrixSubsystem::setRainbowLed));
   }
 
   /**
