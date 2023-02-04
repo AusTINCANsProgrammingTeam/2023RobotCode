@@ -31,7 +31,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem;
   private final SimulationSubsystem simulationSubsystem;
-  private final EverybotIntakeSubsystem intakeSubsystem;
+  private final EverybotIntakeSubsystem everybotIntakeSubsystem;
   private final CameraSubsystem cameraSubsystem;
   private static BatterySubsystem batterySubsystem;
 
@@ -48,8 +48,8 @@ public class RobotContainer {
     simulationSubsystem = Robot.isSimulation() ? new SimulationSubsystem(swerveSubsystem) : null;
     subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
 
-    intakeSubsystem = Robot.intakeEnabled ? new EverybotIntakeSubsystem() : null;
-    subsystemEnabledLog.append(intakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
+    everybotIntakeSubsystem = Robot.intakeEnabled ? new EverybotIntakeSubsystem() : null;
+    subsystemEnabledLog.append(everybotIntakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
 
     cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
     subsystemEnabledLog.append(cameraSubsystem == null ? "Camera: Disabled" : "Camera: Enabled");
@@ -88,8 +88,8 @@ public class RobotContainer {
       OI.Driver.getAlignRightPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(-90), swerveSubsystem));
     }
     if (Robot.intakeEnabled) {
-      OI.Driver.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::pull, intakeSubsystem));
-      OI.Driver.getOuttakeButton().onTrue(new InstantCommand(intakeSubsystem::push, intakeSubsystem));
+      OI.Driver.getIntakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::pull, everybotIntakeSubsystem));
+      OI.Driver.getOuttakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::push, everybotIntakeSubsystem));
     }
   }
 
