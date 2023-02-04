@@ -83,7 +83,7 @@ public class OI {
     public static final class Operator{
 
     }
-
+    
     public static class ControlCurve{
         private double ySaturation; //Maximum output, in percentage of possible output
         private double yIntercept; //Minimum output, in percentage of saturation
