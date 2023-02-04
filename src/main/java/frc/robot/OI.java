@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 public class OI {
     //Operator Interface (OI) class containing all control information
@@ -54,18 +53,20 @@ public class OI {
           };
       
 
-        private static final DriverButtons kOrientationButton = DriverButtons.X; //1 Button, Toggle swerve orientation
-        private static final DriverButtons kZeroButton = DriverButtons.A; //2 Button, Zero the gyroscope
-        private static final DriverButtons kIntakeButton = DriverButtons.B; //3 Button, run intake
-        private static final DriverButtons kOuttakeButton = DriverButtons.Y; //4 Button, run outtake
+          private static final DriverButtons kOrientationButton = DriverButtons.X; //1 Button, Toggle swerve orientation
+          private static final DriverButtons kZeroButton = DriverButtons.B; //3 Button, Zero the gyroscope
+          private static final DriverButtons kAlignForwardButton = DriverButtons.Y; //4 Button, Align forwards
+          private static final DriverButtons kAlignBackwardButton = DriverButtons.A; //2 Button, Align backwards
+          private static final DriverButtons kIntakeButton = DriverButtons.RT; //Right Trigger, run intake
+          private static final DriverButtons kOuttakeButton = DriverButtons.RB; //Right Bumper, run outtake
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
 
         //TODO: Tune curves to driver preference
-        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
-        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
+        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
+        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
         private static final ControlCurve kRotationCurve = new ControlCurve(1,0,1,0.1);
 
         public static Supplier<Double> getXTranslationSupplier(){
@@ -83,34 +84,31 @@ public class OI {
             return () -> kRotationCurve.calculate(-kJoystick.getRawAxis(kRotationAxis));
         }
 
-        public static POVButton getAlignForwardPOV(){
-            return new POVButton(kJoystick, 0);
-        }
-
-        public static POVButton getAlignBackPOV(){
-            return new POVButton(kJoystick, 180);
-        }
-
-        public static POVButton getAlignLeftPOV(){
-            return new POVButton(kJoystick, 270);
-        }
-
-        public static POVButton getAlignRightPOV(){
-            return new POVButton(kJoystick, 90);
-        }
-
         public static JoystickButton getOrientationButton(){
             kOrientationButton.setButtonName("Orientation Button");
             return new JoystickButton(kJoystick, kOrientationButton.getButtonID());
         }
+
         public static JoystickButton getZeroButton(){
             kZeroButton.setButtonName("Zero Button");
             return new JoystickButton(kJoystick, kZeroButton.getButtonID());
         }
+
+        public static JoystickButton getAlignForwardButton(){
+            kAlignForwardButton.setButtonName("Align Forward");
+            return new JoystickButton(kJoystick, kAlignForwardButton.getButtonID());
+        }
+
+        public static JoystickButton getAlignBackButton(){
+            kAlignBackwardButton.setButtonName("Align Backward");
+            return new JoystickButton(kJoystick, kAlignBackwardButton.getButtonID());
+        }
+
         public static JoystickButton getIntakeButton(){
             kIntakeButton.setButtonName("Intake Button");
             return new JoystickButton(kJoystick, kIntakeButton.getButtonID());
         }
+        
         public static JoystickButton getOuttakeButton(){
             kOuttakeButton.setButtonName("Outtake Button");
             return new JoystickButton(kJoystick, kOuttakeButton.getButtonID());
@@ -167,7 +165,7 @@ public class OI {
 
         for (Driver.DriverButtons button : Driver.DriverButtons.values()) 
         sbDriverButtons.add(String.valueOf(button.getButtonID()), "Button " + button.toString() + ": " + button.getButtonName());
-        
+
         for (Operator.OperatorButtons button : Operator.OperatorButtons.values()) 
         sbOperatorButtons.add(String.valueOf(button.getButtonID()+12), "Button " + button.toString() + ": " + button.getButtonName());
     }
