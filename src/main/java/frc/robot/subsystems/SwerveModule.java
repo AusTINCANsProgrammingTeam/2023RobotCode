@@ -197,5 +197,6 @@ public class SwerveModule extends SubsystemBase {
         actualSpeedLog.append(driveEncoder.getVelocity());
         actualAbsoluteAngleLog.append(getAbsoluteTurningPosition());
         actualRelativeAngleLog.append(getTurningPosition());
+        SmartDashboard.putNumber("Swerve Module " + ID + " absolute encoder", getAbsoluteTurningPosition());
     }
 }

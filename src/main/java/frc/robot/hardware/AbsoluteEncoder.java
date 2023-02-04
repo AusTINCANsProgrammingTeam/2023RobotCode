@@ -10,10 +10,10 @@ public class AbsoluteEncoder {
     public enum EncoderConfig {
         //Swerve Modules
         //Offsets determined by manually turning all modules to 0 (forward) and recording their positions
-        FrontLeftModule(12, false, -1.12),
-        FrontRightModule(11, false, -1.078),
-        BackLeftModule(10, false, -3.911),
-        BackRightModule(9, false, -4.686);
+        FrontLeftModule(1, false, -1.774),
+        FrontRightModule(2, false, -1.802),
+        BackLeftModule(3, false, 0.353),
+        BackRightModule(4, false, -0.853);
         
         private int ID;
         private boolean reversed;
