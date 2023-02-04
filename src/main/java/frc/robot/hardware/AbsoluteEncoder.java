@@ -12,9 +12,9 @@ public class AbsoluteEncoder {
         //Swerve Modules
         //Offsets determined by manually turning all modules to 0 (forward) and recording their positions
         FrontLeftModule(1, false, -1.774, -1.12),
-        FrontRightModule(2, false, -1.802),
-        BackLeftModule(3, false, 0.353),
-        BackRightModule(4, false, -0.853);
+        FrontRightModule(2, false, -1.802, -1.078),
+        BackLeftModule(3, false, 0.353, -3.911),
+        BackRightModule(4, false, -0.853, -4.686);
         
         private int ID;
         private boolean reversed;
