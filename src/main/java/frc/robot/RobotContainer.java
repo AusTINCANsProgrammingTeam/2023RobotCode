@@ -13,6 +13,7 @@ import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BatterySubsystem;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.OI.Driver;
 import frc.robot.commands.ArmCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -27,7 +28,6 @@ import frc.robot.subsystems.EverybotIntakeSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private static final Joystick operatorJoystick = new Joystick(0);
 
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
   private final EverybotIntakeSubsystem intakeSubsystem = new EverybotIntakeSubsystem();
@@ -41,7 +41,7 @@ public class RobotContainer {
 
   private static BatterySubsystem batterySubsystem;
   //TODO: Get a joystick
-  private final ArmCommand m_armCommand = new ArmCommand(armSubsystem, operatorJoystick);
+  private final ArmCommand armCommand = new ArmCommand(armSubsystem, Driver.kJoystick);
   
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -58,7 +58,7 @@ public class RobotContainer {
       OI.Driver.getYTranslationSupplier(),
       OI.Driver.getRotationSupplier()));
 
-    armSubsystem.setDefaultCommand(m_armCommand);
+    armSubsystem.setDefaultCommand(armCommand);
     // Configure the button bindings    
 
     configureButtonBindings();

@@ -5,13 +5,13 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.ArmSubsystem;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import java.lang.Math;
 
 public class ArmAutoCommand extends CommandBase {
-  private static final double firstArmLength = 110;
-  private static final double secondArmLength = 94;
+  //Measurements in centimeters
+  private static final double firstArmLength = 100*ArmSubsystem.kBaseArmLength;
+  private static final double secondArmLength = 100*ArmSubsystem.kElbowArmLength;
 
   private final ArmSubsystem armSubsystem;
   private double firstArmAngle;
@@ -79,29 +79,10 @@ public class ArmAutoCommand extends CommandBase {
   public void execute() {
     //Needs to move to points x,y
     getAngles(currentX, currentY);
-    armSubsystem.setBaseRef(firstArmAngle+1);
+    armSubsystem.setBaseRef(firstArmAngle);
     armSubsystem.setElbowRef(secondArmAngle);
   }
-  public void setBaseArmAngle(double angle) {
-    armSubsystem.setBaseRef(angle);
-  }
-  public void setBaseArmPos(double x, double y) {
-    armSubsystem.setBaseRef(Math.atan(y/x));
-  }
-  public void changeBaseArmX(double xchange) {
-    currentX = Math.cos(firstArmAngle) * firstArmLength;
-    currentY = Math.sin(firstArmAngle) * firstArmLength;
-    setBaseArmPos(currentY,(currentX+xchange));
-  }
-  public void changeBaseArmY(double ychange) {
-    currentX = Math.cos(firstArmAngle) * firstArmLength;
-    currentY = Math.sin(firstArmAngle) * firstArmLength;
-    setBaseArmPos((currentY+ychange),currentX);
-  }
-  public void changeBaseArmCoords(double xchange, double ychange) {
-    changeBaseArmX(xchange);
-    changeBaseArmY(ychange);
-  }
+  
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {}

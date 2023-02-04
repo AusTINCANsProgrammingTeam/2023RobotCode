@@ -11,7 +11,7 @@ public class OI {
     private static final int kDriverJoystickPort = 0;
 
     public static final class Driver{
-        private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
+        public static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
 
         private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
         private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
