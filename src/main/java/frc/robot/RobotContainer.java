@@ -41,7 +41,7 @@ public class RobotContainer {
 
   private static BatterySubsystem batterySubsystem;
   //TODO: Get a joystick
-  private final ArmCommand armCommand = new ArmCommand(armSubsystem, Driver.kJoystick);
+  private final ArmCommand armCommand = new ArmCommand(armSubsystem, OI.Driver.getArmRotationSupplier());
   
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -72,6 +72,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
+    OI.Driver.getArmButton().onTrue(new InstantCommand(armSubsystem::toggleArmControl));
     OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
     OI.Driver.getAlignForwardPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
     OI.Driver.getAlignBackPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));

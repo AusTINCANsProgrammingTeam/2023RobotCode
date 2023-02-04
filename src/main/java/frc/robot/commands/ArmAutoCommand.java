@@ -79,8 +79,8 @@ public class ArmAutoCommand extends CommandBase {
   public void execute() {
     //Needs to move to points x,y
     getAngles(currentX, currentY);
-    armSubsystem.setBaseRef(firstArmAngle);
-    armSubsystem.setElbowRef(secondArmAngle);
+    //armSubsystem.setBaseRef(firstArmAngle);
+    //armSubsystem.setElbowRef(secondArmAngle);
   }
   
   // Called once the command ends or is interrupted.

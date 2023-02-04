@@ -11,6 +11,9 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
+
+import java.util.function.Supplier;
+
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
@@ -24,6 +27,7 @@ import edu.wpi.first.wpilibj.simulation.DutyCycleSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.OI;
 import frc.robot.Robot;
 import frc.robot.commands.ArmAutoCommand;
 
@@ -74,23 +78,30 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kMaxEAngle = Units.degreesToRadians(89);
   public static final double kBaseArmMass = Units.lbsToKilograms(15); //15
   public static final double kElbowArmMass = Units.lbsToKilograms(15);
+  private final Supplier<Double> rJoystick;
   public final double baseArmInertia = SingleJointedArmSim.estimateMOI(kBaseArmLength, kBaseArmMass+kElbowArmMass);
   public final double elbowArmInertia = SingleJointedArmSim.estimateMOI(kElbowArmLength, kElbowArmMass);
   private double simBCurrentAngle;
   private double simECurrentAngle;
-  public ShuffleboardTab configTab = Shuffleboard.getTab("Arm");
+  public static boolean controlIsBaseArm;
+  public ShuffleboardTab armSimTab = Shuffleboard.getTab("Arm Simulation");
   //Base Arm Values for Simulation
-  private GenericEntry simBArmAngle = configTab.add("SimBase Arm Angle", 0.0).getEntry();
-  private GenericEntry simBEncoderPos = configTab.add("SimBase Encoder Angle", 0.0).getEntry();
-  private GenericEntry simBOutSet = configTab.add("SimBase Output", 0.0).getEntry();
-  private GenericEntry simBError = configTab.add("SimBase Error", 0.0).getEntry();
-  private GenericEntry simBVoltage = configTab.add("SimBase Motor Voltage", 0.0).getEntry();
+  private GenericEntry simBArmAngle = armSimTab.add("SimBase Arm Angle", 0.0).getEntry();
+  private GenericEntry simBEncoderPos = armSimTab.add("SimBase Encoder Angle", 0.0).getEntry();
+  private GenericEntry simBOutSet = armSimTab.add("SimBase Output", 0.0).getEntry();
+  private GenericEntry simBError = armSimTab.add("SimBase Error", 0.0).getEntry();
+  private GenericEntry simBVoltage = armSimTab.add("SimBase Motor Voltage", 0.0).getEntry();
   //Elbow Arm Values for Simulation
-  private GenericEntry simEArmAngle = configTab.add("SimElbow Arm Angle", 0.0).getEntry();
-  private GenericEntry simEEncoderPos = configTab.add("SimElbow Encoder Angle", 0.0).getEntry();
-  private GenericEntry simEOutSet = configTab.add("SimElbow Output", 0.0).getEntry();
-  private GenericEntry simEError = configTab.add("SimElbow Error", 0.0).getEntry();
-  private GenericEntry simEVoltage = configTab.add("SimElbow Motor Voltage", 0.0).getEntry();
+  private GenericEntry simEArmAngle = armSimTab.add("SimElbow Arm Angle", 0.0).getEntry();
+  private GenericEntry simEEncoderPos = armSimTab.add("SimElbow Encoder Angle", 0.0).getEntry();
+  private GenericEntry simEOutSet = armSimTab.add("SimElbow Output", 0.0).getEntry();
+  private GenericEntry simEError = armSimTab.add("SimElbow Error", 0.0).getEntry();
+  private GenericEntry simEVoltage = armSimTab.add("SimElbow Motor Voltage", 0.0).getEntry();
+  //Real arm values
+  public ShuffleboardTab armTab = Shuffleboard.getTab("Arm (Real)");
+  private GenericEntry baseArmAngle = armTab.add("Base Arm Angle", 0.0).getEntry();
+  private GenericEntry baseArmAngleSet = armTab.add("Base Arm Angle Setpoint", 0.0).getEntry();
+  private GenericEntry elbowArmAngle = armTab.add("Elbow Arm Angle", 0.0).getEntry();
   
 
   
@@ -99,6 +110,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, elbowArmInertia, kElbowArmLength, kMinEAngle, kMaxEAngle, kElbowArmMass, false);
 
   public ArmSubsystem() {
+    controlIsBaseArm = true;
+    rJoystick = OI.Driver.getArmRotationSupplier();
     motorBaseOne = MotorController.constructMotor(MotorConfig.ArmBaseMotor1);
     motorBaseTwo = MotorController.constructMotor(MotorConfig.ArmBaseMotor2);
     motorBaseTwo.follow(motorBaseOne);
@@ -114,8 +127,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     motorBaseOneDutyCycleSim = new DutyCycleSim(motorBaseOneDutyCycle);
     motorElbowDutyCycleSim = new DutyCycleSim(motorElbowDutyCycle);
     //motorBaseOneEncoderSim.setDistance(Units.degreesToRadians(kMinBAngle));
-    motorBaseOneDutyCycleSim.setOutput((kMinBAngle/(Math.PI*2)));
-    motorElbowDutyCycleSim.setOutput((kMinEAngle/(Math.PI*2)));
+    if(Robot.isSimulation()) {
+      motorBaseOneDutyCycleSim.setOutput((kMinBAngle/(Math.PI*2)));
+      motorElbowDutyCycleSim.setOutput((kMinEAngle/(Math.PI*2)));
+    }
     //motorElbowEncoderSim = new EncoderSim(motorElbowEncoder);
     //motorElbowEncoderSim.setDistance(Units.degreesToRadians(kMinEAngle));
     basePIDController = new PIDController(kBaskElbowP, kBaskElbowI, kBaskElbowD);
@@ -135,11 +150,21 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
    public void setElbowRef(double setpoint) {
     motorElbow.set(MathUtil.clamp(elbowPIDController.calculate(getElbowDutyCycleAngle(), setpoint),-1,1));
   }
-  
+  public void toggleArmControl() {
+    //Toggle control from base arm to elbow arm
+    controlIsBaseArm = !controlIsBaseArm;
+  }
+  public void stopArmMotors() {
+    motorBaseOne.stopMotor();
+    motorElbow.stopMotor();
+  }
   
   @Override
-  public void periodic() {  
+  public void periodic() {
     // This method will be called once per scheduler run
+    baseArmAngle.setDouble(getBaseDutyCycleAngle());
+    elbowArmAngle.setDouble(getElbowDutyCycleAngle());
+    baseArmAngleSet.setDouble((MathUtil.clamp(rJoystick.get(),0,1)*Units.degreesToRadians(45))+Units.degreesToRadians(45));
   }
 
   @Override

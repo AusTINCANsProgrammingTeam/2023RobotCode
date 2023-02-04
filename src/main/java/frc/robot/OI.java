@@ -17,15 +17,19 @@ public class OI {
         private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
         private static final int kIntakeButtonID = 3; //3 Button, run intake
         private static final int kOuttakeButtonID = 4; //4 Button, run outtake
+        private static final int kArmButtonID = 5; //5 Button, toggle which arm is being controlled
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
+        //TODO: Get real value here
+        private static final int kArmRotationAxis = 4;
 
         //TODO: Tune curves to driver preference
         private static final ControlCurve kXTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
         private static final ControlCurve kYTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
         private static final ControlCurve kRotationCurve = new ControlCurve(1,0,1,0.1);
+        private static final ControlCurve kArmRotationCurve = new ControlCurve(1,0,1,0.1);
 
         public static Supplier<Double> getXTranslationSupplier(){
             //This axis is inverted
@@ -40,6 +44,10 @@ public class OI {
         public static Supplier<Double> getRotationSupplier(){
             //This axis is inverted
             return () -> kRotationCurve.calculate(-kJoystick.getRawAxis(kRotationAxis));
+        }
+        
+        public static Supplier<Double> getArmRotationSupplier(){
+            return () -> kArmRotationCurve.calculate(kJoystick.getRawAxis(kArmRotationAxis));
         }
 
         public static POVButton getAlignForwardPOV(){
@@ -70,6 +78,9 @@ public class OI {
         }
         public static JoystickButton getOuttakeButton(){
             return new JoystickButton(kJoystick, kOuttakeButtonID);
+        }
+        public static JoystickButton getArmButton(){
+            return new JoystickButton(kJoystick, kArmButtonID);
         }
     }
 

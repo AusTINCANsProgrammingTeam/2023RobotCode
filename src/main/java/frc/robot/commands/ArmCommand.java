@@ -7,17 +7,19 @@ package frc.robot.commands;
 import frc.robot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj.Joystick;
+
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 
 public class ArmCommand extends CommandBase {
   private final ArmSubsystem armSubsystem;
-  private final Joystick baseJoystick;
-  private final double minSetpoint = Units.degreesToRadians(-160);
-  private final double maxSetpoint = Units.degreesToRadians(160);
+  private final Supplier<Double> rJoystick;
 
-  public ArmCommand(ArmSubsystem armSubsystem, Joystick baseJoystick) {
+  public ArmCommand(ArmSubsystem armSubsystem, Supplier<Double> rJoystick) {
     this.armSubsystem = armSubsystem;
-    this.baseJoystick = baseJoystick;
+    this.rJoystick = rJoystick;
 
     addRequirements(armSubsystem);
   }
@@ -29,16 +31,15 @@ public class ArmCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double baseY = baseJoystick.getY();
-    double baseSetpoint;
-
-    if (baseY >= 0) {
-      baseSetpoint = baseY * maxSetpoint;
+    armSubsystem.stopArmMotors();
+    if(ArmSubsystem.controlIsBaseArm) {
+      //Move base arm
+      //armSubsystem.setBaseRef(rJoystick.get());
+      //armSubsystem.setBaseRef((MathUtil.clamp(rJoystick.get(),0,1)*Units.degreesToRadians(45))+Units.degreesToRadians(45));
     } else {
-      baseSetpoint = baseY * minSetpoint;
+      //Move elbow arm
+      //armSubsystem.setElbowRef((MathUtil.clamp(rJoystick.get(),0,1)*Units.degreesToRadians(45))+Units.degreesToRadians(45));
     }
-
-    armSubsystem.setBaseRef(baseSetpoint);
   }
 
   // Called once the command ends or is interrupted.
