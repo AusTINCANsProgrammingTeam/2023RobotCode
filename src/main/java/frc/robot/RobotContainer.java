@@ -6,11 +6,10 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.classes.Auton;
 import frc.robot.commands.SwerveTeleopCommand;
-import frc.robot.subsystems.AutonSubsytem;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.BatterySubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.CameraSubsystem;
@@ -26,29 +25,26 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
   private final EverybotIntakeSubsystem intakeSubsystem = new EverybotIntakeSubsystem();
-
-
-  private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
-  private SimulationSubsystem simulationSubsystem;
-  
   private final CameraSubsystem cameraSubsystem = new CameraSubsystem();
 
-  private static BatterySubsystem batterySubsystem;
+  private SimulationSubsystem simulationSubsystem;
+  
+  private Auton auton = new Auton(swerveSubsystem);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
     if(Robot.isSimulation()){
       simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
     }
-    if (!Robot.isCompetition) {
-      batterySubsystem = new BatterySubsystem();
-    }
+
     swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
       OI.Driver.getXTranslationSupplier(),
       OI.Driver.getYTranslationSupplier(),
       OI.Driver.getRotationSupplier()));
 
+      
     // Configure the button bindings    
 
     configureButtonBindings();
@@ -61,13 +57,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
-    OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
-    OI.Driver.getParkButton().whileTrue(new InstantCommand(swerveSubsystem::parkModules,swerveSubsystem));
-    OI.Driver.getAlignForwardPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
-    OI.Driver.getAlignBackPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
-    OI.Driver.getAlignLeftPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(90), swerveSubsystem));
-    OI.Driver.getAlignRightPOV().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(-90), swerveSubsystem));
+    OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation, swerveSubsystem));
+    OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading, swerveSubsystem));
+    OI.Driver.getAlignForwardButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
+    OI.Driver.getAlignBackButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
     OI.Driver.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::pull, intakeSubsystem));
     OI.Driver.getOuttakeButton().onTrue(new InstantCommand(intakeSubsystem::push, intakeSubsystem));
   }
@@ -78,6 +71,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autonSubsytem.getAutonCommand();
+    return auton.getAutonCommand();
   }
 }
