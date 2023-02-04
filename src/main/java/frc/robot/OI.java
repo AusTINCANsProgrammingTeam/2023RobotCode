@@ -54,20 +54,12 @@ public class OI {
             return new JoystickButton(kJoystick, kOrientationButtonID);
         }
 
-        public static JoystickButton getZeroButton(){
-            return new JoystickButton(kJoystick, kZeroButtonID);
-        }
-
         public static JoystickButton getAlignForwardButton(){
             return new JoystickButton(kJoystick, kAlignForwardButtonID);
         }
 
         public static JoystickButton getAlignBackButton(){
             return new JoystickButton(kJoystick, kAlignBackwardButtonID);
-        }
-
-        public static JoystickButton getOrientationButton(){
-            return new JoystickButton(kJoystick, kOrientationButtonID);
         }
 
         public static JoystickButton getZeroButton(){
