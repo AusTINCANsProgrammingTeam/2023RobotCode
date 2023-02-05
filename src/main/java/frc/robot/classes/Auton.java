@@ -32,15 +32,22 @@ public class Auton{
         BACKWARD, // Wait 3 seconds, go backward 1 meter
         FORWARD180, // Go forward 2 meters and rotate 180 degrees
         CURVE, // Go forward 1 meter and left 1 meter
-        ONESCORECHARGETOP, // Score preloaded game piece and engage charge pad starting from top of community
-        ONESCORECHARGEMID, // Score preloaded game piece and engage charge pad starting from middle of community
-        ONESCORECHARGELOW, // Score preloaded game piece and engage charge pad starting from bottom of community
-        TWOSCORETOP, // Score preloaded game piece and score another game piece starting from top of community
-        TWOSCOREMID, // Score preloaded game piece and score another game piece starting from middle of community
-        TWOSCORELOW, // Score preloaded game piece and score another game piece starting from bottom of community
-        TWOSCORECHARGETOP, // Score preloaded game piece, score another game piece, and engage charge pad starting from top of community
-        TWOSCORECHARGEMID, // Score preloaded game piece, score another game piece, and engage charge pad starting from middle of community
-        TWOSCORECHARGELOW; // Score preloaded game piece, score another game piece, and engage charge pad starting from bottom of community
+        ONESCORECHARGE1, // Score preloaded game piece from first starting position and engage charge pad
+        ONESCORECHARGE2, // Score preloaded game piece from second starting position and engage charge pad
+        ONESCORECHARGE3, // Score preloaded game piece from third starting position and engage charge pad
+        ONESCORECHARGE4, // Score preloaded game piece from fourth starting position and engage charge pad
+        ONESCORECHARGE5, // Score preloaded game piece from fifth starting position and engage charge pad
+        ONESCORECHARGE6, // Score preloaded game piece from sixth starting position and engage charge pad
+        TWOSCORE1, // Score preloaded game piece from first starting position and score another game piece
+        TWOSCORE6, // Score preloaded game piece from sixth starting position and score another game piece
+        TWOSCORECHARGE1, // Score preloaded game piece from first starting position, score another game piece, and engage charge pad
+        TWOSCORECHARGE6, // Score preloaded game piece from sixth starting position, score another game piece, and engage charge pad
+        THREESCORE1, // Score preloaded game piece from first starting position, score another game piece, and score another game piece
+        THREESCORE6, // Score preloaded game piece from sixth starting position, score another game piece, and score another game piece
+        TWOSCORELOADCHARGE1, // Score preloaded game piece from first starting position, score another game piece, intake another game piece, and engage charge pad
+        TWOSCORELOADCHARGE6, // Score preloaded game piece from sixth starting position, score another game piece, intake another game piece, and engage charge pad
+        THREESCORECHARGE1, // Score preloaded game piece from first starting position, score another game piece, score another game piece, and engage charge pad
+        THREESCORECHARGE6, // Score preloaded game piece from sixth starting position, score another game piece, score another game piece, and engage charge pad
     }
     private final AutonModes kDefaultAutonMode = AutonModes.FORWARD;
 
@@ -128,68 +135,127 @@ public class Auton{
                         resetOdometry("Curve"),
                         swerveSubsystem.followTrajectory("Curve", getTrajectory("Curve"))
                     );
-            case ONESCORECHARGETOP:
+            case ONESCORECHARGE1:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("1ScoreChargeTop"),
-                        swerveSubsystem.followTrajectory("1ScoreChargeTop", getTrajectory("1ScoreChargeTop"))
+                        resetOdometry("1ScoreCharge-1"),
+                        swerveSubsystem.followTrajectory("1ScoreCharge-1", getTrajectory("1ScoreCharge-1"))
                     );
-            case ONESCORECHARGEMID:
+            case ONESCORECHARGE2:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("1ScoreChargeMid"),
-                        swerveSubsystem.followTrajectory("1ScoreChargeMid", getTrajectory("1ScoreChargeMid"))
+                        resetOdometry("1ScoreCharge-2"),
+                        swerveSubsystem.followTrajectory("1ScoreCharge-2", getTrajectory("1ScoreCharge-2"))
                     );
-            case ONESCORECHARGELOW:
+            case ONESCORECHARGE3:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("1ScoreChargeLow"),
-                        swerveSubsystem.followTrajectory("1ScoreChargeLow", getTrajectory("1ScoreChargeLow"))
+                        resetOdometry("1ScoreCharge-3"),
+                        swerveSubsystem.followTrajectory("1ScoreCharge-3", getTrajectory("1ScoreCharge-3"))
                     );
-            case TWOSCORETOP:
+            case ONESCORECHARGE4:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("2ScoreTop1"),
-                        swerveSubsystem.followTrajectory("2ScoreTop1", getTrajectory("2ScoreTop1")),
-                        swerveSubsystem.followTrajectory("2ScoreTop2", getTrajectory("2ScoreTop2"))
+                        resetOdometry("1ScoreCharge-4"),
+                        swerveSubsystem.followTrajectory("1ScoreCharge-4", getTrajectory("1ScoreCharge-4"))
                     );
-            case TWOSCOREMID:
+            case ONESCORECHARGE5:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("2ScoreMid"),
-                        swerveSubsystem.followTrajectory("2ScoreMid1", getTrajectory("2ScoreMid1")),
-                        swerveSubsystem.followTrajectory("2ScoreMid2", getTrajectory("2ScoreMid2"))
+                        resetOdometry("1ScoreCharge-5"),
+                        swerveSubsystem.followTrajectory("1ScoreCharge-5", getTrajectory("1ScoreCharge-5"))
                     );
-            case TWOSCORELOW:
+            case ONESCORECHARGE6:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("2ScoreLow1"),
-                        swerveSubsystem.followTrajectory("2ScoreLow1", getTrajectory("2ScoreLow1")),
-                        swerveSubsystem.followTrajectory("2ScoreLow2", getTrajectory("2ScoreLow2"))
+                        resetOdometry("1ScoreCharge-6"),
+                        swerveSubsystem.followTrajectory("1ScoreCharge-6", getTrajectory("1ScoreCharge-6"))
                     );
-            case TWOSCORECHARGETOP:
+            case TWOSCORE1:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("2ScoreChargeTop1"),
-                        swerveSubsystem.followTrajectory("2ScoreChargeTop1", getTrajectory("2ScoreChargeTop1")),
-                        swerveSubsystem.followTrajectory("2ScoreChargeTop2", getTrajectory("2ScoreChargeTop2")),
-                        swerveSubsystem.followTrajectory("2ScoreChargeTop3", getTrajectory("2ScoreChargeTop3"))
+                        resetOdometry("2Score1-1"),
+                        swerveSubsystem.followTrajectory("2Score1-1", getTrajectory("2Score1-1")),
+                        swerveSubsystem.followTrajectory("2Score2-1", getTrajectory("2Score2-1"))
                     );
-            case TWOSCORECHARGEMID:
+            case TWOSCORE6:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("2ScoreChargeMid1"),
-                        swerveSubsystem.followTrajectory("2ScoreChargeMid1", getTrajectory("2ScoreChargeMid1")),
-                        swerveSubsystem.followTrajectory("2ScoreChargeMid2", getTrajectory("2ScoreChargeMid2")),
-                        swerveSubsystem.followTrajectory("2ScoreChargeMid3", getTrajectory("2ScoreChargeMid3"))
+                        resetOdometry("2Score1-6"),
+                        swerveSubsystem.followTrajectory("2Score1-6", getTrajectory("2Score1-6")),
+                        swerveSubsystem.followTrajectory("2Score2-6", getTrajectory("2Score2-6"))
                     );
-            case TWOSCORECHARGELOW:
+            case TWOSCORECHARGE1:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("1ScoreChargeTop"),
-                        swerveSubsystem.followTrajectory("2ScoreChargeLow1", getTrajectory("2ScoreChargeLow1")),
-                        swerveSubsystem.followTrajectory("2ScoreChargeLow2", getTrajectory("2ScoreChargeLow2")),
-                        swerveSubsystem.followTrajectory("2ScoreChargeLow3", getTrajectory("2ScoreChargeLow3"))
+                        resetOdometry("2ScoreCharge1-1"),
+                        swerveSubsystem.followTrajectory("2ScoreCharge1-1", getTrajectory("2ScoreCharge1-1")),
+                        swerveSubsystem.followTrajectory("2ScoreCharge2-1", getTrajectory("2ScoreCharge2-1")),
+                        swerveSubsystem.followTrajectory("2ScoreCharge3-1", getTrajectory("2ScoreCharge3-1"))
+                    );
+            case TWOSCORECHARGE6:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("2ScoreCharge1-6"),
+                        swerveSubsystem.followTrajectory("2ScoreCharge1-6", getTrajectory("2ScoreCharge1-6")),
+                        swerveSubsystem.followTrajectory("2ScoreCharge2-6", getTrajectory("2ScoreCharge2-6")),
+                        swerveSubsystem.followTrajectory("2ScoreCharge3-6", getTrajectory("2ScoreCharge3-6"))
+                    );
+            case THREESCORE1:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("3Score1-1"),
+                        swerveSubsystem.followTrajectory("3Score1-1", getTrajectory("3Score1-1")),
+                        swerveSubsystem.followTrajectory("3Score2-1", getTrajectory("3Score2-1")),
+                        swerveSubsystem.followTrajectory("3Score3-1", getTrajectory("3Score3-1")),
+                        swerveSubsystem.followTrajectory("3Score4-1", getTrajectory("3Score4-1"))
+                    );
+            case THREESCORE6:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("3Score1-6"),
+                        swerveSubsystem.followTrajectory("3Score1-6", getTrajectory("3Score1-6")),
+                        swerveSubsystem.followTrajectory("3Score2-6", getTrajectory("3Score2-6")),
+                        swerveSubsystem.followTrajectory("3Score3-6", getTrajectory("3Score3-6")),
+                        swerveSubsystem.followTrajectory("3Score4-6", getTrajectory("3Score4-6"))
+                    );
+            case TWOSCORELOADCHARGE1:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("2ScoreLoadCharge1-1"),
+                        swerveSubsystem.followTrajectory("2ScoreLoadCharge1-1", getTrajectory("2ScoreLoadCharge1-1")),
+                        swerveSubsystem.followTrajectory("2ScoreLoadCharge2-1", getTrajectory("2ScoreLoadCharge2-1")),
+                        swerveSubsystem.followTrajectory("2ScoreLoadCharge3-1", getTrajectory("2ScoreLoadCharge3-1")),
+                        swerveSubsystem.followTrajectory("2ScoreLoadCharge4-1", getTrajectory("2ScoreLoadCharge4-1"))
+                    );
+            case TWOSCORELOADCHARGE6:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("2ScoreLoadCharge1-6"),
+                        swerveSubsystem.followTrajectory("2ScoreLoadCharge1-6", getTrajectory("2ScoreLoadCharge1-6")),
+                        swerveSubsystem.followTrajectory("2ScoreLoadCharge2-6", getTrajectory("2ScoreLoadCharge2-6")),
+                        swerveSubsystem.followTrajectory("2ScoreLoadCharge3-6", getTrajectory("2ScoreLoadCharge3-6")),
+                        swerveSubsystem.followTrajectory("2ScoreLoadCharge4-6", getTrajectory("2ScoreLoadCharge4-6"))
+                    );
+            case THREESCORECHARGE1:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("3ScoreCharge1-1"),
+                        swerveSubsystem.followTrajectory("3ScoreCharge1-1", getTrajectory("3ScoreCharge1-1")),
+                        swerveSubsystem.followTrajectory("3ScoreCharge2-1", getTrajectory("3ScoreCharge2-1")),
+                        swerveSubsystem.followTrajectory("3ScoreCharge3-1", getTrajectory("3ScoreCharge3-1")),
+                        swerveSubsystem.followTrajectory("3ScoreCharge4-1", getTrajectory("3ScoreCharge4-1")),
+                        swerveSubsystem.followTrajectory("3ScoreCharge5-1", getTrajectory("3ScoreCharge5-1"))
+                    );
+            case THREESCORECHARGE6:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("3ScoreCharge1-6"),
+                        swerveSubsystem.followTrajectory("3ScoreCharge1-6", getTrajectory("3ScoreCharge1-6")),
+                        swerveSubsystem.followTrajectory("3ScoreCharge2-6", getTrajectory("3ScoreCharge2-6")),
+                        swerveSubsystem.followTrajectory("3ScoreCharge3-6", getTrajectory("3ScoreCharge3-6")),
+                        swerveSubsystem.followTrajectory("3ScoreCharge4-6", getTrajectory("3ScoreCharge4-6")),
+                        swerveSubsystem.followTrajectory("3ScoreCharge5-6", getTrajectory("3ScoreCharge5-6"))
                     );
             default:
                 return null;
