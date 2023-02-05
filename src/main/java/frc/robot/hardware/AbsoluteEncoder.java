@@ -18,14 +18,14 @@ public class AbsoluteEncoder {
         
         private int ID;
         private boolean reversed;
-        private double offset; //Offset in radians
-        private double altOffset; //Offset in radians, used on practice bot
+        private double competitionOffset; //Offset in radians, used on competition bot
+        private double practiceOffset; //Offset in radians, used on practice bot
     
         EncoderConfig(int ID, boolean reversed, double offset, double altOffset){
             this.ID = ID;
             this.reversed = reversed;
-            this.offset = offset;
-            this.altOffset = altOffset;
+            this.competitionOffset = offset;
+            this.practiceOffset = altOffset;
         }
 
         EncoderConfig(int ID, boolean reversed, double offset){
@@ -48,12 +48,12 @@ public class AbsoluteEncoder {
             return reversed;
         }
 
-        public double getOffset(){
-            return offset;
+        public double getCompetitionOffset(){
+            return competitionOffset;
         }
 
-        public double getAltOffset(){
-            return altOffset;
+        public double getPracticeOffset(){
+            return practiceOffset;
         }
     }
 
@@ -63,7 +63,7 @@ public class AbsoluteEncoder {
         encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
         encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
         encoder.configSensorDirection(config.getReversed());
-        encoder.configMagnetOffset(Units.radiansToDegrees(Robot.isCompetitionRobot ? config.getOffset() : config.getAltOffset()));
+        encoder.configMagnetOffset(Units.radiansToDegrees(Robot.isCompetitionRobot ? config.getCompetitionOffset() : config.getPracticeOffset()));
         return encoder;
     }
 }
