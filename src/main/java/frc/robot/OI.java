@@ -30,7 +30,6 @@ public class OI {
         private static final ControlCurve kXTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
         private static final ControlCurve kYTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
         private static final ControlCurve kRotationCurve = new ControlCurve(1,0,1,0.1);
-        private static final ControlCurve kArmRotationCurve = new ControlCurve(1,0,1,0.1);
 
         public static Supplier<Double> getXTranslationSupplier(){
             //This axis is inverted
@@ -84,11 +83,12 @@ public class OI {
     }
 
     public static final class Operator{
+        private static final ControlCurve kArmRotationCurve = new ControlCurve(0.8,0,1,0.1);
         public static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
-        private static final int kArmRotationAxis = 3;
+        private static final int kArmRotationAxis = 1;
         public static Supplier<Double> getArmRotationSupplier(){
-            return () -> kJoystick.getRawAxis(kArmRotationAxis);
-            //return () -> kArmRotationCurve.calculate(kJoystick.getRawAxis(kArmRotationAxis));
+            //return () -> kJoystick.getRawAxis(kArmRotationAxis);
+            return () -> kArmRotationCurve.calculate(kJoystick.getRawAxis(kArmRotationAxis));
         }
 
     }

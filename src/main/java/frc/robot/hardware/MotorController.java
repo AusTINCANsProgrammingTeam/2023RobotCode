@@ -22,9 +22,9 @@ public class MotorController {
         BackRightModuleDrive(6, 50, IdleMode.kBrake),
         BackRightModuleTurn(5, 40, IdleMode.kBrake, true),
         //Arm Modules
-        ArmBaseMotor1(14, 40, IdleMode.kBrake),
-        ArmBaseMotor2(9, 40, IdleMode.kBrake),
-        ArmElbowMotor(15, 40, IdleMode.kBrake),  
+        ArmBaseMotor1(14, 40, IdleMode.kBrake, true),
+        ArmBaseMotor2(9, 40, IdleMode.kBrake, true),
+        ArmElbowMotor(15, 40, IdleMode.kCoast, true),  
         //Intake motors
         IntakeMotor1(13),
         IntakeMotor2(11); //TODO update to real hardware IDs

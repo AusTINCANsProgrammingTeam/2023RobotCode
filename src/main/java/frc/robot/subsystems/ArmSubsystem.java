@@ -16,6 +16,8 @@ import java.util.function.Supplier;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -27,8 +29,10 @@ import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DutyCycleSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.OI;
 import frc.robot.Robot;
+import frc.robot.classes.TunableNumber;
 import frc.robot.commands.ArmAutoCommand;
 
 
@@ -37,14 +41,17 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   // FIXME using PWMSparkMax because CANSparkMax doesn't have an equivalent simulation class
   // FIXME https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
   // May limit how much we can do in terms of JUnit tests
-  //Base arm PID values
-  private double kBaskElbowP = 1;
-  private double kBaskElbowI = 0;
-  private double kBaskElbowD = 0.1;
-  //Elbow arm PID values
-  private double kElbowP = 0.05;
-  private double kElbowI = 0;
-  private double kElbowD = 0.2;
+  //Base arm PID values (was 1, 0, 0.1)
+  private double kBaseP = 1;
+  private double kBaseI = 0.036;
+  private double kBaseD = 0;
+  //Elbow arm PID values (was 0.05,0,0.2)
+  private double kElbowP = 1;
+  //private TunableNumber elbowPTuner;
+  private double kElbowI = 0.036;
+  //private TunableNumber elbowITuner;
+  private double kElbowD = 0;
+  //private TunableNumber elbowDTuner;
   private CANSparkMax motorBaseOne;
   private CANSparkMax motorBaseTwo;
   private CANSparkMax motorElbow;
@@ -70,8 +77,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private final PIDController elbowPIDController;
   // SIM VALUES:
   public static final double kBaseOffset = Units.degreesToRadians(-242);
-  //-294
-  public static final double kElbowOffset = Units.degreesToRadians(-202);
+  //-294 -202
+  public static final double kElbowOffset = Units.degreesToRadians(380);
   public static final double kBaseGearing = 12.;
   public static final double kElbowGearing = 8.57142857;
   public static final double kBaseArmLength = Units.inchesToMeters(43.5);
@@ -107,6 +114,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private GenericEntry baseArmAngleSet = armTab.add("Base Arm Angle Setpoint", 0.0).getEntry();
   private GenericEntry elbowArmAngle = armTab.add("Elbow Arm Angle", 0.0).getEntry();
   private GenericEntry baseArmRelEncoderAngle = armTab.add("Base NEO Angle", 0.0).getEntry();
+  private GenericEntry elbowOutput = armTab.add("Elbow Output", 0.0).getEntry();
   
 
   
@@ -115,8 +123,11 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, elbowArmInertia, kElbowArmLength, kMinEAngle, kMaxEAngle, kElbowArmMass, false);
 
   public ArmSubsystem() {
-    controlIsBaseArm = true;
+    controlIsBaseArm = false;
     rJoystick = OI.Operator.getArmRotationSupplier();
+    SmartDashboard.putNumber("Elbow P", kElbowP);
+    SmartDashboard.putNumber("Elbow I", kElbowI);
+    SmartDashboard.putNumber("Elbow D", kElbowD);
     motorBaseOne = MotorController.constructMotor(MotorConfig.ArmBaseMotor1);
     motorBaseTwo = MotorController.constructMotor(MotorConfig.ArmBaseMotor2);
     motorBaseTwo.follow(motorBaseOne);
@@ -147,9 +158,14 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     }
     //motorElbowEncoderSim = new EncoderSim(motorElbowEncoder);
     //motorElbowEncoderSim.setDistance(Units.degreesToRadians(kMinEAngle));
-    basePIDController = new PIDController(kBaskElbowP, kBaskElbowI, kBaskElbowD);
+    basePIDController = new PIDController(kBaseP, kBaseI, kBaseD);
+    //basePIDController = new SparkMaxPIDController(motorBaseOne);
     //basePIDController = motorBaseOne.getPIDController();
     elbowPIDController = new PIDController(kElbowP, kElbowI, kElbowD);
+    //elbowPTuner = new TunableNumber("Elbow P", kElbowP, elbowPIDController::setP);
+    //elbowITuner = new TunableNumber("Elbow I", kElbowI, elbowPIDController::setI);
+    //elbowDTuner = new TunableNumber("Elbow D", kElbowD, elbowPIDController::setD);
+    
   }
 
   public double getBaseDutyCycleSimAngle() {
@@ -162,12 +178,13 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     return motorElbowDutyCycleSim.getOutput()*(Math.PI*2);
   }
   public double getElbowDutyCycleAngle() {
-    return ((motorElbowDutyCycleEncoder.getAbsolutePosition()*(Math.PI*2))+kElbowOffset);
+    SmartDashboard.putNumber("Elbow Absolute", motorElbowDutyCycleEncoder.getAbsolutePosition());
+    return (kElbowOffset+((motorElbowDutyCycleEncoder.getAbsolutePosition()*-1)*(Math.PI*2)));
   }
   public void setBaseRef(double setpoint) {
     motorBaseOne.set(MathUtil.clamp(basePIDController.calculate(getBaseDutyCycleAngle(), setpoint),-1,1));
   }
-   public void setElbowRef(double setpoint) {
+  public void setElbowRef(double setpoint) {
     motorElbow.set(MathUtil.clamp(elbowPIDController.calculate(getElbowDutyCycleAngle(), setpoint),-1,1));
   }
   public void toggleArmControl() {
@@ -188,7 +205,14 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     baseArmRelEncoderAngle.setDouble(Units.radiansToDegrees(motorBaseOneRelativeEncoder.getPosition()));
     //baseArmAngleSet.setDouble((MathUtil.clamp(rJoystick.get(),0,1)*Units.degreesToRadians(45))+Units.degreesToRadians(45));
     baseArmAngleSet.setDouble(rJoystick.get());
-    motorBaseOne.set(rJoystick.get()/10);
+    //motorElbow.set(rJoystick.get()*.8);
+    elbowOutput.setDouble(motorElbow.getAppliedOutput());
+    kElbowP = SmartDashboard.getNumber("Elbow P", kElbowP);
+    elbowPIDController.setP(kElbowP);
+    kElbowI = SmartDashboard.getNumber("Elbow I", kElbowI);
+    elbowPIDController.setI(kElbowI);
+    kElbowD = SmartDashboard.getNumber("Elbow D", kElbowD);
+    elbowPIDController.setD(kElbowD);
   }
 
   @Override

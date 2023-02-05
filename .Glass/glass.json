@@ -1,0 +1,24 @@
+{
+  "NetworkTables": {
+    "transitory": {
+      "Shuffleboard": {
+        "Arm (Real)": {
+          "open": true
+        },
+        "Tuning": {
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Config/Auton mode": "String Chooser"
+    }
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "2158",
+    "visible": false
+  }
+}
