@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 public class OI {
     //Operator Interface (OI) class containing all control information
     private static final int kDriverJoystickPort = 0;
+    private static final int kOperatorJoystickPort = 1;
 
     public static final class Driver{
         public static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
@@ -21,9 +22,9 @@ public class OI {
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
-        private static final int kRotationAxis = 2;
+        private static final int kRotationAxis = 1;
         //TODO: Get real value here
-        private static final int kArmRotationAxis = 4;
+        
 
         //TODO: Tune curves to driver preference
         private static final ControlCurve kXTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
@@ -46,9 +47,7 @@ public class OI {
             return () -> kRotationCurve.calculate(-kJoystick.getRawAxis(kRotationAxis));
         }
         
-        public static Supplier<Double> getArmRotationSupplier(){
-            return () -> kArmRotationCurve.calculate(kJoystick.getRawAxis(kArmRotationAxis));
-        }
+        
 
         public static POVButton getAlignForwardPOV(){
             return new POVButton(kJoystick, 0);
@@ -85,6 +84,12 @@ public class OI {
     }
 
     public static final class Operator{
+        public static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
+        private static final int kArmRotationAxis = 3;
+        public static Supplier<Double> getArmRotationSupplier(){
+            return () -> kJoystick.getRawAxis(kArmRotationAxis);
+            //return () -> kArmRotationCurve.calculate(kJoystick.getRawAxis(kArmRotationAxis));
+        }
 
     }
 

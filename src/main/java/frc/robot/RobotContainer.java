@@ -41,7 +41,7 @@ public class RobotContainer {
 
   private static BatterySubsystem batterySubsystem;
   //TODO: Get a joystick
-  private final ArmCommand armCommand = new ArmCommand(armSubsystem, OI.Driver.getArmRotationSupplier());
+  private final ArmCommand armCommand = new ArmCommand(armSubsystem, OI.Operator.getArmRotationSupplier());
   
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
