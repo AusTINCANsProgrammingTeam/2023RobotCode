@@ -106,7 +106,7 @@ public class SwerveSubsystem extends SubsystemBase{
         controlOrientationIsFOD = true;
 
         //Add coast mode command to shuffleboard
-        configTab.add(new StartEndCommand(this::coastModules, this::brakeModules, this));
+        configTab.add(new StartEndCommand(this::coastModules, this::brakeModules, this).ignoringDisable(true).withName("Coast Modules"));
 
         //Define PID controllers for tracking trajectory
         xController = new PIDController(kXTranslationP, 0, 0);
