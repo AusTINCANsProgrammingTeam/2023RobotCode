@@ -47,7 +47,7 @@ private final AddressableLED leds = new AddressableLED(2);
     public void setRainbowLed(){
         for (int j = 0; j < 255; j++) {
             for (int i = 0, h = 0; i < 256; i++, h++) {
-              buffer.setHSV(i, (instance + h) / 200, 255, 255); /* The higher the value 4 the less fade there is and vice versa */ 
+              buffer.setHSV(i, (instance + h) / 200, 255, 255/2); //Change the divisor in the hue to change the fade speed
             }
             instance = instance + 1;
         }
