@@ -15,7 +15,6 @@ import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -63,28 +62,21 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private double kBaseD = 0;
   //Elbow arm PID values
   private double kElbowP = 1;
-  //private TunableNumber elbowPTuner;
   private double kElbowI = 0.036;
-  //private TunableNumber elbowITuner;
   private double kElbowD = 0;
-  //private TunableNumber elbowDTuner;
-  private CANSparkMax motorBaseOne;
-  private CANSparkMax motorBaseTwo;
-  private CANSparkMax motorElbow;
-  private final DutyCycleEncoder motorBaseOneDutyCycleEncoder;
-  private final DutyCycleEncoder motorElbowDutyCycleEncoder;
+
+  private CANSparkMax baseMotor;
+  private CANSparkMax elbowMotor;
+
+  private final DutyCycleEncoder baseAbsoluteEncoder;
+  private final DutyCycleEncoder elbowAbsoluteEncoder;
+
   private double simBaseEncoderPosition;
   private double simElbowEncoderPosition;
 
-  private final RelativeEncoder motorBaseOneRelativeEncoder;
-  //private final SparkMaxPIDController basePIDController;
   private final PIDController basePIDController;
   private final PIDController elbowPIDController;
-  // SIM VALUES:
-  public static final double kBaseOffset = Units.degreesToRadians(-242);
-  //-294 -202
-  public static final double kElbowOffset = Units.degreesToRadians(380);
-  public static final double kBaseGearing = 12.;
+  public static final double kBaseGearing = 12;
   public static final double kElbowGearing = 8.57142857;
   public static final double kBaseArmLength = Units.inchesToMeters(43.5);
   public static final double kElbowArmLength = Units.inchesToMeters(37.5);
@@ -92,7 +84,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kMaxBAngle = Units.degreesToRadians(91);
   public static final double kMinEAngle = Units.degreesToRadians(-70);
   public static final double kMaxEAngle = Units.degreesToRadians(89);
-  public static final double kBaseArmMass = Units.lbsToKilograms(15); //15
+  public static final double kBaseArmMass = Units.lbsToKilograms(15);
   public static final double kElbowArmMass = Units.lbsToKilograms(15);
   public final double baseArmInertia = SingleJointedArmSim.estimateMOI(kBaseArmLength, kBaseArmMass+kElbowArmMass);
   public final double elbowArmInertia = SingleJointedArmSim.estimateMOI(kElbowArmLength, kElbowArmMass);
@@ -117,7 +109,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private GenericEntry baseArmAngle = armTab.add("Base Arm Angle", 0.0).getEntry();
   private GenericEntry baseArmAngleSet = armTab.add("Base Arm Angle Setpoint", 0.0).getEntry();
   private GenericEntry elbowArmAngle = armTab.add("Elbow Arm Angle", 0.0).getEntry();
-  private GenericEntry baseArmRelEncoderAngle = armTab.add("Base NEO Angle", 0.0).getEntry();
   private GenericEntry elbowOutput = armTab.add("Elbow Output", 0.0).getEntry();
 
   private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), kBaseGearing, baseArmInertia, kBaseArmLength, kMinBAngle, kMaxBAngle, kBaseArmMass, false);
@@ -128,14 +119,11 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Elbow P", kElbowP);
     SmartDashboard.putNumber("Elbow I", kElbowI);
     SmartDashboard.putNumber("Elbow D", kElbowD);
-    motorBaseOne = MotorController.constructMotor(MotorConfig.ArmBaseMotor1);
-    motorBaseTwo = MotorController.constructMotor(MotorConfig.ArmBaseMotor2);
-    motorBaseTwo.follow(motorBaseOne);
-    motorElbow = MotorController.constructMotor(MotorConfig.ArmElbowMotor);
+    baseMotor = MotorController.constructMotor(MotorConfig.ArmBase);
+    elbowMotor = MotorController.constructMotor(MotorConfig.ArmElbow);
     //TODO: Place real values for channels
-    motorBaseOneDutyCycleEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmBase);
-    motorElbowDutyCycleEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);
-    motorBaseOneRelativeEncoder = motorBaseOne.getEncoder();
+    baseAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmBase);
+    elbowAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);
     basePIDController = new PIDController(kBaseP, kBaseI, kBaseD);
     elbowPIDController = new PIDController(kElbowP, kElbowI, kElbowD);
     //elbowPTuner = new TunableNumber("Elbow P", kElbowP, elbowPIDController::setP);
@@ -148,19 +136,19 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     return simBaseEncoderPosition;
   }
   public double getBaseDutyCycleAngle() {
-    return AbsoluteEncoder.getPositionRadians(motorBaseOneDutyCycleEncoder);
+    return AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder);
   }
   public double getElbowDutyCycleSimAngle() {
     return simElbowEncoderPosition;
   }
   public double getElbowDutyCycleAngle() {
-    return AbsoluteEncoder.getPositionRadians(motorElbowDutyCycleEncoder);
+    return AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder);
   }
   public void setBaseRef(double setpoint) {
-    motorBaseOne.set(MathUtil.clamp(basePIDController.calculate(getBaseDutyCycleAngle(), setpoint),-1,1));
+    baseMotor.set(MathUtil.clamp(basePIDController.calculate(getBaseDutyCycleAngle(), setpoint),-1,1));
   }
   public void setElbowRef(double setpoint) {
-    motorElbow.set(MathUtil.clamp(elbowPIDController.calculate(getElbowDutyCycleAngle(), setpoint),-1,1));
+    elbowMotor.set(MathUtil.clamp(elbowPIDController.calculate(getElbowDutyCycleAngle(), setpoint),-1,1));
   }
   public void toggleArmControl() {
     //Toggle control from base arm to elbow arm
@@ -168,21 +156,17 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
   
   public void stopArmMotors() {
-    motorBaseOne.stopMotor();
-    motorElbow.stopMotor();
+    baseMotor.stopMotor();
+    elbowMotor.stopMotor();
   }
   
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //motorBaseOneRelativeEncoder.setPosition(getBaseDutyCycleAngle());
     baseArmAngle.setDouble(Units.radiansToDegrees(getBaseDutyCycleAngle()));
     elbowArmAngle.setDouble(Units.radiansToDegrees(getElbowDutyCycleAngle()));
-    baseArmRelEncoderAngle.setDouble(Units.radiansToDegrees(motorBaseOneRelativeEncoder.getPosition()));
-    //baseArmAngleSet.setDouble((MathUtil.clamp(rJoystick.get(),0,1)*Units.degreesToRadians(45))+Units.degreesToRadians(45));
     baseArmAngleSet.setDouble(basePIDController.getSetpoint());
-    //motorElbow.set(rJoystick.get()*.8);
-    elbowOutput.setDouble(motorElbow.getAppliedOutput());
+    elbowOutput.setDouble(elbowMotor.getAppliedOutput());
     kElbowP = SmartDashboard.getNumber("Elbow P", kElbowP);
     elbowPIDController.setP(kElbowP);
     kElbowI = SmartDashboard.getNumber("Elbow I", kElbowI);
@@ -233,10 +217,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public void close() throws Exception {
     // This method will close all device handles used by this object and release any other dynamic memory.
     // Mostly for JUnit tests
-    motorBaseOne.close();
-    //motorBaseOneDutyCycle.close();
-    motorBaseTwo.close();
-    motorElbow.close();
+    baseMotor.close();
+    baseAbsoluteEncoder.close();
+    elbowMotor.close();
     basePIDController.close();
     elbowPIDController.close();
   }
