@@ -10,12 +10,15 @@ import frc.robot.Robot;
 
 public class AbsoluteEncoder {
     public enum EncoderConfig {
-        //Swerve Modules
+        //Swerve Modules (CAN)
         //Offsets determined by manually turning all modules to 0 (forward) and recording their positions
         FrontLeftModule(1, false, -1.774, -1.12),
         FrontRightModule(2, false, -1.802, -1.078),
         BackLeftModule(3, false, 0.353, -3.911),
-        BackRightModule(4, false, -0.853, -4.686);
+        BackRightModule(4, false, -0.853, -4.686),
+        //Arm Encoders (REV)
+        ArmBase(0, false, Units.degreesToRadians(380)),
+        ArmElbow(1);
         
         private int ID;
         private boolean reversed;
@@ -71,6 +74,13 @@ public class AbsoluteEncoder {
     public static DutyCycleEncoder constructREVEncoder(EncoderConfig config){
         DutyCycleEncoder encoder = new DutyCycleEncoder(config.getID());
         encoder.setPositionOffset(Units.radiansToRotations(Robot.isCompetitionRobot ? config.getCompetitionOffset() : config.getPracticeOffset()));
+        encoder.setDistancePerRotation(config.getReversed() ? -1 : 1);
         return encoder;
+    }
+
+    public static double getPositionRadians(DutyCycleEncoder encoder){
+        //Get position of a REV encoder in radians
+        double position = encoder.getAbsolutePosition() + encoder.getPositionOffset();
+        return Units.rotationsToRadians(encoder.getDistancePerRotation() < 0 ? 1 - position : position);
     }
 }
