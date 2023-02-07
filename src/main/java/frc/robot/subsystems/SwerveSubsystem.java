@@ -34,8 +34,8 @@ public class SwerveSubsystem extends SubsystemBase{
     public static final double kPhysicalMaxSpeed = Units.feetToMeters(14.5);; //Max drivebase speed in meters per second
     public static final double kPhysicalMaxAngularSpeed = 2 * Math.PI; //Max drivebase angular speed in radians per second
 
-    public static final double kTrackWidth = Units.inchesToMeters(18.75); //Distance between right and left wheels
-    public static final double kWheelBase = Units.inchesToMeters(18.75); //Distance between front and back wheels
+    public static final double kTrackWidth = Units.inchesToMeters(19.75); //Distance between right and left wheels
+    public static final double kWheelBase = Units.inchesToMeters(19.75); //Distance between front and back wheels
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics( //Creates robot geometry using the locations of the 4 wheels
         new Translation2d(kWheelBase / 2, kTrackWidth / 2), 
         new Translation2d(kWheelBase / 2, -kTrackWidth /2),
@@ -44,7 +44,7 @@ public class SwerveSubsystem extends SubsystemBase{
         
     public static final double kXTranslationP = 1.5;
     public static final double kYTranslationP = 1.5;
-    public static final double kRotationP = 0.85;
+    public static final double kRotationP = 0.575;
 
     private final SwerveModule frontLeft = new SwerveModule(
         MotorConfig.FrontLeftModuleDrive,
