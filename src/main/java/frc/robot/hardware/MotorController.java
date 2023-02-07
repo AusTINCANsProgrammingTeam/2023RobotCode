@@ -99,7 +99,8 @@ public class MotorController {
         return motor;
     }
 
-    public static CANSparkMax withPID(CANSparkMax motor, double[] PIDArray){
+    public static CANSparkMax constructMotor(MotorConfig config, double[] PIDArray){
+        CANSparkMax motor = constructMotor(config);
         SparkMaxPIDController motorPIDcontroller = motor.getPIDController();
         motorPIDcontroller.setP(PIDArray[0]);
         motorPIDcontroller.setI(PIDArray[1]);
