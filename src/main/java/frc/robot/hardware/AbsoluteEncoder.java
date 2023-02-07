@@ -5,6 +5,7 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.Robot;
 
 public class AbsoluteEncoder {
@@ -57,13 +58,19 @@ public class AbsoluteEncoder {
         }
     }
 
-    public static WPI_CANCoder constructEncoder(EncoderConfig config){
+    public static WPI_CANCoder constructCANCoder(EncoderConfig config){
         WPI_CANCoder encoder = new WPI_CANCoder(config.getID());
         encoder.configFactoryDefault();
         encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
         encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
         encoder.configSensorDirection(config.getReversed());
         encoder.configMagnetOffset(Units.radiansToDegrees(Robot.isCompetitionRobot ? config.getCompetitionOffset() : config.getPracticeOffset()));
+        return encoder;
+    }
+
+    public static DutyCycleEncoder constructREVEncoder(EncoderConfig config){
+        DutyCycleEncoder encoder = new DutyCycleEncoder(config.getID());
+        encoder.setPositionOffset(Units.radiansToRotations(Robot.isCompetitionRobot ? config.getCompetitionOffset() : config.getPracticeOffset()));
         return encoder;
     }
 }

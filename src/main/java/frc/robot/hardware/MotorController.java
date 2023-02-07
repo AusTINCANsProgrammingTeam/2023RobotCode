@@ -1,6 +1,7 @@
 package frc.robot.hardware;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -99,6 +100,15 @@ public class MotorController {
         motor.setIdleMode(config.getIdleMode());
         motor.setOpenLoopRampRate(config.getOpenLoopRampRate());
         motor.setInverted(config.getReversed());
+        return motor;
+    }
+
+    public static CANSparkMax constructMotor(MotorConfig config, double[] PIDArray){
+        CANSparkMax motor = constructMotor(config);
+        SparkMaxPIDController motorPIDcontroller = motor.getPIDController();
+        motorPIDcontroller.setP(PIDArray[0]);
+        motorPIDcontroller.setI(PIDArray[1]);
+        motorPIDcontroller.setD(PIDArray[2]);
         return motor;
     }
 }
