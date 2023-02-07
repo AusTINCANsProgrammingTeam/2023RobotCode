@@ -14,8 +14,6 @@ import frc.robot.hardware.MotorController;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
-import java.util.function.Supplier;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 
@@ -28,7 +26,6 @@ import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.OI;
 import frc.robot.Robot;
 import frc.robot.commands.ArmAutoCommand;
 
@@ -97,7 +94,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kMaxEAngle = Units.degreesToRadians(89);
   public static final double kBaseArmMass = Units.lbsToKilograms(15); //15
   public static final double kElbowArmMass = Units.lbsToKilograms(15);
-  private final Supplier<Double> rJoystick;
   public final double baseArmInertia = SingleJointedArmSim.estimateMOI(kBaseArmLength, kBaseArmMass+kElbowArmMass);
   public final double elbowArmInertia = SingleJointedArmSim.estimateMOI(kElbowArmLength, kElbowArmMass);
   private double simBCurrentAngle;
@@ -129,7 +125,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   public ArmSubsystem() {
     controlIsBaseArm = false;
-    rJoystick = OI.Operator.getArmRotationSupplier();
     SmartDashboard.putNumber("Elbow P", kElbowP);
     SmartDashboard.putNumber("Elbow I", kElbowI);
     SmartDashboard.putNumber("Elbow D", kElbowD);
@@ -185,7 +180,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     elbowArmAngle.setDouble(Units.radiansToDegrees(getElbowDutyCycleAngle()));
     baseArmRelEncoderAngle.setDouble(Units.radiansToDegrees(motorBaseOneRelativeEncoder.getPosition()));
     //baseArmAngleSet.setDouble((MathUtil.clamp(rJoystick.get(),0,1)*Units.degreesToRadians(45))+Units.degreesToRadians(45));
-    baseArmAngleSet.setDouble(rJoystick.get());
+    baseArmAngleSet.setDouble(basePIDController.getSetpoint());
     //motorElbow.set(rJoystick.get()*.8);
     elbowOutput.setDouble(motorElbow.getAppliedOutput());
     kElbowP = SmartDashboard.getNumber("Elbow P", kElbowP);
