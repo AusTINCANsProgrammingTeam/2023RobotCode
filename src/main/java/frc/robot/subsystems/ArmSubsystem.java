@@ -37,6 +37,28 @@ import frc.robot.commands.ArmAutoCommand;
 
 
 public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
+  public static enum ArmState{
+    STOWED(0,0), //Arm is retracted into the frame perimeter
+    INTAKE(0,0), //Arm is in position to intake
+    MIDSCORE(0,0), //Arm is in position to score on the mid pole
+    HIGHSCORE(0,0); //Arm is in position to score on the high pole
+
+    private double x; //Position relative to the base of the arm, in meters
+    private double y; //Positon above the carpet, in meters
+    
+    ArmState(double x, double y){
+      this.x = x;
+      this.y = y;
+    }
+
+    public double getX(){
+      return x;
+    }
+
+    public double getY(){
+      return y;
+    }
+  }
 
   // FIXME using PWMSparkMax because CANSparkMax doesn't have an equivalent simulation class
   // FIXME https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
