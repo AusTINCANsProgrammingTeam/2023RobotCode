@@ -6,7 +6,6 @@ package frc.robot.commands;
 
 import frc.robot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.function.Supplier;
@@ -22,15 +21,13 @@ public class ArmCommand extends CommandBase {
   public ArmCommand(ArmSubsystem armSubsystem, Supplier<Double> rJoystick) {
     this.armSubsystem = armSubsystem;
     this.rJoystick = rJoystick;
-    
-
     addRequirements(armSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    setpoint = armSubsystem.getElbowDutyCycleAngle();
+    setpoint = armSubsystem.getElbowAngle();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -43,7 +40,7 @@ public class ArmCommand extends CommandBase {
       //armSubsystem.setBaseRef((MathUtil.clamp(rJoystick.get(),0,1)*Units.degreesToRadians(45))+Units.degreesToRadians(45));
     } else {
       setpoint = MathUtil.clamp(setpoint+Units.degreesToRadians(rJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(130));
-      armSubsystem.setElbowRef(setpoint);
+      armSubsystem.setElbowReference(setpoint);
       SmartDashboard.putNumber("Elbow setpoint", Units.radiansToDegrees(setpoint));
     }
   }

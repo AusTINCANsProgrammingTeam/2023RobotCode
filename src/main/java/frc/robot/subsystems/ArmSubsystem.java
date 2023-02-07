@@ -132,30 +132,37 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     
   }
 
-  public double getBaseDutyCycleSimAngle() {
-    return simBaseEncoderPosition;
+  public double getBaseAngle() {
+    return Robot.isSimulation() ? simBaseEncoderPosition : AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder);
   }
-  public double getBaseDutyCycleAngle() {
-    return AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder);
+
+  public double getElbowAngle() {
+    return Robot.isSimulation() ? simElbowEncoderPosition : AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder);
   }
-  public double getElbowDutyCycleSimAngle() {
-    return simElbowEncoderPosition;
+
+  public void setBaseReference(double setpoint) {
+    baseMotor.set(MathUtil.clamp(basePIDController.calculate(getBaseAngle(), setpoint),-1,1));
   }
-  public double getElbowDutyCycleAngle() {
-    return AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder);
+
+  public void setElbowReference(double setpoint) {
+    elbowMotor.set(MathUtil.clamp(elbowPIDController.calculate(getElbowAngle(), setpoint),-1,1));
   }
-  public void setBaseRef(double setpoint) {
-    baseMotor.set(MathUtil.clamp(basePIDController.calculate(getBaseDutyCycleAngle(), setpoint),-1,1));
+
+  public void setState(ArmState state){
+    double desiredBaseAngle = 0; //TODO: add math translating x and y to angles in radians
+    double desiredElbowAngle = 0;
+
+    
+    setBaseReference(desiredBaseAngle);
+    setElbowReference(desiredElbowAngle);
   }
-  public void setElbowRef(double setpoint) {
-    elbowMotor.set(MathUtil.clamp(elbowPIDController.calculate(getElbowDutyCycleAngle(), setpoint),-1,1));
-  }
+
   public void toggleArmControl() {
     //Toggle control from base arm to elbow arm
     controlIsBaseArm = !controlIsBaseArm;
   }
   
-  public void stopArmMotors() {
+  public void stop() {
     baseMotor.stopMotor();
     elbowMotor.stopMotor();
   }
@@ -163,8 +170,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    baseArmAngle.setDouble(Units.radiansToDegrees(getBaseDutyCycleAngle()));
-    elbowArmAngle.setDouble(Units.radiansToDegrees(getElbowDutyCycleAngle()));
+    baseArmAngle.setDouble(Units.radiansToDegrees(getBaseAngle()));
+    elbowArmAngle.setDouble(Units.radiansToDegrees(getElbowAngle()));
     baseArmAngleSet.setDouble(basePIDController.getSetpoint());
     elbowOutput.setDouble(elbowMotor.getAppliedOutput());
     kElbowP = SmartDashboard.getNumber("Elbow P", kElbowP);
@@ -182,8 +189,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     double simulationYCoord = 100*Units.inchesToMeters(26.9);
     double baseSetpoint = ArmAutoCommand.getBaseAngle(simulationXCoord, simulationYCoord)+Units.degreesToRadians(0);
     double elbowSetpoint = ArmAutoCommand.getElbowAngle(simulationXCoord, simulationYCoord)+Units.degreesToRadians(0);
-    double baskElbowPidOut = MathUtil.clamp(basePIDController.calculate(getBaseDutyCycleSimAngle(), baseSetpoint), -1, 1);
-    double elbowPidOut = MathUtil.clamp(elbowPIDController.calculate(getElbowDutyCycleSimAngle(), elbowSetpoint), -1, 1);
+    double baskElbowPidOut = MathUtil.clamp(basePIDController.calculate(getBaseAngle(), baseSetpoint), -1, 1);
+    double elbowPidOut = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle(), elbowSetpoint), -1, 1);
     baseArmSim.setInputVoltage(baskElbowPidOut * RobotController.getBatteryVoltage());
     elbowArmSim.setInputVoltage(elbowPidOut * RobotController.getBatteryVoltage());
     simBaseEncoderPosition = baseArmSim.getAngleRads();
@@ -196,8 +203,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     //SB Base Arm Return values
     simBCurrentAngle = Units.radiansToDegrees(baseArmSim.getAngleRads()); //Returns angle in degrees
     simBArmAngle.setDouble(simBCurrentAngle);
-    simBEncoderPos.setDouble(Units.radiansToDegrees(getBaseDutyCycleSimAngle()));
-    simBEncoderPos.setDouble(Units.radiansToDegrees(getBaseDutyCycleSimAngle()));
+    simBEncoderPos.setDouble(Units.radiansToDegrees(getBaseAngle()));
     //simBOutSet.setDouble(basePidOut);
     simBOutSet.setDouble(Units.radiansToDegrees(ArmAutoCommand.getBaseAngle(simulationXCoord, simulationYCoord)));
     simBError.setDouble(Units.radiansToDegrees(basePIDController.getPositionError()));
@@ -206,7 +212,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     //SB Elbow Arm Return values
     simECurrentAngle = Units.radiansToDegrees(elbowArmSim.getAngleRads()); //Returns angle in degrees
     simEArmAngle.setDouble(simECurrentAngle);
-    simEEncoderPos.setDouble(getElbowDutyCycleSimAngle());
+    simEEncoderPos.setDouble(getElbowAngle());
     //simEOutSet.setDouble(baskElbowPidOut);
     simEOutSet.setDouble(ArmAutoCommand.getElbowAngle(simulationXCoord, simulationYCoord)*(180/Math.PI));
     simEError.setDouble(Units.radiansToDegrees(elbowPIDController.getPositionError()));
