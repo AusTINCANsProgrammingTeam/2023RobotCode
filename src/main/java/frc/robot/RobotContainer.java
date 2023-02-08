@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -68,7 +67,6 @@ public class RobotContainer {
     }
 
     // Configure the button bindings    
-
     configureButtonBindings();
 
   }
@@ -90,6 +88,10 @@ public class RobotContainer {
     if (Robot.intakeEnabled) {
       OI.Driver.getIntakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::pull, everybotIntakeSubsystem));
       OI.Driver.getOuttakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::push, everybotIntakeSubsystem));
+    }
+
+    if (!Robot.isCompetition) {
+      OI.putControllerButtons();
     }
   }
   /**
