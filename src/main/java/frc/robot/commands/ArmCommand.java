@@ -16,7 +16,7 @@ import edu.wpi.first.math.util.Units;
 public class ArmCommand extends CommandBase {
   private final ArmSubsystem armSubsystem;
   private final Supplier<Double> rJoystick;
-  private double setpoint;
+  private double setpoint = 0;
 
   public ArmCommand(ArmSubsystem armSubsystem, Supplier<Double> rJoystick) {
     this.armSubsystem = armSubsystem;
@@ -35,10 +35,16 @@ public class ArmCommand extends CommandBase {
   public void execute() {
     //armSubsystem.stopArmMotors();
     if(ArmSubsystem.controlIsBaseArm) {
+      //setpoint = MathUtil.clamp(setpoint+Units.degreesToRadians(rJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(100));
+      //armSubsystem.setBaseReference(setpoint);
+      //SmartDashboard.putNumber("Base setpoint", Units.radiansToDegrees(setpoint));
+      armSubsystem.setBase(rJoystick.get());
+      SmartDashboard.putNumber("Controller", rJoystick.get());
       //Move base arm
       //armSubsystem.setBaseRef(rJoystick.get());
       //armSubsystem.setBaseRef((MathUtil.clamp(rJoystick.get(),0,1)*Units.degreesToRadians(45))+Units.degreesToRadians(45));
     } else {
+      
       setpoint = MathUtil.clamp(setpoint+Units.degreesToRadians(rJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(130));
       armSubsystem.setElbowReference(setpoint);
       SmartDashboard.putNumber("Elbow setpoint", Units.radiansToDegrees(setpoint));

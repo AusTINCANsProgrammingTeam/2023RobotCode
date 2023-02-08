@@ -115,7 +115,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, elbowArmInertia, kElbowArmLength, kMinEAngle, kMaxEAngle, kElbowArmMass, false);
 
   public ArmSubsystem() {
-    controlIsBaseArm = false;
+    controlIsBaseArm = true;
     SmartDashboard.putNumber("Elbow P", kElbowP);
     SmartDashboard.putNumber("Elbow I", kElbowI);
     SmartDashboard.putNumber("Elbow D", kElbowD);
@@ -134,6 +134,13 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   public double getBaseAngle() {
     return Robot.isSimulation() ? simBaseEncoderPosition : AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder);
+  }
+
+  public void setBase(double speed){
+    baseMotor.set(speed);
+    SmartDashboard.putNumber("Applied", baseMotor.getAppliedOutput());
+    SmartDashboard.putNumber("Current", baseMotor.getOutputCurrent());
+    
   }
 
   public double getElbowAngle() {
@@ -170,6 +177,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    
     baseArmAngle.setDouble(Units.radiansToDegrees(getBaseAngle()));
     elbowArmAngle.setDouble(Units.radiansToDegrees(getElbowAngle()));
     baseArmAngleSet.setDouble(basePIDController.getSetpoint());

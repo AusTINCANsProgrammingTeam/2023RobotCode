@@ -17,8 +17,9 @@ public class AbsoluteEncoder {
         BackLeftModule(3, false, 0.353, -3.911),
         BackRightModule(4, false, -0.853, -4.686),
         //Arm Encoders (REV)
-        ArmBase(0, false, Units.degreesToRadians(-242)),
-        ArmElbow(1, false, Units.degreesToRadians(-202));
+        //-242, -202
+        ArmBase(0, false, Units.degreesToRadians(242.8)),
+        ArmElbow(1, true, Units.degreesToRadians(20.712));
         
         private int ID;
         private boolean reversed;
@@ -80,7 +81,7 @@ public class AbsoluteEncoder {
 
     public static double getPositionRadians(DutyCycleEncoder encoder){
         //Get position of a REV encoder in radians
-        double position = encoder.getAbsolutePosition() + encoder.getPositionOffset();
+        double position = encoder.getAbsolutePosition() - encoder.getPositionOffset();
         return Units.rotationsToRadians(encoder.getDistancePerRotation() < 0 ? 1 - position : position);
     }
 }

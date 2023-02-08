@@ -78,7 +78,7 @@ public class OI {
 
         private static final int kArmControlAxis = 1;
 
-        private static final ControlCurve kArmRotationCurve = new ControlCurve(0.8,0,1,0.1);
+        private static final ControlCurve kArmRotationCurve = new ControlCurve(1,0,1,0.1);
 
         public static Supplier<Double> getArmRotationSupplier(){
             //return () -> kJoystick.getRawAxis(kArmRotationAxis);
