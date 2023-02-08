@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
-import frc.robot.commands.ArmAutoCommand;
 
 
 public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
@@ -148,16 +147,43 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void setBaseReference(double setpoint) {
-    baseMotor.set(MathUtil.clamp(basePIDController.calculate(getBaseAngle(), setpoint),-1,1));
+    basePIDController.setSetpoint(setpoint);
+    
+  }
+  public void updateMotors() {
+    baseMotor.set(MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1));
+    elbowMotor.set(MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),-1,1));
   }
 
   public void setElbowReference(double setpoint) {
-    elbowMotor.set(MathUtil.clamp(elbowPIDController.calculate(getElbowAngle(), setpoint),-1,1));
+    elbowPIDController.setSetpoint(setpoint);
+  }
+
+  //Angle finding methods
+
+  public static double convertToPrelimAngle(double x, double y) {
+    return (
+      -1*Math.acos(
+        ( (x*x) + (y*y) - (kBaseArmLength*kBaseArmLength) - (kElbowArmLength*kElbowArmLength) )/(2*kBaseArmLength*kElbowArmLength)
+      )
+    );
+  }
+
+  public static double convertToBaseAngle(double x, double y) {
+    double pAngle = convertToPrelimAngle(x, y);
+    return (
+      Math.atan(y/x)-Math.atan((kElbowArmLength*Math.sin(pAngle) )/( (kBaseArmLength+(kElbowArmLength*Math.cos(pAngle))))
+      )
+    );
+  }
+
+  public static double convertToElbowAngle(double x, double y) {
+    return Units.degreesToRadians(90) + convertToPrelimAngle(x, y) + convertToPrelimAngle(x, y);
   }
 
   public void setState(ArmState state){
-    double desiredBaseAngle = 0; //TODO: add math translating x and y to angles in radians
-    double desiredElbowAngle = 0;
+    double desiredBaseAngle = convertToBaseAngle(state.x,state.y);
+    double desiredElbowAngle = convertToElbowAngle(state.x,state.y);
 
     
     setBaseReference(desiredBaseAngle);
@@ -195,8 +221,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     //Base arm angle
     double simulationXCoord = 100*Units.inchesToMeters(45.8);
     double simulationYCoord = 100*Units.inchesToMeters(26.9);
-    double baseSetpoint = ArmAutoCommand.getBaseAngle(simulationXCoord, simulationYCoord)+Units.degreesToRadians(0);
-    double elbowSetpoint = ArmAutoCommand.getElbowAngle(simulationXCoord, simulationYCoord)+Units.degreesToRadians(0);
+    double baseSetpoint = convertToBaseAngle(simulationXCoord, simulationYCoord)+Units.degreesToRadians(0);
+    double elbowSetpoint = convertToElbowAngle(simulationXCoord, simulationYCoord)+Units.degreesToRadians(0);
     double baskElbowPidOut = MathUtil.clamp(basePIDController.calculate(getBaseAngle(), baseSetpoint), -1, 1);
     double elbowPidOut = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle(), elbowSetpoint), -1, 1);
     baseArmSim.setInputVoltage(baskElbowPidOut * RobotController.getBatteryVoltage());
@@ -213,7 +239,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     simBArmAngle.setDouble(simBCurrentAngle);
     simBEncoderPos.setDouble(Units.radiansToDegrees(getBaseAngle()));
     //simBOutSet.setDouble(basePidOut);
-    simBOutSet.setDouble(Units.radiansToDegrees(ArmAutoCommand.getBaseAngle(simulationXCoord, simulationYCoord)));
+    simBOutSet.setDouble(Units.radiansToDegrees(convertToBaseAngle(simulationXCoord, simulationYCoord)));
     simBError.setDouble(Units.radiansToDegrees(basePIDController.getPositionError()));
     simBVoltage.setDouble(baseArmSim.getCurrentDrawAmps());
     
@@ -222,7 +248,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     simEArmAngle.setDouble(simECurrentAngle);
     simEEncoderPos.setDouble(getElbowAngle());
     //simEOutSet.setDouble(baskElbowPidOut);
-    simEOutSet.setDouble(ArmAutoCommand.getElbowAngle(simulationXCoord, simulationYCoord)*(180/Math.PI));
+    simEOutSet.setDouble(convertToElbowAngle(simulationXCoord, simulationYCoord)*(180/Math.PI));
     simEError.setDouble(Units.radiansToDegrees(elbowPIDController.getPositionError()));
     simEVoltage.setDouble(elbowArmSim.getCurrentDrawAmps());
   } 
