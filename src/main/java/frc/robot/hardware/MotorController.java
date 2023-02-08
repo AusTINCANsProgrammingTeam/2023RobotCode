@@ -21,7 +21,7 @@ public class MotorController {
         BackLeftModuleTurn(8, 40, IdleMode.kBrake, true),
         BackRightModuleDrive(6, 50, IdleMode.kBrake),
         BackRightModuleTurn(5, 40, IdleMode.kBrake, true),
-        //BuddyBalance Motor
+        //BuddyBalance Motors
 
         BuddyBalanceRight(13, 40, IdleMode.kBrake),
         BuddyBalanceLeft(14, 40, IdleMode.kBrake, true); // TODO: update IDs for buddy balance motors when robot is finalized
