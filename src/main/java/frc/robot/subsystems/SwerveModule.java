@@ -4,6 +4,14 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.sensors.WPI_CANCoder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -20,17 +28,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.classes.RelativeEncoderSim;
-import frc.robot.classes.TunableNumber;
 import frc.robot.hardware.AbsoluteEncoder;
-import frc.robot.hardware.MotorController;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
+import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
 
-import com.ctre.phoenix.sensors.WPI_CANCoder;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
+
 
 public class SwerveModule extends SubsystemBase {
     public static final double kWheelDiameterMeters = Units.inchesToMeters(3.5);
@@ -54,7 +57,6 @@ public class SwerveModule extends SubsystemBase {
     private final RelativeEncoderSim simDriveEncoder;
     private final RelativeEncoderSim simTurningEncoder;
 
-    private final TunableNumber tunableP;
     private final SparkMaxPIDController turningPIDController;
     private final PIDController simTurningPIDController;
     private double turningSetpoint;
@@ -106,7 +108,6 @@ public class SwerveModule extends SubsystemBase {
         turningPIDController.setP(kPTurning);
         simTurningPIDController = new PIDController(turningPIDController.getP(), turningPIDController.getI(), turningPIDController.getD());
         simTurningPIDController.enableContinuousInput(-Math.PI, Math.PI);
-        tunableP = new TunableNumber("Swerve " + ID + " P", kPTurning, turningPIDController::setP);
 
         resetEncoders();
 
@@ -173,9 +174,29 @@ public class SwerveModule extends SubsystemBase {
         desiredSpeedLog.append(desiredState.speedMetersPerSecond);
     }
 
+    public void park(boolean reversed) {
+        stop();
+        if(reversed){
+            //not using calculateSetpoint because these are less than one full rotation
+            turningPIDController.setReference(Math.PI/4, ControlType.kPosition);  
+        } else{
+            turningPIDController.setReference(-Math.PI/4, ControlType.kPosition);
+        }
+    }
+
     public void stop() {
         driveMotor.set(0);
         turningMotor.set(0);
+    }
+
+    public void coast() {
+        driveMotor.setIdleMode(IdleMode.kCoast);
+        turningMotor.setIdleMode(IdleMode.kCoast);
+    }
+
+    public void brake() {
+        driveMotor.setIdleMode(IdleMode.kBrake);
+        turningMotor.setIdleMode(IdleMode.kBrake);
     }
 
     @Override
@@ -197,8 +218,6 @@ public class SwerveModule extends SubsystemBase {
 
     @Override
     public void periodic(){
-        SmartDashboard.putNumber("Swerve[" + ID + "] absolute encoder position", getAbsoluteTurningPosition());
-        SmartDashboard.putNumber("Swerve[" + ID + "] relative encoder position", getTurningPosition());
         actualSpeedLog.append(driveEncoder.getVelocity());
         actualAbsoluteAngleLog.append(getAbsoluteTurningPosition());
         actualRelativeAngleLog.append(getTurningPosition());

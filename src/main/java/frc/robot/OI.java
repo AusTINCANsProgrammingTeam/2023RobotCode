@@ -14,17 +14,27 @@ public class OI {
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
 
         private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
-        private static final int kZeroButtonID = 2; //2 Button, Zero the gyroscope
-        private static final int kIntakeButtonID = 3; //3 Button, run intake
-        private static final int kOuttakeButtonID = 4; //4 Button, run outtake
+        private static final int kZeroButtonID = 3; //3 Button, Zero the gyroscope
+        private static final int kAlignForwardButtonID = 4; //4 Button, Align forwards
+        private static final int kAlignBackwardButtonID = 2; //2 Button, Align backwards
+        private static final int kIntakeButtonID = 7; //Right Trigger, run intake
+        private static final int kOuttakeButtonID = 6; //Right Bumper, run outtake
+
+        private static final int kParkButtonID = 5; //left bumper, park the robot
+        /*for reference "button" 5 is the left bumper
+         * "button" 6 is the right bumper
+         * "button" 7 is the left trigger
+         * and "button" 8 is the right trigger
+        */
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
+        private static final int kToggleBalanceButton = 3;
 
         //TODO: Tune curves to driver preference
-        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
-        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
+        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
+        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
         private static final ControlCurve kRotationCurve = new ControlCurve(1,0,1,0.1);
 
         public static Supplier<Double> getXTranslationSupplier(){
@@ -42,41 +52,45 @@ public class OI {
             return () -> kRotationCurve.calculate(-kJoystick.getRawAxis(kRotationAxis));
         }
 
-        public static POVButton getAlignForwardPOV(){
-            return new POVButton(kJoystick, 0);
-        }
-
-        public static POVButton getAlignBackPOV(){
-            return new POVButton(kJoystick, 180);
-        }
-
-        public static POVButton getAlignLeftPOV(){
-            return new POVButton(kJoystick, 270);
-        }
-
-        public static POVButton getAlignRightPOV(){
-            return new POVButton(kJoystick, 90);
-        }
-
         public static JoystickButton getOrientationButton(){
             return new JoystickButton(kJoystick, kOrientationButtonID);
+        }
+
+        public static JoystickButton getAlignForwardButton(){
+            return new JoystickButton(kJoystick, kAlignForwardButtonID);
+        }
+
+        public static JoystickButton getAlignBackButton(){
+            return new JoystickButton(kJoystick, kAlignBackwardButtonID);
         }
 
         public static JoystickButton getZeroButton(){
             return new JoystickButton(kJoystick, kZeroButtonID);
         }
+        
+        public static JoystickButton getBalanceButton(){
+            return new JoystickButton(kJoystick, kToggleBalanceButton);
+
+        }
+
         public static JoystickButton getIntakeButton(){
             return new JoystickButton(kJoystick, kIntakeButtonID);
         }
+
+
         public static JoystickButton getOuttakeButton(){
             return new JoystickButton(kJoystick, kOuttakeButtonID);
+        }
+        
+        public static JoystickButton getParkButton(){
+            return new JoystickButton(kJoystick, kParkButtonID);
         }
     }
 
     public static final class Operator{
 
     }
-
+    
     public static class ControlCurve{
         private double ySaturation; //Maximum output, in percentage of possible output
         private double yIntercept; //Minimum output, in percentage of saturation
