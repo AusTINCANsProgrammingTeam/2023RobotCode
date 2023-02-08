@@ -10,10 +10,12 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.classes.Auton;
 import frc.robot.commands.SwerveTeleopCommand;
+import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
+import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.commands.AssistedBalanceCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.CameraSubsystem;
@@ -34,6 +36,8 @@ public class RobotContainer {
 
   private Auton auton;
 
+  private AssistedBalanceCommand assistedBalanceCommand;
+
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/");
 
@@ -53,6 +57,8 @@ public class RobotContainer {
 
     auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
 
+    assistedBalanceCommand = Robot.swerveEnabled ? new AssistedBalanceCommand(swerveSubsystem) : null;
+
     if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
@@ -61,10 +67,10 @@ public class RobotContainer {
       OI.Driver.getRotationSupplier()));
     }
 
-      
     // Configure the button bindings    
 
     configureButtonBindings();
+
   }
 
   /**
@@ -79,13 +85,13 @@ public class RobotContainer {
       OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
       OI.Driver.getAlignForwardButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
       OI.Driver.getAlignBackButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
+      OI.Driver.getBalanceButton().toggleOnTrue(assistedBalanceCommand); //C on Keyboard
     }
     if (Robot.intakeEnabled) {
       OI.Driver.getIntakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::pull, everybotIntakeSubsystem));
       OI.Driver.getOuttakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::push, everybotIntakeSubsystem));
     }
   }
-
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
