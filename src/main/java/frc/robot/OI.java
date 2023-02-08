@@ -60,6 +60,13 @@ public class OI {
           private static final Button kIntakeButton = Button.RT; //Right Trigger, run intake
           private static final Button kOuttakeButton = Button.RB; //Right Bumper, run outtake
 
+        private static final int kParkButtonID = 5; //left bumper, park the robot
+        /*for reference "button" 5 is the left bumper
+         * "button" 6 is the right bumper
+         * "button" 7 is the left trigger
+         * and "button" 8 is the right trigger
+        */
+
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
@@ -90,11 +97,6 @@ public class OI {
             return new JoystickButton(kJoystick, kOrientationButton.getButtonID());
         }
 
-        public static JoystickButton getZeroButton(){
-            kZeroButton.setButtonFunction("Zero Button");
-            return new JoystickButton(kJoystick, kZeroButton.getButtonID());
-        }
-
         public static JoystickButton getAlignForwardButton(){
             kAlignForwardButton.setButtonFunction("Align Forward");
             return new JoystickButton(kJoystick, kAlignForwardButton.getButtonID());
@@ -105,18 +107,28 @@ public class OI {
             return new JoystickButton(kJoystick, kAlignBackwardButton.getButtonID());
         }
 
+        public static JoystickButton getZeroButton(){
+            return new JoystickButton(kJoystick, kZeroButton.getButtonID());
+        }
+        
         public static JoystickButton getBalanceButton(){
             return new JoystickButton(kJoystick, kToggleBalanceButton);
+
         }
 
         public static JoystickButton getIntakeButton(){
             kIntakeButton.setButtonFunction("Intake Button");
             return new JoystickButton(kJoystick, kIntakeButton.getButtonID());
         }
-        
+
+
         public static JoystickButton getOuttakeButton(){
             kOuttakeButton.setButtonFunction("Outtake Button");
             return new JoystickButton(kJoystick, kOuttakeButton.getButtonID());
+        }
+        
+        public static JoystickButton getParkButton(){
+            return new JoystickButton(kJoystick, kParkButtonID);
         }
     }
 
