@@ -65,6 +65,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private double kElbowD = 0;
 
   private CANSparkMax baseMotor;
+  private CANSparkMax baseMotor2;
   private CANSparkMax elbowMotor;
 
   private final DutyCycleEncoder baseAbsoluteEncoder;
@@ -118,7 +119,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("Elbow P", kElbowP);
     SmartDashboard.putNumber("Elbow I", kElbowI);
     SmartDashboard.putNumber("Elbow D", kElbowD);
-    baseMotor = MotorController.constructMotor(MotorConfig.ArmBase);
+    baseMotor = MotorController.constructMotor(MotorConfig.ArmBase1);
+    baseMotor2 = MotorController.constructMotor(MotorConfig.ArmBase2);
+    baseMotor2.follow(baseMotor);
     elbowMotor = MotorController.constructMotor(MotorConfig.ArmElbow);
     //TODO: Place real values for channels
     baseAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmBase);
