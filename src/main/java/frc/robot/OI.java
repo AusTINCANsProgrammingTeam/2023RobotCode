@@ -133,14 +133,14 @@ public class OI {
             A (2),
             B (3),
             Y (4),
-            LB (5),
-            RB (6),
-            LT (7),
-            RT (8),
+            LB (5), // Left Bumper
+            RB (6), // Right Bumper
+            LT (7), // Left Trigger
+            RT (8), // Right Trigger
             Back (9),
             Start (10),
-            LJ (11),
-            RJ (12);
+            LJ (11), // Left Joystick Button
+            RJ (12); // Right Joystick Button
             
             private final int buttonID; 
             private String buttonAction;
@@ -165,23 +165,24 @@ public class OI {
     }
 
     public static void putControllerButtons(){
-        ShuffleboardLayout DriverButtonsLayout = Shuffleboard.getTab("Controller Buttons")
+        ShuffleboardLayout driverButtonsLayout = Shuffleboard.getTab("Controller Buttons")
         .getLayout("Driver Buttons", BuiltInLayouts.kList)
         .withSize(2, 5)
         .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for Variables;
 
-        ShuffleboardLayout OperatorButtonsLayout = Shuffleboard.getTab("Controller Buttons")
+        ShuffleboardLayout operatorButtonsLayout = Shuffleboard.getTab("Controller Buttons")
         .getLayout("Operator Buttons", BuiltInLayouts.kList)
         .withSize(2, 5)
         .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for Variables;
 
-        for (Driver.Button button : Driver.Button.values())
-            DriverButtonsLayout.add(String.valueOf(button.getButtonID()), "Button " + button.toString() + ": " + button.getButtonAction());
+        for (Driver.Button button : Driver.Button.values()) {
+            driverButtonsLayout.add(String.valueOf(button.getButtonID()), "Button " + button.toString() + ": " + button.getButtonAction());
+        }
 
-        for (Operator.Button button : Operator.Button.values())
-            OperatorButtonsLayout.add(String.valueOf(button.getButtonID()+Operator.Button.values().length), "Button " + button.toString() + ": " + button.getButtonAction());
+        for (Operator.Button button : Operator.Button.values()) {
+            operatorButtonsLayout.add(String.valueOf(button.getButtonID()+Operator.Button.values().length), "Button " + button.toString() + ": " + button.getButtonAction());
+        }
     }
-    
     public static class ControlCurve{
         private double ySaturation; // Maximum output, in percentage of possible output
         private double yIntercept; // Minimum output, in percentage of saturation
