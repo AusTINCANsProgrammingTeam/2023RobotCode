@@ -23,6 +23,8 @@ public class SimulationSubsystem extends SubsystemBase {
   private double simYaw = 0;
   private double simPitch;
   private double swerveX;
+  private SimDouble pitch = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Pitch"));
+  private SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
   /** Creates a new SimulationSubsystem. */
   public SimulationSubsystem(SwerveSubsystem swerveSubsystem) {
     this.swerveSubsystem = swerveSubsystem;
@@ -53,18 +55,17 @@ public class SimulationSubsystem extends SubsystemBase {
     //Update simPitch
     swerveX = swerveSubsystem.getPose().getX();
     
-    if (swerveX >= 0 && swerveX <= FieldConstants.Community.chargingStationLength) {
+    if (swerveX >= 0 && 
+        swerveX <= FieldConstants.Community.chargingStationLength) {
       simPitch = Units.degreesToRadians((swerveX * ((FieldConstants.Community.chargingStationAngle * 2) / FieldConstants.Community.chargingStationLength)) - FieldConstants.Community.chargingStationAngle);
     }
     else {
       simPitch = 0;
     }
 
-    SimDouble pitch = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Pitch"));
     pitch.set(simPitch);
 
     //Updating Sim NavX
-    SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
     angle.set(-Units.radiansToDegrees(simYaw));
   }
 }

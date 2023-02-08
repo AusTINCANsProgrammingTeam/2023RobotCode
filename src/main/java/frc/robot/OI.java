@@ -26,8 +26,8 @@ public class OI {
         private static final int kToggleBalanceButton = 3;
 
         //TODO: Tune curves to driver preference
-        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
-        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.7,0,0.5,0.1);
+        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
+        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
         private static final ControlCurve kRotationCurve = new ControlCurve(1,0,1,0.1);
 
         public static Supplier<Double> getXTranslationSupplier(){
@@ -43,22 +43,6 @@ public class OI {
         public static Supplier<Double> getRotationSupplier(){
             //This axis is inverted
             return () -> kRotationCurve.calculate(-kJoystick.getRawAxis(kRotationAxis));
-        }
-
-        public static POVButton getAlignForwardPOV(){
-            return new POVButton(kJoystick, 0);
-        }
-
-        public static POVButton getAlignBackPOV(){
-            return new POVButton(kJoystick, 180);
-        }
-
-        public static POVButton getAlignLeftPOV(){
-            return new POVButton(kJoystick, 270);
-        }
-
-        public static POVButton getAlignRightPOV(){
-            return new POVButton(kJoystick, 90);
         }
 
         public static JoystickButton getOrientationButton(){

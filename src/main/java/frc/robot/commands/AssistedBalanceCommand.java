@@ -42,7 +42,9 @@ public class AssistedBalanceCommand extends CommandBase {
   @Override
   public void execute() {
 
-    swerve_subsystem.setModuleStates(swerve_subsystem.convertToModuleStates(0.0, pidController.calculate(swerve_subsystem.getPitch(), 0.0), 0.0));  
+    swerve_subsystem.setModuleStates(
+      swerve_subsystem.convertToModuleStates(
+        0.0, pidController.calculate(swerve_subsystem.getPitch(), 0.0), 0.0));  
   }
 
   // Called once the command ends or is interrupted.
@@ -54,6 +56,7 @@ public class AssistedBalanceCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return swerve_subsystem.getPitch() < balancingDeadzoneNumber && swerve_subsystem.getPitch() > -balancingDeadzoneNumber;
+    return swerve_subsystem.getPitch() < balancingDeadzoneNumber && 
+    swerve_subsystem.getPitch() > -balancingDeadzoneNumber;
   }
 }
