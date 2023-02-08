@@ -32,7 +32,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem;
   private final SimulationSubsystem simulationSubsystem;
-  private final EverybotIntakeSubsystem everybotIntakeSubsystem;
+  private final EverybotIntakeSubsystem intakeSubsystem;
   private final CameraSubsystem cameraSubsystem;
 
   private Auton auton;
@@ -50,8 +50,8 @@ public class RobotContainer {
     simulationSubsystem = Robot.isSimulation() && Robot.simulationEnabled && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
     subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
 
-    everybotIntakeSubsystem = Robot.intakeEnabled ? new EverybotIntakeSubsystem() : null;
-    subsystemEnabledLog.append(everybotIntakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
+    intakeSubsystem = Robot.intakeEnabled ? new EverybotIntakeSubsystem() : null;
+    subsystemEnabledLog.append(intakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
 
     cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
     subsystemEnabledLog.append(cameraSubsystem == null ? "Camera: Disabled" : "Camera: Enabled");
