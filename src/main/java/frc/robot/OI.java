@@ -30,23 +30,23 @@ public class OI {
             RJ (12); // Right Joystick Button
             
             private final int buttonID; 
-            private String buttonFunction;
+            private String buttonAction;
           
             Button(int ID) {
               this.buttonID = ID;
-              this.buttonFunction = "";
+              this.buttonAction = "";
             }
           
             private int getButtonID(){
               return this.buttonID;
             };
     
-            private String getButtonFunction(){
-                return this.buttonFunction;
+            private String getButtonAction(){
+                return this.buttonAction;
             }
     
-            private void setButtonFunction(String name){
-                this.buttonFunction = name;
+            private void setButtonAction(String name){
+                this.buttonAction = name;
             }
         };
 
@@ -86,43 +86,43 @@ public class OI {
         }
 
         public static JoystickButton getOrientationButton(){
-            kOrientationButton.setButtonFunction("Orientation");
+            kOrientationButton.setButtonAction("Orientation");
             return new JoystickButton(kJoystick, kOrientationButton.getButtonID());
         }
 
         public static JoystickButton getAlignForwardButton(){
-            kAlignForwardButton.setButtonFunction("Align Forward");
+            kAlignForwardButton.setButtonAction("Align Forward");
             return new JoystickButton(kJoystick, kAlignForwardButton.getButtonID());
         }
 
         public static JoystickButton getAlignBackButton(){
-            kAlignBackwardButton.setButtonFunction("Align Backward");
+            kAlignBackwardButton.setButtonAction("Align Backward");
             return new JoystickButton(kJoystick, kAlignBackwardButton.getButtonID());
         }
 
         public static JoystickButton getZeroButton(){
-            kZeroButton.setButtonFunction("Zeroing");
+            kZeroButton.setButtonAction("Zeroing");
             return new JoystickButton(kJoystick, kZeroButton.getButtonID());
         }
         
         public static JoystickButton getBalanceButton(){
-            kToggleBalanceButton.setButtonFunction("Balance Robot");
+            kToggleBalanceButton.setButtonAction("Balance Robot");
             return new JoystickButton(kJoystick, kToggleBalanceButton.getButtonID());
 
         }
 
         public static JoystickButton getIntakeButton(){
-            kIntakeButton.setButtonFunction("Intake");
+            kIntakeButton.setButtonAction("Intake");
             return new JoystickButton(kJoystick, kIntakeButton.getButtonID());
         }
 
         public static JoystickButton getOuttakeButton(){
-            kOuttakeButton.setButtonFunction("Outtake");
+            kOuttakeButton.setButtonAction("Outtake");
             return new JoystickButton(kJoystick, kOuttakeButton.getButtonID());
         }
         
         public static JoystickButton getParkButton(){
-            kParkButton.setButtonFunction("Parking");
+            kParkButton.setButtonAction("Parking");
             return new JoystickButton(kJoystick, kParkButton.getButtonID());
         }
     }
@@ -143,23 +143,23 @@ public class OI {
             RJ (12);
             
             private final int buttonID; 
-            private String buttonFunction;
+            private String buttonAction;
           
             Button(int ID) {
               this.buttonID = ID;
-              this.buttonFunction = "";
+              this.buttonAction = "";
             }
           
             private int getButtonID(){
               return this.buttonID;
             };
     
-            private String getButtonFunction(){
-                return this.buttonFunction;
+            private String getButtonAction(){
+                return this.buttonAction;
             }
     
-            private void setButtonFunction(String name){
-                this.buttonFunction = name;
+            private void setButtonAction(String name){
+                this.buttonAction = name;
             }
         };
     }
@@ -176,10 +176,10 @@ public class OI {
         .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for Variables;
 
         for (Driver.Button button : Driver.Button.values())
-            DriverButtonsLayout.add(String.valueOf(button.getButtonID()), "Button " + button.toString() + ": " + button.getButtonFunction());
+            DriverButtonsLayout.add(String.valueOf(button.getButtonID()), "Button " + button.toString() + ": " + button.getButtonAction());
 
         for (Operator.Button button : Operator.Button.values())
-            OperatorButtonsLayout.add(String.valueOf(button.getButtonID()+Operator.Button.values().length), "Button " + button.toString() + ": " + button.getButtonFunction());
+            OperatorButtonsLayout.add(String.valueOf(button.getButtonID()+Operator.Button.values().length), "Button " + button.toString() + ": " + button.getButtonAction());
     }
     
     public static class ControlCurve{
