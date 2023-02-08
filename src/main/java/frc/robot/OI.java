@@ -16,10 +16,10 @@ public class OI {
 
     public static final class Driver{
         private static enum Button {
-            X (1),
-            A (2),
-            B (3),
-            Y (4),
+            button1 (1),
+            button2 (2),
+            button3 (3),
+            button4 (4),
             LB (5), // Left Bumper
             RB (6), // Right Bumper
             LT (7), // Left Trigger
@@ -52,10 +52,10 @@ public class OI {
 
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
         
-          private static final Button kOrientationButton = Button.X; //1, Toggle swerve orientation
-          private static final Button kZeroButton = Button.B; //3, Zero the gyroscope
-          private static final Button kAlignForwardButton = Button.Y; //4, Align forwards
-          private static final Button kAlignBackwardButton = Button.A; //2, Align backwards
+          private static final Button kOrientationButton = Button.button1; //1, Toggle swerve orientation
+          private static final Button kZeroButton = Button.button3; //3, Zero the gyroscope
+          private static final Button kAlignForwardButton = Button.button4; //4, Align forwards
+          private static final Button kAlignBackwardButton = Button.button2; //2, Align backwards
           private static final Button kIntakeButton = Button.RT; //Right Trigger, run intake
           private static final Button kOuttakeButton = Button.RB; //Right Bumper, run outtake
           private static final Button kParkButton = Button.RB; //5, park the robot
