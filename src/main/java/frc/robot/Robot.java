@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -21,6 +22,19 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   public static final boolean isCompetition = true;
 
+  //RoboRIO serial numbers
+  public static final String competitionRobotSerial = "03161743";
+  public static final String practiceRobotSerial = "03064df0";
+  public static final boolean isCompetitionRobot = !HALUtil.getSerialNumber().equals(practiceRobotSerial);
+
+  //Subsystem toggle
+  public static final boolean batteryEnabled = true;
+  public static final boolean cameraEnabled = true;
+  public static final boolean everybotIntakeEnabled = true;
+  public static final boolean intakeEnabled = true;
+  public static final boolean simulationEnabled = true;
+  public static final boolean swerveEnabled = true;
+  
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();
   private IntegerLogEntry loopCountEntry = new IntegerLogEntry(loopCountlog, "/robot/loopCount");
