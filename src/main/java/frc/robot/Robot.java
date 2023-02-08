@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
-  public static final boolean isCompetition = true;
+  public static final boolean isCompetition = false;
   public static final boolean batteryEnabled = true;
   public static final boolean cameraEnabled = true;
   public static final boolean everybotIntakeEnabled = true;

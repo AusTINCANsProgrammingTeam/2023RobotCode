@@ -83,7 +83,9 @@ public class RobotContainer {
       OI.Driver.getOuttakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::push, everybotIntakeSubsystem));
     }
 
-    OI.putControllerButtons();
+    if (Robot.isCompetition == false) {
+      OI.putControllerButtons();
+    }
   }
 
   /**

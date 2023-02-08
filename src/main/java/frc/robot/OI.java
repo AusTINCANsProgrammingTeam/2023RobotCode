@@ -15,50 +15,49 @@ public class OI {
     private static final int kDriverJoystickPort = 0;
 
     public static final class Driver{
-        private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
-
-        public enum DriverButtons {
-            X (1, null),
-            A (2, null),
-            B (3, null),
-            Y (4, null),
-            LB (5, null),
-            RB (6, null),
-            LT (7, null),
-            RT (8, null),
-            Back (9, null),
-            Start (10, null),
-            LJ (11, null),
-            RJ (12, null);
+        private static enum Button {
+            X (1),
+            A (2),
+            B (3),
+            Y (4),
+            LB (5), // Left Bumper
+            RB (6), // Right Bumper
+            LT (7), // Left Trigger
+            RT (8), // Right Trigger
+            Back (9),
+            Start (10),
+            LJ (11), // Left Joystick Button
+            RJ (12); // Right Joystick Button
             
             private final int buttonID; 
-            private String buttonName;
+            private String buttonFunction;
           
-            DriverButtons(int ID, String N) {
+            Button(int ID) {
               this.buttonID = ID;
-              this.buttonName = N;
+              this.buttonFunction = "";
             }
           
             private int getButtonID(){
               return this.buttonID;
             };
-
-            private String getButtonName(){
-                return this.buttonName;
+    
+            private String getButtonFunction(){
+                return this.buttonFunction;
             }
-
-            private void setButtonName(String name){
-                this.buttonName = name;
+    
+            private void setButtonFunction(String name){
+                this.buttonFunction = name;
             }
-          };
-      
+        };
 
-          private static final DriverButtons kOrientationButton = DriverButtons.X; //1 Button, Toggle swerve orientation
-          private static final DriverButtons kZeroButton = DriverButtons.B; //3 Button, Zero the gyroscope
-          private static final DriverButtons kAlignForwardButton = DriverButtons.Y; //4 Button, Align forwards
-          private static final DriverButtons kAlignBackwardButton = DriverButtons.A; //2 Button, Align backwards
-          private static final DriverButtons kIntakeButton = DriverButtons.RT; //Right Trigger, run intake
-          private static final DriverButtons kOuttakeButton = DriverButtons.RB; //Right Bumper, run outtake
+        private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
+        
+          private static final Button kOrientationButton = Button.X; //1, Toggle swerve orientation
+          private static final Button kZeroButton = Button.B; //3, Zero the gyroscope
+          private static final Button kAlignForwardButton = Button.Y; //4, Align forwards
+          private static final Button kAlignBackwardButton = Button.A; //2, Align backwards
+          private static final Button kIntakeButton = Button.RT; //Right Trigger, run intake
+          private static final Button kOuttakeButton = Button.RB; //Right Bumper, run outtake
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -85,89 +84,89 @@ public class OI {
         }
 
         public static JoystickButton getOrientationButton(){
-            kOrientationButton.setButtonName("Orientation Button");
+            kOrientationButton.setButtonFunction("Orientation Button");
             return new JoystickButton(kJoystick, kOrientationButton.getButtonID());
         }
 
         public static JoystickButton getZeroButton(){
-            kZeroButton.setButtonName("Zero Button");
+            kZeroButton.setButtonFunction("Zero Button");
             return new JoystickButton(kJoystick, kZeroButton.getButtonID());
         }
 
         public static JoystickButton getAlignForwardButton(){
-            kAlignForwardButton.setButtonName("Align Forward");
+            kAlignForwardButton.setButtonFunction("Align Forward");
             return new JoystickButton(kJoystick, kAlignForwardButton.getButtonID());
         }
 
         public static JoystickButton getAlignBackButton(){
-            kAlignBackwardButton.setButtonName("Align Backward");
+            kAlignBackwardButton.setButtonFunction("Align Backward");
             return new JoystickButton(kJoystick, kAlignBackwardButton.getButtonID());
         }
 
         public static JoystickButton getIntakeButton(){
-            kIntakeButton.setButtonName("Intake Button");
+            kIntakeButton.setButtonFunction("Intake Button");
             return new JoystickButton(kJoystick, kIntakeButton.getButtonID());
         }
         
         public static JoystickButton getOuttakeButton(){
-            kOuttakeButton.setButtonName("Outtake Button");
+            kOuttakeButton.setButtonFunction("Outtake Button");
             return new JoystickButton(kJoystick, kOuttakeButton.getButtonID());
         }
     }
 
     public static final class Operator{
-        public enum OperatorButtons {
-            X (1, null),
-            A (2, null),
-            B (3, null),
-            Y (4, null),
-            LB (5, null),
-            RB (6, null),
-            LT (7, null),
-            RT (8, null),
-            Back (9, null),
-            Start (10, null),
-            LJ (11, null),
-            RJ (12, null);
+        private static enum Button {
+            X (1),
+            A (2),
+            B (3),
+            Y (4),
+            LB (5),
+            RB (6),
+            LT (7),
+            RT (8),
+            Back (9),
+            Start (10),
+            LJ (11),
+            RJ (12);
             
             private final int buttonID; 
-            private String buttonName;
+            private String buttonFunction;
           
-            OperatorButtons(int ID, String N) {
+            Button(int ID) {
               this.buttonID = ID;
-              this.buttonName = N;
+              this.buttonFunction = "";
             }
           
             private int getButtonID(){
               return this.buttonID;
             };
-
-            private String getButtonName(){
-                return this.buttonName;
+    
+            private String getButtonFunction(){
+                return this.buttonFunction;
             }
-
-            private void setButtonName(String name){
-                this.buttonName = name;
+    
+            private void setButtonFunction(String name){
+                this.buttonFunction = name;
             }
         };
     }
 
     public static void putControllerButtons(){
-        ShuffleboardLayout sbDriverButtons = Shuffleboard.getTab("Controller Buttons")
+        ShuffleboardLayout DriverButtonsLayout = Shuffleboard.getTab("Controller Buttons")
         .getLayout("Driver Buttons", BuiltInLayouts.kList)
         .withSize(2, 5)
         .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for Variables;
 
-        ShuffleboardLayout sbOperatorButtons = Shuffleboard.getTab("Controller Buttons")
+        ShuffleboardLayout OperatorButtonsLayout = Shuffleboard.getTab("Controller Buttons")
         .getLayout("Operator Buttons", BuiltInLayouts.kList)
         .withSize(2, 5)
         .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for Variables;
 
-        for (Driver.DriverButtons button : Driver.DriverButtons.values()) 
-        sbDriverButtons.add(String.valueOf(button.getButtonID()), "Button " + button.toString() + ": " + button.getButtonName());
+        for (Driver.Button button : Driver.Button.values())
+            DriverButtonsLayout.add(String.valueOf(button.getButtonID()), "Button " + button.toString() + ": " + button.getButtonFunction());
 
-        for (Operator.OperatorButtons button : Operator.OperatorButtons.values()) 
-        sbOperatorButtons.add(String.valueOf(button.getButtonID()+12), "Button " + button.toString() + ": " + button.getButtonName());
+        for (Operator.Button button : Operator.Button.values())
+            OperatorButtonsLayout.add(String.valueOf(button.getButtonID()+Operator.Button.values().length), "Button " + button.toString() + ": " + button.getButtonFunction());
     }
 
     public static class ControlCurve{
