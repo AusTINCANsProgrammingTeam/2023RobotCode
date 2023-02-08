@@ -20,6 +20,13 @@ public class OI {
         private static final int kIntakeButtonID = 7; //Right Trigger, run intake
         private static final int kOuttakeButtonID = 6; //Right Bumper, run outtake
 
+        private static final int kParkButtonID = 5; //left bumper, park the robot
+        /*for reference "button" 5 is the left bumper
+         * "button" 6 is the right bumper
+         * "button" 7 is the left trigger
+         * and "button" 8 is the right trigger
+        */
+
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
@@ -49,10 +56,6 @@ public class OI {
             return new JoystickButton(kJoystick, kOrientationButtonID);
         }
 
-        public static JoystickButton getZeroButton(){
-            return new JoystickButton(kJoystick, kZeroButtonID);
-        }
-
         public static JoystickButton getAlignForwardButton(){
             return new JoystickButton(kJoystick, kAlignForwardButtonID);
         }
@@ -61,16 +64,26 @@ public class OI {
             return new JoystickButton(kJoystick, kAlignBackwardButtonID);
         }
 
+        public static JoystickButton getZeroButton(){
+            return new JoystickButton(kJoystick, kZeroButtonID);
+        }
+        
         public static JoystickButton getBalanceButton(){
             return new JoystickButton(kJoystick, kToggleBalanceButton);
+
         }
 
         public static JoystickButton getIntakeButton(){
             return new JoystickButton(kJoystick, kIntakeButtonID);
         }
-        
+
+
         public static JoystickButton getOuttakeButton(){
             return new JoystickButton(kJoystick, kOuttakeButtonID);
+        }
+        
+        public static JoystickButton getParkButton(){
+            return new JoystickButton(kJoystick, kParkButtonID);
         }
     }
 
