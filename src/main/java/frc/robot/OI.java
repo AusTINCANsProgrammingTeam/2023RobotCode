@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 public class OI {
     //Operator Interface (OI) class containing all control information
@@ -59,18 +58,12 @@ public class OI {
           private static final Button kAlignBackwardButton = Button.A; //2, Align backwards
           private static final Button kIntakeButton = Button.RT; //Right Trigger, run intake
           private static final Button kOuttakeButton = Button.RB; //Right Bumper, run outtake
-
-        private static final int kParkButtonID = 5; //left bumper, park the robot
-        /*for reference "button" 5 is the left bumper
-         * "button" 6 is the right bumper
-         * "button" 7 is the left trigger
-         * and "button" 8 is the right trigger
-        */
+          private static final Button kParkButton = Button.RB; //5, park the robot
+          private static final Button kToggleBalanceButton = Button.LB; //6, balance the robot
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
-        private static final int kToggleBalanceButton = 3;
 
         //TODO: Tune curves to driver preference
         private static final ControlCurve kXTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
@@ -93,7 +86,7 @@ public class OI {
         }
 
         public static JoystickButton getOrientationButton(){
-            kOrientationButton.setButtonFunction("Orientation Button");
+            kOrientationButton.setButtonFunction("Orientation");
             return new JoystickButton(kJoystick, kOrientationButton.getButtonID());
         }
 
@@ -108,27 +101,29 @@ public class OI {
         }
 
         public static JoystickButton getZeroButton(){
+            kZeroButton.setButtonFunction("Zeroing");
             return new JoystickButton(kJoystick, kZeroButton.getButtonID());
         }
         
         public static JoystickButton getBalanceButton(){
-            return new JoystickButton(kJoystick, kToggleBalanceButton);
+            kToggleBalanceButton.setButtonFunction("Balance Robot");
+            return new JoystickButton(kJoystick, kToggleBalanceButton.getButtonID());
 
         }
 
         public static JoystickButton getIntakeButton(){
-            kIntakeButton.setButtonFunction("Intake Button");
+            kIntakeButton.setButtonFunction("Intake");
             return new JoystickButton(kJoystick, kIntakeButton.getButtonID());
         }
 
-
         public static JoystickButton getOuttakeButton(){
-            kOuttakeButton.setButtonFunction("Outtake Button");
+            kOuttakeButton.setButtonFunction("Outtake");
             return new JoystickButton(kJoystick, kOuttakeButton.getButtonID());
         }
         
         public static JoystickButton getParkButton(){
-            return new JoystickButton(kJoystick, kParkButtonID);
+            kParkButton.setButtonFunction("Parking");
+            return new JoystickButton(kJoystick, kParkButton.getButtonID());
         }
     }
 
