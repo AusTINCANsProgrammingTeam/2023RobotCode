@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 public class OI {
     //Operator Interface (OI) class containing all control information
@@ -62,6 +63,7 @@ public class OI {
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
+        private static final int kToggleBalanceButton = 3;
 
         //TODO: Tune curves to driver preference
         private static final ControlCurve kXTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
@@ -101,6 +103,10 @@ public class OI {
         public static JoystickButton getAlignBackButton(){
             kAlignBackwardButton.setButtonFunction("Align Backward");
             return new JoystickButton(kJoystick, kAlignBackwardButton.getButtonID());
+        }
+
+        public static JoystickButton getBalanceButton(){
+            return new JoystickButton(kJoystick, kToggleBalanceButton);
         }
 
         public static JoystickButton getIntakeButton(){
@@ -168,7 +174,7 @@ public class OI {
         for (Operator.Button button : Operator.Button.values())
             OperatorButtonsLayout.add(String.valueOf(button.getButtonID()+Operator.Button.values().length), "Button " + button.toString() + ": " + button.getButtonFunction());
     }
-
+    
     public static class ControlCurve{
         private double ySaturation; // Maximum output, in percentage of possible output
         private double yIntercept; // Minimum output, in percentage of saturation
