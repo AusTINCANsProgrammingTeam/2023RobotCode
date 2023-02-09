@@ -15,7 +15,7 @@ public class LedDriver {
     }
 
     public static enum BlinkinLedMode {
-        SOLID_YELLOW(0.69), SOLID_VIOLET(0.91), OFF(0);
+        SOLID_YELLOW(0.69), SOLID_VIOLET(0.91), OFF(0.99);
 
     private final double value;
 

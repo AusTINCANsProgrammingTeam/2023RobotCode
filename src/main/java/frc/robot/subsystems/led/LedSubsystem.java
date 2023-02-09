@@ -75,6 +75,5 @@ public class LedSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    setMode(ledMode);
   }
 }

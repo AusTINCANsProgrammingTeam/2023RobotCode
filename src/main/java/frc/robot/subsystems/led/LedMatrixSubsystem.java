@@ -55,6 +55,5 @@ private final AddressableLED leds = new AddressableLED(2);
     }
     @Override
     public void periodic() {
-        setRainbowLed();
     }
-}
+}  
