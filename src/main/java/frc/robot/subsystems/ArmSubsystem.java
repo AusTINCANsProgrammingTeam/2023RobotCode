@@ -124,7 +124,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     baseMotor2 = MotorController.constructMotor(MotorConfig.ArmBase2);
     baseMotor2.follow(baseMotor);
     elbowMotor = MotorController.constructMotor(MotorConfig.ArmElbow);
-    //TODO: Place real values for channels
     baseAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmBase);
     elbowAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);
     basePIDController = new PIDController(kBaseP, kBaseI, kBaseD);
