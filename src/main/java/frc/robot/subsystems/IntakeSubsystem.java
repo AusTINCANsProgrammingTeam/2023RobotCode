@@ -35,7 +35,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   
   private void spinWheels(double velocity) {
     motor.set(velocity);
-
+    intakeEntry.setDouble(velocity);
+    
   }
 
   public void push() {
@@ -50,6 +51,9 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     return motor.get();
   }
 
+  public void stop() {
+    spinWheels(0);
+  }
 
   @Override
   public void close() throws Exception {
@@ -62,7 +66,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    intakeEntry.setDouble(getSpeed());
     // This method will be called once per scheduler run
   }
 
