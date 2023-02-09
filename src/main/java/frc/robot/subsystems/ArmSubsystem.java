@@ -107,7 +107,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   //Real arm values
   public ShuffleboardTab armTab = Shuffleboard.getTab("Arm (Real)");
   private GenericEntry baseArmAngle = armTab.add("Base Arm Angle", 0.0).getEntry();
-  private GenericEntry baseArmAngleSet = armTab.add("Base Arm Angle Setpoint", 0.0).getEntry();
+  private GenericEntry baseArmAngleSetpoint = armTab.add("Base Angle Setpoint", 0.0).getEntry();
+  private GenericEntry elbowArmAngleSetpoint = armTab.add("Elbow Angle Setpoint", 0.0).getEntry();
   private GenericEntry elbowArmAngle = armTab.add("Elbow Arm Angle", 0.0).getEntry();
   private GenericEntry elbowOutput = armTab.add("Elbow Output", 0.0).getEntry();
 
@@ -206,10 +207,13 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    
+    updateMotors();
+
+
     baseArmAngle.setDouble(Units.radiansToDegrees(getBaseAngle()));
     elbowArmAngle.setDouble(Units.radiansToDegrees(getElbowAngle()));
-    baseArmAngleSet.setDouble(basePIDController.getSetpoint());
+    baseArmAngleSetpoint.setDouble(Units.radiansToDegrees(basePIDController.getSetpoint()));
+    elbowArmAngleSetpoint.setDouble(Units.radiansToDegrees(elbowPIDController.getSetpoint()));
     elbowOutput.setDouble(elbowMotor.getAppliedOutput());
     kElbowP = SmartDashboard.getNumber("Elbow P", kElbowP);
     elbowPIDController.setP(kElbowP);

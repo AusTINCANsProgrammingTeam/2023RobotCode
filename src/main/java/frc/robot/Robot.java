@@ -34,6 +34,7 @@ public class Robot extends TimedRobot {
   public static final boolean intakeEnabled = true;
   public static final boolean simulationEnabled = true;
   public static final boolean swerveEnabled = true;
+  public static final boolean armEnabled = true;
   
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();

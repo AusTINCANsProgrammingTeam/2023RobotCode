@@ -19,8 +19,6 @@ public class OI {
         private static final int kAlignBackwardButtonID = 2; //2 Button, Align backwards
         private static final int kIntakeButtonID = 7; //Right Trigger, run intake
         private static final int kOuttakeButtonID = 6; //Right Bumper, run outtake
-        private static final int kArmButtonID = 5; //5 Button, toggle which arm is being controlled
-
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
@@ -68,21 +66,30 @@ public class OI {
             return new JoystickButton(kJoystick, kOuttakeButtonID);
         }
 
-        public static JoystickButton getArmButton(){
-            return new JoystickButton(kJoystick, kArmButtonID);
-        }
+
     }
 
     public static final class Operator{
         public static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
 
-        private static final int kArmControlAxis = 1;
+        private static final int kBaseArmAxis = 1;
+        private static final int kElbowArmAxis = 2;
+        private static final int kHighArmButtonID = 1;
+        private static final int kMidArmButtonID = 2;
 
         private static final ControlCurve kArmRotationCurve = new ControlCurve(1,0,1,0.1);
 
-        public static Supplier<Double> getArmRotationSupplier(){
-            //return () -> kJoystick.getRawAxis(kArmRotationAxis);
-            return () -> kArmRotationCurve.calculate(kJoystick.getRawAxis(kArmControlAxis));
+        public static Supplier<Double> getBaseSupplier(){
+            return () -> kArmRotationCurve.calculate(kJoystick.getRawAxis(kBaseArmAxis));
+        }
+        public static Supplier<Double> getElbowSupplier(){
+            return () -> kArmRotationCurve.calculate(kJoystick.getRawAxis(kElbowArmAxis));
+        }
+        public static JoystickButton getHighArmButton(){
+            return new JoystickButton(kJoystick, kHighArmButtonID);
+        }
+        public static JoystickButton getMidArmButton(){
+            return new JoystickButton(kJoystick, kMidArmButtonID);
         }
 
     }

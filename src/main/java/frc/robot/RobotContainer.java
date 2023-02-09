@@ -14,8 +14,10 @@ import frc.robot.commands.ArmCommand;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.ArmSubsystem.ArmState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.EverybotIntakeSubsystem;
@@ -36,7 +38,7 @@ public class RobotContainer {
   private Auton auton;
 
   private final ArmSubsystem armSubsystem = new ArmSubsystem();
-  private final ArmCommand armCommand = new ArmCommand(armSubsystem, OI.Operator.getArmRotationSupplier());
+  private final ArmCommand armCommand = new ArmCommand(armSubsystem, OI.Operator.getBaseSupplier(), OI.Operator.getElbowSupplier());
 
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/");
@@ -88,7 +90,11 @@ public class RobotContainer {
       OI.Driver.getIntakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::pull, everybotIntakeSubsystem));
       OI.Driver.getOuttakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::push, everybotIntakeSubsystem));
     }
-    OI.Driver.getArmButton().onTrue(new InstantCommand(armSubsystem::toggleArmControl));
+    if (Robot.armEnabled) {
+      OI.Operator.getHighArmButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.setState(ArmState.HIGHSCORE), () -> armSubsystem.setState(ArmState.STOWED), armSubsystem));
+      OI.Operator.getMidArmButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.setState(ArmState.MIDSCORE), () -> armSubsystem.setState(ArmState.STOWED), armSubsystem));
+    }
+    
   }
 
   /**
