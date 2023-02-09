@@ -21,18 +21,18 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
 public class BuddyBalanceSubsystem extends SubsystemBase {
-  public static double kBalancedPosition; // Buddy balance PID reference point when lifting a robot and engaging charge station
-  public static double kDeployedPosition; // Buddy balance PID reference point when setting down a robot/initial position when deployed
+  private static double kBalancedPosition; // Buddy balance PID reference point when lifting a robot and engaging charge station
+  private static double kDeployedPosition; // Buddy balance PID reference point when setting down a robot/initial position when deployed
   // TODO: Make the reference point constants and default motor PID values final when they are done being tuned with TunableNumbers
-  public static final double kDefaultMotorP = 1e-6;
-  public static final double kDefaultMotorI = 0;
-  public static final double kDefaultMotorD = 1e-6;
-  public static final int deployServoID = 15;
-  public static final int servoDeployedPos = 1;
+  private static final double kDefaultMotorP = 1e-6;
+  private static final double kDefaultMotorI = 0;
+  private static final double kDefaultMotorD = 1e-6;
+  private static final int deployServoID = 1;
+  private static double kServoDeployedPos = 1;
 
-  private TunableNumber refPointDockedTuner;
   private TunableNumber refPointBalancedTuner;
   private TunableNumber refPointDeployedTuner;
+  private TunableNumber refPointServoTuner;
   private TunableNumber tunerNumRightP;
   private TunableNumber tunerNumRightI;
   private TunableNumber tunerNumRightD;
@@ -77,6 +77,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
 
     refPointBalancedTuner = new TunableNumber("Ref Point Balanced", 15, (a) -> {kBalancedPosition = a;});
     refPointDeployedTuner = new TunableNumber("Ref Point Deployed", 0, (a) -> {kDeployedPosition = a;});
+    refPointServoTuner = new TunableNumber("Ref Point Servo", 1, (a) -> {kServoDeployedPos = a;});
 
     positionEntry = buddyBalanceTab.add("Buddy Balance Position", 0).getEntry();
   }
@@ -86,7 +87,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void deployBuddyBalance() {
-    activateDeploy.set(servoDeployedPos);
+    activateDeploy.set(kServoDeployedPos);
     isDeployed = true;
   }
 
