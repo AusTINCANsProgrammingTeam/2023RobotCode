@@ -45,7 +45,7 @@ public class RobotContainer {
     swerveSubsystem = Robot.swerveEnabled ? new SwerveSubsystem() : null;
     subsystemEnabledLog.append(swerveSubsystem == null ? "Swerve: Disabled" : "Swerve: Enabled");
 
-    simulationSubsystem = Robot.isSimulation() && Robot.simulationEnabled && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
+    simulationSubsystem = Robot.isSimulation() && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
     subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
 
     everybotIntakeSubsystem = Robot.intakeEnabled ? new EverybotIntakeSubsystem() : null;
