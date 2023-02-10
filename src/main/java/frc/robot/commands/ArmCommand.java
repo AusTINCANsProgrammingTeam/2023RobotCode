@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.robot.Robot;
 import frc.robot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,12 +38,14 @@ public class ArmCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    baseSetpoint = MathUtil.clamp(baseSetpoint+Units.degreesToRadians(baseArmJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(100));
-    armSubsystem.setBaseReference(baseSetpoint);
-    //SmartDashboard.putNumber("Base setpoint", Units.radiansToDegrees(setpoint));
-    elbowSetpoint = MathUtil.clamp(elbowSetpoint+Units.degreesToRadians(elbowArmJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(130));
-    armSubsystem.setElbowReference(elbowSetpoint);
-    //SmartDashboard.putNumber("Elbow setpoint", Units.radiansToDegrees(setpoint));
+    if(!Robot.isSimulation()) {
+      baseSetpoint = MathUtil.clamp(baseSetpoint+Units.degreesToRadians(baseArmJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(100));
+      armSubsystem.setBaseReference(baseSetpoint);
+      //SmartDashboard.putNumber("Base setpoint", Units.radiansToDegrees(setpoint));
+      elbowSetpoint = MathUtil.clamp(elbowSetpoint+Units.degreesToRadians(elbowArmJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(130));
+      armSubsystem.setElbowReference(elbowSetpoint);
+      //SmartDashboard.putNumber("Elbow setpoint", Units.radiansToDegrees(setpoint));
+    }
   }
 
   // Called once the command ends or is interrupted.
