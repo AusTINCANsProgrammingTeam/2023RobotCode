@@ -1,21 +1,65 @@
 package frc.robot;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class OI {
     //Operator Interface (OI) class containing all control information
+
     private static final int kDriverJoystickPort = 0;
 
     public static final class Driver{
-        private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
+        private static enum Button {
+            button1 (1),
+            button2 (2),
+            button3 (3),
+            button4 (4),
+            LB (5), // Left Bumper
+            RB (6), // Right Bumper
+            LT (7), // Left Trigger
+            RT (8), // Right Trigger
+            Back (9),
+            Start (10),
+            LJ (11), // Left Joystick Button
+            RJ (12); // Right Joystick Button
+            
+            private final int buttonID; 
+            private String buttonAction;
+          
+            Button(int ID) {
+              this.buttonID = ID;
+              this.buttonAction = "";
+            }
+          
+            private int getButtonID(){
+              return this.buttonID;
+            };
+    
+            private String getButtonAction(){
+                return this.buttonAction;
+            }
+    
+            private void setButtonAction(String name){
+                this.buttonAction = name;
+            }
+        };
 
-        private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
-        private static final int kZeroButtonID = 3; //3 Button, Zero the gyroscope
-        private static final int kAlignForwardButtonID = 4; //4 Button, Align forwards
-        private static final int kAlignBackwardButtonID = 2; //2 Button, Align backwards
+        private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
+        
+          private static final Button kOrientationButton = Button.button1; //1, Toggle swerve orientation
+          private static final Button kZeroButton = Button.button3; //3, Zero the gyroscope
+          private static final Button kAlignForwardButton = Button.button4; //4, Align forwards
+          private static final Button kAlignBackwardButton = Button.button2; //2, Align backwards
+          private static final Button kIntakeButton = Button.RT; //Right Trigger, run intake
+          private static final Button kOuttakeButton = Button.RB; //Right Bumper, run outtake
+          private static final Button kParkButton = Button.RB; //5, park the robot
+          private static final Button kToggleBalanceButton = Button.LB; //6, balance the robot
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -42,31 +86,108 @@ public class OI {
         }
 
         public static JoystickButton getOrientationButton(){
-            return new JoystickButton(kJoystick, kOrientationButtonID);
-        }
-
-        public static JoystickButton getZeroButton(){
-            return new JoystickButton(kJoystick, kZeroButtonID);
+            kOrientationButton.setButtonAction("Orientation");
+            return new JoystickButton(kJoystick, kOrientationButton.getButtonID());
         }
 
         public static JoystickButton getAlignForwardButton(){
-            return new JoystickButton(kJoystick, kAlignForwardButtonID);
+            kAlignForwardButton.setButtonAction("Align Forward");
+            return new JoystickButton(kJoystick, kAlignForwardButton.getButtonID());
         }
 
         public static JoystickButton getAlignBackButton(){
-            return new JoystickButton(kJoystick, kAlignBackwardButtonID);
+            kAlignBackwardButton.setButtonAction("Align Backward");
+            return new JoystickButton(kJoystick, kAlignBackwardButton.getButtonID());
+        }
+
+        public static JoystickButton getZeroButton(){
+            kZeroButton.setButtonAction("Zeroing");
+            return new JoystickButton(kJoystick, kZeroButton.getButtonID());
+        }
+        
+        public static JoystickButton getBalanceButton(){
+            kToggleBalanceButton.setButtonAction("Balance Robot");
+            return new JoystickButton(kJoystick, kToggleBalanceButton.getButtonID());
+
+        }
+
+        public static JoystickButton getIntakeButton(){
+            kIntakeButton.setButtonAction("Intake");
+            return new JoystickButton(kJoystick, kIntakeButton.getButtonID());
+        }
+
+        public static JoystickButton getOuttakeButton(){
+            kOuttakeButton.setButtonAction("Outtake");
+            return new JoystickButton(kJoystick, kOuttakeButton.getButtonID());
+        }
+        
+        public static JoystickButton getParkButton(){
+            kParkButton.setButtonAction("Parking");
+            return new JoystickButton(kJoystick, kParkButton.getButtonID());
         }
     }
 
     public static final class Operator{
-
+        private static enum Button {
+            X (1),
+            A (2),
+            B (3),
+            Y (4),
+            LB (5), // Left Bumper
+            RB (6), // Right Bumper
+            LT (7), // Left Trigger
+            RT (8), // Right Trigger
+            Back (9),
+            Start (10),
+            LJ (11), // Left Joystick Button
+            RJ (12); // Right Joystick Button
+            
+            private final int buttonID; 
+            private String buttonAction;
+          
+            Button(int ID) {
+              this.buttonID = ID;
+              this.buttonAction = "";
+            }
+          
+            private int getButtonID(){
+              return this.buttonID;
+            };
+    
+            private String getButtonAction(){
+                return this.buttonAction;
+            }
+    
+            private void setButtonAction(String name){
+                this.buttonAction = name;
+            }
+        };
     }
 
+    public static void putControllerButtons(){
+        ShuffleboardLayout driverButtonsLayout = Shuffleboard.getTab("Controller Buttons")
+        .getLayout("Driver Buttons", BuiltInLayouts.kList)
+        .withSize(2, 5)
+        .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for Variables;
+
+        ShuffleboardLayout operatorButtonsLayout = Shuffleboard.getTab("Controller Buttons")
+        .getLayout("Operator Buttons", BuiltInLayouts.kList)
+        .withSize(2, 5)
+        .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for Variables;
+
+        for (Driver.Button button : Driver.Button.values()) {
+            driverButtonsLayout.add(String.valueOf(button.getButtonID()), "Button " + button.toString() + ": " + button.getButtonAction());
+        }
+
+        for (Operator.Button button : Operator.Button.values()) {
+            operatorButtonsLayout.add(String.valueOf(button.getButtonID()+Operator.Button.values().length), "Button " + button.toString() + ": " + button.getButtonAction());
+        }
+    }
     public static class ControlCurve{
-        private double ySaturation; //Maximum output, in percentage of possible output
-        private double yIntercept; //Minimum output, in percentage of saturation
-        private double curvature; //Curvature shift between linear and cubic
-        private double deadzone; //Range of input that will always return zero output
+        private double ySaturation; // Maximum output, in percentage of possible output
+        private double yIntercept; // Minimum output, in percentage of saturation
+        private double curvature; // Curvature shift between linear and cubic
+        private double deadzone; // Range of input that will always return zero output
 
         public ControlCurve(double ySaturation, double yIntercept, double curvature, double deadzone){
             this.ySaturation = ySaturation;
