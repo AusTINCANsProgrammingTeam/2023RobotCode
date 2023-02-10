@@ -18,30 +18,34 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
   // TODO Led parameters and RIO ports
 public class LedSubsystem extends SubsystemBase {
   private final AddressableLEDBuffer buffer;
-  private final AddressableLED leds = new AddressableLED(1);
+  private final AddressableLED leds = new AddressableLED(2);
   private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
   private GenericEntry ledState = ledTab.add("OnOff", false).getEntry();
   private SimpleWidget ledGamePiece = ledTab.add("Color", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow"));
-  private static final int length = 1; //Amount of Leds in strip light. Or one if we are using a single light
+  private static final int length = 256; //Amount of Leds in strip light. Or one if we are using a single light
   private static enum LedMode {
-    CONE, CUBE;
+    CONE, CUBE, OFF;
   }
   private LedMode ledMode = LedMode.CONE;
   /** Configure AddressableLED */
   public LedSubsystem() {
     buffer = new AddressableLEDBuffer(length);
-    leds.setBitTiming(1, 1, 1, 1);
+    //leds.setBitTiming(1, 1, 1, 1);
     leds.setLength(length);
     leds.setData(buffer);
-  }
+    leds.start();
+    }
   /** Sends to AddressableLED */
   public void setMode(LedMode mode){
       switch (mode) {
           case CUBE: 
-            solid(Color.kPurple);
+            solid(Color.kViolet);
           break;
           case CONE:
             solid(Color.kYellow);
+          break;
+          case OFF:
+            solid(Color.kBlack);
           break;
       }
       leds.setData(buffer);
@@ -54,13 +58,17 @@ public class LedSubsystem extends SubsystemBase {
     }
   }
 
-  public void stopLed(){
-    leds.stop();
+  public void offLed(){
+    ledMode = LedMode.OFF;
+    setMode(ledMode);
     ledState.setBoolean(false);
+    leds.setData(buffer);
   }
-  public void startLed(){
-    leds.start();
+  public void onLed(){
+    ledMode = LedMode.CONE;
+    setMode(ledMode);
     ledState.setBoolean(true);
+    leds.setData(buffer);
   }
 
   public void changeGamePiece(){
@@ -71,6 +79,8 @@ public class LedSubsystem extends SubsystemBase {
       ledMode = LedMode.CONE;
       ledGamePiece.getEntry().setBoolean(true);
     }
+    setMode(ledMode);
+    leds.setData(buffer);
   }
 
   @Override

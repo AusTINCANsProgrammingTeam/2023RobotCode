@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.hardware.LedDriver.BlinkinLedMode;
 import frc.robot.subsystems.AutonSubsytem;
@@ -14,6 +15,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BatterySubsystem;
 import frc.robot.subsystems.led.BlinkinLedSubsystem;
 import frc.robot.subsystems.led.LedMatrixSubsystem;
+import frc.robot.subsystems.led.LedSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -31,7 +33,7 @@ public class RobotContainer {
   private SimulationSubsystem simulationSubsystem;
 
   private static BatterySubsystem batterySubsystem;
-  private BlinkinLedSubsystem blinkinLedSubsystem = new BlinkinLedSubsystem();
+  private LedSubsystem ledSubsystem = new LedSubsystem();
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     if(Robot.isSimulation()){
@@ -60,8 +62,8 @@ public class RobotContainer {
   private void configureButtonBindings() {
     OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
     OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
-    OI.Operator.getLedSwitchButton().onTrue(new InstantCommand(blinkinLedSubsystem::blinkinChangeGamePiece));
-    OI.Operator.getLedToggleButton().toggleOnTrue(new StartEndCommand(blinkinLedSubsystem::blinkinStartLed, blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
+    OI.Operator.getLedSwitchButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
+    OI.Operator.getLedToggleButton().toggleOnTrue(new StartEndCommand(ledSubsystem::onLed, ledSubsystem::offLed, ledSubsystem));
   }
 
   /**
