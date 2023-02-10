@@ -21,10 +21,11 @@ import frc.robot.classes.FieldConstants;
 public class SimulationSubsystem extends SubsystemBase {
 
   private final Field2d m_field;
+  private final Field2d swerveModuleField;
 
   private final SwerveSubsystem swerveSubsystem;
 
-  private Translation2d swerveWheelOffset = new Translation2d(5,5);
+  private Translation2d swerveWheelOffset = new Translation2d(8,4);
   private Translation2d[] swerveWheelPos = new Translation2d[4];
   private FieldObject2d[] swerveWheelSim = new FieldObject2d[4];
 
@@ -39,15 +40,17 @@ public class SimulationSubsystem extends SubsystemBase {
     this.swerveSubsystem = swerveSubsystem;
 
     m_field = new Field2d(); 
+    swerveModuleField = new Field2d();
 
     for (int i = 0; i < swerveWheelSim.length; i++) {
-      swerveWheelSim[i] = m_field.getObject("SwerveWheel_" + i);
-      swerveWheelPos[i] = new Translation2d(Math.pow(-1,i/2) *SwerveSubsystem.kWheelBase/2, Math.pow(-1,i)*SwerveSubsystem.kTrackWidth/2).times(3);
+      swerveWheelSim[i] = swerveModuleField.getObject("SwerveWheel_" + i);
+      swerveWheelPos[i] = new Translation2d(Math.pow(-1,i/2) *SwerveSubsystem.kWheelBase/2, Math.pow(-1,i)*SwerveSubsystem.kTrackWidth/2).times(7);
       swerveWheelSim[i].setPose(new Pose2d(swerveWheelPos[i].plus(swerveWheelOffset), new Rotation2d()));
     }
 
     //This puts the field into SmartDashboard
     SmartDashboard.putData("Field", m_field); 
+    SmartDashboard.putData("SwerveModules", swerveModuleField); 
   }
 
   @Override
@@ -66,6 +69,7 @@ public class SimulationSubsystem extends SubsystemBase {
       // Update angle of each swerve module
       swerveWheelSim[i].setPose(new Pose2d(swerveWheelPos[i].rotateBy(new Rotation2d(simYaw)).plus(swerveWheelOffset), rot));
     }
+    swerveModuleField.setRobotPose(new Pose2d(swerveWheelOffset, m_field.getRobotPose().getRotation()));
 
     //Gets the Chassis Speeds (Combined Speeds) from the module states
     ChassisSpeeds chassisSpeed = SwerveSubsystem.kDriveKinematics.toChassisSpeeds(swerveSubsystem.getModuleStates());
