@@ -49,7 +49,7 @@ public class SwerveSubsystem extends SubsystemBase{
         
     public static final double kXTranslationP = 1.5;
     public static final double kYTranslationP = 1.5;
-    public static final double kRotationP = 0.575;
+    public static final double kRotationP = 1.5;
 
     private final SwerveModule frontLeft = new SwerveModule(
         MotorConfig.FrontLeftModuleDrive,
@@ -262,6 +262,7 @@ public class SwerveSubsystem extends SubsystemBase{
             yController, 
             rotationController, 
             this::setModuleStates, 
+            true,
             this
         ).beforeStarting(() -> trajectoryLog.append("Following trajectory " + name)
         ).andThen(() -> trajectoryLog.append("Trajectory " + name +  " Ended"));

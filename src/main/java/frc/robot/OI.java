@@ -30,7 +30,7 @@ public class OI {
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
-        private static final int kToggleBalanceButton = 3;
+        private static final int kToggleBalanceButton = 9;
 
         //TODO: Tune curves to driver preference
         private static final ControlCurve kXTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
