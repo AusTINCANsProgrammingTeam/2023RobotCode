@@ -171,13 +171,13 @@ public class OI {
 
         private static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
 
-        private static final Button kBuddyBalanceDeployButton = Button.B; //Deploy buddy balance
+        private static final Button kBuddyBalanceActivateButton = Button.B; //Activates buddy balance
         private static final Button kDownBuddyBalanceButton = Button.POVDOWN; // Lowers buddy balance lift
         private static final Button kUpBuddyBalanceButton = Button.POVUP; // Raises buddy balance lift
 
         public static JoystickButton getActivateBuddyBalanceButton() {
-            kBuddyBalanceDeployButton.setButtonAction("Deploy buddy balance");
-            return new JoystickButton(kJoystick, kBuddyBalanceDeployButton.getButtonID()); // This button must be held in order for the buddy balance to function
+            kBuddyBalanceActivateButton.setButtonAction("Activate buddy balance");
+            return new JoystickButton(kJoystick, kBuddyBalanceActivateButton.getButtonID()); // This button must be held in order for the buddy balance to function
         }
 
         public static POVButton getDownBuddyBalanceButton() {
