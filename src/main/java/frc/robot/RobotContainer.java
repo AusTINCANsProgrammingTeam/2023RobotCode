@@ -17,7 +17,9 @@ import frc.robot.subsystems.led.LedMatrixSubsystem;
 import frc.robot.subsystems.led.LedSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.AssistedBalanceCommand;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.EverybotIntakeSubsystem;
@@ -84,7 +86,16 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-     // OI.Operator.getToggleLEDButton().whileTrue(new StartEndCommand(ledSubsystem::onLed, ledSubsystem::offLed, ledSubsystem));
+     OI.Operator.getToggleLEDButton().onTrue(
+      new SequentialCommandGroup(
+        new InstantCommand(ledMatrixSubsystem::setLedThree),
+        new WaitCommand(1),
+        new InstantCommand(ledMatrixSubsystem::setLedTwo),
+        new WaitCommand(1),
+        new InstantCommand(ledMatrixSubsystem::setLedOne),
+        new WaitCommand(1),
+        new InstantCommand(ledMatrixSubsystem::setLedGoCans))
+      );
      // OI.Operator.getSwitchLedButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
     if (Robot.swerveEnabled) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
