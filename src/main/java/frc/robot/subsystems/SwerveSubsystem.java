@@ -103,7 +103,7 @@ public class SwerveSubsystem extends SubsystemBase{
     private PIDController rotationController;
 
     public SwerveSubsystem() {
-        zeroHeading();
+        //zeroHeading();
         controlOrientationIsFOD = true;
 
         //Add coast mode command to shuffleboard
@@ -121,8 +121,14 @@ public class SwerveSubsystem extends SubsystemBase{
         gyro.reset();
     }
 
+    public void zeroHeading(Rotation2d rotation2d) {
+        if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");} 
+        gyro.reset();
+        gyro.setAngleAdjustment(rotation2d.getDegrees());
+    }
+
     public double getHeading() {
-        return gyro.getYaw();
+        return Math.IEEEremainder(gyro.getAngle(), 360);
     }
 
     public double getPitch() {

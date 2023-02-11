@@ -266,7 +266,7 @@ public final class FieldConstants {
       return new Pose2d(
           pose.getX(),
           fieldWidth - pose.getY(),
-          pose.getRotation().plus(new Rotation2d(Math.PI)));
+          pose.getRotation());
     } else {
       return pose;
     }
