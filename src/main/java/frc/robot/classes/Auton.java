@@ -81,6 +81,10 @@ public class Auton{
         return PathPlanner.loadPath(name, pathConstraints);
     }
 
+    private PathPlannerTrajectory getTrajectory(String name, PathConstraints pathConstraints) throws NullPointerException{
+        return PathPlanner.loadPath(name, pathConstraints);
+    }
+
     private PathPoint constructPoint(double x, double y, double rotation, double heading){
         return new PathPoint(new Translation2d(x, y), Rotation2d.fromDegrees(heading), Rotation2d.fromDegrees(rotation));
     }
