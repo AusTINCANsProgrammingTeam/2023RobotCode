@@ -7,10 +7,7 @@ package frc.robot.commands;
 import frc.robot.Robot;
 import frc.robot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.function.Supplier;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 
@@ -41,10 +38,8 @@ public class ArmCommand extends CommandBase {
     if(!Robot.isSimulation()) {
       baseSetpoint = MathUtil.clamp(baseSetpoint+Units.degreesToRadians(baseArmJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(100));
       armSubsystem.setBaseReference(baseSetpoint);
-      //SmartDashboard.putNumber("Base setpoint", Units.radiansToDegrees(setpoint));
       elbowSetpoint = MathUtil.clamp(elbowSetpoint+Units.degreesToRadians(elbowArmJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(130));
       armSubsystem.setElbowReference(elbowSetpoint);
-      //SmartDashboard.putNumber("Elbow setpoint", Units.radiansToDegrees(setpoint));
     }
   }
 
