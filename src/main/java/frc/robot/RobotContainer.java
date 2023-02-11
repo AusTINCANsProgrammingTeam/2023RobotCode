@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
-import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.AssistedBalanceCommand;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -83,8 +82,9 @@ public class RobotContainer {
       OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
       OI.Driver.getAlignForwardButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
       OI.Driver.getAlignBackButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
-      OI.Driver.getBalanceButton().toggleOnTrue(assistedBalanceCommand); //C on Keyboard
+      OI.Operator.getBalanceButton().toggleOnTrue(assistedBalanceCommand); //C on Keyboard
     }
+
     if (Robot.intakeEnabled) {
       OI.Driver.getIntakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::pull, everybotIntakeSubsystem));
       OI.Driver.getOuttakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::push, everybotIntakeSubsystem));

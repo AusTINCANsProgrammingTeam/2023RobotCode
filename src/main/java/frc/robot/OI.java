@@ -13,6 +13,7 @@ public class OI {
     //Operator Interface (OI) class containing all control information
 
     private static final int kDriverJoystickPort = 0;
+    private static final int kOperatorJoystickPort = 1;
 
     public static final class Driver{
         private static enum Button {
@@ -52,14 +53,13 @@ public class OI {
 
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
         
-          private static final Button kOrientationButton = Button.B1; //Toggle swerve orientation
-          private static final Button kZeroButton = Button.B3; //Zero the gyroscope
-          private static final Button kAlignForwardButton = Button.B4; //Align forwards
-          private static final Button kAlignBackwardButton = Button.B2; //Align backwards
-          private static final Button kIntakeButton = Button.RT; //Run intake
-          private static final Button kOuttakeButton = Button.RB; //Run outtake
-          private static final Button kParkButton = Button.RB; //Park modules
-          private static final Button kAssistedBalanceButton = Button.LB; //Toggle assisted balance
+        private static final Button kOrientationButton = Button.B1; //Toggle swerve orientation
+        private static final Button kZeroButton = Button.B3; //Zero the gyroscope
+        private static final Button kAlignForwardButton = Button.B4; //Align forwards
+        private static final Button kAlignBackwardButton = Button.B2; //Align backwards
+        private static final Button kIntakeButton = Button.RT; //Run intake
+        private static final Button kOuttakeButton = Button.RB; //Run outtake
+        private static final Button kParkButton = Button.RB; //Park modules
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -119,11 +119,6 @@ public class OI {
             kParkButton.setButtonAction("Park modules");
             return new JoystickButton(kJoystick, kParkButton.getButtonID());
         }
-
-        public static JoystickButton getBalanceButton(){
-            kAssistedBalanceButton.setButtonAction("Toggle assisted balance");
-            return new JoystickButton(kJoystick, kAssistedBalanceButton.getButtonID());
-        }
     }
 
     public static final class Operator{
@@ -161,6 +156,15 @@ public class OI {
                 this.buttonAction = name;
             }
         };
+
+        private static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
+
+        private static final Button kAssistedBalanceButton = Button.Y; //Toggle assisted balance
+
+        public static JoystickButton getBalanceButton(){
+            kAssistedBalanceButton.setButtonAction("Toggle assisted balance");
+            return new JoystickButton(kJoystick, kAssistedBalanceButton.getButtonID());
+        }
     }
 
     public static void putControllerButtons(){
