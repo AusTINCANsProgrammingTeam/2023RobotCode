@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
-import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.AssistedBalanceCommand;
 import edu.wpi.first.wpilibj2.command.Command;

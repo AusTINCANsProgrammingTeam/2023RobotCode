@@ -4,12 +4,21 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -19,21 +28,23 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
-  public static final boolean isCompetition = true;
+public class Robot extends LoggedRobot {
+  public static boolean isCompetition = true;
+  public static boolean isReplayMode = false;
+  public static double kDefaultPeriod = 0.02;
 
   //RoboRIO serial numbers
-  public static final String competitionRobotSerial = "03161743";
-  public static final String practiceRobotSerial = "03064df0";
-  public static final boolean isCompetitionRobot = !HALUtil.getSerialNumber().equals(practiceRobotSerial);
+  public static String competitionRobotSerial = "03161743";;
+  public static String practiceRobotSerial = "03064df0";
+  public static boolean isCompetitionRobot = !HALUtil.getSerialNumber().equals(practiceRobotSerial);
 
   //Subsystem toggle
-  public static final boolean batteryEnabled = true;
-  public static final boolean cameraEnabled = true;
-  public static final boolean everybotIntakeEnabled = true;
-  public static final boolean intakeEnabled = true;
-  public static final boolean simulationEnabled = true;
-  public static final boolean swerveEnabled = true;
+  public static boolean batteryEnabled = true;
+  public static boolean cameraEnabled = true;
+  public static boolean everybotIntakeEnabled = true;
+  public static boolean intakeEnabled = true;
+  public static boolean simulationEnabled = true;
+  public static boolean swerveEnabled = true;
   
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();
@@ -49,6 +60,23 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+
+    if (isReal()) {
+        Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+        Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+        new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+    } else {
+        setUseTiming(false); // Run as fast as possible
+        if (isReplayMode) {
+          String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+          Logger.getInstance().setReplaySource(new WPILOGReader(logPath)); // Read replay log
+          Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+        }
+    }
+
+    Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+
     DataLogManager.start();
     //Automatically log joystick and Driver Station control data
     DriverStation.startDataLog(DataLogManager.getLog());

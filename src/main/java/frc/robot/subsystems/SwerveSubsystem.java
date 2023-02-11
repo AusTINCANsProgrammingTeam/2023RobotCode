@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+
+
+import org.littletonrobotics.junction.Logger;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
@@ -198,7 +202,9 @@ public class SwerveSubsystem extends SubsystemBase{
         }
         SmartDashboard.putString("chassis speeds",chassisSpeeds.toString());
         //Convert Chassis Speeds to individual module states
-        return kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+        SwerveModuleState[] moduleStates = kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+        Logger.getInstance().recordOutput("Desired States", moduleStates);
+        return moduleStates;
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -280,6 +286,6 @@ public class SwerveSubsystem extends SubsystemBase{
         pitchEntry.setDouble(gyro.getPitch());
         headingEntry.setDouble(getHeading());
         positionEntry.setString(getPose().getTranslation().toString());
-        SmartDashboard.putData(getModuleStates());
+        Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
     }
 }
