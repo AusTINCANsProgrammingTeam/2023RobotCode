@@ -16,35 +16,37 @@ import frc.robot.hardware.LedDriver;
 
 public class LedMatrixSubsystem extends SubsystemBase{
     private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
-    private GenericEntry ledBrightnessSlider = ledTab.add("Brightness", 2).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
-    String[][] colors = LedDriver.canman;
+    private GenericEntry ledBrightnessSlider = ledTab.add("Brightness", 0.2).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
+    String[][] colors = LedDriver.gocans;
 
     public Color hex2Rgb(String colorStr) {
         return new Color(
-            Integer.valueOf( colorStr.substring( 1, 3 ), 16 ) / (int)ledBrightnessSlider.getInteger(4),
-            Integer.valueOf( colorStr.substring( 3, 5 ), 16 ) / (int)ledBrightnessSlider.getInteger(4),
-            Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) / (int)ledBrightnessSlider.getInteger(4) );
+            Integer.valueOf( colorStr.substring( 1, 3 ), 16 ) * ledBrightnessSlider.getDouble(0.2) / 255,
+            Integer.valueOf( colorStr.substring( 3, 5 ), 16 ) * ledBrightnessSlider.getDouble(0.2) / 255,
+            Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) * ledBrightnessSlider.getDouble(0.2) / 255 );
     }
 
 private final AddressableLEDBuffer buffer;
-private final AddressableLED leds = new AddressableLED(2);
+private final AddressableLED leds = new AddressableLED(4);
 
     public LedMatrixSubsystem() {
         buffer = new AddressableLEDBuffer(256);
         leds.setLength(256);
         leds.setData(buffer);
         leds.start();
-        ledBrightnessSlider.getInteger(4);
+        ledBrightnessSlider.getDouble(0.2);
     }
-
+    boolean self2 = true;
     public void setLed(){
+        if (self2){
         for (int i=0; i<colors.length; i += 2) {
             Collections.reverse(Arrays.asList(colors[i]));
         };
+        self2 = false;
+    }
         for (int i=0; i<colors.length; i++) { 
             for (int j=0; j<colors[i].length; j++){
                 buffer.setLED((16*i)+j, hex2Rgb(colors[i][j]));
-                System.out.print(hex2Rgb(colors[i][j]));
             }
         }
         leds.setData(buffer);
@@ -53,7 +55,7 @@ private final AddressableLED leds = new AddressableLED(2);
     public void setRainbowLed(){
         for (int j = 0; j < 255; j++) {
             for (int i = 0, h = 0; i < 256; i++, h++) {
-              buffer.setHSV(i, (instance + h)/100, 255, 255 /  (int)ledBrightnessSlider.getInteger(4)); //Change the divisor in the hue to change the fade speed
+              buffer.setHSV(i, (instance + h)/100, 255, (int) (255 * ledBrightnessSlider.getInteger(4))); //Change the divisor in the hue to change the fade speed
             }
             instance = instance + 1;
         }
@@ -61,5 +63,6 @@ private final AddressableLED leds = new AddressableLED(2);
     }
     @Override
     public void periodic() {
+        setLed();
     }
 }  

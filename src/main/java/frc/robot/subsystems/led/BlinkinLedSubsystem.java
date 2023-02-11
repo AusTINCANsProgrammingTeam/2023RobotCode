@@ -5,7 +5,7 @@ import frc.robot.hardware.LedDriver;
 import frc.robot.hardware.LedDriver.BlinkinLedMode;
 // TODO Led parameters and RIO ports
 public class BlinkinLedSubsystem extends SubsystemBase {
-    private static final int port = 2; //TODO setport
+    private static final int port = 6; //PWM port 12
     private final LedDriver blinkin;
     private BlinkinLedMode mode = BlinkinLedMode.SOLID_YELLOW;
 

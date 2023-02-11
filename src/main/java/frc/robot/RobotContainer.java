@@ -4,21 +4,24 @@
 
 package frc.robot;
 
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.commands.SwerveTeleopCommand;
-import frc.robot.hardware.LedDriver.BlinkinLedMode;
-import frc.robot.subsystems.AutonSubsytem;
+import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.BatterySubsystem;
-import frc.robot.subsystems.led.BlinkinLedSubsystem;
 import frc.robot.subsystems.led.LedMatrixSubsystem;
 import frc.robot.subsystems.led.LedSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import frc.robot.commands.AssistedBalanceCommand;
+import frc.robot.subsystems.CameraSubsystem;
+import frc.robot.subsystems.EverybotIntakeSubsystem;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -27,30 +30,51 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+  private final SwerveSubsystem swerveSubsystem;
+  private final SimulationSubsystem simulationSubsystem;
+  private final EverybotIntakeSubsystem intakeSubsystem;
+  private final CameraSubsystem cameraSubsystem;
+  private LedSubsystem ledSubsystem;
+  private final LedMatrixSubsystem ledMatrixSubsystem;
 
-  private final AutonSubsytem autonSubsytem = new AutonSubsytem(swerveSubsystem);
-  private SimulationSubsystem simulationSubsystem;
+  private Auton auton;
 
-  private static BatterySubsystem batterySubsystem;
-  private LedSubsystem ledSubsystem = new LedSubsystem();
+  private AssistedBalanceCommand assistedBalanceCommand;
+
+  private DataLog robotSubsystemsLog = DataLogManager.getLog();
+  private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    if(Robot.isSimulation()){
-      simulationSubsystem = new SimulationSubsystem(swerveSubsystem);
-    }
-    if (!Robot.isCompetition) {
-      batterySubsystem = new BatterySubsystem();
-    }
-    swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
+    //ledSubsystem = new LedSubsystem(); //PWM port 1
+    ledMatrixSubsystem = new LedMatrixSubsystem(); //PWM port 2
+
+    swerveSubsystem = Robot.swerveEnabled ? new SwerveSubsystem() : null;
+    subsystemEnabledLog.append(swerveSubsystem == null ? "Swerve: Disabled" : "Swerve: Enabled");
+
+    simulationSubsystem = Robot.isSimulation() && Robot.simulationEnabled && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
+    subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
+
+    intakeSubsystem = Robot.intakeEnabled ? new EverybotIntakeSubsystem() : null;
+    subsystemEnabledLog.append(intakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
+
+    cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
+    subsystemEnabledLog.append(cameraSubsystem == null ? "Camera: Disabled" : "Camera: Enabled");
+
+    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
+
+    assistedBalanceCommand = Robot.swerveEnabled ? new AssistedBalanceCommand(swerveSubsystem) : null;
+
+    if (Robot.swerveEnabled) {
+      swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
       OI.Driver.getXTranslationSupplier(),
       OI.Driver.getYTranslationSupplier(),
       OI.Driver.getRotationSupplier()));
+    }
 
     // Configure the button bindings    
-
     configureButtonBindings();
+
   }
 
   /**
@@ -60,18 +84,30 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
-    OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
-    OI.Operator.getLedSwitchButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
-    OI.Operator.getLedToggleButton().toggleOnTrue(new StartEndCommand(ledSubsystem::onLed, ledSubsystem::offLed, ledSubsystem));
-  }
+     // OI.Operator.getToggleLEDButton().whileTrue(new StartEndCommand(ledSubsystem::onLed, ledSubsystem::offLed, ledSubsystem));
+     // OI.Operator.getSwitchLedButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
+    if (Robot.swerveEnabled) {
+      OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
+      OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
+      OI.Driver.getAlignForwardButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(0), swerveSubsystem));
+      OI.Driver.getAlignBackButton().onTrue(new InstantCommand(() -> swerveSubsystem.enableRotationHold(180), swerveSubsystem));
+      OI.Driver.getBalanceButton().toggleOnTrue(assistedBalanceCommand); //C on Keyboard
+    }
+    if (Robot.intakeEnabled) {
+    OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem));
+    OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem));
+    }
 
+    if (!Robot.isCompetition) {
+      OI.putControllerButtons();
+    }
+  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autonSubsytem.getAutonCommand();
+    return auton != null ? auton.getAutonCommand() : null;
   }
 }

@@ -13,14 +13,17 @@ public class MotorController {
 
     public static enum MotorConfig {
         //Swerve Modules
-        FrontLeftModuleDrive(4, 50, IdleMode.kBrake),
-        FrontLeftModuleTurn(3, 40, IdleMode.kBrake, true),
+        FrontLeftModuleDrive(20, 50, IdleMode.kBrake),
+        FrontLeftModuleTurn(19, 40, IdleMode.kBrake, true),
         FrontRightModuleDrive(2, 50, IdleMode.kBrake),
         FrontRightModuleTurn(1, 40, IdleMode.kBrake, true),
-        BackLeftModuleDrive(7, 50, IdleMode.kBrake),
-        BackLeftModuleTurn(8, 40, IdleMode.kBrake, true),
-        BackRightModuleDrive(6, 50, IdleMode.kBrake),
-        BackRightModuleTurn(5, 40, IdleMode.kBrake, true);
+        BackLeftModuleDrive(11, 50, IdleMode.kBrake),
+        BackLeftModuleTurn(12, 40, IdleMode.kBrake, true),
+        BackRightModuleDrive(10, 50, IdleMode.kBrake),
+        BackRightModuleTurn(9, 40, IdleMode.kBrake, true),
+        //Intake motors
+        IntakeMotor1(13),
+        IntakeMotor2(14); //TODO update to real hardware IDs
 
         private int ID;
         private int currentLimit;
