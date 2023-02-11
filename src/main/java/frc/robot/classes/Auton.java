@@ -98,7 +98,11 @@ public class Auton{
         //Resets odometry to the initial position of the given trajectory
         PathPlannerTrajectory trajectory = getTrajectory(initialTrajectory);
         Pose2d initialPose = FieldConstants.allianceFlip(Objects.isNull(trajectory) ? new Pose2d(0, 0, new Rotation2d()) : trajectory.getInitialPose());
-        return new InstantCommand(() -> swerveSubsystem.resetOdometry(initialPose)).alongWith(new InstantCommand(() -> swerveSubsystem.zeroHeading(initialPose.getRotation())));
+        return new SequentialCommandGroup(
+            new InstantCommand(() -> swerveSubsystem.resetOdometry(initialPose)),
+            new InstantCommand(() -> swerveSubsystem.zeroHeading()),
+            new InstantCommand(() -> swerveSubsystem.setOffset(initialPose.getRotation()))
+        );
     }
 
     private Command delay(double seconds){

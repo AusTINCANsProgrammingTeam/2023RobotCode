@@ -76,6 +76,7 @@ public class SwerveSubsystem extends SubsystemBase{
         "BR");
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
+    private double gyroOffset; //Offset in degrees
     private SwerveDriveOdometry odometer = new SwerveDriveOdometry(kDriveKinematics, getRotation2d(), getModulePositions());
 
     private DataLog datalog = DataLogManager.getLog();
@@ -103,7 +104,7 @@ public class SwerveSubsystem extends SubsystemBase{
     private PIDController rotationController;
 
     public SwerveSubsystem() {
-        //zeroHeading();
+        zeroHeading();
         controlOrientationIsFOD = true;
 
         //Add coast mode command to shuffleboard
@@ -121,14 +122,12 @@ public class SwerveSubsystem extends SubsystemBase{
         gyro.reset();
     }
 
-    public void zeroHeading(Rotation2d rotation2d) {
-        if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");} 
-        gyro.reset();
-        gyro.setAngleAdjustment(rotation2d.getDegrees());
+    public void setOffset(Rotation2d rotation2d) {
+        gyroOffset = rotation2d.getDegrees();
     }
 
     public double getHeading() {
-        return Math.IEEEremainder(gyro.getAngle(), 360);
+        return Math.IEEEremainder(gyro.getAngle() + gyroOffset, 360);
     }
 
     public double getPitch() {
