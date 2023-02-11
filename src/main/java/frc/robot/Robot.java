@@ -39,12 +39,13 @@ public class Robot extends LoggedRobot {
   public static boolean isCompetitionRobot = !HALUtil.getSerialNumber().equals(practiceRobotSerial);
 
   //Subsystem toggle
-  public static boolean batteryEnabled = true;
-  public static boolean cameraEnabled = true;
-  public static boolean everybotIntakeEnabled = true;
-  public static boolean intakeEnabled = true;
-  public static boolean simulationEnabled = true;
-  public static boolean swerveEnabled = true;
+  public static final boolean batteryEnabled = true;
+  public static final boolean cameraEnabled = true;
+  public static final boolean everybotIntakeEnabled = true;
+  public static final boolean intakeEnabled = true;
+  public static final boolean simulationEnabled = true;
+  public static final boolean swerveEnabled = true;
+  public static final boolean buddyBalanceEnabled = false;
   
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();
