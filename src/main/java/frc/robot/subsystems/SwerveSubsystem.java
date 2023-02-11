@@ -14,9 +14,12 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -81,8 +84,13 @@ public class SwerveSubsystem extends SubsystemBase{
         "BR");
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
+
+    private Quaternion ASQuaternion = new Quaternion(gyro.getQuaternionW(), gyro.getQuaternionX(), gyro.getQuaternionY(), gyro.getQuaternionZ());
+    private Rotation3d ASRotation3D = new Rotation3d(ASQuaternion);
+
     private SwerveDriveOdometry odometer = new SwerveDriveOdometry(kDriveKinematics, getRotation2d(), getModulePositions());
-    //private SwerveDriveOdometry 3Dodometer = new SwerveDriveOdometry(kDriveKinematics, );
+    private SwerveDriveOdometry odometer3D = new SwerveDriveOdometry(kDriveKinematics, ASRotation3D.toRotation2d(), getModulePositions());
+    private Translation3d ASTranslation3d = new Translation3d(ASRotation3D.getX(), ASRotation3D.getY(), ASRotation3D.getZ());
 
     private DataLog datalog = DataLogManager.getLog();
     private DoubleLogEntry translationXOutputLog = new DoubleLogEntry(datalog, "/swerve/txout"); //Logs x translation state output
@@ -139,12 +147,17 @@ public class SwerveSubsystem extends SubsystemBase{
         return Rotation2d.fromDegrees(getHeading());
     }
 
-    // public Rotation3d getRotation3d() {
-    //     return Rotation3d.getQuaternion(getHeading());
-    // }
+    public Rotation3d getRotation3d() {
+        return ASRotation3D;
+    }
 
     public Pose2d getPose() {
         return odometer.getPoseMeters();
+    }
+
+    public Pose3d getPose3d() {
+        Pose3d ASPose3d = new Pose3d(ASTranslation3d, ASRotation3D);
+        return ASPose3d;
     }
 
     public void resetOdometry(Pose2d pose) {
@@ -287,5 +300,6 @@ public class SwerveSubsystem extends SubsystemBase{
         headingEntry.setDouble(getHeading());
         positionEntry.setString(getPose().getTranslation().toString());
         Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
+        Logger.getInstance().recordOutput("Rot3D", getPose3d());
     }
 }
