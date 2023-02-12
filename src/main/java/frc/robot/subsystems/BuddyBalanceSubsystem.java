@@ -53,7 +53,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private double kSimP = 0.1;
   private double kSimI = 0.0;
   private double kSimD = 0.0;
-  private double kSimGearing = 0;
+  private double kSimGearing = 0.028571;
   private double kArmLength = Units.inchesToMeters(43.5);
   private double kArmMass = 2;
   private double kMinAngle = 70;
