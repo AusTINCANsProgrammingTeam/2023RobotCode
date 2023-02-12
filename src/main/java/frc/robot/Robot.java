@@ -29,14 +29,14 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends LoggedRobot {
-  public static boolean isCompetition = true;
-  public static boolean isReplayMode = false;
-  public static double kDefaultPeriod = 0.02;
+  public static final boolean isCompetition = true;
+  public static final boolean isReplayMode = false;
+  public static final double kDefaultPeriod = 0.02;
 
   //RoboRIO serial numbers
-  public static String competitionRobotSerial = "03161743";;
-  public static String practiceRobotSerial = "03064df0";
-  public static boolean isCompetitionRobot = !HALUtil.getSerialNumber().equals(practiceRobotSerial);
+  public static final String competitionRobotSerial = "03161743";;
+  public static final String practiceRobotSerial = "03064df0";
+  public static final boolean isCompetitionRobot = !HALUtil.getSerialNumber().equals(practiceRobotSerial);
 
   //Subsystem toggle
   public static final boolean batteryEnabled = true;
@@ -67,13 +67,11 @@ public class Robot extends LoggedRobot {
         Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
         Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
-    } else {
+    } else if (isReplayMode) {
         setUseTiming(false); // Run as fast as possible
-        if (isReplayMode) {
-          String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-          Logger.getInstance().setReplaySource(new WPILOGReader(logPath)); // Read replay log
-          Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
-        }
+        String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+        Logger.getInstance().setReplaySource(new WPILOGReader(logPath)); // Read replay log
+        Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
     }
 
     Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
