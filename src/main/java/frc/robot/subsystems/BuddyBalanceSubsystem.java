@@ -4,12 +4,15 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -19,6 +22,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
@@ -50,20 +54,21 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private RelativeEncoder leftEncoder;
 
   // Simulation
-  private double kSimP = 0.1;
-  private double kSimI = 0.0;
-  private double kSimD = 0.0;
-  private double kSimGearing = 0.028571;
-  private double kArmLength = Units.inchesToMeters(43.5);
-  private double kArmMass = 2;
-  private double kMinAngle = 70;
-  private double kMaxAngle = 90;
-  private double simBBEncoderPosition;
-  private final double kSimInertia = SingleJointedArmSim.estimateMOI(kArmLength, kArmMass);
-  private final SingleJointedArmSim buddyBalanceSim = new SingleJointedArmSim(DCMotor.getNEO(1), kSimGearing, kSimInertia, kArmLength, kMinAngle, kMaxAngle, false);
+  private static double kSimP = 0.1;
+  private static double kSimI = 0.0;
+  private static double kSimD = 0.0;
+  private PIDController simPIDController;
+  private static final double kSimGearing = 0.028571;
+  private static final double kArmLength = Units.inchesToMeters(43.5);
+  private static final double kArmMass = 2;
+  private static final double kMinAngle = 70;
+  private static final double kMaxAngle = 90;
+  private static final double kSimInertia = SingleJointedArmSim.estimateMOI(kArmLength, kArmMass);
+  private static SingleJointedArmSim buddyBalanceSim;
+  private double simArmAngle;
   private Mechanism2d simBBCanvas = new Mechanism2d(5, 5);
-  private MechanismRoot2d buddyBalanceSimRoot = simBBCanvas.getRoot("Buddy Balance Arm Root", 0, 0);
-  private MechanismLigament2d buddyBalanceSimV = buddyBalanceSimRoot.append(new MechanismLigament2d("Buddy Balance Lift Arm", kArmLength*3, buddyBalanceSim.getAngleRads()));
+  private MechanismRoot2d buddyBalanceSimRoot;
+  private MechanismLigament2d buddyBalanceSimV;
 
   // Tunable Numbers
   private TunableNumber refPointBalancedTuner;
@@ -75,17 +80,20 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private TunableNumber tunerNumLeftP;
   private TunableNumber tunerNumLeftI;
   private TunableNumber tunerNumLeftD;
+  private TunableNumber tunerSimP;
+  private TunableNumber tunerSimI;
+  private TunableNumber tunerSimD;
 
   // Shuffleboard
-  private boolean isDeployed = false;
   private DataLog datalog = DataLogManager.getLog();
   private DoubleLogEntry buddyBalancePosition = new DoubleLogEntry(datalog, "/buddybalance/position");
   private ShuffleboardTab buddyBalanceTab = Shuffleboard.getTab("Buddy Balance"); // TODO: Replace buddy balance tab with whatever tab the position should be logged to
   private GenericEntry positionEntry;
   private ShuffleboardTab buddyBalanceSimTab = Shuffleboard.getTab("Buddy Balance Simulation");
   private GenericEntry simBBAngle = buddyBalanceSimTab.add("Sim BB Arm Angle", 0.0).getEntry();
-  private GenericEntry simBBEncoderPos = buddyBalanceSimTab.add("Sim BB Encoder Angle", 0.0).getEntry();
-  private GenericEntry simBBOutput = buddyBalanceSimTab.add("Sim BB Output", 0.0).getEntry();
+
+  // The instance variable we don't talk about. (didn't fit in a category)
+  private boolean isDeployed = false;
 
   public BuddyBalanceSubsystem() {
     rightMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceRight);
@@ -93,14 +101,23 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     activateDeploy = new Servo(deployServoID);
     rightPIDController = rightMotor.getPIDController();
     leftPIDController = leftMotor.getPIDController();
-    rightPIDController.setP(kDefaultMotorP);
-    rightPIDController.setI(kDefaultMotorI);
-    rightPIDController.setD(kDefaultMotorD);
-    leftPIDController.setP(kDefaultMotorP);
-    leftPIDController.setI(kDefaultMotorI);
-    leftPIDController.setD(kDefaultMotorD);
+    if(Robot.isSimulation()) {
+      simPIDController = new PIDController(kSimP, kSimI, kSimD);
+    } else {
+      rightPIDController.setP(kDefaultMotorP);
+      rightPIDController.setI(kDefaultMotorI);
+      rightPIDController.setD(kDefaultMotorD);
+      leftPIDController.setP(kDefaultMotorP);
+      leftPIDController.setI(kDefaultMotorI);
+      leftPIDController.setD(kDefaultMotorD);
+    }
     rightEncoder = rightMotor.getEncoder();
     leftEncoder = leftMotor.getEncoder();
+    buddyBalanceSim = new SingleJointedArmSim(DCMotor.getNEO(1), kSimGearing, kSimInertia, kArmLength, kMinAngle, kMaxAngle, false);
+    buddyBalanceSimRoot = simBBCanvas.getRoot("Buddy Balance Arm Root", 0, 0);
+    buddyBalanceSimV = buddyBalanceSimRoot.append(new MechanismLigament2d("Buddy Balance Lift Arm", kArmLength, buddyBalanceSim.getAngleRads()));
+    SmartDashboard.putData("Buddy Balance Sim", simBBCanvas);
+    simPIDController.setSetpoint(getSimAngle());
 
     tunerNumRightP = new TunableNumber("Buddy Balance Right Motor P", kDefaultMotorP, rightPIDController::setP);
     tunerNumRightI = new TunableNumber("Buddy Balance Right Motor I", kDefaultMotorI, rightPIDController::setI);
@@ -108,6 +125,10 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     tunerNumLeftP = new TunableNumber("Buddy Balance Left Motor P", kDefaultMotorP, leftPIDController::setP);
     tunerNumLeftI = new TunableNumber("Buddy Balance Left Motor I", kDefaultMotorI, leftPIDController::setI);
     tunerNumLeftD = new TunableNumber("Buddy Balance Left Motor D", kDefaultMotorD, leftPIDController::setD);
+
+    tunerSimP = new TunableNumber("Buddy Balance Simulated P", kSimP, simPIDController::setP);
+    tunerSimI = new TunableNumber("Buddy Balance Simulated I", kSimI, simPIDController::setI);
+    tunerSimD = new TunableNumber("Buddy Balance Simulated D", kSimD, simPIDController::setD);
 
     refPointBalancedTuner = new TunableNumber("Ref Point Balanced", 15, (a) -> {kBalancedPosition = a;});
     refPointDeployedTuner = new TunableNumber("Ref Point Deployed", 0, (a) -> {kDeployedPosition = a;});
@@ -135,14 +156,23 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     leftPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition);
   }
 
-  @Override
-  public void simulationPeriodic() {
-    simBBEncoderPosition = buddyBalanceSim.getAngleRads();
-    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(buddyBalanceSim.getCurrentDrawAmps()));
-    buddyBalanceSimV.setAngle(Units.radiansToDegrees(buddyBalanceSim.getAngleRads()));
-    buddyBalanceSim.update(Robot.kDefaultPeriod);
+  public void updateSimMotor() {
+    buddyBalanceSim.setInputVoltage((MathUtil.clamp(simPIDController.calculate(simArmAngle),-1,1)) * RobotController.getBatteryVoltage());
+  }
 
-    
+  public double getSimAngle() {
+    return simArmAngle;
+  }
+
+  @Override
+  public void simulationPeriodic() { // The majority of our simulation code was taken from the ArmSubsystem
+    updateSimMotor();
+    simArmAngle = buddyBalanceSim.getAngleRads();
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(buddyBalanceSim.getCurrentDrawAmps()));
+    buddyBalanceSimV.setAngle(Units.radiansToDegrees(simArmAngle));
+    buddyBalanceSim.update(Robot.kDefaultPeriod);
+    //Shuffleboard
+    simBBAngle.setDouble(Units.radiansToDegrees(buddyBalanceSim.getAngleRads()));
   }
 
   @Override
