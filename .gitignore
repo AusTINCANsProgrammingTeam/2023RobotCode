@@ -164,3 +164,4 @@ bin/
 simgui.json
 simgui-ds.json
 *.wpilog
+BuildConstants.java
