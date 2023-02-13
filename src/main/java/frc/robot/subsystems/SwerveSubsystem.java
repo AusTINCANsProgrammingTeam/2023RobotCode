@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+
+
+import org.littletonrobotics.junction.Logger;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
@@ -30,6 +34,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
@@ -76,6 +81,7 @@ public class SwerveSubsystem extends SubsystemBase{
         "BR");
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
+
     private SwerveDriveOdometry odometer = new SwerveDriveOdometry(kDriveKinematics, getRotation2d(), getModulePositions());
 
     private DataLog datalog = DataLogManager.getLog();
@@ -192,7 +198,9 @@ public class SwerveSubsystem extends SubsystemBase{
         }
         SmartDashboard.putString("chassis speeds",chassisSpeeds.toString());
         //Convert Chassis Speeds to individual module states
-        return kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+        SwerveModuleState[] moduleStates = kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+        Logger.getInstance().recordOutput("Desired States", moduleStates);
+        return moduleStates;
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -264,7 +272,7 @@ public class SwerveSubsystem extends SubsystemBase{
             this::setModuleStates, 
             this
         ).beforeStarting(() -> trajectoryLog.append("Following trajectory " + name)
-        ).andThen(() -> trajectoryLog.append("Trajectory " + name +  " Ended"));
+        ).alongWith(new InstantCommand(() -> Logger.getInstance().recordOutput("trajectory " + name, trajectory)));
     }
     
     @Override
@@ -274,5 +282,7 @@ public class SwerveSubsystem extends SubsystemBase{
         pitchEntry.setDouble(gyro.getPitch());
         headingEntry.setDouble(getHeading());
         positionEntry.setString(getPose().getTranslation().toString());
+        Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
+        Logger.getInstance().recordOutput("Pose 2D", getPose());
     }
 }
