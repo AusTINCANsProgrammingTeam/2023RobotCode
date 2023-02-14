@@ -123,8 +123,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private GenericEntry armXPosition = armTab.add("Arm X Position", 0.0).getEntry();
   private GenericEntry armYPosition = armTab.add("Arm Y Position", 0.0).getEntry();
 
-  private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kBaseGearing, baseArmInertia, kBaseArmLength, kMinBAngle, kMaxBAngle, kBaseArmMass, false);
-  private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, elbowArmInertia, kElbowArmLength, kMinEAngle, kMaxEAngle, kElbowArmMass, false);
+  private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kBaseGearing, baseArmInertia, kBaseArmLength, kMinBAngle, kMaxBAngle, false);
+  private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, elbowArmInertia, kElbowArmLength, kMinEAngle, kMaxEAngle, false);
 
   //The "canvas" that both arms are drawn on
   Mechanism2d simArmCanvas = new Mechanism2d(7,7);

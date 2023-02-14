@@ -17,7 +17,7 @@ public class OI {
     private static final int kOperatorJoystickPort = 1;
 
     public static final class Driver{
-        public static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
+        public static final Joystick kDriverJoystick = new Joystick(OI.kDriverJoystickPort);
 
         private static final int kOrientationButtonID = 1; //1 Button, Toggle swerve orientation
         private static final int kZeroButtonID = 3; //3 Button, Zero the gyroscope
@@ -139,7 +139,7 @@ public class OI {
     }
 
     public static final class Operator{
-        public static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
+        public static final Joystick kOperatorJoystick = new Joystick(OI.kOperatorJoystickPort);
 
         private static final int kBaseArmAxis = 1;
         private static final int kElbowArmAxis = 2;
@@ -159,6 +159,7 @@ public class OI {
         }
         public static JoystickButton getMidArmButton(){
             return new JoystickButton(kJoystick, kMidArmButtonID);
+        }
         private static enum Button {
             X (1),
             A (2),
