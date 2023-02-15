@@ -76,6 +76,7 @@ public class SwerveSubsystem extends SubsystemBase{
         "BR");
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
+    public double gyroOffset; //Offset in degrees, reset at the start of auton
     private SwerveDriveOdometry odometer = new SwerveDriveOdometry(kDriveKinematics, getRotation2d(), getModulePositions());
 
     private DataLog datalog = DataLogManager.getLog();
@@ -119,16 +120,17 @@ public class SwerveSubsystem extends SubsystemBase{
     public void zeroHeading() {
         if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");} 
         gyro.reset();
+        gyroOffset = 0;
     }
 
     public void zeroHeading(Rotation2d rotation2d) {
         if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");} 
         gyro.reset();
-        gyro.setAngleAdjustment(rotation2d.getDegrees());
+        gyroOffset = rotation2d.getDegrees();
     }
 
     public double getHeading() {
-        return Math.IEEEremainder(gyro.getAngle(), 360);
+        return Math.IEEEremainder(gyro.getAngle() + gyroOffset, 360);
     }
 
     public double getPitch() {
