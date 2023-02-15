@@ -18,11 +18,6 @@ import frc.robot.hardware.LedDriver;
 public class LedMatrixSubsystem extends SubsystemBase{
     private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
     private GenericEntry ledBrightnessSlider = ledTab.add("Brightness", 0.2).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
-    String[][] colors = LedDriver.gocans;
-    String[][] gocans = LedDriver.gocans;
-    String[][] one = LedDriver.one;
-    String[][] two = LedDriver.two;
-    String[][] three = LedDriver.three;
 
     public Color hex2Rgb(String colorStr) {
         return new Color(
@@ -41,80 +36,41 @@ private final AddressableLED leds = new AddressableLED(Robot.ledPort);
         leds.start();
         ledBrightnessSlider.getDouble(0.2);
     }
-    boolean self = true;
-    public void setLed(){
-        if (self){
-        for (int i=0; i<colors.length; i += 2) {
-            Collections.reverse(Arrays.asList(colors[i]));
-        };
-        self = false;
-    }
-        for (int i=0; i<colors.length; i++) { 
-            for (int j=0; j<colors[i].length; j++){
-                buffer.setLED((16*i)+j, hex2Rgb(colors[i][j]));
-            }
+
+    private void serpentine(boolean bool, String[][] image){
+        if (bool){
+            for (int i=0; i<image.length; i += 2) {
+                Collections.reverse(Arrays.asList(image[i]));
+            };
         }
-        leds.setData(buffer);
+            for (int i=0; i<image.length; i++) { 
+                for (int j=0; j<image[i].length; j++){
+                    buffer.setLED((16*i)+j, hex2Rgb(image[i][j]));
+                }
+            }
+            leds.setData(buffer);
     }
+
+    boolean self = true;
+    
     boolean self2 = true;
     public void setLedOne(){
-        if (self2){
-            for (int i=0; i<colors.length; i += 2) {
-                Collections.reverse(Arrays.asList(one[i]));
-            };
-            self2 = false;
-        }
-            for (int i=0; i<colors.length; i++) { 
-                for (int j=0; j<colors[i].length; j++){
-                    buffer.setLED((16*i)+j, hex2Rgb(one[i][j]));
-                }
-            }
-            leds.setData(buffer);
+        serpentine(self2, LedDriver.one);
     }
+
     boolean self3 = true;
     public void setLedTwo(){
-        if (self3){
-            for (int i=0; i<colors.length; i += 2) {
-                Collections.reverse(Arrays.asList(two[i]));
-            };
-            self3 = false;
-        }
-            for (int i=0; i<colors.length; i++) { 
-                for (int j=0; j<colors[i].length; j++){
-                    buffer.setLED((16*i)+j, hex2Rgb(two[i][j]));
-                }
-            }
-            leds.setData(buffer);
+        serpentine(self3, LedDriver.two);
     }
+
     boolean self4 = true;
     public void setLedThree(){
-        if (self4){
-            for (int i=0; i<colors.length; i += 2) {
-                Collections.reverse(Arrays.asList(three[i]));
-            };
-            self4 = false;
-        }
-            for (int i=0; i<colors.length; i++) { 
-                for (int j=0; j<colors[i].length; j++){
-                    buffer.setLED((16*i)+j, hex2Rgb(three[i][j]));
-                }
-            }
-            leds.setData(buffer);
+        serpentine(self4, LedDriver.three);
     }
+
     boolean self5 = true;
     public void setLedGoCans(){
-        if (self5){
-            for (int i=0; i<colors.length; i += 2) {
-                Collections.reverse(Arrays.asList(gocans[i]));
-            };
-            self5 = false;
-        }
-            for (int i=0; i<colors.length; i++) { 
-                for (int j=0; j<colors[i].length; j++){
-                    buffer.setLED((16*i)+j, hex2Rgb(gocans[i][j]));
-                }
-            }
-            leds.setData(buffer);
+        serpentine(self5, LedDriver.gocans);
     }
 
     int instance = 0;
@@ -135,6 +91,5 @@ private final AddressableLED leds = new AddressableLED(Robot.ledPort);
 
     @Override
     public void periodic() {
-        setRainbowLed();
     }
 }  

@@ -24,7 +24,7 @@ public class LedSubsystem extends SubsystemBase {
   private GenericEntry ledState = ledTab.add("OnOff", false).getEntry();
   private SimpleWidget ledGamePiece = ledTab.add("Color", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow"));
   private static final int length = 256; //Amount of Leds in strip light. Or one if we are using a single light
-  private static enum LedMode {
+  public static enum LedMode {
     CONE, CUBE, OFF;
   }
   private LedMode ledMode = LedMode.CONE;
