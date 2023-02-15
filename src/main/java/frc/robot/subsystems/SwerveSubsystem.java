@@ -128,13 +128,9 @@ public class SwerveSubsystem extends SubsystemBase{
         gyroOffset = 0;
     }
 
-<<<<<<< HEAD
-    public void setOffset(Rotation2d rotation2d) {
-=======
     public void zeroHeading(Rotation2d rotation2d) {
         if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");} 
         gyro.reset();
->>>>>>> dd5403cf22c5cf5fec7fbac0486d210c2f3003a2
         gyroOffset = rotation2d.getDegrees();
     }
 
