@@ -30,7 +30,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public IntakeSubsystem() {
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
     motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
-    motor.follow(motor2);
+    motor2.follow(motor, true);
   }
   
   private void spinWheels(double velocity) {
