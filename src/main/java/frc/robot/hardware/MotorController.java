@@ -23,7 +23,10 @@ public class MotorController {
         BackRightModuleTurn(9, 40, IdleMode.kBrake, true),
         //Intake motors
         IntakeMotor1(13),
-        IntakeMotor2(14); //TODO update to real hardware IDs
+        IntakeMotor2(14), //TODO update to real hardware IDs
+        //BuddyBalance Motors
+        BuddyBalanceRight(15, 40, IdleMode.kBrake),
+        BuddyBalanceLeft(16, 40, IdleMode.kBrake, true); // TODO: update IDs for buddy balance motors when robot is finalized
 
         private int ID;
         private int currentLimit;
