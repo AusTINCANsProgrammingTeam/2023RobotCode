@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends LoggedRobot {
-  public static final boolean isCompetition = true;
+  public static final boolean isCompetition = false;
   public static final boolean isReplayMode = false;
   public static final double kDefaultPeriod = 0.02;
 
