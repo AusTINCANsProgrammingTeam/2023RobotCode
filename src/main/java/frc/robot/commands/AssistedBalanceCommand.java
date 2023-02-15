@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.classes.TunableNumber;
 import frc.robot.subsystems.SwerveSubsystem;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -17,6 +18,7 @@ public class AssistedBalanceCommand extends CommandBase {
   private final double kIBalancing = 0;
   private final double kDBalancing = 0;
   private final double balancingDeadzoneNumber = 0.001;
+  private final double pidControllerMaxSpeed = 0.5;
   private PIDController pidController = new PIDController(kPBalancing, kIBalancing, kDBalancing);
   TunableNumber tunableP = new TunableNumber("Balancing P", kPBalancing, pidController::setP);
   TunableNumber tunableI = new TunableNumber("Balancing I", kIBalancing, pidController::setI);
@@ -44,7 +46,7 @@ public class AssistedBalanceCommand extends CommandBase {
 
     swerve_subsystem.setModuleStates(
       swerve_subsystem.convertToModuleStates(
-        0.0, pidController.calculate(swerve_subsystem.getPitch(), 0.0), 0.0));  
+        0.0, MathUtil.clamp(pidController.calculate(swerve_subsystem.getPitch(), 0.0), -pidControllerMaxSpeed, pidControllerMaxSpeed), 0.0));  
   }
 
   // Called once the command ends or is interrupted.
