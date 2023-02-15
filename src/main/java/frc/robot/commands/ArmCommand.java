@@ -35,12 +35,10 @@ public class ArmCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(!Robot.isSimulation()) {
-      baseSetpoint = MathUtil.clamp(baseSetpoint+Units.degreesToRadians(baseArmJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(100));
-      armSubsystem.setBaseReference(baseSetpoint);
-      elbowSetpoint = MathUtil.clamp(elbowSetpoint+Units.degreesToRadians(elbowArmJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(130));
-      armSubsystem.setElbowReference(elbowSetpoint);
-    }
+    baseSetpoint = MathUtil.clamp(baseSetpoint+Units.degreesToRadians(baseArmJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(100));
+    armSubsystem.setBaseReference(baseSetpoint);
+    elbowSetpoint = MathUtil.clamp(elbowSetpoint+Units.degreesToRadians(elbowArmJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(130));
+    armSubsystem.setElbowReference(elbowSetpoint);
   }
 
   // Called once the command ends or is interrupted.
