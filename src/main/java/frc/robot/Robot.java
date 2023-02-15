@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   public static final boolean isCompetition = true;
 
+  public static final int ledPort = 2;
+
   //RoboRIO serial numbers
   public static final String competitionRobotSerial = "03161743";
   public static final String practiceRobotSerial = "03064df0";

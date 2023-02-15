@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.Robot;
 import frc.robot.hardware.LedDriver;
 
 public class LedMatrixSubsystem extends SubsystemBase{
@@ -31,7 +32,7 @@ public class LedMatrixSubsystem extends SubsystemBase{
     }
 
 private final AddressableLEDBuffer buffer;
-private final AddressableLED leds = new AddressableLED(4);
+private final AddressableLED leds = new AddressableLED(Robot.ledPort);
 
     public LedMatrixSubsystem() {
         buffer = new AddressableLEDBuffer(256);
