@@ -22,7 +22,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   public static final boolean isCompetition = true;
 
-  public static final int ledPort = 2;
+  public static final int ledStipPort = 2;
+  public static final int ledMatrixPort = 3;
 
   //RoboRIO serial numbers
   public static final String competitionRobotSerial = "03161743";
@@ -30,6 +31,9 @@ public class Robot extends TimedRobot {
   public static final boolean isCompetitionRobot = !HALUtil.getSerialNumber().equals(practiceRobotSerial);
 
   //Subsystem toggle
+  public static final boolean ledMatrixEnabled = true;
+  public static final boolean ledSubsystem = true;
+  public static final boolean blinkinLedEnabled = false;
   public static final boolean batteryEnabled = true;
   public static final boolean cameraEnabled = true;
   public static final boolean everybotIntakeEnabled = true;

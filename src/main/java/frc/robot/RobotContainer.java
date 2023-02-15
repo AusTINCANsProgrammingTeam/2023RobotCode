@@ -13,6 +13,7 @@ import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.led.BlinkinLedSubsystem;
 import frc.robot.subsystems.led.LedMatrixSubsystem;
 import frc.robot.subsystems.led.LedSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,8 +37,10 @@ public class RobotContainer {
   private final SimulationSubsystem simulationSubsystem;
   private final EverybotIntakeSubsystem intakeSubsystem;
   private final CameraSubsystem cameraSubsystem;
+
   private LedSubsystem ledSubsystem;
   private final LedMatrixSubsystem ledMatrixSubsystem;
+  private BlinkinLedSubsystem blinkinLedSubsystem;
 
   private Auton auton;
 
@@ -47,8 +50,9 @@ public class RobotContainer {
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    //ledSubsystem = new LedSubsystem(); //PWM port 1
-    ledMatrixSubsystem = new LedMatrixSubsystem(); //PWM port 2
+    ledSubsystem = Robot.ledSubsystem ? new LedSubsystem() : null;
+    ledMatrixSubsystem = Robot.ledMatrixEnabled ? new LedMatrixSubsystem() : null; //PWM port 2
+    blinkinLedSubsystem = Robot.blinkinLedEnabled ? new BlinkinLedSubsystem() : null;
 
     swerveSubsystem = Robot.swerveEnabled ? new SwerveSubsystem() : null;
     subsystemEnabledLog.append(swerveSubsystem == null ? "Swerve: Disabled" : "Swerve: Enabled");
@@ -86,6 +90,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    if (Robot.ledMatrixEnabled){
      OI.Operator.getToggleLEDButton().onTrue(
       new SequentialCommandGroup(
         new InstantCommand(ledMatrixSubsystem::setLedThree),
@@ -96,7 +101,15 @@ public class RobotContainer {
         new WaitCommand(1),
         new InstantCommand(ledMatrixSubsystem::setLedGoCans))
       );
-     // OI.Operator.getSwitchLedButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
+    }
+    if (Robot.blinkinLedEnabled){
+      OI.Operator.getSwitchLedButton().onTrue(new InstantCommand(blinkinLedSubsystem::blinkinChangeGamePiece));
+      OI.Operator.getToggleLEDButton().whileTrue(new StartEndCommand(blinkinLedSubsystem::blinkinStartLed, blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
+    }
+    if (Robot.ledSubsystem){
+      OI.Operator.getSwitchLedButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
+      OI.Operator.getToggleLEDButton().whileTrue(new StartEndCommand(ledSubsystem::onLed, ledSubsystem::offLed, ledSubsystem));
+    }
     if (Robot.swerveEnabled) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
       OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));

@@ -19,7 +19,7 @@ import frc.robot.Robot;
   // TODO Led parameters and RIO ports
 public class LedSubsystem extends SubsystemBase {
   private final AddressableLEDBuffer buffer;
-  private final AddressableLED leds = new AddressableLED(Robot.ledPort);
+  private final AddressableLED leds = new AddressableLED(Robot.ledStipPort);
   private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
   private GenericEntry ledState = ledTab.add("OnOff", false).getEntry();
   private SimpleWidget ledGamePiece = ledTab.add("Color", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow"));

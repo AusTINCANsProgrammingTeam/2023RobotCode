@@ -10,7 +10,7 @@ public class BlinkinLedSubsystem extends SubsystemBase {
     private BlinkinLedMode mode = BlinkinLedMode.SOLID_YELLOW;
 
     public BlinkinLedSubsystem() {
-        blinkin = new LedDriver(Robot.ledPort);
+        blinkin = new LedDriver(Robot.ledStipPort);
     }
 
     public void blinkinStopLed(){

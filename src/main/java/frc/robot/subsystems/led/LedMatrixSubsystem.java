@@ -27,7 +27,7 @@ public class LedMatrixSubsystem extends SubsystemBase{
     }
 
 private final AddressableLEDBuffer buffer;
-private final AddressableLED leds = new AddressableLED(Robot.ledPort);
+private final AddressableLED leds = new AddressableLED(Robot.ledMatrixPort);
 
     public LedMatrixSubsystem() {
         buffer = new AddressableLEDBuffer(256);
