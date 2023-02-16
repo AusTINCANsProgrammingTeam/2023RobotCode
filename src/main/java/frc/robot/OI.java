@@ -55,14 +55,14 @@ public class OI {
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
         
           private static final Button kOrientationButton = Button.button1; //1, Toggle swerve orientation
-          private static final Button kZeroButton = Button.button3; //3, Zero the gyroscope
+          private static final Button kZeroButton = Button.Start; //3, Zero the gyroscope
+          private static final Button kOuttakeButton = Button.LB; //Right Bumper, run outtake
+          private static final Button kIntakeButton = Button.LT; //Right Trigger, run intake
           private static final Button kAlignForwardButton = Button.button4; //4, Align forwards
           private static final Button kAlignBackwardButton = Button.button2; //2, Align backwards
-          private static final Button kIntakeButton = Button.RT; //Right Trigger, run intake
-          private static final Button kOuttakeButton = Button.RB; //Right Bumper, run outtake
-          private static final Button kParkButton = Button.RB; //5, park the robot
-          private static final Button kToggleBalanceButton = Button.LB; //6, balance the robot
-
+          private static final Button kArmHighButton = Button.RB;
+          private static final Button kArmMidButton = Button.RT;
+        
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
@@ -106,12 +106,6 @@ public class OI {
             kZeroButton.setButtonAction("Zeroing");
             return new JoystickButton(kJoystick, kZeroButton.getButtonID());
         }
-        
-        public static JoystickButton getBalanceButton(){
-            kToggleBalanceButton.setButtonAction("Balance Robot");
-            return new JoystickButton(kJoystick, kToggleBalanceButton.getButtonID());
-
-        }
 
         public static JoystickButton getIntakeButton(){
             kIntakeButton.setButtonAction("Intake");
@@ -121,11 +115,6 @@ public class OI {
         public static JoystickButton getOuttakeButton(){
             kOuttakeButton.setButtonAction("Outtake");
             return new JoystickButton(kJoystick, kOuttakeButton.getButtonID());
-        }
-        
-        public static JoystickButton getParkButton(){
-            kParkButton.setButtonAction("Parking");
-            return new JoystickButton(kJoystick, kParkButton.getButtonID());
         }
     }
 
@@ -174,6 +163,11 @@ public class OI {
         private static final Button kBuddyBalanceActivateButton = Button.B; //Activates buddy balance
         private static final Button kDownBuddyBalanceButton = Button.POVDOWN; // Lowers buddy balance lift
         private static final Button kUpBuddyBalanceButton = Button.POVUP; // Raises buddy balance lift
+        private static final Button kYellowCargo = Button.Y;
+        private static final Button kPurpleCargo = Button.X;
+
+        private static final int kArmElow = 0;
+        private static final int kArmBase = 2;
 
         public static JoystickButton getActivateBuddyBalanceButton() {
             kBuddyBalanceActivateButton.setButtonAction("Activate buddy balance");
