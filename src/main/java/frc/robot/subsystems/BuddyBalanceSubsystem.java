@@ -54,7 +54,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private RelativeEncoder leftEncoder;
 
   // Simulation
-  private static double kSimP = 0.1;
+  private static double kSimP = 1;
   private static double kSimI = 0.0;
   private static double kSimD = 0.0;
   private PIDController simPIDController;
@@ -142,18 +142,29 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void deployBuddyBalance() {
+    System.out.println("deployed");
     activateDeploy.set(kServoDeployedPos);
     isDeployed = true;
   }
 
   public void retrieveBuddy() { // Used to pick up the buddy robot while the lift is already underneath it
-    rightPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition);
-    leftPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition);
+    System.out.println("retrieved");
+    if(Robot.isSimulation()) {
+      simPIDController.setSetpoint(1);
+    } else {
+      rightPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition);
+      leftPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition);
+    }
   }
 
   public void releaseBuddy() { // Used to set down the robot
-    rightPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition);
-    leftPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition);
+    System.out.println("released");
+    if(Robot.isSimulation()) {
+      simPIDController.setSetpoint(20);
+    } else {
+      rightPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition);
+      leftPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition);
+    }
   }
 
   public void updateSimMotor() {
