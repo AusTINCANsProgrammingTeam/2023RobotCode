@@ -279,7 +279,7 @@ public class SwerveSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());
-        
+
         pitchEntry.setDouble(gyro.getPitch());
         headingEntry.setDouble(getHeading());
         positionEntry.setString(getPose().getTranslation().toString());

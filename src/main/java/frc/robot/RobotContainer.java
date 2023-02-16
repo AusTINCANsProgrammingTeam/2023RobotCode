@@ -13,7 +13,6 @@ import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.commands.AssistedBalanceCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.CameraSubsystem;
@@ -34,8 +33,6 @@ public class RobotContainer {
 
   private Auton auton;
 
-  private AssistedBalanceCommand assistedBalanceCommand;
-
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/");
 
@@ -55,8 +52,6 @@ public class RobotContainer {
 
     auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
 
-    assistedBalanceCommand = Robot.swerveEnabled ? new AssistedBalanceCommand(swerveSubsystem) : null;
-
     if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
@@ -67,7 +62,6 @@ public class RobotContainer {
 
     // Configure the button bindings    
     configureButtonBindings();
-
   }
 
   /**
