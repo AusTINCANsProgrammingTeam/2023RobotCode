@@ -11,14 +11,12 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 
-public class ArmCommand extends CommandBase {
+public class ArmAnglesCommand extends CommandBase {
   private final ArmSubsystem armSubsystem;
   private final Supplier<Double> baseArmJoystick;
   private final Supplier<Double> elbowArmJoystick;
-  private double elbowSetpoint = 0;
-  private double baseSetpoint = 0;
 
-  public ArmCommand(ArmSubsystem armSubsystem, Supplier<Double> baseArmJoystick, Supplier<Double> elbowArmJoystick) {
+  public ArmAnglesCommand(ArmSubsystem armSubsystem, Supplier<Double> baseArmJoystick, Supplier<Double> elbowArmJoystick) {
     this.armSubsystem = armSubsystem;
     this.baseArmJoystick = baseArmJoystick;
     this.elbowArmJoystick = elbowArmJoystick;
@@ -28,17 +26,13 @@ public class ArmCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    elbowSetpoint = armSubsystem.getElbowAngle();
-    baseSetpoint = armSubsystem.getBaseAngle();
+    armSubsystem.setReferences(armSubsystem.getBaseAngle(), armSubsystem.getElbowAngle());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    baseSetpoint = MathUtil.clamp(baseSetpoint+Units.degreesToRadians(baseArmJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(100));
-    armSubsystem.setBaseReference(baseSetpoint);
-    elbowSetpoint = MathUtil.clamp(elbowSetpoint+Units.degreesToRadians(elbowArmJoystick.get()*2),Units.degreesToRadians(30),Units.degreesToRadians(130));
-    armSubsystem.setElbowReference(elbowSetpoint);
+    armSubsystem.updateReferences(baseArmJoystick.get(), elbowArmJoystick.get());
   }
 
   // Called once the command ends or is interrupted.

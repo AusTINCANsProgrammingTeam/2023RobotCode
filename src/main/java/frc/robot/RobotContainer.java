@@ -12,6 +12,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
+import frc.robot.commands.ArmAnglesCommand;
+import frc.robot.commands.ArmPositionCommand;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ArmSubsystem.ArmState;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BuddyBalanceSubsystem;
 import frc.robot.commands.AssistedBalanceCommand;
@@ -34,6 +38,10 @@ public class RobotContainer {
   private final EverybotIntakeSubsystem intakeSubsystem;
   private final CameraSubsystem cameraSubsystem;
   private final BuddyBalanceSubsystem buddyBalanceSubsystem;
+  private final ArmSubsystem armSubsystem;
+  private final ArmAnglesCommand armAnglesCommand;
+  private final ArmPositionCommand armPositionCommand;
+  
 
   private Auton auton;
 
@@ -44,6 +52,8 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    armSubsystem = Robot.armEnabled ? new ArmSubsystem() : null;
+
     swerveSubsystem = Robot.swerveEnabled ? new SwerveSubsystem() : null;
     subsystemEnabledLog.append(swerveSubsystem == null ? "Swerve: Disabled" : "Swerve: Enabled");
 
@@ -63,6 +73,9 @@ public class RobotContainer {
 
     assistedBalanceCommand = Robot.swerveEnabled ? new AssistedBalanceCommand(swerveSubsystem) : null;
 
+    armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getBaseSupplier(), OI.Operator.getElbowSupplier()) : null;
+    armPositionCommand = Robot.armEnabled ? new ArmPositionCommand(armSubsystem, OI.Operator.getBaseSupplier(), OI.Operator.getElbowSupplier()) : null;
+
     if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
       swerveSubsystem, 
@@ -71,6 +84,9 @@ public class RobotContainer {
       OI.Driver.getRotationSupplier()));
     }
 
+    if (Robot.armEnabled) {
+      armSubsystem.setDefaultCommand(armAnglesCommand);
+    }
     // Configure the button bindings    
     configureButtonBindings();
 
@@ -99,6 +115,11 @@ public class RobotContainer {
       OI.Operator.getDownBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::deployBuddyBalance, buddyBalanceSubsystem).unless(() -> buddyBalanceSubsystem.getIsDeployed()));
       OI.Operator.getDownBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::releaseBuddy, buddyBalanceSubsystem).unless(() -> !buddyBalanceSubsystem.getIsDeployed()));
       OI.Operator.getUpBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::retrieveBuddy, buddyBalanceSubsystem).unless(() -> !buddyBalanceSubsystem.getIsDeployed()));
+    }
+
+    if (Robot.armEnabled) {
+      OI.Operator.getHighArmButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.setState(ArmState.HIGHSCORE), () -> armSubsystem.setState(ArmState.STOWED), armSubsystem));
+      OI.Operator.getMidArmButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.setState(ArmState.MIDSCORE), () -> armSubsystem.setState(ArmState.STOWED), armSubsystem));
     }
 
     if (!Robot.isCompetition) {
