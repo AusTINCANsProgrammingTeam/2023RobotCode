@@ -23,7 +23,9 @@ public class Robot extends TimedRobot {
   public static final boolean isCompetition = true;
 
   public static final int ledStipPort = 2;
+  public static final int ledStripLength = 256;
   public static final int ledMatrixPort = 3;
+  public static final int ledMatrixLenth = 256;
 
   //RoboRIO serial numbers
   public static final String competitionRobotSerial = "03161743";

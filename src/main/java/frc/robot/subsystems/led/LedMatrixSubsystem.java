@@ -30,8 +30,8 @@ private final AddressableLEDBuffer buffer;
 private final AddressableLED leds = new AddressableLED(Robot.ledMatrixPort);
 
     public LedMatrixSubsystem() {
-        buffer = new AddressableLEDBuffer(256);
-        leds.setLength(256);
+        buffer = new AddressableLEDBuffer(Robot.ledMatrixLenth);
+        leds.setLength(Robot.ledMatrixLenth);
         leds.setData(buffer);
         leds.start();
         ledBrightnessSlider.getDouble(0.2);

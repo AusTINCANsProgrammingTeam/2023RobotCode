@@ -23,16 +23,15 @@ public class LedSubsystem extends SubsystemBase {
   private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
   private GenericEntry ledState = ledTab.add("OnOff", false).getEntry();
   private SimpleWidget ledGamePiece = ledTab.add("Color", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow"));
-  private static final int length = 256; //Amount of Leds in strip light. Or one if we are using a single light
   public static enum LedMode {
     CONE, CUBE, OFF;
   }
   private LedMode ledMode = LedMode.CONE;
   /** Configure AddressableLED */
   public LedSubsystem() {
-    buffer = new AddressableLEDBuffer(length);
+    buffer = new AddressableLEDBuffer(Robot.ledStripLength);
     //leds.setBitTiming(1, 1, 1, 1);
-    leds.setLength(length);
+    leds.setLength(Robot.ledStripLength);
     leds.setData(buffer);
     leds.start();
     }
@@ -54,7 +53,7 @@ public class LedSubsystem extends SubsystemBase {
 
   /* Solid Color */
   private void solid(Color color) {
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < Robot.ledStripLength; i++) {
         buffer.setLED(i, color);
     }
   }
