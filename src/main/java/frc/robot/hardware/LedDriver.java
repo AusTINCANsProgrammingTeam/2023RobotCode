@@ -1,28 +1,6 @@
 package frc.robot.hardware;
-
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-
 /** REV Robotics Blinkin LED Driver. */
 public class LedDriver {
-    private final Spark spark;
-    //TODO setbounds
-    public LedDriver(int channel) {
-        spark = new Spark(channel);
-    }
-
-    public void setMode(BlinkinLedMode mode) {
-        spark.set(mode.value);
-    }
-
-    public static enum BlinkinLedMode {
-        SOLID_YELLOW(0.69), SOLID_VIOLET(0.91), OFF(0.99);
-
-    private final double value;
-
-        BlinkinLedMode(double value) {
-            this.value = value;
-        }
-    }
 
 // ('CanMan_Left', 16x16px) With original color and blending
     public static String[][] canman = {

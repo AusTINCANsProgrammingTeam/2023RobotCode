@@ -1,33 +1,40 @@
 package frc.robot.subsystems.led;
 
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.hardware.LedDriver;
-import frc.robot.hardware.LedDriver.BlinkinLedMode;
 // TODO Led parameters and RIO ports
 public class BlinkinLedSubsystem extends SubsystemBase {
-    private final LedDriver blinkin;
     private BlinkinLedMode mode = BlinkinLedMode.SOLID_YELLOW;
+    private final Spark spark;
 
+    public static enum BlinkinLedMode {
+        SOLID_YELLOW(0.69), SOLID_VIOLET(0.91), OFF(0.99);
+    private final double value;
+        BlinkinLedMode(double value) {
+            this.value = value;
+        }
+    }
+    
     public BlinkinLedSubsystem() {
-        blinkin = new LedDriver(Robot.ledStipPort);
+        spark = new Spark(Robot.ledStipPort);
     }
 
     public void blinkinStopLed(){
-        blinkin.setMode(BlinkinLedMode.OFF);
+        spark.set(BlinkinLedMode.OFF.value);
     }
 
     public void blinkinStartLed(){
-        blinkin.setMode(mode);
+        spark.set(mode.value);
     }
 
     public void blinkinChangeGamePiece(){
         if (mode == BlinkinLedMode.SOLID_YELLOW){
             mode = BlinkinLedMode.SOLID_VIOLET;
-            blinkin.setMode(mode);
+            spark.set(mode.value);
         } else if (mode == BlinkinLedMode.SOLID_VIOLET){
             mode = BlinkinLedMode.SOLID_YELLOW;
-            blinkin.setMode(mode);
+            spark.set(mode.value);
         }
     }
 

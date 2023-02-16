@@ -176,7 +176,7 @@ public class OI {
         }
         
         public static JoystickButton getSwitchLedButton(){
-            kSwitchLEDButton.setButtonAction("Parking");
+            kSwitchLEDButton.setButtonAction("Switch GamePiece Led Mode Button");
             return new JoystickButton(kJoystick, kSwitchLEDButton.getButtonID());
         }
     }
