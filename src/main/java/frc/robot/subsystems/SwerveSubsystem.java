@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
@@ -98,8 +99,7 @@ public class SwerveSubsystem extends SubsystemBase{
     private GenericEntry pitchEntry = matchTab.add("NavX Pitch", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
 
     private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
-    private GenericEntry positionEntry = configTab.add("Position", "").getEntry();
-
+    private GenericEntry positionEntry;
     public boolean controlOrientationIsFOD;
 
     public Double rotationHold;
@@ -109,9 +109,12 @@ public class SwerveSubsystem extends SubsystemBase{
     private PIDController rotationController;
 
     public SwerveSubsystem() {
+        
         zeroHeading();
         controlOrientationIsFOD = true;
-
+        if (!Robot.isCompetition){
+            positionEntry = configTab.add("Position", "").getEntry();
+        };
         //Add coast mode command to shuffleboard
         configTab.add(new StartEndCommand(this::coastModules, this::brakeModules, this).ignoringDisable(true).withName("Coast Modules"));
 
