@@ -62,6 +62,7 @@ public class OI {
           private static final Button kAlignBackwardButton = Button.button2; //2, Align backwards
           private static final Button kArmHighButton = Button.RB;
           private static final Button kArmMidButton = Button.RT;
+          private static final Button kFloorIntake = Button.button3;
         
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -166,8 +167,8 @@ public class OI {
         private static final Button kYellowCargo = Button.Y;
         private static final Button kPurpleCargo = Button.X;
 
-        private static final int kArmElow = 0;
-        private static final int kArmBase = 2;
+        private static final int kArmElbowAxis = 0;
+        private static final int kArmBaseAxis = 2;
 
         public static JoystickButton getActivateBuddyBalanceButton() {
             kBuddyBalanceActivateButton.setButtonAction("Activate buddy balance");
@@ -182,6 +183,16 @@ public class OI {
         public static POVButton getUpBuddyBalanceButton() {
             kUpBuddyBalanceButton.setButtonAction("Raise buddy balance");
             return new POVButton(kJoystick, kUpBuddyBalanceButton.getButtonID()); // This button will move the lift to the balanced position if it was in the deployed position
+        }
+
+        public static JoystickButton getYellowCargoButton() {
+            kYellowCargo.setButtonAction("Yellow Cargo Lights");
+            return new JoystickButton(kJoystick, kYellowCargo.getButtonID());
+        }
+
+        public static JoystickButton getPurpleCargoButton() {
+            kYellowCargo.setButtonAction("Purple Cargo Lights");
+            return new JoystickButton(kJoystick, kPurpleCargo.getButtonID());
         }
     }
 
