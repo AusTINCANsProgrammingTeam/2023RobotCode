@@ -120,6 +120,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private GenericEntry elbowP = armTab.add("Elbow P", kElbowP).getEntry();
   private GenericEntry elbowI = armTab.add("Elbow I", kElbowI).getEntry();
   private GenericEntry elbowD = armTab.add("Elbow D", kElbowD).getEntry();
+  private GenericEntry armXPos = armTab.add("X Position", getArmX()).getEntry();
+  private GenericEntry armYPos = armTab.add("Y Position", getArmY()).getEntry();
 
   private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), kBaseGearing, baseArmInertia, kBaseArmLength, kMinBAngle, kMaxBAngle, false);
   private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, elbowArmInertia, kElbowArmLength, kMinEAngle, kMaxEAngle, false);
@@ -177,20 +179,39 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     elbowPIDController.setSetpoint(setpointE);
   }
 
-  public void setPositions(double x, double y) {
+  //Sets motor angle setpoints based on a coordinate pair. This uses the same logic as the setState() method,
+  //except instead of drawing from an enum's x and y, we supply it ourselves.
+  public void setMotorPositions(double x, double y) {
     double desiredBaseAngle = convertToBaseAngle(x, y);
     double desiredElbowAngle = convertToBaseAngle(x, y);
 
     setReferences(desiredBaseAngle, desiredElbowAngle);
   }
 
-  public void updatePositions(double bJoystickValue, double eJoystickValue) {
-    //FIXME Add the actual math here
-    //This method is not complete
-    double c = Math.sqrt((kBaseArmLength*kBaseArmLength) + (kElbowArmLength+kElbowArmLength) - 2*(kBaseArmLength*kElbowArmLength) * Math.cos(Math.PI+(convertToPrelimAngle(armXPosition, armYPosition))));
-    armXPosition = 0;
-    armYPosition = 0;
-    double desiredBaseAngle = convertToBaseAngle(armXPosition+bJoystickValue,armYPosition+eJoystickValue);
+  //Gets arm X and Y positions. Desmos simulation link: https://www.desmos.com/calculator/fv7smerzhp
+  public double getArmX() {
+    double c = Math.sqrt((kBaseArmLength*kBaseArmLength)+(kElbowArmLength*kElbowArmLength)-(2*kBaseArmLength*kElbowArmLength)*Math.cos(getElbowAngle()-getBaseAngle()));
+    double innerangle = Math.acos(((kBaseArmLength*kBaseArmLength)+(c*c)-(kElbowArmLength*kElbowArmLength))/(2*kBaseArmLength*c));
+    return Math.cos(getBaseAngle()-innerangle)*c;
+  }
+  public double getArmY() {
+    double c = Math.sqrt((kBaseArmLength*kBaseArmLength)+(kElbowArmLength*kElbowArmLength)-(2*kBaseArmLength*kElbowArmLength)*Math.cos(getElbowAngle()-getBaseAngle()));
+    double innerangle = Math.acos(((kBaseArmLength*kBaseArmLength)+(c*c)-(kElbowArmLength*kElbowArmLength))/(2*kBaseArmLength*c));
+    return Math.sin(getBaseAngle()-innerangle)*c;
+  }
+
+  //This updates the actual motor angle setpoints with positions, and is mean to be used with ArmPositionCommand.
+  public void updateMotorPositions(double bJoystickValue, double eJoystickValue) {
+    double desiredBaseAngle = convertToBaseAngle(getArmX()+bJoystickValue, getArmY()+eJoystickValue);
+    double desiredElbowAngle = convertToBaseAngle(getArmX()+bJoystickValue, getArmY()+eJoystickValue);
+
+    setReferences(desiredBaseAngle, desiredElbowAngle);
+  }
+
+  //This updates the arm positions to be used for stuff like shuffleboard
+  public void updatePositions() {
+    armXPosition = getArmX();
+    armYPosition = getArmY();
   }
 
   public void updateMotors() {
@@ -246,10 +267,12 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     // This method will be called once per scheduler run
     updateMotors();
-
+    updatePositions();
     //Shuffleboard + Smartdashboard values 
     baseArmAngle.setDouble(Units.radiansToDegrees(getBaseAngle()));
     elbowArmAngle.setDouble(Units.radiansToDegrees(getElbowAngle()));
+    armXPos.setDouble(armXPosition);
+    armYPos.setDouble(armYPosition);
     baseArmAngleSetpoint.setDouble(Units.radiansToDegrees(basePIDController.getSetpoint()));
     elbowArmAngleSetpoint.setDouble(Units.radiansToDegrees(elbowPIDController.getSetpoint()));
     elbowOutput.setDouble(elbowMotor.getAppliedOutput());

@@ -29,7 +29,7 @@ public class ArmPositionCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    armSubsystem.updatePositions(baseArmJoystick.get(), elbowArmJoystick.get());
+    armSubsystem.updateMotorPositions(baseArmJoystick.get(), elbowArmJoystick.get());
   }
 
   // Called once the command ends or is interrupted.
