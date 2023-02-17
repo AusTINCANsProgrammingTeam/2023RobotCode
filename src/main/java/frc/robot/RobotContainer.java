@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.hardware.LedDriver;
+import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -24,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.AssistedBalanceCommand;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.EverybotIntakeSubsystem;
 
@@ -54,9 +54,9 @@ public class RobotContainer {
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    ledSubsystem = Robot.ledSubsystem ? new LedSubsystem() : null;
-    ledMatrixSubsystem = Robot.ledMatrixEnabled ? new LedMatrixSubsystem() : null; //PWM port 2
-    blinkinLedSubsystem = Robot.blinkinLedEnabled ? new BlinkinLedSubsystem() : null;
+    ledSubsystem = Robot.ledSubSelect == LedEnum.STRIP ? new LedSubsystem() : null;
+    ledMatrixSubsystem = Robot.ledSubSelect == LedEnum.MATRIX ? new LedMatrixSubsystem() : null; //PWM port 2
+    blinkinLedSubsystem = Robot.ledSubSelect == LedEnum.BLINKIN ? new BlinkinLedSubsystem() : null;
 
     swerveSubsystem = Robot.swerveEnabled ? new SwerveSubsystem() : null;
     subsystemEnabledLog.append(swerveSubsystem == null ? "Swerve: Disabled" : "Swerve: Enabled");
@@ -97,7 +97,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    if (Robot.ledMatrixEnabled){
+    if (Robot.ledSubSelect == LedEnum.MATRIX){
      OI.Operator.getLedToggleButton().onTrue(
       new SequentialCommandGroup(
         new InstantCommand(() -> ledMatrixSubsystem.serpentine(LedDriver.three), ledMatrixSubsystem),
@@ -109,11 +109,11 @@ public class RobotContainer {
         new InstantCommand(() -> ledMatrixSubsystem.serpentine(LedDriver.gocans), ledMatrixSubsystem))
       );
     }
-    if (Robot.blinkinLedEnabled){
+    if (Robot.ledSubSelect == LedEnum.BLINKIN){
       OI.Operator.getLedToggleButton().onTrue(new InstantCommand(blinkinLedSubsystem::blinkinChangeGamePiece));
       OI.Operator.getLedSwitchButton().whileTrue(new StartEndCommand(blinkinLedSubsystem::blinkinStartLed, blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
     }
-    if (Robot.ledSubsystem){
+    if (Robot.ledSubSelect == LedEnum.STRIP){
       OI.Operator.getLedSwitchButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
       OI.Operator.getLedToggleButton().whileTrue(new StartEndCommand(ledSubsystem::onLed, ledSubsystem::offLed, ledSubsystem));
     }
