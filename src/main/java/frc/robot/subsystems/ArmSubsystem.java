@@ -83,13 +83,17 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   private final DutyCycleEncoder baseAbsoluteEncoder;
   private final DutyCycleEncoder elbowAbsoluteEncoder;
+  private double simBaseEncoderPosition;
+  private double simElbowEncoderPosition;
 
   private final PIDController basePIDController;
   private final PIDController elbowPIDController;
   public static final double kBaseGearing = 40.8333333;
   public static final double kElbowGearing = 4.28571429;
   public static final double kBaseArmLength = Units.inchesToMeters(43.5);
+  public static final double kBaseArmLengthCM = kBaseArmLength*100;
   public static final double kElbowArmLength = Units.inchesToMeters(37.5);
+  public static final double kElbowArmLengthCM = kElbowArmLength*100;
   public static final double kMinBAngle = Units.degreesToRadians(30);
   public static final double kMaxBAngle = Units.degreesToRadians(91);
   public static final double kMinEAngle = Units.degreesToRadians(-70);
@@ -107,6 +111,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private GenericEntry simArmStateY = armSimTab.add("Arm State Y", 0.0).getEntry();
   //Elbow Arm Values for Simulation
   private GenericEntry simEArmAngle = armSimTab.add("SimElbow Arm Angle", 0.0).getEntry();
+  private GenericEntry simEEncoderPos = armSimTab.add("SimElbow Encoder Angle", 0.0).getEntry();
   private GenericEntry simEOutSet = armSimTab.add("SimElbow Output", 0.0).getEntry();
   //Real arm values
   public ShuffleboardTab armTab = Shuffleboard.getTab("Arm (Real)");
@@ -122,6 +127,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private GenericEntry elbowD = armTab.add("Elbow D", kElbowD).getEntry();
   private GenericEntry armXPos = armTab.add("X Position", getArmX()).getEntry();
   private GenericEntry armYPos = armTab.add("Y Position", getArmY()).getEntry();
+  private GenericEntry armC = armTab.add("C (Debug))", getArmY()).getEntry();
 
   private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), kBaseGearing, baseArmInertia, kBaseArmLength, kMinBAngle, kMaxBAngle, false);
   private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, elbowArmInertia, kElbowArmLength, kMinEAngle, kMaxEAngle, false);
@@ -153,12 +159,13 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     setState(ArmState.STOWED);
   }
 
+  //Returns sim encoder position (No offset) if in simulation, the actual position otherwise
   public double getBaseAngle() {
-    return AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder);
+    return Robot.isSimulation() ? simBaseEncoderPosition : AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder);
   }
 
   public double getElbowAngle() {
-    return AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder);
+    return Robot.isSimulation() ? simElbowEncoderPosition : AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder);
   }
 
   public void updateReferences(double bJoystickValue, double eJoystickValue) {
@@ -188,15 +195,21 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     setReferences(desiredBaseAngle, desiredElbowAngle);
   }
 
+  
   //Gets arm X and Y positions. Desmos simulation link: https://www.desmos.com/calculator/fv7smerzhp
+  public double getC() {
+    return getElbowAngle()-getBaseAngle()-(Math.PI/2)+Math.PI;
+    //return (getElbowAngle()-getBaseAngle())+(Math.PI/2);
+    //return Math.sqrt((110*110)+(96*96)-(2*110*96)*Math.cos(1.66963140027));
+  }
   public double getArmX() {
-    double c = Math.sqrt((kBaseArmLength*kBaseArmLength)+(kElbowArmLength*kElbowArmLength)-(2*kBaseArmLength*kElbowArmLength)*Math.cos(getElbowAngle()-getBaseAngle()));
-    double innerangle = Math.acos(((kBaseArmLength*kBaseArmLength)+(c*c)-(kElbowArmLength*kElbowArmLength))/(2*kBaseArmLength*c));
+    double c = Math.sqrt((kBaseArmLengthCM*kBaseArmLengthCM)+(kElbowArmLengthCM*kElbowArmLengthCM)-(2*kBaseArmLengthCM*kElbowArmLengthCM)*Math.cos(getElbowAngle()-getBaseAngle()-(Math.PI/2)+Math.PI));
+    double innerangle = Math.acos(((kBaseArmLengthCM*kBaseArmLengthCM)+(c*c)-(kElbowArmLengthCM*kElbowArmLengthCM))/(2*kBaseArmLengthCM*c));
     return Math.cos(getBaseAngle()-innerangle)*c;
   }
   public double getArmY() {
-    double c = Math.sqrt((kBaseArmLength*kBaseArmLength)+(kElbowArmLength*kElbowArmLength)-(2*kBaseArmLength*kElbowArmLength)*Math.cos(getElbowAngle()-getBaseAngle()));
-    double innerangle = Math.acos(((kBaseArmLength*kBaseArmLength)+(c*c)-(kElbowArmLength*kElbowArmLength))/(2*kBaseArmLength*c));
+    double c = Math.sqrt((kBaseArmLengthCM*kBaseArmLengthCM)+(kElbowArmLengthCM*kElbowArmLengthCM)-(2*kBaseArmLengthCM*kElbowArmLengthCM)*Math.cos(getElbowAngle()-getBaseAngle()-(Math.PI/2)+Math.PI));
+    double innerangle = Math.acos(((kBaseArmLengthCM*kBaseArmLengthCM)+(c*c)-(kElbowArmLengthCM*kElbowArmLengthCM))/(2*kBaseArmLengthCM*c));
     return Math.sin(getBaseAngle()-innerangle)*c;
   }
 
@@ -213,6 +226,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     armXPosition = getArmX();
     armYPosition = getArmY();
   }
+  
 
   public void updateMotors() {
     baseMotor.set(MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1));
@@ -262,6 +276,12 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     baseMotor.stopMotor();
     elbowMotor.stopMotor();
   }
+
+  public void stopsim() {
+    stop();
+    baseArmSim.setInputVoltage(0);
+    elbowArmSim.setInputVoltage(0);
+  }
   
   @Override
   public void periodic() {
@@ -273,6 +293,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     elbowArmAngle.setDouble(Units.radiansToDegrees(getElbowAngle()));
     armXPos.setDouble(armXPosition);
     armYPos.setDouble(armYPosition);
+    armC.setDouble(getC());
     baseArmAngleSetpoint.setDouble(Units.radiansToDegrees(basePIDController.getSetpoint()));
     elbowArmAngleSetpoint.setDouble(Units.radiansToDegrees(elbowPIDController.getSetpoint()));
     elbowOutput.setDouble(elbowMotor.getAppliedOutput());
@@ -291,7 +312,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void simulationPeriodic() {
+    //stopsim();
     updateSimMotors();
+    simBaseEncoderPosition = baseArmSim.getAngleRads();
+    simElbowEncoderPosition = elbowArmSim.getAngleRads();
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(baseArmSim.getCurrentDrawAmps()+elbowArmSim.getCurrentDrawAmps()));
     baseArmSimV.setAngle(Units.radiansToDegrees(baseArmSim.getAngleRads()));
     elbowArmSimV.setAngle(Units.radiansToDegrees(elbowArmSim.getAngleRads())-baseArmSimV.getAngle()-90);
@@ -303,6 +327,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     simBEncoderPos.setDouble(Units.radiansToDegrees(getBaseAngle()));
     simBOutSet.setDouble(Units.radiansToDegrees(basePIDController.getSetpoint()));
     simEArmAngle.setDouble(Units.radiansToDegrees(elbowArmSim.getAngleRads()));
+    simEEncoderPos.setDouble(Units.radiansToDegrees(getElbowAngle()));
     simEOutSet.setDouble(Units.radiansToDegrees(elbowPIDController.getSetpoint()));
   }
 
