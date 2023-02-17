@@ -42,14 +42,12 @@ public class Robot extends LoggedRobot {
   public static final String practiceRobotSerial = "03064df0";
   public static final boolean isCompetitionRobot = !HALUtil.getSerialNumber().equals(practiceRobotSerial);
 
-  public static enum Led {
+  public static enum LedEnum {
     BLINKIN, STRIP, MATRIX, NONE;
   }
 
   //Subsystem toggle
-  public static final boolean ledMatrixEnabled = true;
-  public static final boolean ledSubsystem = false;
-  public static final boolean blinkinLedEnabled = false;
+  public static final LedEnum ledSubSelect = LedEnum.MATRIX;
 
   public static final boolean batteryEnabled = true;
   public static final boolean cameraEnabled = true;
