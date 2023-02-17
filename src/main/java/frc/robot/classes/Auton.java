@@ -103,8 +103,8 @@ public class Auton{
         PathPlannerTrajectory trajectory = getTrajectory(initialTrajectory);
         Pose2d initialPose = FieldConstants.allianceFlip(Objects.isNull(trajectory) ? new Pose2d(0, 0, new Rotation2d()) : trajectory.getInitialPose());
         return new SequentialCommandGroup(
-            new InstantCommand(() -> swerveSubsystem.resetOdometry(initialPose)),
-            new InstantCommand(() -> swerveSubsystem.zeroHeading(initialPose.getRotation()))
+            new InstantCommand(() -> swerveSubsystem.zeroHeading(initialPose.getRotation())),
+            new InstantCommand(() -> swerveSubsystem.resetOdometry(initialPose))
         );
     }
 
