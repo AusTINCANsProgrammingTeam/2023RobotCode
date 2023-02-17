@@ -16,19 +16,21 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-  // TODO Led parameters and RIO ports
 public class LedSubsystem extends SubsystemBase {
   private final AddressableLEDBuffer buffer;
-  private final AddressableLED leds = new AddressableLED(Robot.ledStipPort);
+  private final AddressableLED leds;
   private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
   private GenericEntry ledState = ledTab.add("OnOff", false).getEntry();
   private SimpleWidget ledGamePiece = ledTab.add("Color", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow"));
+  private double ledBrightnessSlider = ledTab.add("Brightness", 0.2).withWidget(BuiltInWidgets.kNumberSlider).getEntry().getDouble(0.2);
+
   public static enum LedMode {
     CONE, CUBE, OFF;
   }
   private LedMode ledMode = LedMode.CONE;
   /** Configure AddressableLED */
   public LedSubsystem() {
+    leds = new AddressableLED(Robot.ledPort);
     buffer = new AddressableLEDBuffer(Robot.ledStripLength);
     //leds.setBitTiming(1, 1, 1, 1);
     leds.setLength(Robot.ledStripLength);
@@ -39,13 +41,13 @@ public class LedSubsystem extends SubsystemBase {
   public void setMode(LedMode mode){
       switch (mode) {
           case CUBE: 
-            solid(Color.kViolet);
+            solid(new Color(0.93333334 * ledBrightnessSlider, 0.50980395 * ledBrightnessSlider, 0.93333334 * ledBrightnessSlider));
           break;
           case CONE:
-            solid(Color.kYellow);
+            solid(new Color(1 * ledBrightnessSlider, 1 * ledBrightnessSlider, 0.0f));
           break;
           case OFF:
-            solid(Color.kBlack);
+            solid(new Color(0.0f, 0.0f, 0.0f));
           break;
       }
       leds.setData(buffer);

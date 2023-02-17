@@ -10,12 +10,15 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
+import frc.robot.hardware.LedDriver;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.BuddyBalanceSubsystem;
 import frc.robot.subsystems.led.BlinkinLedSubsystem;
 import frc.robot.subsystems.led.LedMatrixSubsystem;
 import frc.robot.subsystems.led.LedSubsystem;
+import frc.robot.commands.AssistedBalanceCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -37,9 +40,10 @@ public class RobotContainer {
   private final SimulationSubsystem simulationSubsystem;
   private final EverybotIntakeSubsystem intakeSubsystem;
   private final CameraSubsystem cameraSubsystem;
+  private final BuddyBalanceSubsystem buddyBalanceSubsystem;
 
   private LedSubsystem ledSubsystem;
-  private final LedMatrixSubsystem ledMatrixSubsystem;
+  private LedMatrixSubsystem ledMatrixSubsystem;
   private BlinkinLedSubsystem blinkinLedSubsystem;
 
   private Auton auton;
@@ -66,6 +70,9 @@ public class RobotContainer {
     cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
     subsystemEnabledLog.append(cameraSubsystem == null ? "Camera: Disabled" : "Camera: Enabled");
 
+    buddyBalanceSubsystem = Robot.buddyBalanceEnabled ? new BuddyBalanceSubsystem() : null;
+    subsystemEnabledLog.append(buddyBalanceSubsystem == null ? "Buddy Balance: Disabled" : "Buddy Balance Enabled");
+
     auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
 
     assistedBalanceCommand = Robot.swerveEnabled ? new AssistedBalanceCommand(swerveSubsystem) : null;
@@ -91,24 +98,24 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     if (Robot.ledMatrixEnabled){
-     OI.Operator.getToggleLEDButton().onTrue(
+     OI.Operator.getLedToggleButton().onTrue(
       new SequentialCommandGroup(
-        new InstantCommand(ledMatrixSubsystem::setLedThree),
+        new InstantCommand(() -> ledMatrixSubsystem.serpentine(LedDriver.three), ledMatrixSubsystem),
         new WaitCommand(1),
-        new InstantCommand(ledMatrixSubsystem::setLedTwo),
+        new InstantCommand(() -> ledMatrixSubsystem.serpentine(LedDriver.two), ledMatrixSubsystem),
         new WaitCommand(1),
-        new InstantCommand(ledMatrixSubsystem::setLedOne),
+        new InstantCommand(() -> ledMatrixSubsystem.serpentine(LedDriver.one), ledMatrixSubsystem),
         new WaitCommand(1),
-        new InstantCommand(ledMatrixSubsystem::setLedGoCans))
+        new InstantCommand(() -> ledMatrixSubsystem.serpentine(LedDriver.gocans), ledMatrixSubsystem))
       );
     }
     if (Robot.blinkinLedEnabled){
-      OI.Operator.getSwitchLedButton().onTrue(new InstantCommand(blinkinLedSubsystem::blinkinChangeGamePiece));
-      OI.Operator.getToggleLEDButton().whileTrue(new StartEndCommand(blinkinLedSubsystem::blinkinStartLed, blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
+      OI.Operator.getLedToggleButton().onTrue(new InstantCommand(blinkinLedSubsystem::blinkinChangeGamePiece));
+      OI.Operator.getLedSwitchButton().whileTrue(new StartEndCommand(blinkinLedSubsystem::blinkinStartLed, blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
     }
     if (Robot.ledSubsystem){
-      OI.Operator.getSwitchLedButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
-      OI.Operator.getToggleLEDButton().whileTrue(new StartEndCommand(ledSubsystem::onLed, ledSubsystem::offLed, ledSubsystem));
+      OI.Operator.getLedSwitchButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
+      OI.Operator.getLedToggleButton().whileTrue(new StartEndCommand(ledSubsystem::onLed, ledSubsystem::offLed, ledSubsystem));
     }
     if (Robot.swerveEnabled) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
@@ -120,6 +127,12 @@ public class RobotContainer {
     if (Robot.intakeEnabled) {
     OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem));
     OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem));
+    }
+
+    if (Robot.buddyBalanceEnabled) {
+      OI.Operator.getDownBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::deployBuddyBalance, buddyBalanceSubsystem).unless(() -> buddyBalanceSubsystem.getIsDeployed()));
+      OI.Operator.getDownBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::releaseBuddy, buddyBalanceSubsystem).unless(() -> !buddyBalanceSubsystem.getIsDeployed()));
+      OI.Operator.getUpBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::retrieveBuddy, buddyBalanceSubsystem).unless(() -> !buddyBalanceSubsystem.getIsDeployed()));
     }
 
     if (!Robot.isCompetition) {

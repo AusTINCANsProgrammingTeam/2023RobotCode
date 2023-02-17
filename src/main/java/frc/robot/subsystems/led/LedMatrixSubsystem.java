@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Robot;
-import frc.robot.hardware.LedDriver;
 
 public class LedMatrixSubsystem extends SubsystemBase{
     private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
@@ -27,9 +26,10 @@ public class LedMatrixSubsystem extends SubsystemBase{
     }
 
 private final AddressableLEDBuffer buffer;
-private final AddressableLED leds = new AddressableLED(Robot.ledMatrixPort);
+private final AddressableLED leds;
 
     public LedMatrixSubsystem() {
+        leds = new AddressableLED(Robot.ledPort);
         buffer = new AddressableLEDBuffer(Robot.ledMatrixLenth);
         leds.setLength(Robot.ledMatrixLenth);
         leds.setData(buffer);
@@ -37,40 +37,16 @@ private final AddressableLED leds = new AddressableLED(Robot.ledMatrixPort);
         ledBrightnessSlider.getDouble(0.2);
     }
 
-    private void serpentine(boolean bool, String[][] image){
-        if (bool){
-            for (int i=0; i<image.length; i += 2) {
-                Collections.reverse(Arrays.asList(image[i]));
-            };
-        }
-            for (int i=0; i<image.length; i++) { 
-                for (int j=0; j<image[i].length; j++){
-                    buffer.setLED((16*i)+j, hex2Rgb(image[i][j]));
-                }
+    public void serpentine(String[][] image){
+        for (int i=0; i<image.length; i += 2) {
+            Collections.reverse(Arrays.asList(image[i]));
+        };
+        for (int i=0; i<image.length; i++) { 
+            for (int j=0; j<image[i].length; j++){
+                buffer.setLED((16*i)+j, hex2Rgb(image[i][j]));
             }
-            leds.setData(buffer);
-    }
-
-    boolean self = true;
-    
-    boolean self2 = true;
-    public void setLedOne(){
-        serpentine(self2, LedDriver.one);
-    }
-
-    boolean self3 = true;
-    public void setLedTwo(){
-        serpentine(self3, LedDriver.two);
-    }
-
-    boolean self4 = true;
-    public void setLedThree(){
-        serpentine(self4, LedDriver.three);
-    }
-
-    boolean self5 = true;
-    public void setLedGoCans(){
-        serpentine(self5, LedDriver.gocans);
+        }
+        leds.setData(buffer);
     }
 
     int instance = 0;

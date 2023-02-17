@@ -8,12 +8,13 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 public class OI {
     //Operator Interface (OI) class containing all control information
 
     private static final int kDriverJoystickPort = 0;
-    private static final int kTeleopJoystickPort = 1;
+    private static final int kOperatorJoystickPort = 1;
 
     public static final class Driver{
         private static enum Button {
@@ -141,7 +142,11 @@ public class OI {
             Back (9),
             Start (10),
             LJ (11), // Left Joystick Button
-            RJ (12); // Right Joystick Button
+            RJ (12),  // Right Joystick Button
+            POVUP (0),
+            POVDOWN (180),
+            POVLEFT (270),
+            POVRIGHT (90);
             
             private final int buttonID; 
             private String buttonAction;
@@ -164,20 +169,38 @@ public class OI {
             }
         };
 
-        private static final Joystick kJoystick = new Joystick(OI.kTeleopJoystickPort);
+        private static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
 
+        private static final Button ledToggleButton = Button.A;
+        private static final Button ledSwitchButton = Button.B;
 
-        private static final Button kToggleLEDButton = Button.X; //1, Toggles the LEDs
-        private static final Button kSwitchLEDButton = Button.A; //2, Switches the LEDs mode (Cone, Cube)
+        private static final Button kBuddyBalanceActivateButton = Button.B; //Activates buddy balance
+        private static final Button kDownBuddyBalanceButton = Button.POVDOWN; // Lowers buddy balance lift
+        private static final Button kUpBuddyBalanceButton = Button.POVUP; // Raises buddy balance lift
 
-        public static JoystickButton getToggleLEDButton(){
-            kToggleLEDButton.setButtonAction("Toggle LED Button");
-            return new JoystickButton(kJoystick, kToggleLEDButton.getButtonID());
+        public static JoystickButton getLedToggleButton(){
+            ledToggleButton.setButtonAction("Toggle Leds");
+            return new JoystickButton(kJoystick, ledToggleButton.getButtonID());
         }
-        
-        public static JoystickButton getSwitchLedButton(){
-            kSwitchLEDButton.setButtonAction("Switch GamePiece Led Mode Button");
-            return new JoystickButton(kJoystick, kSwitchLEDButton.getButtonID());
+
+        public static JoystickButton getLedSwitchButton(){
+            ledSwitchButton.setButtonAction("Switch Led Game Piece");
+            return new JoystickButton(kJoystick, ledSwitchButton.getButtonID());
+        }
+
+        public static JoystickButton getActivateBuddyBalanceButton() {
+            kBuddyBalanceActivateButton.setButtonAction("Activate buddy balance");
+            return new JoystickButton(kJoystick, kBuddyBalanceActivateButton.getButtonID()); // This button must be held in order for the buddy balance to function
+        }
+
+        public static POVButton getDownBuddyBalanceButton() {
+            kDownBuddyBalanceButton.setButtonAction("Lower buddy balance");
+            return new POVButton(kJoystick, kDownBuddyBalanceButton.getButtonID()); // This button will deploy the buddy balance if the confirm button is also held, and also move the lift to the deployed position if it was in the balanced position
+        }
+
+        public static POVButton getUpBuddyBalanceButton() {
+            kUpBuddyBalanceButton.setButtonAction("Raise buddy balance");
+            return new POVButton(kJoystick, kUpBuddyBalanceButton.getButtonID()); // This button will move the lift to the balanced position if it was in the deployed position
         }
     }
 

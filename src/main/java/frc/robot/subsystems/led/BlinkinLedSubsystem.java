@@ -3,21 +3,20 @@ package frc.robot.subsystems.led;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-// TODO Led parameters and RIO ports
 public class BlinkinLedSubsystem extends SubsystemBase {
     private BlinkinLedMode mode = BlinkinLedMode.SOLID_YELLOW;
     private final Spark spark;
 
-    public static enum BlinkinLedMode {
+    private static enum BlinkinLedMode {
         SOLID_YELLOW(0.69), SOLID_VIOLET(0.91), OFF(0.99);
-    private final double value;
+        private final double value;
         BlinkinLedMode(double value) {
-            this.value = value;
+                this.value = value;
         }
     }
     
     public BlinkinLedSubsystem() {
-        spark = new Spark(Robot.ledStipPort);
+        spark = new Spark(Robot.ledPort);
     }
 
     public void blinkinStopLed(){
