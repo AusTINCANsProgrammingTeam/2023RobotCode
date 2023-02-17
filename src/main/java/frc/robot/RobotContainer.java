@@ -100,9 +100,7 @@ public class RobotContainer {
       OI.Operator.getUpBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::retrieveBuddy, buddyBalanceSubsystem).unless(() -> !buddyBalanceSubsystem.getIsDeployed()));
     }
 
-    if (!Robot.isCompetition) {
-      OI.putControllerButtons();
-    }
+    OI.putControllerButtons();
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
