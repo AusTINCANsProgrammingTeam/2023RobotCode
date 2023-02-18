@@ -60,8 +60,8 @@ public class OI {
           private static final Button kIntakeButton = Button.LT; //Right Trigger, run intake
           private static final Button kAlignForwardButton = Button.button4; //4, Align forwards
           private static final Button kAlignBackwardButton = Button.button2; //2, Align backwards
-          private static final Button kArmHighButton = Button.RB;
-          private static final Button kArmMidButton = Button.RT;
+          private static final Button kArmHighTrigger = Button.RB;
+          private static final Button kArmMidTrigger = Button.RT;
           private static final Button kFloorIntake = Button.button3;
         
         private static final int kXTranslationAxis = 0;
