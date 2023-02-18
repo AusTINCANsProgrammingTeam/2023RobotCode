@@ -19,6 +19,7 @@ import frc.robot.classes.TunableNumber;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import frc.robot.Robot;
 
 public class BuddyBalanceSubsystem extends SubsystemBase {
   private static double kBalancedPosition; // Buddy balance PID reference point when lifting a robot and engaging charge station
@@ -50,10 +51,15 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private boolean isDeployed = false;
   private DataLog datalog = DataLogManager.getLog();
   private DoubleLogEntry buddyBalancePosition = new DoubleLogEntry(datalog, "/buddybalance/position");
-  private ShuffleboardTab buddyBalanceTab = Shuffleboard.getTab("Buddy Balance"); // TODO: Replace buddy balance tab with whatever tab the position should be logged to
+  private ShuffleboardTab buddyBalanceTab; // TODO: Replace buddy balance tab with whatever tab the position should be logged to
   private GenericEntry positionEntry;
 
   public BuddyBalanceSubsystem() {
+
+    if (!Robot.isCompetition){
+      buddyBalanceTab = Shuffleboard.getTab("Buddy Balance");
+    }
+
     rightMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceRight);
     leftMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft);
     activateDeploy = new Servo(deployServoID);
