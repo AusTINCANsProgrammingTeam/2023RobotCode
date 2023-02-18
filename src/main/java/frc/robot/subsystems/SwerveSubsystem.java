@@ -288,10 +288,13 @@ public class SwerveSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());
-        
-        pitchEntry.setDouble(gyro.getPitch());
-        headingEntry.setDouble(getHeading());
-        positionEntry.setString(getPose().getTranslation().toString());
+
+        if (!Robot.isCompetition) {
+            pitchEntry.setDouble(gyro.getPitch());
+            headingEntry.setDouble(getHeading());
+            positionEntry.setString(getPose().getTranslation().toString());
+        }
+
         Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
         Logger.getInstance().recordOutput("Pose 2D", getPose());
     }
