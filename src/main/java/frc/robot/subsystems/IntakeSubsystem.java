@@ -41,8 +41,9 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   
   private void spinWheels(double velocity) {
     motor.set(velocity);
-    intakeEntry.setDouble(velocity);
-    
+    if (!Robot.isCompetition) {
+      intakeEntry.setDouble(velocity);
+    }
   }
 
   public void push() {
