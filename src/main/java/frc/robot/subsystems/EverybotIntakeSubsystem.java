@@ -14,17 +14,21 @@ import frc.robot.hardware.MotorController.MotorConfig;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.Robot;
 
 public class EverybotIntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kOuttakeSpeed = -1;
   public static final double kIntakeSpeed = 0.5;
   private CANSparkMax motor;
-  private static ShuffleboardTab intakeTab = Shuffleboard.getTab("Match");
-  private static GenericEntry intakeEntry = intakeTab.add("Everybot Intake Speed", 0.0).getEntry();
+  private static ShuffleboardTab intakeTab;
+  private static GenericEntry intakeEntry;
   /** Creates a new IntakeSubsystem. */
   public EverybotIntakeSubsystem() {
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
-  
+    if (!Robot.isCompetition){
+      intakeTab = Shuffleboard.getTab("Match");
+      intakeEntry = intakeTab.add("Everybot Intake Speed", 0.0).getEntry();
+    }
   }
   
   private void spinWheels(double velocity) {
