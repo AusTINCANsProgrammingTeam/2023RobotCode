@@ -33,7 +33,9 @@ public class EverybotIntakeSubsystem extends SubsystemBase implements AutoClosea
   
   private void spinWheels(double velocity) {
     motor.set(velocity);
-    intakeEntry.setDouble(velocity);
+    if (!Robot.isCompetition) {
+      intakeEntry.setDouble(velocity);
+    }
   }
 
   public void push() {
