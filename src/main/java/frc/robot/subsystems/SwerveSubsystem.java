@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.AssistedBalanceCommand;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
@@ -281,6 +282,10 @@ public class SwerveSubsystem extends SubsystemBase{
             this
         ).beforeStarting(() -> trajectoryLog.append("Following trajectory " + name)
         ).alongWith(new InstantCommand(() -> Logger.getInstance().recordOutput("trajectory " + name, trajectory)));
+    }
+
+    public Command assistedBalance(){
+        return new AssistedBalanceCommand(this);
     }
     
     @Override
