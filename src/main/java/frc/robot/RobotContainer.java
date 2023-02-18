@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.CameraSubsystem;
-import frc.robot.subsystems.EverybotIntakeSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,7 +35,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem;
   private final SimulationSubsystem simulationSubsystem;
-  private final EverybotIntakeSubsystem intakeSubsystem;
+  private final IntakeSubsystem intakeSubsystem;
   private final CameraSubsystem cameraSubsystem;
   private final BuddyBalanceSubsystem buddyBalanceSubsystem;
   private final ArmSubsystem armSubsystem;
@@ -60,7 +60,7 @@ public class RobotContainer {
     simulationSubsystem = Robot.isSimulation() && Robot.simulationEnabled && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
     subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
 
-    intakeSubsystem = Robot.intakeEnabled ? new EverybotIntakeSubsystem() : null;
+    intakeSubsystem = Robot.intakeEnabled ? new IntakeSubsystem() : null;
     subsystemEnabledLog.append(intakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
 
     cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
