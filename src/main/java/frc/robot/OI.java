@@ -186,18 +186,17 @@ public class OI {
         private static final int kArmBaseAxis = 2;
 
         //TODO: Tune curves to driver preference
-        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
-        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
-        private static final ControlCurve kRotationCurve = new ControlCurve(1,0,1,0.1);
+        private static final ControlCurve kArmElbowCurve = new ControlCurve(0.65,0.05,1,0.1);
+        private static final ControlCurve kArmBaseCurve = new ControlCurve(0.65,0.05,1,0.1);
  
         public static Supplier<Double> getArmElbowSupplier(){
             //This axis is inverted
-            return () -> kXTranslationCurve.calculate(-kJoystick.getRawAxis(kArmElbowAxis));
+            return () -> kArmElbowCurve.calculate(-kJoystick.getRawAxis(kArmElbowAxis));
         }
 
         public static Supplier<Double> getArmBaseSupplier(){
             //This axis is inverted
-            return () -> kYTranslationCurve.calculate(-kJoystick.getRawAxis(kArmBaseAxis));
+            return () -> kArmBaseCurve.calculate(-kJoystick.getRawAxis(kArmBaseAxis));
         }
 
         public static JoystickButton getActivateBuddyBalanceButton() {
