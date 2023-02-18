@@ -17,13 +17,13 @@ public class AssistedBalanceCommand extends CommandBase {
   private final double kPBalancing = 0.2;
   private final double kIBalancing = 0;
   private final double kDBalancing = 0;
-  private final double balancingDeadzoneNumber = 0.001;
-  private double pidControllerMaxSpeed = 0.1;
+  private final double balancingDeadzoneNumber = 2.5;
+  private double pidControllerMaxSpeed = 0.15;
   PIDController pidController = new PIDController(kPBalancing, kIBalancing, kDBalancing);
   TunableNumber tunableP = new TunableNumber("Balancing P", kPBalancing, pidController::setP);
   TunableNumber tunableI = new TunableNumber("Balancing I", kIBalancing, pidController::setI);
   TunableNumber tunableD = new TunableNumber("Balancing D", kDBalancing, pidController::setD);
-  TunableNumber TunableSpeed = new TunableNumber("PID Max Speed", pidControllerMaxSpeed, (a) -> {pidControllerMaxSpeed = a});
+  //TunableNumber TunableSpeed = new TunableNumber("PID Max Speed", pidControllerMaxSpeed, (a) -> {pidControllerMaxSpeed = a});
   
   /**
    * Creates a new AssistedBalanceCommand
