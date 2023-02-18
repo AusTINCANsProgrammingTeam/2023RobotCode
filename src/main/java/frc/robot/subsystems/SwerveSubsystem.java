@@ -93,12 +93,12 @@ public class SwerveSubsystem extends SubsystemBase{
     private StringLogEntry errors = new StringLogEntry(datalog, "/swerve/errors"); //Logs any hardware errors
     private StringLogEntry trajectoryLog = new StringLogEntry(datalog, "/auton/trajectory"); //Logs autonomous trajectory following
 
-    private ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
-    private GenericEntry controlOrientationEntry = matchTab.add("FOD", true).getEntry();
-    private GenericEntry headingEntry = matchTab.add("NavX Yaw", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
-    private GenericEntry pitchEntry = matchTab.add("NavX Pitch", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
+    private ShuffleboardTab matchTab;
+    private GenericEntry controlOrientationEntry;
+    private GenericEntry headingEntry;
+    private GenericEntry pitchEntry;
 
-    private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
+    private ShuffleboardTab configTab;
     private GenericEntry positionEntry;
     public boolean controlOrientationIsFOD;
 
@@ -112,9 +112,16 @@ public class SwerveSubsystem extends SubsystemBase{
         
         zeroHeading();
         controlOrientationIsFOD = true;
+        
         if (!Robot.isCompetition){
+            matchTab = Shuffleboard.getTab("Match");
+            controlOrientationEntry = matchTab.add("FOD", true).getEntry();
+            headingEntry = matchTab.add("NavX Yaw", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
+            pitchEntry = matchTab.add("NavX Pitch", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
+            configTab = Shuffleboard.getTab("Config");
             positionEntry = configTab.add("Position", "").getEntry();
         };
+
         //Add coast mode command to shuffleboard
         configTab.add(new StartEndCommand(this::coastModules, this::brakeModules, this).ignoringDisable(true).withName("Coast Modules"));
 
