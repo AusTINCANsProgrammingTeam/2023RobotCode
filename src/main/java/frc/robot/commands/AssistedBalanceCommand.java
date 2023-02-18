@@ -46,7 +46,7 @@ public class AssistedBalanceCommand extends CommandBase {
 
     swerve_subsystem.setModuleStates(
       swerve_subsystem.convertToModuleStates(
-        0.0, MathUtil.clamp(pidController.calculate(swerve_subsystem.getPitch(), 0.0), -pidControllerMaxSpeed, pidControllerMaxSpeed), 0.0));  
+        0.0, MathUtil.clamp(-pidController.calculate(swerve_subsystem.getPitch(), 0.0), -pidControllerMaxSpeed, pidControllerMaxSpeed), 0.0));  
   }
 
   // Called once the command ends or is interrupted.
