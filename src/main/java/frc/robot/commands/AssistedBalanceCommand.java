@@ -23,7 +23,6 @@ public class AssistedBalanceCommand extends CommandBase {
   TunableNumber tunableP = new TunableNumber("Balancing P", kPBalancing, pidController::setP);
   TunableNumber tunableI = new TunableNumber("Balancing I", kIBalancing, pidController::setI);
   TunableNumber tunableD = new TunableNumber("Balancing D", kDBalancing, pidController::setD);
-  //TunableNumber TunableSpeed = new TunableNumber("PID Max Speed", pidControllerMaxSpeed, (a) -> {pidControllerMaxSpeed = a});
   
   /**
    * Creates a new AssistedBalanceCommand
