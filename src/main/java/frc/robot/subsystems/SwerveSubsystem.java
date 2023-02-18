@@ -56,6 +56,7 @@ public class SwerveSubsystem extends SubsystemBase{
     public static final double kXTranslationP = 1.5;
     public static final double kYTranslationP = 1.5;
     public static final double kRotationP = 1.5;
+    public static final double kRotationI = 1e-5;
 
     private final SwerveModule frontLeft = new SwerveModule(
         MotorConfig.FrontLeftModuleDrive,
@@ -117,9 +118,9 @@ public class SwerveSubsystem extends SubsystemBase{
         configTab.add(new StartEndCommand(this::coastModules, this::brakeModules, this).ignoringDisable(true).withName("Coast Modules"));
 
         //Define PID controllers for tracking trajectory
-        xController = new PIDController(kXTranslationP, 0, 0);
-        yController = new PIDController(kYTranslationP, 0, 0);
-        rotationController = new PIDController(kRotationP, 0, 0);
+        xController = new PIDController(kXTranslationP, 0, 1e-4);
+        yController = new PIDController(kYTranslationP, 0, 1e-4);
+        rotationController = new PIDController(kRotationP, kRotationI, 0);
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
