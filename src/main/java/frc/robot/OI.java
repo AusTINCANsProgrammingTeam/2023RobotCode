@@ -117,6 +117,21 @@ public class OI {
             kOuttakeButton.setButtonAction("Outtake");
             return new JoystickButton(kJoystick, kOuttakeButton.getButtonID());
         }
+
+        public static JoystickButton getArmHighTrigger(){
+            kArmHighTrigger.setButtonAction("Arm High");
+            return new JoystickButton(kJoystick, kArmHighTrigger.getButtonID());
+        }
+
+        public static JoystickButton getArmMidTrigger(){
+            kArmMidTrigger.setButtonAction("Arm Mid");
+            return new JoystickButton(kJoystick, kArmMidTrigger.getButtonID());
+        }
+
+        public static JoystickButton getFloorIntakeButton(){
+            kFloorIntake.setButtonAction("Floor Intake");
+            return new JoystickButton(kJoystick, kFloorIntake.getButtonID());
+        }
     }
 
     public static final class Operator{
@@ -169,6 +184,21 @@ public class OI {
 
         private static final int kArmElbowAxis = 0;
         private static final int kArmBaseAxis = 2;
+
+        //TODO: Tune curves to driver preference
+        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
+        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
+        private static final ControlCurve kRotationCurve = new ControlCurve(1,0,1,0.1);
+ 
+        public static Supplier<Double> getArmElbowSupplier(){
+            //This axis is inverted
+            return () -> kXTranslationCurve.calculate(-kJoystick.getRawAxis(kArmElbowAxis));
+        }
+
+        public static Supplier<Double> getArmBaseSupplier(){
+            //This axis is inverted
+            return () -> kYTranslationCurve.calculate(-kJoystick.getRawAxis(kArmBaseAxis));
+        }
 
         public static JoystickButton getActivateBuddyBalanceButton() {
             kBuddyBalanceActivateButton.setButtonAction("Activate buddy balance");
