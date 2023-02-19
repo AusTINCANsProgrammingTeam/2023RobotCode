@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.hardware.VL53L0X;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -39,13 +40,15 @@ public class Robot extends LoggedRobot {
   public static final boolean isCompetitionRobot = !HALUtil.getSerialNumber().equals(practiceRobotSerial);
 
   //Subsystem toggle
-  public static final boolean batteryEnabled = true;
-  public static final boolean cameraEnabled = true;
-  public static final boolean everybotIntakeEnabled = true;
-  public static final boolean intakeEnabled = true;
-  public static final boolean simulationEnabled = true;
-  public static final boolean swerveEnabled = true;
+  public static final boolean batteryEnabled = false;
+  public static final boolean cameraEnabled = false;
+  public static final boolean everybotIntakeEnabled = false;
+  public static final boolean intakeEnabled = false;
+  public static final boolean simulationEnabled = false;
+  public static final boolean swerveEnabled = false;
   public static final boolean buddyBalanceEnabled = false;
+
+  private VL53L0X timeOfFlightSensor;
   
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();
@@ -83,6 +86,8 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    timeOfFlightSensor = new VL53L0X();
   }
 
   /**
@@ -101,6 +106,8 @@ public class Robot extends LoggedRobot {
     loopCount++;
     loopCountEntry.append(loopCount);
     CommandScheduler.getInstance().run();
+
+    System.out.println("Range: " + timeOfFlightSensor.getRange() + " mm");
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

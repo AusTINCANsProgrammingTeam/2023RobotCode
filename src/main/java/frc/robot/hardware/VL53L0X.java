@@ -4,10 +4,12 @@
 
 package frc.robot.hardware;
 
+import edu.wpi.first.hal.simulation.BufferCallback;
+import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
-
+import edu.wpi.first.wpilibj.simulation.CallbackStore;
 import edu.wpi.first.wpilibj.simulation.I2CSim;
 
 import java.util.Map;
@@ -16,6 +18,8 @@ import java.util.Map;
 public class VL53L0X {
     private static final int i2c_addr = 0x52;
     private final I2C i2c; 
+
+    private I2CSim simDev;
 
     private static final int SYSRANGE_START = 0x00;
     private static final int SYSTEM_THRESH_HIGH = 0x0C;
@@ -88,12 +92,28 @@ public class VL53L0X {
     );
 
     private int stopVariable;
+    private CallbackStore readCallbackStore, writeCallbackStore;
 
 /*
  * Vendor of this IC doesn't provide a register map (apparently its extremely complex). Basing off AdaFruit's python implementation
  */
     public VL53L0X() {
         i2c = new I2C(Port.kMXP, i2c_addr);
+        
+        // Simulation setup
+        simDev = new I2CSim(Port.kMXP.value);
+        simDev.setInitialized(true);
+        BufferCallback readCallback = (String name, byte[] buffer, int count) -> {
+           System.out.println(name + " " + count); 
+        };
+
+        ConstBufferCallback writeCallback = (String name, byte[] buffer, int count) -> {
+           System.out.println(name + " " + count); 
+        };
+        readCallbackStore = simDev.registerReadCallback(readCallback);
+        writeCallbackStore = simDev.registerWriteCallback(writeCallback);
+        // End simulation setup
+
         readAndCheckMapVL53L0X(refRegs);
         // Initialize access to the sensor.  This is based on the logic from:
         //   https://github.com/pololu/vl53l0x-arduino/blob/master/VL53L0X.cpp
