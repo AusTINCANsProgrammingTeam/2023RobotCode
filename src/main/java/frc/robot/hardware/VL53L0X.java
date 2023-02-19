@@ -6,16 +6,18 @@ package frc.robot.hardware;
 
 import edu.wpi.first.hal.simulation.BufferCallback;
 import edu.wpi.first.hal.simulation.ConstBufferCallback;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.simulation.CallbackStore;
 import edu.wpi.first.wpilibj.simulation.I2CSim;
+import frc.robot.Robot;
 
-import java.util.Map;
+import java.util.List;
 
 /** Add your docs here. */
-public class VL53L0X {
+public class VL53L0X  implements AutoCloseable{
     private static final int i2c_addr = 0x52;
     private final I2C i2c; 
 
@@ -84,15 +86,17 @@ public class VL53L0X {
 
     private boolean isPresent = true;
 
-    private static final Map<Integer, Integer> refRegs = Map.of(
-        0xC0, 0xEE,
-        0xC1, 0xAA,
-        0xC2, 0x10
+    private static final List<Pair<Integer, Integer>> refRegs = List.of(
+        new Pair<>(0xC0, 0xEE),
+        new Pair<>(0xC1, 0xAA),
+        new Pair<>(0xC2, 0x10)
 
     );
 
     private int stopVariable;
     private CallbackStore readCallbackStore, writeCallbackStore;
+
+    private byte[] simBuf = new byte[128];
 
 /*
  * Vendor of this IC doesn't provide a register map (apparently its extremely complex). Basing off AdaFruit's python implementation
@@ -100,38 +104,47 @@ public class VL53L0X {
     public VL53L0X() {
         i2c = new I2C(Port.kMXP, i2c_addr);
         
-        // Simulation setup
-        simDev = new I2CSim(Port.kMXP.value);
-        simDev.setInitialized(true);
-        BufferCallback readCallback = (String name, byte[] buffer, int count) -> {
-           System.out.println(name + " " + count); 
-        };
+        if (Robot.isSimulation()) {
+            simDev = new I2CSim(Port.kMXP.value);
+            simDev.setInitialized(true);
+            BufferCallback readCallback = (String name, byte[] buffer, int count) -> {
+            System.out.print(name + " " + count + " bytes:" ); 
+            for (int i = 0; i < count; i++) {
+                    buffer[i] = simBuf[i];
+                    System.out.print(" " + String.format("%02X", buffer[i])); 
+            }
+            System.out.println();
+            };
 
-        ConstBufferCallback writeCallback = (String name, byte[] buffer, int count) -> {
-           System.out.println(name + " " + count); 
-        };
-        readCallbackStore = simDev.registerReadCallback(readCallback);
-        writeCallbackStore = simDev.registerWriteCallback(writeCallback);
-        // End simulation setup
+            ConstBufferCallback writeCallback = (String name, byte[] buffer, int count) -> {
+            System.out.print(name + " " + count + " bytes:" ); 
+            for (int i = 0; i < count; i++) {
+                    System.out.print(" " + String.format("%02X", buffer[i])); 
+            }
+            System.out.println();
+            };
+            readCallbackStore = simDev.registerReadCallback(readCallback);
+            writeCallbackStore = simDev.registerWriteCallback(writeCallback);
+        }
 
-        readAndCheckMapVL53L0X(refRegs);
+        readAndCheckListVL53L0X(refRegs);
         // Initialize access to the sensor.  This is based on the logic from:
         //   https://github.com/pololu/vl53l0x-arduino/blob/master/VL53L0X.cpp
         // Set I2C standard mode.
-        writeMapVL53L0X(
-            Map.of(
-                0x88, 0x00,
-                0x80, 0x01,
-                0xFF, 0x01,
-                0x00, 0x00
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0x88, 0x00),
+                new Pair<Integer,Integer>(0x80, 0x01),
+                new Pair<Integer,Integer>(0xFF, 0x01),
+                new Pair<Integer,Integer>(0x00, 0x00)
             )
         );
         stopVariable = readVL53L0X(0x91);
-        writeMapVL53L0X(
-            Map.of(
-                0x00, 0x01,
-                0xFF, 0x00,
-                0x80, 0x00
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0x00, 0x01),
+                new Pair<Integer,Integer>(0xFF, 0x00),
+                new Pair<Integer,Integer>(0x80, 0x00)
             )
         );
 
@@ -142,7 +155,9 @@ public class VL53L0X {
 
         // set final range signal rate limit to 0.25 MCPS (million counts per
         // second)
-        double signalRateLimit = 0.25;
+        int signalRateLimit = (int)(0.25 * (1 << 7));
+        write16VL53L0X(FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, signalRateLimit);
+
         writeVL53L0X(SYSTEM_SEQUENCE_CONFIG, 0xFF);
 
         //spad_count, spad_is_aperture = self._get_spad_info()
@@ -151,46 +166,49 @@ public class VL53L0X {
         // count and boolean is_aperture.  Based on code from:
         //   https://github.com/pololu/vl53l0x-arduino/blob/master/VL53L0X.cpp
 
-        writeMapVL53L0X(
-            Map.of(
-                0x80, 0x01,
-                0xFF, 0x01,
-                0x00, 0x00,
-                0xFF, 0x06
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0x80, 0x01),
+                new Pair<Integer,Integer>(0xFF, 0x01),
+                new Pair<Integer,Integer>(0x00, 0x00),
+                new Pair<Integer,Integer>(0xFF, 0x06)
             )
         );
         writeVL53L0X(0x83, readVL53L0X(0x83) | 0x04);
-        writeMapVL53L0X(
-            Map.of(
-                0xFF, 0x07,
-                0x81, 0x01,
-                0x80, 0x01,
-                0x94, 0x6B,
-                0x83, 0x00
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0xFF, 0x07),
+                new Pair<Integer,Integer>(0x81, 0x01),
+                new Pair<Integer,Integer>(0x80, 0x01),
+                new Pair<Integer,Integer>(0x94, 0x6B),
+                new Pair<Integer,Integer>(0x83, 0x00)
             )
         );
 
         //TODO Remove busy wait
-        while(readVL53L0X(0x83) == 0x00) { }
+        simBuf[0] = 0x00;
+        while(readVL53L0X(0x83) == 0x00) { simBuf[0] = 0x01; }
+        simBuf[0] = 0x00;
+
         writeVL53L0X(0x83,0x01);
         int tmp = readVL53L0X(0x92);
         int spad_count = tmp & 0x7F;
         boolean spad_is_aperture = (tmp & 0x80) != 0;
 
-        writeMapVL53L0X(
-            Map.of(
-                0x81, 0x00, 
-                0xFF, 0x06
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0x81, 0x00), 
+                new Pair<Integer,Integer>(0xFF, 0x06)
             )
         );
         writeVL53L0X(0x83, readVL53L0X(0x83) & 0xFB);
 
-        writeMapVL53L0X(
-            Map.of(
-                0xFF, 0x01,
-                0x00, 0x01, 
-                0xFF, 0x00, 
-                0x80, 0x00
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0xFF, 0x01),
+                new Pair<Integer,Integer>(0x00, 0x01), 
+                new Pair<Integer,Integer>(0xFF, 0x00), 
+                new Pair<Integer,Integer>(0x80, 0x00)
             )
         );
 
@@ -200,13 +218,13 @@ public class VL53L0X {
         // _6, so read it from there.
         byte[] ref_spad_map = readBufferVL53L0X(GLOBAL_CONFIG_SPAD_ENABLES_REF_0, 6);
 
-        writeMapVL53L0X(
-            Map.of(
-                0xFF, 0x01,
-                DYNAMIC_SPAD_REF_EN_START_OFFSET, 0x00,
-                DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD, 0x2C,
-                0xFF, 0x00,
-                GLOBAL_CONFIG_REF_EN_START_SELECT, 0xB4
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0xFF, 0x01),
+                new Pair<Integer,Integer>(DYNAMIC_SPAD_REF_EN_START_OFFSET, 0x00),
+                new Pair<Integer,Integer>(DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD, 0x2C),
+                new Pair<Integer,Integer>(0xFF, 0x00),
+                new Pair<Integer,Integer>(GLOBAL_CONFIG_REF_EN_START_SELECT, 0xB4)
             )
         );
 
@@ -217,122 +235,122 @@ public class VL53L0X {
                 // This bit is lower than the first one that should be enabled,
                 // or (reference_spad_count) bits have already been enabled, so
                 // zero this bit.
-                ref_spad_map[1 + (i / 8)] &= ~(1 << (i % 8));
-            } else if (((ref_spad_map[1 + (i / 8)] >> (i % 8)) & 0x01) > 0) {
+                ref_spad_map[(i / 8)] &= ~(1 << (i % 8));
+            } else if (((ref_spad_map[(i / 8)] >> (i % 8)) & 0x01) > 0) {
                 spads_enabled++;
             }
         }
         writeBufferVL53L0X(GLOBAL_CONFIG_SPAD_ENABLES_REF_0, ref_spad_map);
-        writeMapVL53L0X(
-            Map.of(
-                0xFF, 0x01,
-                0x00, 0x00,
-                0xFF, 0x00,
-                0x09, 0x00,
-                0x10, 0x00,
-                0x11, 0x00,
-                0x24, 0x01,
-                0x25, 0xFF,
-                0x75, 0x00,
-                0xFF, 0x01
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0xFF, 0x01),
+                new Pair<Integer,Integer>(0x00, 0x00),
+                new Pair<Integer,Integer>(0xFF, 0x00),
+                new Pair<Integer,Integer>(0x09, 0x00),
+                new Pair<Integer,Integer>(0x10, 0x00),
+                new Pair<Integer,Integer>(0x11, 0x00),
+                new Pair<Integer,Integer>(0x24, 0x01),
+                new Pair<Integer,Integer>(0x25, 0xFF),
+                new Pair<Integer,Integer>(0x75, 0x00),
+                new Pair<Integer,Integer>(0xFF, 0x01)
             )
         );
-        writeMapVL53L0X(
-            Map.of(
-                0x4E, 0x2C,
-                0x48, 0x00,
-                0x30, 0x20,
-                0xFF, 0x00,
-                0x30, 0x09,
-                0x54, 0x00,
-                0x31, 0x04,
-                0x32, 0x03,
-                0x40, 0x83,
-                0x46, 0x25
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0x4E, 0x2C),
+                new Pair<Integer,Integer>(0x48, 0x00),
+                new Pair<Integer,Integer>(0x30, 0x20),
+                new Pair<Integer,Integer>(0xFF, 0x00),
+                new Pair<Integer,Integer>(0x30, 0x09),
+                new Pair<Integer,Integer>(0x54, 0x00),
+                new Pair<Integer,Integer>(0x31, 0x04),
+                new Pair<Integer,Integer>(0x32, 0x03),
+                new Pair<Integer,Integer>(0x40, 0x83),
+                new Pair<Integer,Integer>(0x46, 0x25)
             )
         );
-        writeMapVL53L0X(
-            Map.of(
-                0x60, 0x00,
-                0x27, 0x00,
-                0x50, 0x06,
-                0x51, 0x00,
-                0x52, 0x96,
-                0x56, 0x08,
-                0x57, 0x30,
-                0x61, 0x00,
-                0x62, 0x00,
-                0x64, 0x00
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0x60, 0x00),
+                new Pair<Integer,Integer>(0x27, 0x00),
+                new Pair<Integer,Integer>(0x50, 0x06),
+                new Pair<Integer,Integer>(0x51, 0x00),
+                new Pair<Integer,Integer>(0x52, 0x96),
+                new Pair<Integer,Integer>(0x56, 0x08),
+                new Pair<Integer,Integer>(0x57, 0x30),
+                new Pair<Integer,Integer>(0x61, 0x00),
+                new Pair<Integer,Integer>(0x62, 0x00),
+                new Pair<Integer,Integer>(0x64, 0x00)
             )
         );
-        writeMapVL53L0X(
-            Map.of(
-                0x65, 0x00,
-                0x66, 0xA0,
-                0xFF, 0x01,
-                0x22, 0x32,
-                0x47, 0x14,
-                0x49, 0xFF,
-                0x4A, 0x00,
-                0xFF, 0x00,
-                0x7A, 0x0A,
-                0x7B, 0x00
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0x65, 0x00),
+                new Pair<Integer,Integer>(0x66, 0xA0),
+                new Pair<Integer,Integer>(0xFF, 0x01),
+                new Pair<Integer,Integer>(0x22, 0x32),
+                new Pair<Integer,Integer>(0x47, 0x14),
+                new Pair<Integer,Integer>(0x49, 0xFF),
+                new Pair<Integer,Integer>(0x4A, 0x00),
+                new Pair<Integer,Integer>(0xFF, 0x00),
+                new Pair<Integer,Integer>(0x7A, 0x0A),
+                new Pair<Integer,Integer>(0x7B, 0x00)
             )
         );
-        writeMapVL53L0X(
-            Map.of(
-                0x78, 0x21,
-                0xFF, 0x01,
-                0x23, 0x34,
-                0x42, 0x00,
-                0x44, 0xFF,
-                0x45, 0x26,
-                0x46, 0x05,
-                0x40, 0x40,
-                0x0E, 0x06,
-                0x20, 0x1A
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0x78, 0x21),
+                new Pair<Integer,Integer>(0xFF, 0x01),
+                new Pair<Integer,Integer>(0x23, 0x34),
+                new Pair<Integer,Integer>(0x42, 0x00),
+                new Pair<Integer,Integer>(0x44, 0xFF),
+                new Pair<Integer,Integer>(0x45, 0x26),
+                new Pair<Integer,Integer>(0x46, 0x05),
+                new Pair<Integer,Integer>(0x40, 0x40),
+                new Pair<Integer,Integer>(0x0E, 0x06),
+                new Pair<Integer,Integer>(0x20, 0x1A)
             )
         );
-        writeMapVL53L0X(
-            Map.of(
-                0x43, 0x40,
-                0xFF, 0x00,
-                0x34, 0x03,
-                0x35, 0x44,
-                0xFF, 0x01,
-                0x31, 0x04,
-                0x4B, 0x09,
-                0x4C, 0x05,
-                0x4D, 0x04,
-                0xFF, 0x00
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0x43, 0x40),
+                new Pair<Integer,Integer>(0xFF, 0x00),
+                new Pair<Integer,Integer>(0x34, 0x03),
+                new Pair<Integer,Integer>(0x35, 0x44),
+                new Pair<Integer,Integer>(0xFF, 0x01),
+                new Pair<Integer,Integer>(0x31, 0x04),
+                new Pair<Integer,Integer>(0x4B, 0x09),
+                new Pair<Integer,Integer>(0x4C, 0x05),
+                new Pair<Integer,Integer>(0x4D, 0x04),
+                new Pair<Integer,Integer>(0xFF, 0x00)
             )
         );
-        writeMapVL53L0X(
-            Map.of(
-                0x44, 0x00,
-                0x45, 0x20,
-                0x47, 0x08,
-                0x48, 0x28,
-                0x67, 0x00,
-                0x70, 0x04,
-                0x71, 0x01,
-                0x72, 0xFE,
-                0x76, 0x00,
-                0x77, 0x00
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0x44, 0x00),
+                new Pair<Integer,Integer>(0x45, 0x20),
+                new Pair<Integer,Integer>(0x47, 0x08),
+                new Pair<Integer,Integer>(0x48, 0x28),
+                new Pair<Integer,Integer>(0x67, 0x00),
+                new Pair<Integer,Integer>(0x70, 0x04),
+                new Pair<Integer,Integer>(0x71, 0x01),
+                new Pair<Integer,Integer>(0x72, 0xFE),
+                new Pair<Integer,Integer>(0x76, 0x00),
+                new Pair<Integer,Integer>(0x77, 0x00)
             )
         );
-        writeMapVL53L0X(
-            Map.of(
-                0xFF, 0x01,
-                0x0D, 0x01,
-                0xFF, 0x00,
-                0x80, 0x01,
-                0x01, 0xF8,
-                0xFF, 0x01,
-                0x8E, 0x01,
-                0x00, 0x01,
-                0xFF, 0x00,
-                0x80, 0x00
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0xFF, 0x01),
+                new Pair<Integer,Integer>(0x0D, 0x01),
+                new Pair<Integer,Integer>(0xFF, 0x00),
+                new Pair<Integer,Integer>(0x80, 0x01),
+                new Pair<Integer,Integer>(0x01, 0xF8),
+                new Pair<Integer,Integer>(0xFF, 0x01),
+                new Pair<Integer,Integer>(0x8E, 0x01),
+                new Pair<Integer,Integer>(0x00, 0x01),
+                new Pair<Integer,Integer>(0xFF, 0x00),
+                new Pair<Integer,Integer>(0x80, 0x00)
             )
         );
         writeVL53L0X(SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04);
@@ -451,22 +469,27 @@ public class VL53L0X {
     };
 
     public int getRange() {
-        writeMapVL53L0X(
-            Map.of(
-                0x80, 0x01,
-                0xFF, 0x01,
-                0x00, 0x00,
-                0x91, stopVariable,
-                0x00, 0x01,
-                0xFF, 0x00,
-                0x80, 0x00,
-                SYSRANGE_START, 0x01
+        writeListVL53L0X(
+            List.of(
+                new Pair<Integer,Integer>(0x80, 0x01),
+                new Pair<Integer,Integer>(0xFF, 0x01),
+                new Pair<Integer,Integer>(0x00, 0x00),
+                new Pair<Integer,Integer>(0x91, stopVariable),
+                new Pair<Integer,Integer>(0x00, 0x01),
+                new Pair<Integer,Integer>(0xFF, 0x00),
+                new Pair<Integer,Integer>(0x80, 0x00),
+                new Pair<Integer,Integer>(SYSRANGE_START, 0x01)
             )
         );
 
         //TODO Fix busy wait x2
-        while ((readVL53L0X(SYSRANGE_START) & 0x01) > 0) {}
-        while ((readVL53L0X(RESULT_INTERRUPT_STATUS) & 0x07) == 0) {}
+        while ((readVL53L0X(SYSRANGE_START) & 0x01) > 0) { simBuf[0] = 0x01; }
+        simBuf[0] = 0x00;
+
+        while ((readVL53L0X(RESULT_INTERRUPT_STATUS) & 0x07) == 0) {simBuf[0] = 0x07;}
+        simBuf[0] = 0x00;
+
+
         int rangeBuf = read16VL53L0X(RESULT_RANGE_STATUS + 10);
         writeVL53L0X(SYSTEM_INTERRUPT_CLEAR, 0x01);
         return rangeBuf;
@@ -481,8 +504,11 @@ public class VL53L0X {
     private void performSingleRefCal(int vhv_init_byte) {
         // based on VL53L0X_perform_single_ref_calibration() from ST API.
         writeVL53L0X(SYSRANGE_START, 0x01 | vhv_init_byte & 0xFF);
+
         // TODO Fix busy wait
-        while((readVL53L0X(RESULT_INTERRUPT_STATUS) & 0x07) == 0) {}
+        while((readVL53L0X(RESULT_INTERRUPT_STATUS) & 0x07) == 0) { simBuf[0] = 0x07; }
+        simBuf[0] = 0x00;
+
         writeVL53L0X(SYSTEM_INTERRUPT_CLEAR, 0x01);
         writeVL53L0X(SYSRANGE_START, 0x00);
     }
@@ -520,9 +546,10 @@ public class VL53L0X {
         return ((int) buf[0]) & 0xFF;
     }
     
-    private void readAndCheckMapVL53L0X(Map<Integer,Integer> regPairs) {
-        for (Integer k : regPairs.keySet()) {
-            if (readVL53L0X(k) != refRegs.get(k).intValue()) {
+    private void readAndCheckListVL53L0X(List<Pair<Integer,Integer>> regPairs) {
+        for (Pair<Integer,Integer> p : regPairs) {
+            simBuf[0] = (byte)(p.getSecond() & 0xFF);
+            if (readVL53L0X(p.getFirst()) != p.getSecond()) {
                 isPresent = false;
                 break;
             }
@@ -561,12 +588,21 @@ public class VL53L0X {
         }
         return false;
     }
-    private void writeMapVL53L0X(Map<Integer,Integer> regPairs) {
-        for (Integer k : regPairs.keySet()) {
-            if(writeVL53L0X(k.intValue(),regPairs.get(k))) {
+    private void writeListVL53L0X(List<Pair<Integer,Integer>> regPairs) {
+        for (Pair<Integer,Integer> p : regPairs) {
+            if(writeVL53L0X(p.getFirst(),p.getSecond())) {
                 break;
             }
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+        if (Robot.isSimulation()) {
+            readCallbackStore.close();
+            writeCallbackStore.close();
+        }
+        i2c.close();
     }
     
 

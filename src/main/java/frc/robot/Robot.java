@@ -88,6 +88,10 @@ public class Robot extends LoggedRobot {
     m_robotContainer = new RobotContainer();
 
     timeOfFlightSensor = new VL53L0X();
+
+    System.out.println("Start Get Time of Flight measurement");
+    System.out.println("Range: " + timeOfFlightSensor.getRange() + " mm");
+    System.out.println("End Get Time of Flight measurement");
   }
 
   /**
@@ -107,7 +111,6 @@ public class Robot extends LoggedRobot {
     loopCountEntry.append(loopCount);
     CommandScheduler.getInstance().run();
 
-    System.out.println("Range: " + timeOfFlightSensor.getRange() + " mm");
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
