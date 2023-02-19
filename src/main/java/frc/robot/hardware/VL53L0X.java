@@ -18,7 +18,7 @@ import java.util.List;
 
 /** Add your docs here. */
 public class VL53L0X  implements AutoCloseable{
-    private static final int i2c_addr = 0x52;
+    private static final int i2c_addr = 0x29;
     private final I2C i2c; 
 
     private I2CSim simDev;
@@ -192,9 +192,10 @@ public class VL53L0X  implements AutoCloseable{
 
         //TODO Remove busy wait
         simBuf[0] = 0x00;
-        while(readVL53L0X(0x83) == 0x00) { simBuf[0] = 0x01; }
+        while(isPresent && readVL53L0X(0x83) == 0x00) { simBuf[0] = 0x01; }
         simBuf[0] = 0x00;
 
+/* 
         writeVL53L0X(0x83,0x01);
         int tmp = readVL53L0X(0x92);
         int spad_count = tmp & 0x7F;
@@ -471,6 +472,7 @@ public class VL53L0X  implements AutoCloseable{
         // "restore the previous Sequence Config"
         writeVL53L0X(SYSTEM_SEQUENCE_CONFIG, 0xE8);
 
+    */
     };
 
     public int getRange() {
@@ -488,10 +490,10 @@ public class VL53L0X  implements AutoCloseable{
         );
 
         //TODO Fix busy wait x2
-        while ((readVL53L0X(SYSRANGE_START) & 0x01) > 0) { simBuf[0] = 0x01; }
+        while (isPresent && (readVL53L0X(SYSRANGE_START) & 0x01) > 0) { simBuf[0] = 0x01; }
         simBuf[0] = 0x00;
 
-        while ((readVL53L0X(RESULT_INTERRUPT_STATUS) & 0x07) == 0) {simBuf[0] = 0x07;}
+        while (isPresent && (readVL53L0X(RESULT_INTERRUPT_STATUS) & 0x07) == 0) {simBuf[0] = 0x07;}
         simBuf[0] = 0x00;
 
 
@@ -511,7 +513,7 @@ public class VL53L0X  implements AutoCloseable{
         writeVL53L0X(SYSRANGE_START, 0x01 | vhv_init_byte & 0xFF);
 
         // TODO Fix busy wait
-        while((readVL53L0X(RESULT_INTERRUPT_STATUS) & 0x07) == 0) { simBuf[0] = 0x07; }
+        while(isPresent && (readVL53L0X(RESULT_INTERRUPT_STATUS) & 0x07) == 0) { simBuf[0] = 0x07; }
         simBuf[0] = 0x00;
 
         writeVL53L0X(SYSTEM_INTERRUPT_CLEAR, 0x01);
@@ -554,7 +556,12 @@ public class VL53L0X  implements AutoCloseable{
     private void readAndCheckListVL53L0X(List<Pair<Integer,Integer>> regPairs) {
         for (Pair<Integer,Integer> p : regPairs) {
             simBuf[0] = (byte)(p.getSecond() & 0xFF);
-            if (readVL53L0X(p.getFirst()) != p.getSecond()) {
+            int val = readVL53L0X(p.getFirst());
+            if (val != p.getSecond()) {
+                System.out.println(
+                    "Read from " + String.format("%02x", p.getFirst()) + 
+                    "\nExpected: " + String.format("%02x", p.getSecond()) + 
+                    "\nGot: " + String.format("%02x", val));
                 isPresent = false;
                 break;
             }
