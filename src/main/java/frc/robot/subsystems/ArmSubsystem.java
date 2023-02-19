@@ -125,9 +125,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private GenericEntry elbowP = armTab.add("Elbow P", kElbowP).getEntry();
   private GenericEntry elbowI = armTab.add("Elbow I", kElbowI).getEntry();
   private GenericEntry elbowD = armTab.add("Elbow D", kElbowD).getEntry();
-  private GenericEntry armXPos = armTab.add("X Position", getArmX()).getEntry();
-  private GenericEntry armYPos = armTab.add("Y Position", getArmY()).getEntry();
-  private GenericEntry armC = armTab.add("C (Debug))", getArmY()).getEntry();
+  private GenericEntry armXPos = armTab.add("X Position", 0).getEntry();
+  private GenericEntry armYPos = armTab.add("Y Position", 0).getEntry();
+  private GenericEntry armC = armTab.add("C (Debug))", 0).getEntry();
 
   private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), kBaseGearing, baseArmInertia, kBaseArmLength, kMinBAngle, kMaxBAngle, false);
   private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, elbowArmInertia, kElbowArmLength, kMinEAngle, kMaxEAngle, false);
@@ -156,7 +156,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
       basePIDController = new PIDController(kBaseP, kBaseI, kBaseD);
       elbowPIDController = new PIDController(kElbowP, kElbowI, kElbowD);
     }
-    setState(ArmState.STOWED);
+    //setState(ArmState.STOWED);
   }
 
   //Returns sim encoder position (No offset) if in simulation, the actual position otherwise
@@ -216,7 +216,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   //This updates the actual motor angle setpoints with positions, and is mean to be used with ArmPositionCommand.
   public void updateMotorPositions(double bJoystickValue, double eJoystickValue) {
     double desiredBaseAngle = convertToBaseAngle(getArmX()+bJoystickValue, getArmY()+eJoystickValue);
-    double desiredElbowAngle = convertToBaseAngle(getArmX()+bJoystickValue, getArmY()+eJoystickValue);
+    double desiredElbowAngle = convertToElbowAngle(getArmX()+bJoystickValue, getArmY()+eJoystickValue);
 
     setReferences(desiredBaseAngle, desiredElbowAngle);
   }
