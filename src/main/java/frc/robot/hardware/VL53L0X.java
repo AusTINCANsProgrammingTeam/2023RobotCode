@@ -84,22 +84,19 @@ public class VL53L0X  implements AutoCloseable{
     private static final int VCSEL_PERIOD_PRE_RANGE = 0;
     private static final int VCSEL_PERIOD_FINAL_RANGE = 1;
 
+    // If an I2C transaction fails, this gets set to false and future transactions are ignored. 
+    // TODO make this better
     private boolean isPresent = true;
 
-    private static final List<Pair<Integer, Integer>> refRegs = List.of(
-        new Pair<>(0xC0, 0xEE),
-        new Pair<>(0xC1, 0xAA),
-        new Pair<>(0xC2, 0x10)
-
-    );
-
     private int stopVariable;
-    private CallbackStore readCallbackStore, writeCallbackStore;
 
-    private byte[] simBuf = new byte[128];
+    // Simulation variables
+    private CallbackStore readCallbackStore, writeCallbackStore;
+    private byte[] simBuf = new byte[128]; // Buffer is bigger than it needs to be to avoid index out of range exceptions.
 
 /*
- * Vendor of this IC doesn't provide a register map (apparently its extremely complex). Basing off AdaFruit's python implementation
+ * Vendor of this IC doesn't provide a register map (apparently its extremely complex). Basing off AdaFruit's python implementation at
+ * https://github.com/adafruit/Adafruit_CircuitPython_VL53L0X/blob/main/adafruit_vl53l0x.py
  */
     public VL53L0X() {
         i2c = new I2C(Port.kMXP, i2c_addr);
@@ -127,7 +124,13 @@ public class VL53L0X  implements AutoCloseable{
             writeCallbackStore = simDev.registerWriteCallback(writeCallback);
         }
 
-        readAndCheckListVL53L0X(refRegs);
+        readAndCheckListVL53L0X(
+            List.of(
+                new Pair<>(0xC0, 0xEE),
+                new Pair<>(0xC1, 0xAA),
+                new Pair<>(0xC2, 0x10)
+            )
+        );
         // Initialize access to the sensor.  This is based on the logic from:
         //   https://github.com/pololu/vl53l0x-arduino/blob/master/VL53L0X.cpp
         // Set I2C standard mode.
