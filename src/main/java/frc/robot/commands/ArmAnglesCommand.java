@@ -33,6 +33,7 @@ public class ArmAnglesCommand extends CommandBase {
   @Override
   public void execute() {
     armSubsystem.updateReferences(baseArmJoystick.get(), elbowArmJoystick.get());
+    armSubsystem.updateMotors();
   }
 
   // Called once the command ends or is interrupted.

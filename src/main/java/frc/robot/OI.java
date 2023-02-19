@@ -179,9 +179,9 @@ public class OI {
         private static final Button kMidArmButton = Button.RT;
 
         private static final int kBaseArmAxis = 1;
-        private static final int kElbowArmAxis = 2;
+        private static final int kElbowArmAxis = 3;
 
-        private static final ControlCurve kArmRotationCurve = new ControlCurve(1,0,1,0.1);
+        private static final ControlCurve kArmRotationCurve = new ControlCurve(0.5,0,1,0.1);
 
         public static Supplier<Double> getBaseSupplier(){
             return () -> kArmRotationCurve.calculate(kJoystick.getRawAxis(kBaseArmAxis));
@@ -191,14 +191,16 @@ public class OI {
             return () -> kArmRotationCurve.calculate(kJoystick.getRawAxis(kElbowArmAxis));
         }
 
+        // This button will toggle the arm moving between the high and stowed positions
         public static JoystickButton getHighArmButton(){
-            kHighArmButton.setButtonAction("Move to High goal position");
-            return new JoystickButton(kJoystick, kHighArmButton.getButtonID()); // This button will toggle the arm moving between the high and stowed positions
+            kHighArmButton.setButtonAction("High position");
+            return new JoystickButton(kJoystick, kHighArmButton.getButtonID());
         }
 
+         // This button will toggle the arm moving between the middle and stowed positions
         public static JoystickButton getMidArmButton(){
-            kMidArmButton.setButtonAction("Move to Middle goal position");
-            return new JoystickButton(kJoystick, kMidArmButton.getButtonID()); // This button will toggle the arm moving between the middle and stowed positions
+            kMidArmButton.setButtonAction("Middle position");
+            return new JoystickButton(kJoystick, kMidArmButton.getButtonID());
         }
 
         public static JoystickButton getActivateBuddyBalanceButton() {

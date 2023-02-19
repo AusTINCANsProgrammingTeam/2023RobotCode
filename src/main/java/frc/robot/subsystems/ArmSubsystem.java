@@ -63,9 +63,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private double kBaseI = 0.036;
   private double kBaseD = 0;
   //Elbow arm PID values
-  private double kElbowP = 1;
-  private double kElbowI = 0.036;
-  private double kElbowD = 0;
+  private double kElbowP = 3;
+  private double kElbowI = 0.1;
+  private double kElbowD = 0.02;
   //Sim PID values
   private double kSimBaseP = 0.1;
   private double kSimBaseI = 0.0;
@@ -96,8 +96,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kElbowArmLengthCM = kElbowArmLength*100;
   public static final double kMinBAngle = Units.degreesToRadians(30);
   public static final double kMaxBAngle = Units.degreesToRadians(91);
-  public static final double kMinEAngle = Units.degreesToRadians(-70);
-  public static final double kMaxEAngle = Units.degreesToRadians(89);
+  public static final double kMinEAngle = Units.degreesToRadians(15);
+  public static final double kMaxEAngle = Units.degreesToRadians(120);
   public static final double kBaseArmMass = Units.lbsToKilograms(20);
   public static final double kElbowArmMass = Units.lbsToKilograms(5);
   public final double baseArmInertia = SingleJointedArmSim.estimateMOI(kBaseArmLength, kBaseArmMass);
@@ -120,11 +120,15 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private GenericEntry elbowArmAngleSetpoint = armTab.add("Elbow Angle Setpoint", 0.0).getEntry();
   private GenericEntry elbowArmAngle = armTab.add("Elbow Arm Angle", 0.0).getEntry();
   private GenericEntry elbowOutput = armTab.add("Elbow Output", 0.0).getEntry();
+  private GenericEntry baseOutput = armTab.add("Base Output", 0.0).getEntry();
   private GenericEntry armDesiredXPosition = armTab.add("Arm X Position", 0.0).getEntry();
   private GenericEntry armDesiredYPosition = armTab.add("Arm Y Position", 0.0).getEntry();
   private GenericEntry elbowP = armTab.add("Elbow P", kElbowP).getEntry();
   private GenericEntry elbowI = armTab.add("Elbow I", kElbowI).getEntry();
   private GenericEntry elbowD = armTab.add("Elbow D", kElbowD).getEntry();
+  private GenericEntry baseP = armTab.add("Base P", kBaseP).getEntry();
+  private GenericEntry baseI = armTab.add("Base I", kBaseI).getEntry();
+  private GenericEntry baseD = armTab.add("Base D", kElbowI).getEntry();
   private GenericEntry armXPos = armTab.add("X Position", 0).getEntry();
   private GenericEntry armYPos = armTab.add("Y Position", 0).getEntry();
   private GenericEntry armC = armTab.add("C (Debug))", 0).getEntry();
@@ -144,9 +148,11 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public ArmSubsystem() {
     SmartDashboard.putData("Arm Sim", simArmCanvas);
     baseMotor = MotorController.constructMotor(MotorConfig.ArmBase1);
+    baseMotor.enableVoltageCompensation(11);
     baseMotor2 = MotorController.constructMotor(MotorConfig.ArmBase2);
     baseMotor2.follow(baseMotor);
     elbowMotor = MotorController.constructMotor(MotorConfig.ArmElbow);
+    elbowMotor.enableVoltageCompensation(11);
     baseAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmBase);
     elbowAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);
     if(Robot.isSimulation()) {
@@ -156,21 +162,30 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
       basePIDController = new PIDController(kBaseP, kBaseI, kBaseD);
       elbowPIDController = new PIDController(kElbowP, kElbowI, kElbowD);
     }
+    elbowPIDController.setTolerance(Units.degreesToRadians(1));
+    basePIDController.setTolerance(Units.degreesToRadians(1));
+    setReferences(getBaseAngle(), getElbowAngle());
+    elbowP.setDouble(kElbowP);
+    elbowI.setDouble(kElbowI);
+    elbowD.setDouble(kElbowD);
+    baseP.setDouble(kBaseP);
+    baseI.setDouble(kBaseI);
+    baseD.setDouble(kBaseD);
     //setState(ArmState.STOWED);
   }
 
   //Returns sim encoder position (No offset) if in simulation, the actual position otherwise
   public double getBaseAngle() {
-    return Robot.isSimulation() ? simBaseEncoderPosition : AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder);
+    return Robot.isSimulation() ? simBaseEncoderPosition : Math.round(AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder)*1000)/1000.0;
   }
 
   public double getElbowAngle() {
-    return Robot.isSimulation() ? simElbowEncoderPosition : AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder);
+    return Robot.isSimulation() ? simElbowEncoderPosition : Math.round(AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder)*1000)/1000.0;
   }
 
   public void updateReferences(double bJoystickValue, double eJoystickValue) {
-    basePIDController.setSetpoint(MathUtil.clamp(basePIDController.getSetpoint()+Units.degreesToRadians(bJoystickValue*2),ArmSubsystem.kMinBAngle,ArmSubsystem.kMaxBAngle));
-    elbowPIDController.setSetpoint(MathUtil.clamp(elbowPIDController.getSetpoint()+Units.degreesToRadians(eJoystickValue*2),ArmSubsystem.kMinEAngle,ArmSubsystem.kMaxEAngle));
+    basePIDController.setSetpoint(MathUtil.clamp(basePIDController.getSetpoint()+Units.degreesToRadians(bJoystickValue),ArmSubsystem.kMinBAngle,ArmSubsystem.kMaxBAngle));
+    elbowPIDController.setSetpoint(MathUtil.clamp(elbowPIDController.getSetpoint()+Units.degreesToRadians(eJoystickValue),ArmSubsystem.kMinEAngle,ArmSubsystem.kMaxEAngle));
   }
 
   public void setBaseReference(double setpoint) {
@@ -229,9 +244,12 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   
 
   public void updateMotors() {
-    baseMotor.set(MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1));
+    //baseMotor.set(MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1));
+    baseMotor.stopMotor();
+    //elbowMotor.set(0.4);
     elbowMotor.set(MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),-1,1));
   }
+
 
   public void updateSimMotors() {
     updateMotors();
@@ -288,6 +306,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     // This method will be called once per scheduler run
     //updateMotors();
+    //stop();
     calculateCurrentPositions();
     //Shuffleboard + Smartdashboard values 
     baseArmAngle.setDouble(Units.radiansToDegrees(getBaseAngle()));
@@ -297,18 +316,25 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     armC.setDouble(getC());
     baseArmAngleSetpoint.setDouble(Units.radiansToDegrees(basePIDController.getSetpoint()));
     elbowArmAngleSetpoint.setDouble(Units.radiansToDegrees(elbowPIDController.getSetpoint()));
-    elbowOutput.setDouble(elbowMotor.getAppliedOutput());
-    elbowP.setDouble(kElbowP);
-    elbowI.setDouble(kElbowI);
-    elbowD.setDouble(kElbowD);
+    elbowOutput.setDouble(elbowMotor.get());
+    baseOutput.setDouble(baseMotor.get());
+
+    
     if(!Robot.isSimulation()) {
       kElbowP = elbowP.getDouble(kElbowP);
       elbowPIDController.setP(kElbowP);
-      kElbowI = elbowP.getDouble(kElbowI);
+      kElbowI = elbowI.getDouble(kElbowI);
       elbowPIDController.setI(kElbowI);
-      kElbowD = elbowP.getDouble(kElbowD);
+      kElbowD = elbowD.getDouble(kElbowD);
       elbowPIDController.setD(kElbowD);
+      kBaseP = baseP.getDouble(kBaseP);
+      basePIDController.setP(kBaseP);
+      kBaseI = baseI.getDouble(kBaseI);
+      basePIDController.setP(kBaseI);
+      kBaseD = baseD.getDouble(kBaseD);
+      basePIDController.setP(kBaseD);
     }
+    
   }
 
   @Override
