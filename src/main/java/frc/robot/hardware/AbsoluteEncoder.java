@@ -17,9 +17,8 @@ public class AbsoluteEncoder {
         BackLeftModule(3, false, 0.353, -3.911),
         BackRightModule(4, false, -0.853, -4.686),
         //Arm Encoders (REV)
-        //242.8, 20.712
-        ArmBase(0, false, Units.degreesToRadians(242.8)),
-        ArmElbow(1, true, Units.degreesToRadians(20.712));
+        ArmBase(1, true, Units.degreesToRadians(-74.6)),
+        ArmElbow(0, true, Units.degreesToRadians(233.6));
         
         private int ID;
         private boolean reversed;
@@ -74,14 +73,22 @@ public class AbsoluteEncoder {
 
     public static DutyCycleEncoder constructREVEncoder(EncoderConfig config){
         DutyCycleEncoder encoder = new DutyCycleEncoder(config.getID());
-        encoder.setPositionOffset(Units.radiansToRotations(Robot.isCompetitionRobot ? config.getCompetitionOffset() : config.getPracticeOffset()));
+        double offset = Units.radiansToRotations(Robot.isCompetitionRobot ? config.getCompetitionOffset() : config.getPracticeOffset());
+        if (offset < 0){
+            offset++;
+        }
+        encoder.setPositionOffset(offset);
         encoder.setDistancePerRotation(config.getReversed() ? -1 : 1);
         return encoder;
     }
 
     public static double getPositionRadians(DutyCycleEncoder encoder){
         //Get position of a REV encoder in radians
-        double position = encoder.getAbsolutePosition() - encoder.getPositionOffset();
-        return Units.rotationsToRadians(encoder.getDistancePerRotation() < 0 ? 1 - position : position);
+        double position = encoder.getAbsolutePosition() + encoder.getPositionOffset();
+        position = encoder.getDistancePerRotation() < 0 ? 1 - position : position;
+        if(position < 0){
+            position++;
+        }
+        return Units.rotationsToRadians(position);
     }
 }
