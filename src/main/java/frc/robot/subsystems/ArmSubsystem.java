@@ -222,7 +222,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   //This updates the arm positions to be used for stuff like shuffleboard
-  public void updatePositions() {
+  public void calculateCurrentPositions() {
     armXPosition = getArmX();
     armYPosition = getArmY();
   }
@@ -232,6 +232,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     baseMotor.set(MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1));
     elbowMotor.set(MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),-1,1));
   }
+
   public void updateSimMotors() {
     updateMotors();
     baseArmSim.setInputVoltage(baseMotor.get() * RobotController.getBatteryVoltage());
@@ -286,8 +287,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    updateMotors();
-    updatePositions();
+    //updateMotors();
+    calculateCurrentPositions();
     //Shuffleboard + Smartdashboard values 
     baseArmAngle.setDouble(Units.radiansToDegrees(getBaseAngle()));
     elbowArmAngle.setDouble(Units.radiansToDegrees(getElbowAngle()));
