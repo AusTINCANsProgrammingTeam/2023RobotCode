@@ -97,6 +97,8 @@ public class VL53L0X  implements AutoCloseable{
 /*
  * Vendor of this IC doesn't provide a register map (apparently its extremely complex). Basing off AdaFruit's python implementation at
  * https://github.com/adafruit/Adafruit_CircuitPython_VL53L0X/blob/main/adafruit_vl53l0x.py
+ * 
+ * TODO This is going to take way to long if done all at once. Find a way to break into a digestible chuncks (a few I2C transactions per Robot period)
  */
     public VL53L0X() {
         i2c = new I2C(Port.kMXP, i2c_addr);
