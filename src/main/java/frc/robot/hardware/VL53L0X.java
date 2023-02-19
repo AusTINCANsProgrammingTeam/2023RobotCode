@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
 
+import edu.wpi.first.wpilibj.simulation.I2CSim;
+
 import java.util.Map;
 
 /** Add your docs here. */
@@ -320,9 +322,103 @@ public class VL53L0X {
 
 
         //self._measurement_timing_budget_us = self.measurement_timing_budget
+        int measurement_timing_budget = 1910 + 960; // Start overhead + end overhead
+
+        // Get Sequence Step Enables
+        int sequence_config = readVL53L0X(SYSTEM_SEQUENCE_CONFIG);
+        boolean tcc = ((sequence_config >> 4) & 0x1) > 0;
+        boolean dss = ((sequence_config >> 3) & 0x1) > 0;
+        boolean msrc = ((sequence_config >> 2) & 0x1) > 0;
+        boolean pre_range = ((sequence_config >> 6) & 0x1) > 0;
+        boolean final_range = ((sequence_config >> 7) & 0x1) > 0;
+
+        // Get Sequence Step Timeouts
+        // based on get_sequence_step_timeout() from ST API but modified by
+        // pololu here:
+        //   https://github.com/pololu/vl53l0x-arduino/blob/master/VL53L0X.cpp
+
+        //pre_range_vcsel_period_pclks = self._get_vcsel_pulse_period( _VCSEL_PERIOD_PRE_RANGE)
+        int pre_range_vcsel_period_pclks = ((readVL53L0X(PRE_RANGE_CONFIG_VCSEL_PERIOD)+1) & 0xFF) << 1;
+        int msrc_dss_tcc_mclks = (readVL53L0X(MSRC_CONFIG_TIMEOUT_MACROP) + 1) & 0xFF;
+        int msrc_dss_tcc_us = mclksToMicroseconds(msrc_dss_tcc_mclks, pre_range_vcsel_period_pclks);
+
+        int pre_range_mclks_reg = read16VL53L0X(PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI);
+        double pre_range_mclks = (pre_range_mclks_reg & 0xFF) * Math.pow(2.0, (pre_range_mclks_reg & 0xFF00) >> 8) + 1;
+
+        int pre_range_us = mclksToMicroseconds((int)pre_range_mclks, pre_range_vcsel_period_pclks);
+
+        int final_range_vcsel_period_pclks = ((readVL53L0X(FINAL_RANGE_CONFIG_VCSEL_PERIOD)+1) & 0xFF) << 1;
+
+        int final_range_mclks_reg = read16VL53L0X(FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI);
+        double final_range_mclks = (final_range_mclks_reg & 0xFF) * Math.pow(2.0, (final_range_mclks_reg & 0xFF00) >> 8) + 1;
+
+        if (pre_range) {
+            final_range_mclks -= pre_range_mclks;
+        }
+        int final_range_us = mclksToMicroseconds((int)final_range_mclks, final_range_vcsel_period_pclks);
+
+        // Calculate measurement timing budget in microseconds
+        if (tcc) {
+            measurement_timing_budget += msrc_dss_tcc_us + 590;
+        }
+        if (dss) {
+            measurement_timing_budget += 2 * (msrc_dss_tcc_us + 690);
+        } else if (msrc) {
+            measurement_timing_budget += (msrc_dss_tcc_us + 660);
+        }
+        if(pre_range) {
+            measurement_timing_budget += pre_range_us + 660;
+        }
+        if (final_range) {
+            measurement_timing_budget += final_range_us + 550;
+        }
+
+
         writeVL53L0X(SYSTEM_SEQUENCE_CONFIG, 0xE8);
 
         //self.measurement_timing_budget = self._measurement_timing_budget_us
+        if (measurement_timing_budget < 20000) {
+            DriverStation.reportError("Time of Flight sensor timing budget error", true);
+        }
+
+        int used_budget_us = 1320 + 960; // Start (diff from get) + end overhead
+        if (tcc) {
+            used_budget_us += msrc_dss_tcc_us + 590;
+        }
+        if (dss) {
+            used_budget_us += 2 * (msrc_dss_tcc_us + 690);
+        } else if (msrc) {
+            used_budget_us += (msrc_dss_tcc_us + 660);
+        }
+        if(pre_range) {
+            used_budget_us += pre_range_us + 660;
+        }
+        if (final_range) {
+            used_budget_us += final_range_us + 550;
+            if (used_budget_us > measurement_timing_budget) {
+                DriverStation.reportError("Time of Flight sensor timing budget error", true);
+            }
+            int final_range_timeout_us = measurement_timing_budget - used_budget_us;
+            int final_range_timeout_mclks = mclksToMicroseconds(final_range_timeout_us, final_range_vcsel_period_pclks);
+            if (pre_range) {
+                final_range_timeout_mclks += pre_range_mclks;
+            }
+            int encoded_timeout = final_range_timeout_mclks & 0xFFFF;
+            int ls_byte = 0;
+            int ms_byte = 0;
+            if (encoded_timeout > 0) {
+                ls_byte = encoded_timeout -1;
+                while (ls_byte > 255) {
+                    ls_byte >>= 1;
+                    ms_byte++;
+                }
+                encoded_timeout = ((ms_byte << 8) | (ls_byte & 0xFF)) & 0xFFFF;
+            }
+            write16VL53L0X(FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, encoded_timeout);
+        }
+
+
+
         writeVL53L0X(SYSTEM_SEQUENCE_CONFIG, 0x01);
 
         performSingleRefCal(0x40);
@@ -351,10 +447,15 @@ public class VL53L0X {
         //TODO Fix busy wait x2
         while ((readVL53L0X(SYSRANGE_START) & 0x01) > 0) {}
         while ((readVL53L0X(RESULT_INTERRUPT_STATUS) & 0x07) == 0) {}
-        byte[] rangeBuf = readBufferVL53L0X(RESULT_RANGE_STATUS + 10, 2);
+        int rangeBuf = read16VL53L0X(RESULT_RANGE_STATUS + 10);
         writeVL53L0X(SYSTEM_INTERRUPT_CLEAR, 0x01);
-        return ((int)rangeBuf[0]) << 8 + rangeBuf[1];
+        return rangeBuf;
 
+    }
+
+    private int mclksToMicroseconds(int mclks, int vcsel_period_pclks) {
+        int macro_period_us = ((2304 * (vcsel_period_pclks) * 1655) + 500) / 1000;
+        return (mclks * macro_period_us + macro_period_us/2)/1000;
     }
 
     private void performSingleRefCal(int vhv_init_byte) {
@@ -364,6 +465,12 @@ public class VL53L0X {
         while((readVL53L0X(RESULT_INTERRUPT_STATUS) & 0x07) == 0) {}
         writeVL53L0X(SYSTEM_INTERRUPT_CLEAR, 0x01);
         writeVL53L0X(SYSRANGE_START, 0x00);
+    }
+
+    private int read16VL53L0X(int index)
+    {
+        byte[] buf = readBufferVL53L0X(index, 2);
+        return (((int) buf[0] & 0xFF) << 8) + ((int) buf[1] & 0xFF);
     }
 
     private byte[] readBufferVL53L0X(int index, int count) {
@@ -390,7 +497,7 @@ public class VL53L0X {
             isPresent = false;
             return 0;
         }
-        return (int) buf[0];
+        return ((int) buf[0]) & 0xFF;
     }
     
     private void readAndCheckMapVL53L0X(Map<Integer,Integer> regPairs) {
@@ -400,6 +507,12 @@ public class VL53L0X {
                 break;
             }
         }
+    }
+
+    private void write16VL53L0X(int index, int data) {
+        byte[] buf = {(byte)((data & 0xFF00) >> 8), (byte)(data & 0xFF)};
+        writeBufferVL53L0X(index, buf);
+
     }
 
     private void writeBufferVL53L0X(int index, byte[] buf) {
