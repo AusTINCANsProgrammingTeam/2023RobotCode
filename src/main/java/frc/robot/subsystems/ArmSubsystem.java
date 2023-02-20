@@ -60,7 +60,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   //Base arm PID values
   private double kBaseP = 1;
-  private double kBaseI = 0.036;
+  private double kBaseI = 0.1;
   private double kBaseD = 0;
   //Elbow arm PID values
   private double kElbowP = 3;
@@ -94,10 +94,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kBaseArmLengthCM = kBaseArmLength*100;
   public static final double kElbowArmLength = Units.inchesToMeters(37.5);
   public static final double kElbowArmLengthCM = kElbowArmLength*100;
-  public static final double kMinBAngle = Units.degreesToRadians(30);
-  public static final double kMaxBAngle = Units.degreesToRadians(91);
+  public static final double kMinBAngle = Units.degreesToRadians(49);
+  public static final double kMaxBAngle = Units.degreesToRadians(90);
   public static final double kMinEAngle = Units.degreesToRadians(15);
-  public static final double kMaxEAngle = Units.degreesToRadians(120);
+  public static final double kMaxEAngle = Units.degreesToRadians(160);
   public static final double kBaseArmMass = Units.lbsToKilograms(20);
   public static final double kElbowArmMass = Units.lbsToKilograms(5);
   public final double baseArmInertia = SingleJointedArmSim.estimateMOI(kBaseArmLength, kBaseArmMass);
@@ -244,10 +244,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   
 
   public void updateMotors() {
-    //baseMotor.set(MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1));
-    baseMotor.stopMotor();
-    //elbowMotor.set(0.4);
-    elbowMotor.set(MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),-1,1));
+    baseMotor.set(MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1));
+    //baseMotor.stopMotor();
+    //elbowMotor.stopMotor();
+    elbowMotor.set(MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1));
   }
 
 
@@ -330,9 +330,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
       kBaseP = baseP.getDouble(kBaseP);
       basePIDController.setP(kBaseP);
       kBaseI = baseI.getDouble(kBaseI);
-      basePIDController.setP(kBaseI);
+      basePIDController.setI(kBaseI);
       kBaseD = baseD.getDouble(kBaseD);
-      basePIDController.setP(kBaseD);
+      basePIDController.setD(kBaseD);
     }
     
   }

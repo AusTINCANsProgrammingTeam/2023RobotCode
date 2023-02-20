@@ -184,11 +184,13 @@ public class OI {
         private static final ControlCurve kArmRotationCurve = new ControlCurve(0.5,0,1,0.1);
 
         public static Supplier<Double> getBaseSupplier(){
-            return () -> kArmRotationCurve.calculate(kJoystick.getRawAxis(kBaseArmAxis));
+            //This axis is inverted
+            return () -> kArmRotationCurve.calculate(-kJoystick.getRawAxis(kBaseArmAxis));
         }
 
         public static Supplier<Double> getElbowSupplier(){
-            return () -> kArmRotationCurve.calculate(kJoystick.getRawAxis(kElbowArmAxis));
+            //This axis is inverted
+            return () -> kArmRotationCurve.calculate(-kJoystick.getRawAxis(kElbowArmAxis));
         }
 
         // This button will toggle the arm moving between the high and stowed positions
