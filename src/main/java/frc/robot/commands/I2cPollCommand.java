@@ -14,6 +14,7 @@ public class I2cPollCommand extends CommandBase {
   private int index;
   private int result;
   private int bitmask;
+  private int timeout;
 
 
   /** Creates a new I2cRead8Command. */
@@ -23,6 +24,7 @@ public class I2cPollCommand extends CommandBase {
     this.tof = tof;
     this.index = index;
     this.bitmask = bitmask;
+    timeout = 250;
   }
 
   // Called when the command is initially scheduled.
@@ -33,15 +35,18 @@ public class I2cPollCommand extends CommandBase {
   @Override
   public void execute() {
     result = tof.readVL53L0X(index);
+    timeout--;
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    timeout = 250;
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (result & bitmask) != 0;
+    return (result & bitmask) != 0 || timeout <= 0;
   }
 }

@@ -88,10 +88,6 @@ public class Robot extends LoggedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
-    timeOfFlightSensor = new VL53L0X();
-
-
-    SmartDashboard.putNumber("ToF Range mm", 0);
 
   }
 
@@ -152,7 +148,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
 
-    SmartDashboard.putNumber("ToF Range mm", timeOfFlightSensor.getRange());
   }
 
   @Override

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.simulation.CallbackStore;
 import edu.wpi.first.wpilibj.simulation.I2CSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
@@ -88,8 +89,7 @@ public class VL53L0X  extends SubsystemBase implements AutoCloseable{
     // If an I2C transaction fails, this gets set to false and future transactions are ignored. 
     // TODO make this better
     private boolean isPresent = true;
-
-    private int stopVariable;
+    private int range_mm = 0;
 
     // Simulation variables
     private CallbackStore readCallbackStore, writeCallbackStore;
@@ -134,381 +134,17 @@ public class VL53L0X  extends SubsystemBase implements AutoCloseable{
                 new Pair<>(0xC2, 0x10)
             )
         );
-        // Initialize access to the sensor.  This is based on the logic from:
-        //   https://github.com/pololu/vl53l0x-arduino/blob/master/VL53L0X.cpp
-        // Set I2C standard mode.
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0x88, 0x00),
-                new Pair<Integer,Integer>(0x80, 0x01),
-                new Pair<Integer,Integer>(0xFF, 0x01),
-                new Pair<Integer,Integer>(0x00, 0x00)
-            )
-        );
-        stopVariable = readVL53L0X(0x91);
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0x00, 0x01),
-                new Pair<Integer,Integer>(0xFF, 0x00),
-                new Pair<Integer,Integer>(0x80, 0x00)
-            )
-        );
-
-        // disable SIGNAL_RATE_MSRC (bit 1) and SIGNAL_RATE_PRE_RANGE (bit 4)
-        // limit checks
-        int configControl = readVL53L0X(MSRC_CONFIG_CONTROL) | 0x12;
-        writeVL53L0X(MSRC_CONFIG_CONTROL, configControl);
-
-        // set final range signal rate limit to 0.25 MCPS (million counts per
-        // second)
-        int signalRateLimit = (int)(0.25 * (1 << 7));
-        write16VL53L0X(FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, signalRateLimit);
-
-        writeVL53L0X(SYSTEM_SEQUENCE_CONFIG, 0xFF);
-
-        //spad_count, spad_is_aperture = self._get_spad_info()
-
-        // Get reference SPAD count and type, returned as a 2-tuple of
-        // count and boolean is_aperture.  Based on code from:
-        //   https://github.com/pololu/vl53l0x-arduino/blob/master/VL53L0X.cpp
-
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0x80, 0x01),
-                new Pair<Integer,Integer>(0xFF, 0x01),
-                new Pair<Integer,Integer>(0x00, 0x00),
-                new Pair<Integer,Integer>(0xFF, 0x06)
-            )
-        );
-        writeVL53L0X(0x83, readVL53L0X(0x83) | 0x04);
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0xFF, 0x07),
-                new Pair<Integer,Integer>(0x81, 0x01),
-                new Pair<Integer,Integer>(0x80, 0x01),
-                new Pair<Integer,Integer>(0x94, 0x6B),
-                new Pair<Integer,Integer>(0x83, 0x00)
-            )
-        );
-
-        //TODO Remove busy wait
-        simBuf[0] = 0x00;
-        while(isPresent && readVL53L0X(0x83) == 0x00) { simBuf[0] = 0x01; }
-        simBuf[0] = 0x00;
-
-        writeVL53L0X(0x83,0x01);
-        int tmp = readVL53L0X(0x92);
-        int spad_count = tmp & 0x7F;
-        boolean spad_is_aperture = (tmp & 0x80) != 0;
-
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0x81, 0x00), 
-                new Pair<Integer,Integer>(0xFF, 0x06)
-            )
-        );
-        writeVL53L0X(0x83, readVL53L0X(0x83) & 0xFB);
-
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0xFF, 0x01),
-                new Pair<Integer,Integer>(0x00, 0x01), 
-                new Pair<Integer,Integer>(0xFF, 0x00), 
-                new Pair<Integer,Integer>(0x80, 0x00)
-            )
-        );
-
-        // The SPAD map (RefGoodSpadMap) is read by
-        // VL53L0X_get_info_from_device() in the API, but the same data seems to
-        // be more easily readable from GLOBAL_CONFIG_SPAD_ENABLES_REF_0 through
-        // _6, so read it from there.
-        byte[] ref_spad_map = readBufferVL53L0X(GLOBAL_CONFIG_SPAD_ENABLES_REF_0, 6);
-
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0xFF, 0x01),
-                new Pair<Integer,Integer>(DYNAMIC_SPAD_REF_EN_START_OFFSET, 0x00),
-                new Pair<Integer,Integer>(DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD, 0x2C),
-                new Pair<Integer,Integer>(0xFF, 0x00),
-                new Pair<Integer,Integer>(GLOBAL_CONFIG_REF_EN_START_SELECT, 0xB4)
-            )
-        );
-
-        int first_spad_to_enable =  spad_is_aperture ? 12 : 0;
-        int spads_enabled = 0;
-        for (int i = 0 ; i < 48; i++) {
-            if (i < first_spad_to_enable || spads_enabled == spad_count) {
-                // This bit is lower than the first one that should be enabled,
-                // or (reference_spad_count) bits have already been enabled, so
-                // zero this bit.
-                ref_spad_map[(i / 8)] &= ~(1 << (i % 8));
-            } else if (((ref_spad_map[(i / 8)] >> (i % 8)) & 0x01) > 0) {
-                spads_enabled++;
-            }
-        }
-        writeBufferVL53L0X(GLOBAL_CONFIG_SPAD_ENABLES_REF_0, ref_spad_map);
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0xFF, 0x01),
-                new Pair<Integer,Integer>(0x00, 0x00),
-                new Pair<Integer,Integer>(0xFF, 0x00),
-                new Pair<Integer,Integer>(0x09, 0x00),
-                new Pair<Integer,Integer>(0x10, 0x00),
-                new Pair<Integer,Integer>(0x11, 0x00),
-                new Pair<Integer,Integer>(0x24, 0x01),
-                new Pair<Integer,Integer>(0x25, 0xFF),
-                new Pair<Integer,Integer>(0x75, 0x00),
-                new Pair<Integer,Integer>(0xFF, 0x01)
-            )
-        );
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0x4E, 0x2C),
-                new Pair<Integer,Integer>(0x48, 0x00),
-                new Pair<Integer,Integer>(0x30, 0x20),
-                new Pair<Integer,Integer>(0xFF, 0x00),
-                new Pair<Integer,Integer>(0x30, 0x09),
-                new Pair<Integer,Integer>(0x54, 0x00),
-                new Pair<Integer,Integer>(0x31, 0x04),
-                new Pair<Integer,Integer>(0x32, 0x03),
-                new Pair<Integer,Integer>(0x40, 0x83),
-                new Pair<Integer,Integer>(0x46, 0x25)
-            )
-        );
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0x60, 0x00),
-                new Pair<Integer,Integer>(0x27, 0x00),
-                new Pair<Integer,Integer>(0x50, 0x06),
-                new Pair<Integer,Integer>(0x51, 0x00),
-                new Pair<Integer,Integer>(0x52, 0x96),
-                new Pair<Integer,Integer>(0x56, 0x08),
-                new Pair<Integer,Integer>(0x57, 0x30),
-                new Pair<Integer,Integer>(0x61, 0x00),
-                new Pair<Integer,Integer>(0x62, 0x00),
-                new Pair<Integer,Integer>(0x64, 0x00)
-            )
-        );
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0x65, 0x00),
-                new Pair<Integer,Integer>(0x66, 0xA0),
-                new Pair<Integer,Integer>(0xFF, 0x01),
-                new Pair<Integer,Integer>(0x22, 0x32),
-                new Pair<Integer,Integer>(0x47, 0x14),
-                new Pair<Integer,Integer>(0x49, 0xFF),
-                new Pair<Integer,Integer>(0x4A, 0x00),
-                new Pair<Integer,Integer>(0xFF, 0x00),
-                new Pair<Integer,Integer>(0x7A, 0x0A),
-                new Pair<Integer,Integer>(0x7B, 0x00)
-            )
-        );
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0x78, 0x21),
-                new Pair<Integer,Integer>(0xFF, 0x01),
-                new Pair<Integer,Integer>(0x23, 0x34),
-                new Pair<Integer,Integer>(0x42, 0x00),
-                new Pair<Integer,Integer>(0x44, 0xFF),
-                new Pair<Integer,Integer>(0x45, 0x26),
-                new Pair<Integer,Integer>(0x46, 0x05),
-                new Pair<Integer,Integer>(0x40, 0x40),
-                new Pair<Integer,Integer>(0x0E, 0x06),
-                new Pair<Integer,Integer>(0x20, 0x1A)
-            )
-        );
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0x43, 0x40),
-                new Pair<Integer,Integer>(0xFF, 0x00),
-                new Pair<Integer,Integer>(0x34, 0x03),
-                new Pair<Integer,Integer>(0x35, 0x44),
-                new Pair<Integer,Integer>(0xFF, 0x01),
-                new Pair<Integer,Integer>(0x31, 0x04),
-                new Pair<Integer,Integer>(0x4B, 0x09),
-                new Pair<Integer,Integer>(0x4C, 0x05),
-                new Pair<Integer,Integer>(0x4D, 0x04),
-                new Pair<Integer,Integer>(0xFF, 0x00)
-            )
-        );
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0x44, 0x00),
-                new Pair<Integer,Integer>(0x45, 0x20),
-                new Pair<Integer,Integer>(0x47, 0x08),
-                new Pair<Integer,Integer>(0x48, 0x28),
-                new Pair<Integer,Integer>(0x67, 0x00),
-                new Pair<Integer,Integer>(0x70, 0x04),
-                new Pair<Integer,Integer>(0x71, 0x01),
-                new Pair<Integer,Integer>(0x72, 0xFE),
-                new Pair<Integer,Integer>(0x76, 0x00),
-                new Pair<Integer,Integer>(0x77, 0x00)
-            )
-        );
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0xFF, 0x01),
-                new Pair<Integer,Integer>(0x0D, 0x01),
-                new Pair<Integer,Integer>(0xFF, 0x00),
-                new Pair<Integer,Integer>(0x80, 0x01),
-                new Pair<Integer,Integer>(0x01, 0xF8),
-                new Pair<Integer,Integer>(0xFF, 0x01),
-                new Pair<Integer,Integer>(0x8E, 0x01),
-                new Pair<Integer,Integer>(0x00, 0x01),
-                new Pair<Integer,Integer>(0xFF, 0x00),
-                new Pair<Integer,Integer>(0x80, 0x00)
-            )
-        );
-        writeVL53L0X(SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04);
-        int gpio_hv_mux_active_high = readVL53L0X(GPIO_HV_MUX_ACTIVE_HIGH);
-        writeVL53L0X(GPIO_HV_MUX_ACTIVE_HIGH, gpio_hv_mux_active_high & 0x7F);
-        writeVL53L0X(SYSTEM_INTERRUPT_CLEAR, 0x01);
-
-
-        //self._measurement_timing_budget_us = self.measurement_timing_budget
-        int measurement_timing_budget = 1910 + 960; // Start overhead + end overhead
-
-        // Get Sequence Step Enables
-        int sequence_config = readVL53L0X(SYSTEM_SEQUENCE_CONFIG);
-        boolean tcc = ((sequence_config >> 4) & 0x1) > 0;
-        boolean dss = ((sequence_config >> 3) & 0x1) > 0;
-        boolean msrc = ((sequence_config >> 2) & 0x1) > 0;
-        boolean pre_range = ((sequence_config >> 6) & 0x1) > 0;
-        boolean final_range = ((sequence_config >> 7) & 0x1) > 0;
-
-        // Get Sequence Step Timeouts
-        // based on get_sequence_step_timeout() from ST API but modified by
-        // pololu here:
-        //   https://github.com/pololu/vl53l0x-arduino/blob/master/VL53L0X.cpp
-
-        //pre_range_vcsel_period_pclks = self._get_vcsel_pulse_period( _VCSEL_PERIOD_PRE_RANGE)
-        int pre_range_vcsel_period_pclks = ((readVL53L0X(PRE_RANGE_CONFIG_VCSEL_PERIOD)+1) & 0xFF) << 1;
-        int msrc_dss_tcc_mclks = (readVL53L0X(MSRC_CONFIG_TIMEOUT_MACROP) + 1) & 0xFF;
-        int msrc_dss_tcc_us = mclksToMicroseconds(msrc_dss_tcc_mclks, pre_range_vcsel_period_pclks);
-
-        int pre_range_mclks_reg = read16VL53L0X(PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI);
-        double pre_range_mclks = (pre_range_mclks_reg & 0xFF) * Math.pow(2.0, (pre_range_mclks_reg & 0xFF00) >> 8) + 1;
-
-        int pre_range_us = mclksToMicroseconds((int)pre_range_mclks, pre_range_vcsel_period_pclks);
-
-        int final_range_vcsel_period_pclks = ((readVL53L0X(FINAL_RANGE_CONFIG_VCSEL_PERIOD)+1) & 0xFF) << 1;
-
-        int final_range_mclks_reg = read16VL53L0X(FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI);
-        double final_range_mclks = (final_range_mclks_reg & 0xFF) * Math.pow(2.0, (final_range_mclks_reg & 0xFF00) >> 8) + 1;
-
-        if (pre_range) {
-            final_range_mclks -= pre_range_mclks;
-        }
-        int final_range_us = mclksToMicroseconds((int)final_range_mclks, final_range_vcsel_period_pclks);
-
-        // Calculate measurement timing budget in microseconds
-        if (tcc) {
-            measurement_timing_budget += msrc_dss_tcc_us + 590;
-        }
-        if (dss) {
-            measurement_timing_budget += 2 * (msrc_dss_tcc_us + 690);
-        } else if (msrc) {
-            measurement_timing_budget += (msrc_dss_tcc_us + 660);
-        }
-        if(pre_range) {
-            measurement_timing_budget += pre_range_us + 660;
-        }
-        if (final_range) {
-            measurement_timing_budget += final_range_us + 550;
-        }
-
-
-        writeVL53L0X(SYSTEM_SEQUENCE_CONFIG, 0xE8);
-
-        //self.measurement_timing_budget = self._measurement_timing_budget_us
-        if (measurement_timing_budget < 20000) {
-            DriverStation.reportError("Time of Flight sensor timing budget error", true);
-        }
-
-        int used_budget_us = 1320 + 960; // Start (diff from get) + end overhead
-        if (tcc) {
-            used_budget_us += msrc_dss_tcc_us + 590;
-        }
-        if (dss) {
-            used_budget_us += 2 * (msrc_dss_tcc_us + 690);
-        } else if (msrc) {
-            used_budget_us += (msrc_dss_tcc_us + 660);
-        }
-        if(pre_range) {
-            used_budget_us += pre_range_us + 660;
-        }
-        if (final_range) {
-            used_budget_us += final_range_us + 550;
-            if (used_budget_us > measurement_timing_budget) {
-                DriverStation.reportError("Time of Flight sensor timing budget error", true);
-            }
-            int final_range_timeout_us = measurement_timing_budget - used_budget_us;
-            int final_range_timeout_mclks = mclksToMicroseconds(final_range_timeout_us, final_range_vcsel_period_pclks);
-            if (pre_range) {
-                final_range_timeout_mclks += pre_range_mclks;
-            }
-            int encoded_timeout = final_range_timeout_mclks & 0xFFFF;
-            int ls_byte = 0;
-            int ms_byte = 0;
-            if (encoded_timeout > 0) {
-                ls_byte = encoded_timeout -1;
-                while (ls_byte > 255) {
-                    ls_byte >>= 1;
-                    ms_byte++;
-                }
-                encoded_timeout = ((ms_byte << 8) | (ls_byte & 0xFF)) & 0xFFFF;
-            }
-            write16VL53L0X(FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, encoded_timeout);
-        }
-
-
-
-        writeVL53L0X(SYSTEM_SEQUENCE_CONFIG, 0x01);
-
-        performSingleRefCal(0x40);
-        writeVL53L0X(SYSTEM_SEQUENCE_CONFIG, 0x02);
-
-        performSingleRefCal(0x00);
-        // "restore the previous Sequence Config"
-        writeVL53L0X(SYSTEM_SEQUENCE_CONFIG, 0xE8);
 
     };
 
     public void setRange(int range) {
+        range_mm = range;
+        SmartDashboard.putNumber("ToF Range mm", range_mm);
 
     }
 
-    // Need new commands for 
-    // Read8_I2C, Write8_I2C, Read16_I2C, Write16_I2C, ReadBufferI2c, WriteBufferI2c, PollI2c, UpdateRange, Write8List 
-
     public int getRange() {
-        writeListVL53L0X(
-            List.of(
-                new Pair<Integer,Integer>(0x80, 0x01),
-                new Pair<Integer,Integer>(0xFF, 0x01),
-                new Pair<Integer,Integer>(0x00, 0x00),
-                new Pair<Integer,Integer>(0x91, stopVariable),
-                new Pair<Integer,Integer>(0x00, 0x01),
-                new Pair<Integer,Integer>(0xFF, 0x00),
-                new Pair<Integer,Integer>(0x80, 0x00),
-                new Pair<Integer,Integer>(SYSRANGE_START, 0x01)
-            )
-        );
-
-        //TODO Fix busy wait x2
-        while (isPresent && (readVL53L0X(SYSRANGE_START) & 0x01) > 0) { simBuf[0] = 0x01; }
-        simBuf[0] = 0x00;
-
-        while (isPresent && (readVL53L0X(RESULT_INTERRUPT_STATUS) & 0x07) == 0) {
-            simBuf[0] = 0x07; 
-        }
-        simBuf[0] = 0x00;
-        
-
-
-        int rangeBuf = read16VL53L0X(RESULT_RANGE_STATUS + 10);
-        writeVL53L0X(SYSTEM_INTERRUPT_CLEAR, 0x01);
-        return rangeBuf;
+        return range_mm;
 
     }
 
@@ -517,25 +153,6 @@ public class VL53L0X  extends SubsystemBase implements AutoCloseable{
         return (mclks * macro_period_us + macro_period_us/2)/1000;
     }
 
-    private void performSingleRefCal(int vhv_init_byte) {
-        // based on VL53L0X_perform_single_ref_calibration() from ST API.
-        writeVL53L0X(SYSRANGE_START, (0x01 | vhv_init_byte) & 0xFF);
-
-        // TODO Fix busy wait
-        // FIXME Stuck here
-        int i = 0;
-        while(isPresent && (readVL53L0X(RESULT_INTERRUPT_STATUS) & 0x07) == 0 && i < 10) { 
-            simBuf[0] = 0x07; 
-            i++; 
-        }
-        if (i == 10) {
-            DriverStation.reportError("Time of flight sensor calibration timeout", true);
-        }
-        simBuf[0] = 0x00;
-
-        writeVL53L0X(SYSTEM_INTERRUPT_CLEAR, 0x01);
-        writeVL53L0X(SYSRANGE_START, 0x00);
-    }
 
     public int read16VL53L0X(int index)
     {
@@ -553,13 +170,13 @@ public class VL53L0X  extends SubsystemBase implements AutoCloseable{
             isPresent = false;
             return null;
         }
-        System.out.print("Read from: "  + String.format("%02x", index) + 
-                           "\nGot: ");
-        
-        for (int i = 0; i < count; i++) {
-                System.out.print(" " + String.format("%02X", buf[i])); 
-        }
-        System.out.println();
+      //  System.out.print("Read from: "  + String.format("%02x", index) + 
+      //                     "\nGot: ");
+      //  
+      //  for (int i = 0; i < count; i++) {
+      //          System.out.print(" " + String.format("%02X", buf[i])); 
+      //  }
+        //System.out.println();
         return buf;
     }
 
@@ -575,8 +192,8 @@ public class VL53L0X  extends SubsystemBase implements AutoCloseable{
             return 0;
         }
 
-        System.out.println("Read from: "  + String.format("%02x", index) + 
-                           "\nGot: " + String.format("%02x", ((int) buf[0]) & 0xFF));
+     //   System.out.println("Read from: "  + String.format("%02x", index) + 
+     //                      "\nGot: " + String.format("%02x", ((int) buf[0]) & 0xFF));
         return ((int) buf[0]) & 0xFF;
     }
     

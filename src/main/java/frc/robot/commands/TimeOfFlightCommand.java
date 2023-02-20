@@ -93,7 +93,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
         BYTE
       ),
       new I2cReadCommand(tof, (a) -> {tmp = a | 0x04;}, 0x83, BYTE),
-      new I2cWriteCommand(tof, 0x83, tmp, BYTE),
+      new I2cWriteCommand(tof, 0x83, () -> { return tmp; }, BYTE),
       new I2cWriteCommand(
         tof, 
         List.of(
@@ -125,7 +125,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
         BYTE
       ),
       new I2cReadCommand(tof, (a) -> {tmp = a & 0xFB;}, 0x83, BYTE),
-      new I2cWriteCommand(tof, 0x83, tmp, BYTE),
+      new I2cWriteCommand(tof, 0x83, () -> {return tmp;} , BYTE),
       new I2cWriteCommand(
         tof, 
         List.of(
@@ -166,7 +166,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
         ),
         BYTE
       ),
-      new I2cWriteCommand(tof, VL53L0X.GLOBAL_CONFIG_SPAD_ENABLES_REF_0, ref_spad_map),
+      new I2cWriteCommand(tof, VL53L0X.GLOBAL_CONFIG_SPAD_ENABLES_REF_0, () -> {return ref_spad_map;}),
       new I2cWriteCommand(
         tof, 
         List.of(
@@ -297,7 +297,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
       ),
       new I2cWriteCommand(tof, VL53L0X.SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04, BYTE),
       new I2cReadCommand(tof, (a) -> {gpio_hv_mux_active_high = a;}, VL53L0X.GPIO_HV_MUX_ACTIVE_HIGH, BYTE),
-      new I2cWriteCommand(tof, VL53L0X.GPIO_HV_MUX_ACTIVE_HIGH, gpio_hv_mux_active_high & 0x7F, BYTE),
+      new I2cWriteCommand(tof, VL53L0X.GPIO_HV_MUX_ACTIVE_HIGH, () -> {return gpio_hv_mux_active_high & 0x7F;}, BYTE),
       new I2cWriteCommand(tof, VL53L0X.SYSTEM_INTERRUPT_CONFIG_GPIO, 0x01, BYTE),
       new I2cReadCommand(
         tof, 
@@ -409,7 +409,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
         }
       ),
       new ConditionalCommand(
-        new I2cWriteCommand(tof, VL53L0X.FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, encoded_timeout, BYTE), 
+        new I2cWriteCommand(tof, VL53L0X.FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, () -> {return encoded_timeout;}, BYTE), 
         new InstantCommand(() -> {}), 
         () -> {return final_range;}
       ),
@@ -424,7 +424,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
 
   private Command getSingleRefCalCommand(VL53L0X tof, int vhv_init_byte) {
     return new SequentialCommandGroup(
-      new I2cWriteCommand(tof, VL53L0X.SYSRANGE_START, (0x01 | vhv_init_byte & 0xFF), BYTE), 
+      new I2cWriteCommand(tof, VL53L0X.SYSRANGE_START, () -> {return (0x01 | vhv_init_byte & 0xFF);}, BYTE), 
       new I2cPollCommand(tof, VL53L0X.RESULT_INTERRUPT_STATUS, 0x07),
       new I2cWriteCommand(tof, VL53L0X.SYSTEM_INTERRUPT_CLEAR, 0x01, BYTE), 
       new I2cWriteCommand(tof, VL53L0X.SYSRANGE_START, 0x00, BYTE)
@@ -438,8 +438,14 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
         List.of(
             new Pair<Integer,Integer>(0x80, 0x01),
             new Pair<Integer,Integer>(0xFF, 0x01),
-            new Pair<Integer,Integer>(0x00, 0x00),
-            new Pair<Integer,Integer>(0x91, stopVariable),
+            new Pair<Integer,Integer>(0x00, 0x00)
+        ),
+        BYTE
+      ),
+      new I2cWriteCommand(tof, 0x91, () -> {return stopVariable;}, BYTE),
+      new I2cWriteCommand(
+        tof,
+        List.of(
             new Pair<Integer,Integer>(0x00, 0x01),
             new Pair<Integer,Integer>(0xFF, 0x00),
             new Pair<Integer,Integer>(0x80, 0x00),

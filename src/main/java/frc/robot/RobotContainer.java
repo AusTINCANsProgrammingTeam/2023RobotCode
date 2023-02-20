@@ -10,9 +10,11 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
+import frc.robot.commands.TimeOfFlightCommand;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.VL53L0X;
 import frc.robot.subsystems.BuddyBalanceSubsystem;
 import frc.robot.commands.AssistedBalanceCommand;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,6 +36,7 @@ public class RobotContainer {
   private final EverybotIntakeSubsystem intakeSubsystem;
   private final CameraSubsystem cameraSubsystem;
   private final BuddyBalanceSubsystem buddyBalanceSubsystem;
+  private final VL53L0X tof;
 
   private Auton auton;
 
@@ -62,6 +65,10 @@ public class RobotContainer {
     auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
 
     assistedBalanceCommand = Robot.swerveEnabled ? new AssistedBalanceCommand(swerveSubsystem) : null;
+
+    tof = new VL53L0X();
+
+    tof.setDefaultCommand(new TimeOfFlightCommand(tof));
 
     if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(

@@ -4,7 +4,9 @@
 
 package frc.robot.commands;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.math.Pair;
@@ -18,7 +20,7 @@ public class I2cWriteCommand extends CommandBase {
   private boolean byteNotWord;
 
   private int index;
-  private byte[] buffer;
+  private Supplier<byte[]> bufferSupplier;
 
 
   /** Creates a new I2cRead8Command. */
@@ -27,6 +29,27 @@ public class I2cWriteCommand extends CommandBase {
     addRequirements(tof);
     this.tof = tof;
     pairs = List.of(new Pair<Integer,Integer>(index, data));
+
+  }
+  public I2cWriteCommand(VL53L0X tof, int index, Supplier<Integer> data, boolean byteNotword) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(tof);
+    this.tof = tof;
+    if (byteNotword) {
+      bufferSupplier = () -> {
+        byte[] buf = new byte[1];
+        buf[0] = (byte) (data.get() & 0xFF);
+        return buf;
+      };
+  } else {
+      bufferSupplier = () -> {
+        byte[] buf = new byte[2];
+        buf[0] = (byte) ((data.get() & 0xFF00) >> 8);
+        buf[1] = (byte) (data.get() & 0xFF);
+        return buf;
+      };
+
+  }
 
   }
 
@@ -43,7 +66,14 @@ public class I2cWriteCommand extends CommandBase {
 
     addRequirements(tof);
     this.tof = tof;
-    buffer = buf;
+    bufferSupplier = () -> {return buf;};
+    this.index = index;
+  }
+  public I2cWriteCommand(VL53L0X tof, int index, Supplier<byte[]> buf) {
+
+    addRequirements(tof);
+    this.tof = tof;
+    bufferSupplier = buf;
     this.index = index;
   }
 
@@ -55,7 +85,7 @@ public class I2cWriteCommand extends CommandBase {
   @Override
   public void execute() {
     if (pairs == null) {
-      tof.writeBufferVL53L0X(index, buffer);
+      tof.writeBufferVL53L0X(index, bufferSupplier.get());
 
     } else {
       if (byteNotWord) {
@@ -71,7 +101,9 @@ public class I2cWriteCommand extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    listIndex = 0;
+  }
 
   // Returns true when the command should end.
   @Override
