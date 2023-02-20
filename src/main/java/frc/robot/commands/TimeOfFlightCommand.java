@@ -105,7 +105,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
         ),
         BYTE
       ),
-      new I2cPollCommand(tof, 0x83, 0xFF),
+      new I2cPollCommand(tof, 0x83, 0xFF, 50),
       new I2cWriteCommand(tof, 0x83, 0x01, BYTE),
       new I2cReadCommand(tof, 
         (a) -> {
@@ -440,7 +440,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
         ),
         BYTE
       ),
-      new I2cPollCommand(tof, VL53L0X.SYSRANGE_START, 0x01),
+      new I2cPollCommand(tof, VL53L0X.SYSRANGE_START, 0x01, 50),
       // Update range as often as values appear
       new RepeatCommand(getRangeCommand(tof))
     );
@@ -449,7 +449,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
   private Command getSingleRefCalCommand(VL53L0X tof, int vhv_init_byte) {
     return new SequentialCommandGroup(
       new I2cWriteCommand(tof, VL53L0X.SYSRANGE_START, () -> {return (0x01 | vhv_init_byte & 0xFF);}, BYTE), 
-      new I2cPollCommand(tof, VL53L0X.RESULT_INTERRUPT_STATUS, 0x07),
+      new I2cPollCommand(tof, VL53L0X.RESULT_INTERRUPT_STATUS, 0x07, 50),
       new I2cWriteCommand(tof, VL53L0X.SYSTEM_INTERRUPT_CLEAR, 0x01, BYTE), 
       new I2cWriteCommand(tof, VL53L0X.SYSRANGE_START, 0x00, BYTE)
     );
