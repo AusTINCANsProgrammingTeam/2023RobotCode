@@ -79,8 +79,8 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
         BYTE
       ),
       new I2cReadCommand(tof, (a) -> {configControl = a | 0x12;}, VL53L0X.MSRC_CONFIG_CONTROL, BYTE),
-      new I2cWriteCommand(tof, VL53L0X.MSRC_CONFIG_CONTROL, configControl, BYTE),
-      new I2cWriteCommand(tof, VL53L0X.FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, signalRateLimit, WORD),
+      new I2cWriteCommand(tof, VL53L0X.MSRC_CONFIG_CONTROL, () -> {return configControl;}, BYTE),
+      new I2cWriteCommand(tof, VL53L0X.FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, () -> {return signalRateLimit;}, WORD),
       new I2cWriteCommand(tof, VL53L0X.SYSTEM_SEQUENCE_CONFIG, 0xFF, BYTE),
       new I2cWriteCommand(
         tof, 
@@ -111,7 +111,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
         (a) -> {
           tmp = a;
           spad_count = tmp & 0x7F;
-          spad_is_aperture = (tmp & 0x80) != 0;
+          spad_is_aperture = ((tmp >> 7) & 0x01) != 0;
         }, 
   0x92, 
         BYTE
@@ -297,7 +297,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
       ),
       new I2cWriteCommand(tof, VL53L0X.SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04, BYTE),
       new I2cReadCommand(tof, (a) -> {gpio_hv_mux_active_high = a;}, VL53L0X.GPIO_HV_MUX_ACTIVE_HIGH, BYTE),
-      new I2cWriteCommand(tof, VL53L0X.GPIO_HV_MUX_ACTIVE_HIGH, () -> {return gpio_hv_mux_active_high & 0x7F;}, BYTE),
+      new I2cWriteCommand(tof, VL53L0X.GPIO_HV_MUX_ACTIVE_HIGH, () -> {return gpio_hv_mux_active_high & 0xEF;}, BYTE),
       new I2cWriteCommand(tof, VL53L0X.SYSTEM_INTERRUPT_CONFIG_GPIO, 0x01, BYTE),
       new I2cReadCommand(
         tof, 
@@ -385,7 +385,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
             used_budget_us += pre_range_us + 660;
         }
         if (final_range) {
-            used_budget_us += final_range_us + 550;
+            used_budget_us += 550;
             if (used_budget_us > measurement_timing_budget) {
                 DriverStation.reportError("Time of Flight sensor timing budget error", true);
             }
@@ -394,10 +394,11 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
             if (pre_range) {
                 final_range_timeout_mclks += pre_range_mclks;
             }
-            encoded_timeout = final_range_timeout_mclks & 0xFFFF;
+            encoded_timeout = 0;
             int ls_byte = 0;
             int ms_byte = 0;
             if (encoded_timeout > 0) {
+                encoded_timeout = final_range_timeout_mclks & 0xFFFF;
                 ls_byte = encoded_timeout -1;
                 while (ls_byte > 255) {
                     ls_byte >>= 1;
@@ -409,7 +410,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
         }
       ),
       new ConditionalCommand(
-        new I2cWriteCommand(tof, VL53L0X.FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, () -> {return encoded_timeout;}, BYTE), 
+        new I2cWriteCommand(tof, VL53L0X.FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, () -> {return encoded_timeout;}, WORD), 
         new InstantCommand(() -> {}), 
         () -> {return final_range;}
       ),
