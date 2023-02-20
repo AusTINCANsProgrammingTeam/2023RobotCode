@@ -419,21 +419,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
       new I2cWriteCommand(tof, VL53L0X.SYSTEM_SEQUENCE_CONFIG, 0x02, BYTE), 
       getSingleRefCalCommand(tof, 0x00),
       new I2cWriteCommand(tof, VL53L0X.SYSTEM_SEQUENCE_CONFIG, 0xE8, BYTE), 
-      new RepeatCommand(getRangeCommand(tof))
-    );
-  }
-
-  private Command getSingleRefCalCommand(VL53L0X tof, int vhv_init_byte) {
-    return new SequentialCommandGroup(
-      new I2cWriteCommand(tof, VL53L0X.SYSRANGE_START, () -> {return (0x01 | vhv_init_byte & 0xFF);}, BYTE), 
-      new I2cPollCommand(tof, VL53L0X.RESULT_INTERRUPT_STATUS, 0x07),
-      new I2cWriteCommand(tof, VL53L0X.SYSTEM_INTERRUPT_CLEAR, 0x01, BYTE), 
-      new I2cWriteCommand(tof, VL53L0X.SYSRANGE_START, 0x00, BYTE)
-    );
-  }
-
-  private Command getRangeCommand(VL53L0X tof) {
-    return new SequentialCommandGroup(
+      // Start continuous mode
       new I2cWriteCommand(
         tof,
         List.of(
@@ -450,12 +436,28 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
             new Pair<Integer,Integer>(0x00, 0x01),
             new Pair<Integer,Integer>(0xFF, 0x00),
             new Pair<Integer,Integer>(0x80, 0x00),
-            new Pair<Integer,Integer>(VL53L0X.SYSRANGE_START, 0x01)
+            new Pair<Integer,Integer>(VL53L0X.SYSRANGE_START, 0x02)
         ),
         BYTE
       ),
       new I2cPollCommand(tof, VL53L0X.SYSRANGE_START, 0x01),
+      // Update range as often as values appear
+      new RepeatCommand(getRangeCommand(tof))
+    );
+  }
+
+  private Command getSingleRefCalCommand(VL53L0X tof, int vhv_init_byte) {
+    return new SequentialCommandGroup(
+      new I2cWriteCommand(tof, VL53L0X.SYSRANGE_START, () -> {return (0x01 | vhv_init_byte & 0xFF);}, BYTE), 
       new I2cPollCommand(tof, VL53L0X.RESULT_INTERRUPT_STATUS, 0x07),
+      new I2cWriteCommand(tof, VL53L0X.SYSTEM_INTERRUPT_CLEAR, 0x01, BYTE), 
+      new I2cWriteCommand(tof, VL53L0X.SYSRANGE_START, 0x00, BYTE)
+    );
+  }
+
+  private Command getRangeCommand(VL53L0X tof) {
+    return new SequentialCommandGroup(
+      new I2cPollCommand(tof, VL53L0X.RESULT_INTERRUPT_STATUS, 0x07, 10),
       new I2cReadCommand(tof, tof::setRange, VL53L0X.RESULT_RANGE_STATUS+10, WORD),
       new I2cWriteCommand(tof, VL53L0X.SYSTEM_INTERRUPT_CLEAR, 0x01, BYTE)
     );
