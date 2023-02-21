@@ -39,7 +39,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     STOWED(Units.degreesToRadians(50),Units.degreesToRadians(130)), //Arm is retracted into the frame perimeter
     INTAKE(Units.degreesToRadians(50),Units.degreesToRadians(130)), //Arm is in position to intake
     MIDSCORE(Units.degreesToRadians(50),Units.degreesToRadians(130)), //Arm is in position to score on the mid pole
-    HIGHSCORE(Units.degreesToRadians(60),Units.degreesToRadians(140)); //Arm is in position to score on the high pole
+    HIGHSCORE(Units.degreesToRadians(55),Units.degreesToRadians(136)); //Arm is in position to score on the high pole
 
     private double base; //Angle of the base arm, in radians
     private double elbow; //Angle of the elbow arm, in radians
@@ -59,13 +59,13 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   //Base arm PID values
-  private double kBaseP = 1;
+  private double kBaseP = 0.8;
   private double kBaseI = 0.1;
   private double kBaseD = 0;
   //Elbow arm PID values
-  private double kElbowP = 3;
+  private double kElbowP = 1.5;
   private double kElbowI = 0.1;
-  private double kElbowD = 0.02;
+  private double kElbowD = 0.2;
   //Sim PID values
   private double kSimBaseP = 0.1;
   private double kSimBaseI = 0.0;
