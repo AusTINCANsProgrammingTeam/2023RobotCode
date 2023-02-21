@@ -103,6 +103,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kElbowArmMass = Units.lbsToKilograms(5);
   public final double baseArmInertia = SingleJointedArmSim.estimateMOI(kBaseArmLength, kBaseArmMass);
   public final double elbowArmInertia = SingleJointedArmSim.estimateMOI(kElbowArmLength, kElbowArmMass);
+
   public ShuffleboardTab armSimTab = Shuffleboard.getTab("Arm Simulation");
   //Base Arm Values for Simulation
   private GenericEntry simBArmAngle = armSimTab.add("SimBase Arm Angle", 0.0).getEntry();
@@ -112,13 +113,14 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private GenericEntry simEArmAngle = armSimTab.add("SimElbow Arm Angle", 0.0).getEntry();
   private GenericEntry simEEncoderPos = armSimTab.add("SimElbow Encoder Angle", 0.0).getEntry();
   private GenericEntry simEOutSet = armSimTab.add("SimElbow Output", 0.0).getEntry();
+
   //Real arm values
   public ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
   private GenericEntry actualBaseAngle = armTab.add("Actual Base Angle", 0.0).getEntry();
   private GenericEntry desiredBaseAngle = armTab.add("Desired Base Angle", 0.0).getEntry();
-  private GenericEntry actualElbowAngle = armTab.add("Elbow Arm Angle", 0.0).getEntry();
-  private GenericEntry desiredElbowAngle = armTab.add("Elbow Angle Setpoint", 0.0).getEntry();
+  private GenericEntry actualElbowAngle = armTab.add("Actual Elbow Angle", 0.0).getEntry();
+  private GenericEntry desiredElbowAngle = armTab.add("Desired Elbow Angle", 0.0).getEntry();
 
   private GenericEntry elbowOutput = armTab.add("Elbow Output", 0.0).getEntry();
   private GenericEntry baseOutput = armTab.add("Base Output", 0.0).getEntry();
