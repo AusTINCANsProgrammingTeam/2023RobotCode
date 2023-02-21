@@ -55,6 +55,7 @@ public final class FieldConstants {
     // Charging station dimensions
     public static final double chargingStationLength = Units.inchesToMeters(76.125);
     public static final double chargingStationWidth = Units.inchesToMeters(97.25);
+    public static final double chargingStationAngle = 11.0; //Measured in Degrees
     public static final double chargingStationOuterX = outerX - tapeWidth;
     public static final double chargingStationInnerX =
         chargingStationOuterX - chargingStationLength;
