@@ -28,7 +28,7 @@ public class MotorController {
         ArmElbow(15, 50, IdleMode.kBrake),  
         //Intake motors
         IntakeMotor1(4),
-        IntakeMotor2(5, true), //TODO update to real hardware IDs
+        IntakeMotor2(5, true),
         //BuddyBalance Motors
         BuddyBalanceRight(18, 40, IdleMode.kBrake),
         BuddyBalanceLeft(21, 40, IdleMode.kBrake, true); // TODO: update IDs for buddy balance motors when robot is finalized

@@ -38,7 +38,9 @@ import frc.robot.classes.TunableNumber;
 public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public static enum ArmState{
     STOWED(0, 0), //Arm is retracted into the frame perimeter FIXME
-    INTAKE(0, 0), //Arm is in position to intake FIXME
+    CONEINTAKE(0, 0), //Arm is in position to intake cones FIXME
+    CUBEINTAKE(0, 0), //Arm is in position to intake cubes FIXME
+    SUBSTATIONINTAKE(0, 0), //Arm is in position to intake from substation FIXME
     MIDSCORE(0, 0), //Arm is in position to score on the mid pole FIXME
     HIGHSCORE(0, 0); //Arm is in position to score on the high pole FIXME
 
@@ -181,7 +183,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     elbowPIDController.setTolerance(Units.degreesToRadians(1));
     basePIDController.setTolerance(Units.degreesToRadians(1));
     setReferences(getBaseAngle(), getElbowAngle());
-    setState(ArmState.STOWED);
+    //setState(ArmState.STOWED);
   }
 
   //Returns sim encoder position (No offset) if in simulation, the actual position otherwise
