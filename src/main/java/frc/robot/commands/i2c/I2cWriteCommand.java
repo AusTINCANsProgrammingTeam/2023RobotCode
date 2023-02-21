@@ -2,9 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.i2c;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -12,6 +11,15 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.math.Pair;
 
 import frc.robot.subsystems.VL53L0X;
+
+/* Command to write to an I2C address on the Time of Flight sensor.
+ * 
+ * Can write single bytes or words, address:data pairs from a List<Pair<Integer,Integer>> constant,
+ * or byte array data for multi-byte writes.
+ * 
+ * Supplier versions of the constructors are availible to allow write data to change after the 
+ * I2cWriteCommand has been created.
+ */
 
 public class I2cWriteCommand extends CommandBase {
   private VL53L0X tof;
@@ -23,7 +31,7 @@ public class I2cWriteCommand extends CommandBase {
   private Supplier<byte[]> bufferSupplier;
 
 
-  /** Creates a new I2cRead8Command. */
+  // Use this constructor if all inputs are constant values
   public I2cWriteCommand(VL53L0X tof, int index, int data, boolean byteNotword) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(tof);
@@ -31,6 +39,13 @@ public class I2cWriteCommand extends CommandBase {
     pairs = List.of(new Pair<Integer,Integer>(index, data));
 
   }
+
+  /* Use this constructor if the data value is a variable;
+   * i.e. if the value of the data may change between the time 
+   * this Command is constructed and when it is scheduled
+   * 
+   * e.g. I2cWriteCommand(tof, 0x83, () -> {return dataVariable;}, true)
+   */
   public I2cWriteCommand(VL53L0X tof, int index, Supplier<Integer> data, boolean byteNotword) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(tof);
@@ -53,6 +68,9 @@ public class I2cWriteCommand extends CommandBase {
 
   }
 
+  /* Use this constructor to write a (constant) list of address:data pairs.
+   * Note that there is no Supplier version for this I2cWriteCommand type
+   */
   public I2cWriteCommand(VL53L0X tof, List<Pair<Integer,Integer>> pairs, boolean byteNotWord) {
 
     addRequirements(tof);
@@ -62,6 +80,9 @@ public class I2cWriteCommand extends CommandBase {
     
   }
 
+  /* Constructs an I2cWriteCommand using a data buffer.
+   * Use if multi-byte data needs to be written from a constant.
+   */
   public I2cWriteCommand(VL53L0X tof, int index, byte[] buf) {
 
     addRequirements(tof);
@@ -69,6 +90,14 @@ public class I2cWriteCommand extends CommandBase {
     bufferSupplier = () -> {return buf;};
     this.index = index;
   }
+
+  /* Constructs an I2cWriteCommand using a data buffer created by a Supplier method
+   * Use if multi-byte data needs to be written from a variable;
+   * i.e. if the value of the data may change between the time 
+   * this Command is constructed and when it is scheduled
+   * 
+   * e.g. I2cWriteCommand(tof, 0x83, () -> {return bufferVariable;}, true)
+   */
   public I2cWriteCommand(VL53L0X tof, int index, Supplier<byte[]> buf) {
 
     addRequirements(tof);

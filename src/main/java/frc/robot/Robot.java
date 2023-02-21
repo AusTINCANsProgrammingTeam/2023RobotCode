@@ -17,12 +17,9 @@ import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.VL53L0X;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -41,16 +38,15 @@ public class Robot extends LoggedRobot {
   public static final boolean isCompetitionRobot = !HALUtil.getSerialNumber().equals(practiceRobotSerial);
 
   //Subsystem toggle
-  public static final boolean batteryEnabled = false;
-  public static final boolean cameraEnabled = false;
-  public static final boolean everybotIntakeEnabled = false;
-  public static final boolean intakeEnabled = false;
-  public static final boolean simulationEnabled = false;
-  public static final boolean swerveEnabled = false;
+  public static final boolean batteryEnabled = true;
+  public static final boolean cameraEnabled = true;
+  public static final boolean everybotIntakeEnabled = true;
+  public static final boolean intakeEnabled = true;
+  public static final boolean simulationEnabled = true;
+  public static final boolean swerveEnabled = true;
   public static final boolean buddyBalanceEnabled = false;
+  public static final boolean timeOfFlightEnabled = false;
 
-  private VL53L0X timeOfFlightSensor;
-  
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();
   private IntegerLogEntry loopCountEntry = new IntegerLogEntry(loopCountlog, "/robot/loopCount");

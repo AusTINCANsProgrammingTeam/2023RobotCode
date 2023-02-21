@@ -2,13 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.i2c;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.VL53L0X;
+
+/* Command to read an I2C address on the Time of Flight sensor.
+ *
+ * Can retreive a single byte or word as an Integer, or a byte array for larger reads.
+ * The returned value can be retrieved via the Consumer passed into the command constructor.
+ * 
+ */
 
 public class I2cReadCommand extends CommandBase {
   private VL53L0X tof;

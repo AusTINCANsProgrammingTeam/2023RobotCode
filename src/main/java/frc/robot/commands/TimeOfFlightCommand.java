@@ -13,15 +13,30 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.commands.i2c.I2cPollCommand;
+import frc.robot.commands.i2c.I2cReadCommand;
+import frc.robot.commands.i2c.I2cWriteCommand;
 import frc.robot.subsystems.VL53L0X;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
+/* Implementation of VL53L0X initialization and continuous read range 
+ * using WPILib Command based programming. 
+ * 
+ * Limits I2C transactions to 1 per Scheduler cycle to avoid loop overruns. 
+ * 
+ * Reference code: 
+ *   https://github.com/adafruit/Adafruit_CircuitPython_VL53L0X/blob/main/adafruit_vl53l0x.py
+ * 
+ * TODO Poll commands always timeout (unclear on effect on measurement)
+ * 
+ * TODO Calibration doesn't always come out accurately. 
+ * 
+ */
+
 public class TimeOfFlightCommand extends SequentialCommandGroup {
-  private int stopVariable;
   private final boolean BYTE = true;
   private final boolean WORD = false;
+
+  private int stopVariable;
   private int configControl, spad_count;
   private int signalRateLimit = (int)(0.25 * (1 << 7));
   private int tmp;
@@ -48,15 +63,11 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
   private int final_range_vcsel_period_pclks;
   private int final_range_mclks_reg;
   private double final_range_mclks;
-  private int encoded_timeout = 0; 
+  private int encoded_timeout; 
   private int final_range_us;
 
 
-  /** Creates a new TimeOfFlightCommand. */
   public TimeOfFlightCommand(VL53L0X tof) {
-
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       new I2cWriteCommand(
         tof, 
@@ -457,7 +468,7 @@ public class TimeOfFlightCommand extends SequentialCommandGroup {
 
   private Command getRangeCommand(VL53L0X tof) {
     return new SequentialCommandGroup(
-      new I2cPollCommand(tof, VL53L0X.RESULT_INTERRUPT_STATUS, 0x07, 10),
+      new I2cPollCommand(tof, VL53L0X.RESULT_INTERRUPT_STATUS, 0x07, 10), 
       new I2cReadCommand(tof, tof::setRange, VL53L0X.RESULT_RANGE_STATUS+10, WORD),
       new I2cWriteCommand(tof, VL53L0X.SYSTEM_INTERRUPT_CLEAR, 0x01, BYTE)
     );

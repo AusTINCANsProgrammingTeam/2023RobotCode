@@ -66,9 +66,11 @@ public class RobotContainer {
 
     assistedBalanceCommand = Robot.swerveEnabled ? new AssistedBalanceCommand(swerveSubsystem) : null;
 
-    tof = new VL53L0X();
+    tof = Robot.timeOfFlightEnabled ? new VL53L0X() : null;
 
-    tof.setDefaultCommand(new TimeOfFlightCommand(tof));
+    if (tof != null) {
+      tof.setDefaultCommand(new TimeOfFlightCommand(tof).ignoringDisable(true));
+    }
 
     if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(

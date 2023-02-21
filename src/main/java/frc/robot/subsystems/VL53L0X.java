@@ -20,10 +20,10 @@ import java.util.List;
 
 /** Add your docs here. */
 public class VL53L0X  extends SubsystemBase implements AutoCloseable{
+    private final boolean DEBUG = false;
     private static final int i2c_addr = 0x29;
     private final I2C i2c; 
 
-    private I2CSim simDev;
 
     public static final int SYSRANGE_START = 0x00;
     public static final int SYSTEM_THRESH_HIGH = 0x0C;
@@ -92,28 +92,31 @@ public class VL53L0X  extends SubsystemBase implements AutoCloseable{
     private int range_mm = 0;
 
     // Simulation variables
+    private I2CSim simDev;
     private CallbackStore readCallbackStore, writeCallbackStore;
-    private byte[] simBuf = new byte[128]; // Buffer is bigger than it needs to be to avoid index out of range exceptions.
+    private final int simBufSize = 128; // Buffer is bigger than it needs to be to avoid index out of range exceptions.
+    private byte[] simBuf = new byte[simBufSize]; 
 
-/*
- * Vendor of this IC doesn't provide a register map (apparently its extremely complex). Basing off AdaFruit's python implementation at
+/* Vendor of this IC doesn't provide a register map (apparently its extremely complex). Basing off AdaFruit's python implementation at
  * https://github.com/adafruit/Adafruit_CircuitPython_VL53L0X/blob/main/adafruit_vl53l0x.py
  * 
- * TODO This is going to take way to long if done all at once. Find a way to break into a digestible chuncks (a few I2C transactions per Robot period)
  */
     public VL53L0X() {
         i2c = new I2C(Port.kMXP, i2c_addr);
         
+        // Create simulation device and callbacks to prints the writes and reads
+        // Use setSimBuffer to preload what reads should return (zeros by default)
         if (Robot.isSimulation()) {
             simDev = new I2CSim(Port.kMXP.value);
             simDev.setInitialized(true);
             BufferCallback readCallback = (String name, byte[] buffer, int count) -> {
-            System.out.print(name + " " + count + " bytes:" ); 
-            for (int i = 0; i < count; i++) {
-                    buffer[i] = simBuf[i];
-                    System.out.print(" " + String.format("%02X", buffer[i])); 
-            }
-            System.out.println();
+                System.out.print(name + " " + count + " bytes:" ); 
+                for (int i = 0; i < count; i++) {
+                        buffer[i] = simBuf[i];
+                        System.out.print(" " + String.format("%02X", buffer[i])); 
+                }
+                System.out.println();
+                simBuf = new byte[simBufSize]; // Clear buffer after use
             };
 
             ConstBufferCallback writeCallback = (String name, byte[] buffer, int count) -> {
@@ -148,6 +151,20 @@ public class VL53L0X  extends SubsystemBase implements AutoCloseable{
 
     }
 
+    public void setSimBuffer(byte[] buf) {
+        for (int i = 0; i < buf.length; i++) {
+            simBuf[i] = buf[i];
+        }
+    }
+    public void setSimBuffer(int data, boolean byteNotWord) {
+        if (byteNotWord) {
+            simBuf[0] = (byte)(data & 0xFF);
+        } else {
+            simBuf[0] = (byte)((data & 0xFF00) >> 8);
+            simBuf[1] = (byte)(data & 0xFF);
+        }
+    }
+
     public static int mclksToMicroseconds(int mclks, int vcsel_period_pclks) {
         int macro_period_us = ((2304 * (vcsel_period_pclks) * 1655) + 500) / 1000;
         return (mclks * macro_period_us + macro_period_us/2)/1000;
@@ -170,13 +187,15 @@ public class VL53L0X  extends SubsystemBase implements AutoCloseable{
             isPresent = false;
             return null;
         }
-      //  System.out.print("Read from: "  + String.format("%02x", index) + 
-      //                     "\nGot: ");
-      //  
-      //  for (int i = 0; i < count; i++) {
-      //          System.out.print(" " + String.format("%02X", buf[i])); 
-      //  }
-        //System.out.println();
+        if (DEBUG) {
+            System.out.print("Read from: "  + String.format("%02x", index) + 
+                            "\nGot: ");
+            
+            for (int i = 0; i < count; i++) {
+                    System.out.print(" " + String.format("%02X", buf[i])); 
+            }
+            System.out.println();
+        }
         return buf;
     }
 
@@ -191,9 +210,11 @@ public class VL53L0X  extends SubsystemBase implements AutoCloseable{
             isPresent = false;
             return 0;
         }
-
-     //   System.out.println("Read from: "  + String.format("%02x", index) + 
-     //                      "\nGot: " + String.format("%02x", ((int) buf[0]) & 0xFF));
+        if (DEBUG) {
+            System.out.println(
+                "Read from: "  + String.format("%02x", index) + 
+                "\nGot: " + String.format("%02x", ((int) buf[0]) & 0xFF));
+        }
         return ((int) buf[0]) & 0xFF;
     }
     
