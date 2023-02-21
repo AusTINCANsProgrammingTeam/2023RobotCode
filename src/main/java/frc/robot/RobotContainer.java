@@ -73,7 +73,7 @@ public class RobotContainer {
 
     assistedBalanceCommand = Robot.swerveEnabled ? new AssistedBalanceCommand(swerveSubsystem) : null;
 
-    armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getBaseSupplier(), OI.Operator.getElbowSupplier()) : null;
+    armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getBaseSupplier(), OI.Operator.getElbowSupplier(), ArmState.STOWED) : null;
     armPositionCommand = Robot.armEnabled ? new ArmPositionCommand(armSubsystem, OI.Operator.getBaseSupplier(), OI.Operator.getElbowSupplier()) : null;
 
     if (Robot.swerveEnabled) {
@@ -118,8 +118,8 @@ public class RobotContainer {
     }
 
     if (Robot.armEnabled) {
-      OI.Operator.getHighArmButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.setState(ArmState.HIGHSCORE), () -> armSubsystem.setState(ArmState.STOWED), armSubsystem));
-      OI.Operator.getMidArmButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.setState(ArmState.MIDSCORE), () -> armSubsystem.setState(ArmState.STOWED), armSubsystem));
+      OI.Operator.getHighArmButton().toggleOnTrue(new ArmAnglesCommand(armSubsystem, OI.Operator.getBaseSupplier(), OI.Operator.getElbowSupplier(), ArmState.HIGHSCORE));
+      OI.Operator.getMidArmButton().toggleOnTrue(new ArmAnglesCommand(armSubsystem, OI.Operator.getBaseSupplier(), OI.Operator.getElbowSupplier(), ArmState.MIDSCORE));
     }
 
     if (!Robot.isCompetition) {

@@ -36,25 +36,25 @@ import frc.robot.Robot;
 public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public static enum ArmState{
     //FIXME states are not real positions, they are used for sim right now
-    STOWED(1.50,0.3), //Arm is retracted into the frame perimeter
-    INTAKE(0,0), //Arm is in position to intake
-    MIDSCORE(1.40,0.5), //Arm is in position to score on the mid pole
-    HIGHSCORE(1.30,0.6); //Arm is in position to score on the high pole
+    STOWED(Units.degreesToRadians(50),Units.degreesToRadians(130)), //Arm is retracted into the frame perimeter
+    INTAKE(Units.degreesToRadians(50),Units.degreesToRadians(130)), //Arm is in position to intake
+    MIDSCORE(Units.degreesToRadians(50),Units.degreesToRadians(130)), //Arm is in position to score on the mid pole
+    HIGHSCORE(Units.degreesToRadians(60),Units.degreesToRadians(140)); //Arm is in position to score on the high pole
 
-    private double x; //Position relative to the base of the arm, in meters
-    private double y; //Positon above the carpet, in meters
+    private double base; //Angle of the base arm, in radians
+    private double elbow; //Angle of the elbow arm, in radians
     
-    ArmState(double x, double y){
-      this.x = x;
-      this.y = y;
+    ArmState(double base, double elbow){
+      this.base = base;
+      this.elbow = elbow;
     }
 
-    public double getX(){
-      return x;
+    public double getBase(){
+      return base;
     }
 
-    public double getY(){
-      return y;
+    public double getElbow(){
+      return elbow;
     }
   }
 
@@ -90,9 +90,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private final PIDController elbowPIDController;
   public static final double kBaseGearing = 40.8333333;
   public static final double kElbowGearing = 4.28571429;
-  public static final double kBaseArmLength = Units.inchesToMeters(43.5);
+  public static final double kBaseArmLength = Units.inchesToMeters(41);
   public static final double kBaseArmLengthCM = kBaseArmLength*100;
-  public static final double kElbowArmLength = Units.inchesToMeters(37.5);
+  public static final double kElbowArmLength = Units.inchesToMeters(43);
   public static final double kElbowArmLengthCM = kElbowArmLength*100;
   public static final double kMinBAngle = Units.degreesToRadians(49);
   public static final double kMaxBAngle = Units.degreesToRadians(90);
@@ -277,18 +277,19 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public static double convertToElbowAngle(double x, double y) {
-    return Units.degreesToRadians(90) + convertToPrelimAngle(x, y) + convertToBaseAngle(x, y);
+    return Units.degreesToRadians(180) + convertToPrelimAngle(x, y);
   }
 
   public void setState(ArmState state){
+    /*
     double desiredBaseAngle = convertToBaseAngle(state.x,state.y);
     double desiredElbowAngle = convertToElbowAngle(state.x,state.y);
     armDesiredXPosition.setDouble(state.getX());
     armDesiredYPosition.setDouble(state.getY());
     simArmStateX.setDouble(state.getX());
     simArmStateY.setDouble(state.getY());
-    
-    setReferences(desiredBaseAngle, desiredElbowAngle);
+    */
+    setReferences(state.base, state.elbow);
   }
   
   public void stop() {
