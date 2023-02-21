@@ -165,6 +165,10 @@ public class VL53L0X  extends SubsystemBase implements AutoCloseable{
         }
     }
 
+    public boolean isPresent() {
+        return isPresent;
+    }
+
     public static int mclksToMicroseconds(int mclks, int vcsel_period_pclks) {
         int macro_period_us = ((2304 * (vcsel_period_pclks) * 1655) + 500) / 1000;
         return (mclks * macro_period_us + macro_period_us/2)/1000;
