@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 public class OI {
     //Operator Interface (OI) class containing all control information
@@ -134,7 +135,11 @@ public class OI {
             Back (9),
             Start (10),
             LJ (11), // Left Joystick Button
-            RJ (12); // Right Joystick Button
+            RJ (12),  // Right Joystick Button
+            POVUP (0),
+            POVDOWN (180),
+            POVLEFT (270),
+            POVRIGHT (90);
             
             private final int buttonID; 
             private String buttonAction;
