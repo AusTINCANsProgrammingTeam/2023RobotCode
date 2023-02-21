@@ -83,8 +83,6 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-
-
   }
 
   /**
@@ -103,8 +101,6 @@ public class Robot extends LoggedRobot {
     loopCount++;
     loopCountEntry.append(loopCount);
     CommandScheduler.getInstance().run();
-
-
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -142,9 +138,7 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {
-
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void testInit() {
