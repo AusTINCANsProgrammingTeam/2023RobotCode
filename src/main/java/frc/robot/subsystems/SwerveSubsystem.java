@@ -98,8 +98,8 @@ public class SwerveSubsystem extends SubsystemBase{
     private GenericEntry headingEntry;
     private GenericEntry pitchEntry;
 
-    private ShuffleboardTab configTab;
-    private GenericEntry positionEntry;
+    private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
+    private GenericEntry positionEntry = configTab.add("Position", "").getEntry();
     public boolean controlOrientationIsFOD;
 
     public Double rotationHold;
@@ -118,8 +118,6 @@ public class SwerveSubsystem extends SubsystemBase{
             controlOrientationEntry = matchTab.add("FOD", true).getEntry();
             headingEntry = matchTab.add("NavX Yaw", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
             pitchEntry = matchTab.add("NavX Pitch", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
-            configTab = Shuffleboard.getTab("Config");
-            positionEntry = configTab.add("Position", "").getEntry();
         };
 
         //Add coast mode command to shuffleboard
