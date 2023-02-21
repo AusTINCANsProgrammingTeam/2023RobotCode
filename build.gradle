@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2023.3.2"
+    id "edu.wpi.first.GradleRIO" version "2023.4.1"
     id "com.peterabeles.gversion" version "1.10"
 }
 
@@ -124,4 +124,8 @@ gversion {
   dateFormat   = "yyyy-MM-dd HH:mm:ss z"
   timeZone     = "America/Chicago" // Use preferred time zone
   indent       = "  "
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c6bc3fe2a33a429a2bf6dac19aebe27f1a6dbde8
