@@ -16,21 +16,17 @@ public class ArmAnglesCommand extends CommandBase {
   private final ArmSubsystem armSubsystem;
   private final Supplier<Double> baseArmJoystick;
   private final Supplier<Double> elbowArmJoystick;
-  private final ArmState state;
 
-  public ArmAnglesCommand(ArmSubsystem armSubsystem, Supplier<Double> baseArmJoystick, Supplier<Double> elbowArmJoystick, ArmState state) {
+  public ArmAnglesCommand(ArmSubsystem armSubsystem, Supplier<Double> baseArmJoystick, Supplier<Double> elbowArmJoystick) {
     this.armSubsystem = armSubsystem;
     this.baseArmJoystick = baseArmJoystick;
     this.elbowArmJoystick = elbowArmJoystick;
-    this.state = state;
     addRequirements(armSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armSubsystem.setState(state);
-    //armSubsystem.setReferences(armSubsystem.getBaseAngle(), armSubsystem.getElbowAngle());
   }
 
   // Called every time the scheduler runs while the command is scheduled.

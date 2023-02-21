@@ -8,6 +8,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.MotorController;
@@ -280,6 +283,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     return Units.degreesToRadians(180) + convertToPrelimAngle(x, y);
   }
 
+  public boolean atSetpoint(){
+    return basePIDController.atSetpoint() && elbowPIDController.atSetpoint();
+  }
+
   public void setState(ArmState state){
     /*
     double desiredBaseAngle = convertToBaseAngle(state.x,state.y);
@@ -290,6 +297,13 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     simArmStateY.setDouble(state.getY());
     */
     setReferences(state.base, state.elbow);
+  }
+
+  public Command goToState(ArmState state){
+    //Command for autonomous, obstructs routine until arm is at setpoint
+    return new InstantCommand(() -> setState(state), this)
+      .andThen(new RepeatCommand(new InstantCommand(this::updateMotors, this))
+      .until(this::atSetpoint));
   }
   
   public void stop() {
