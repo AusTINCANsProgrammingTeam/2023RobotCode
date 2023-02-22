@@ -99,7 +99,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kBaseArmLengthCM = kBaseArmLength*100;
   public static final double kElbowArmLength = Units.inchesToMeters(43);
   public static final double kElbowArmLengthCM = kElbowArmLength*100;
-  public static final double kMinBAngle = Units.degreesToRadians(49);
+  public static final double kMinBAngle = Units.degreesToRadians(46);
   public static final double kMaxBAngle = Units.degreesToRadians(90);
   public static final double kMinEAngle = Units.degreesToRadians(15);
   public static final double kMaxEAngle = Units.degreesToRadians(160);
@@ -143,6 +143,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private TunableNumber elbowITuner;
   private TunableNumber elbowDTuner;
 
+  private TunableNumber baseSetpointTuner;
+  private TunableNumber elbowSetpointTuner;
+
   private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), kBaseGearing, baseArmInertia, kBaseArmLength, kMinBAngle, kMaxBAngle, false);
   private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, elbowArmInertia, kElbowArmLength, kMinEAngle, kMaxEAngle, false);
 
@@ -181,6 +184,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
       elbowITuner = new TunableNumber("elbowI", kElbowI, elbowPIDController::setI);
       elbowDTuner = new TunableNumber("elbowD", kElbowD, elbowPIDController::setD);
     }
+
+    //baseSetpointTuner = new TunableNumber("base setpoint", getBaseAngle(), this::setBaseReference);
+    //elbowSetpointTuner = new TunableNumber("elbow setpoint", getElbowAngle(), this::setElbowReference);
+
 
     elbowPIDController.setTolerance(Units.degreesToRadians(1));
     basePIDController.setTolerance(Units.degreesToRadians(1));
