@@ -18,10 +18,10 @@ public class OI {
 
     public static final class Driver{
         private static enum Button {
-            button1 (1),
-            button2 (2),
-            button3 (3),
-            button4 (4),
+            B1 (1),
+            B2 (2),
+            B3 (3),
+            B4 (4),
             LB (5), // Left Bumper
             RB (6), // Right Bumper
             LT (7), // Left Trigger
@@ -54,22 +54,21 @@ public class OI {
 
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
         
-          private static final Button kOrientationButton = Button.button1; //1, Toggle swerve orientation
-          private static final Button kZeroButton = Button.button3; //3, Zero the gyroscope
-          private static final Button kAlignForwardButton = Button.button4; //4, Align forwards
-          private static final Button kAlignBackwardButton = Button.button2; //2, Align backwards
-          private static final Button kIntakeButton = Button.RT; //Right Trigger, run intake
-          private static final Button kOuttakeButton = Button.RB; //Right Bumper, run outtake
-          private static final Button kParkButton = Button.RB; //5, park the robot
-          private static final Button kToggleBalanceButton = Button.LB; //6, balance the robot
+        private static final Button kOrientationButton = Button.B1; //Toggle swerve orientation
+        private static final Button kZeroButton = Button.B3; //Zero the gyroscope
+        private static final Button kAlignForwardButton = Button.B4; //Align forwards
+        private static final Button kAlignBackwardButton = Button.B2; //Align backwards
+        private static final Button kIntakeButton = Button.RT; //Run intake
+        private static final Button kOuttakeButton = Button.RB; //Run outtake
+        private static final Button kParkButton = Button.RB; //Park modules
 
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
 
         //TODO: Tune curves to driver preference
-        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
-        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.65,0.05,0.75,0.1);
+        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.85,0.05,0.85,0.1);
+        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.85,0.05,0.85,0.1);
         private static final ControlCurve kRotationCurve = new ControlCurve(1,0,1,0.1);
 
         public static Supplier<Double> getXTranslationSupplier(){
@@ -88,29 +87,23 @@ public class OI {
         }
 
         public static JoystickButton getOrientationButton(){
-            kOrientationButton.setButtonAction("Orientation");
+            kOrientationButton.setButtonAction("Toggle swerve orientation");
             return new JoystickButton(kJoystick, kOrientationButton.getButtonID());
         }
 
+        public static JoystickButton getZeroButton(){
+            kZeroButton.setButtonAction("Zero the gyroscope");
+            return new JoystickButton(kJoystick, kZeroButton.getButtonID());
+        }
+
         public static JoystickButton getAlignForwardButton(){
-            kAlignForwardButton.setButtonAction("Align Forward");
+            kAlignForwardButton.setButtonAction("Align forward");
             return new JoystickButton(kJoystick, kAlignForwardButton.getButtonID());
         }
 
         public static JoystickButton getAlignBackButton(){
-            kAlignBackwardButton.setButtonAction("Align Backward");
+            kAlignBackwardButton.setButtonAction("Align backward");
             return new JoystickButton(kJoystick, kAlignBackwardButton.getButtonID());
-        }
-
-        public static JoystickButton getZeroButton(){
-            kZeroButton.setButtonAction("Zeroing");
-            return new JoystickButton(kJoystick, kZeroButton.getButtonID());
-        }
-        
-        public static JoystickButton getBalanceButton(){
-            kToggleBalanceButton.setButtonAction("Balance Robot");
-            return new JoystickButton(kJoystick, kToggleBalanceButton.getButtonID());
-
         }
 
         public static JoystickButton getIntakeButton(){
@@ -124,7 +117,7 @@ public class OI {
         }
         
         public static JoystickButton getParkButton(){
-            kParkButton.setButtonAction("Parking");
+            kParkButton.setButtonAction("Park modules");
             return new JoystickButton(kJoystick, kParkButton.getButtonID());
         }
     }
@@ -192,14 +185,16 @@ public class OI {
     }
 
     public static void putControllerButtons(){
-        ShuffleboardLayout driverButtonsLayout = Shuffleboard.getTab("Controller Buttons")
+        ShuffleboardLayout driverButtonsLayout = Shuffleboard.getTab("Controls")
         .getLayout("Driver Buttons", BuiltInLayouts.kList)
         .withSize(2, 5)
+        .withPosition(0, 0)
         .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for Variables;
 
-        ShuffleboardLayout operatorButtonsLayout = Shuffleboard.getTab("Controller Buttons")
+        ShuffleboardLayout operatorButtonsLayout = Shuffleboard.getTab("Controls")
         .getLayout("Operator Buttons", BuiltInLayouts.kList)
         .withSize(2, 5)
+        .withPosition(2, 0)
         .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for Variables;
 
         for (Driver.Button button : Driver.Button.values()) {
