@@ -37,7 +37,7 @@ import frc.robot.classes.TunableNumber;
 
 public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public static enum ArmState{
-    STOWED(0, 0), //Arm is retracted into the frame perimeter FIXME
+    STOWED(0.4406, 0.0397), //Arm is retracted into the frame perimeter FIXME
     CONEINTAKE(0, 0), //Arm is in position to intake cones FIXME
     CUBEINTAKE(0, 0), //Arm is in position to intake cubes FIXME
     SUBSTATIONINTAKE(0, 0), //Arm is in position to intake from substation FIXME
