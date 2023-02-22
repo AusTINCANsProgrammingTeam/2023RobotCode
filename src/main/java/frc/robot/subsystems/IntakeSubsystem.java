@@ -19,7 +19,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kIntakeSpeed = 0.5;
   private CANSparkMax motor;
   private CANSparkMax motor2;
-
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
 
@@ -27,7 +26,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public IntakeSubsystem() {
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
     motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
-    motor.follow(motor2);
+    motor2.follow(motor, true);
   }
   
   private void spinWheels(double velocity) {
