@@ -18,7 +18,10 @@ public class AbsoluteEncoder {
         BackRightModule(4, false, -0.853, -4.686),
         //Arm Encoders (REV)
         ArmBase(1, true, Units.degreesToRadians(-74.6)),
-        ArmElbow(0, true, Units.degreesToRadians(233.6));
+        ArmElbow(0, true, Units.degreesToRadians(233.6)),
+        // Buddy Balance Encoders (REV)
+        BuddyBalanceLeft(2, false, 0), // placeholder offset
+        BuddyBalanceRight(3, false, 0); // placeholder offset
         
         private int ID;
         private boolean reversed;

@@ -8,11 +8,16 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.MotorController;
+import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 import frc.robot.classes.TunableNumber;
 
@@ -45,11 +50,12 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private CANSparkMax leftMotor;
   private SparkMaxPIDController rightPIDController;
   private SparkMaxPIDController leftPIDController;
-  private RelativeEncoder rightEncoder;
-  private RelativeEncoder leftEncoder;
+  private DutyCycleEncoder rightEncoder;
+  private DutyCycleEncoder leftEncoder;
   private boolean isDeployed = false;
   private DataLog datalog = DataLogManager.getLog();
-  private DoubleLogEntry buddyBalancePosition = new DoubleLogEntry(datalog, "/buddybalance/position");
+  private DoubleLogEntry buddyBalancePosLeft = new DoubleLogEntry(datalog, "/buddybalance/position/left");
+  private DoubleLogEntry buddyBalancePosRight = new DoubleLogEntry(datalog, "/buddybalance/position/right");
   private ShuffleboardTab buddyBalanceTab = Shuffleboard.getTab("Buddy Balance"); // TODO: Replace buddy balance tab with whatever tab the position should be logged to
   private GenericEntry positionEntry;
 
@@ -65,8 +71,8 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     leftPIDController.setP(kDefaultMotorP);
     leftPIDController.setI(kDefaultMotorI);
     leftPIDController.setD(kDefaultMotorD);
-    rightEncoder = rightMotor.getEncoder();
-    leftEncoder = leftMotor.getEncoder();
+    rightEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalanceRight);
+    leftEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalanceLeft);
 
     tunerNumRightP = new TunableNumber("Buddy Balance Right Motor P", kDefaultMotorP, rightPIDController::setP);
     tunerNumRightI = new TunableNumber("Buddy Balance Right Motor I", kDefaultMotorI, rightPIDController::setI);
@@ -104,7 +110,9 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    buddyBalancePosition.append(rightEncoder.getPosition()); // Logging the position of the buddy balance lift
-    buddyBalancePosition.append(leftEncoder.getPosition());
+    buddyBalancePosLeft.append(AbsoluteEncoder.getPositionRadians(leftEncoder)); // Logging the position of the buddy balance lift
+    buddyBalancePosRight.append(AbsoluteEncoder.getPositionRadians(rightEncoder));
+    SmartDashboard.putNumber("Buddy Balance Right Position", AbsoluteEncoder.getPositionRadians(rightEncoder));
+    SmartDashboard.putNumber("Buddy Balance Left Position", AbsoluteEncoder.getPositionRadians(leftEncoder));
   }
 }
