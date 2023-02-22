@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.MotorController;
@@ -42,7 +43,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     CUBEINTAKE(0, 0), //Arm is in position to intake cubes FIXME
     SUBSTATIONINTAKE(0, 0), //Arm is in position to intake from substation FIXME
     MIDSCORE(0, 0), //Arm is in position to score on the mid pole FIXME
-    HIGHSCORE(0, 0); //Arm is in position to score on the high pole FIXME
+    HIGHSCORE(0, 0), //Arm is in position to score on the high pole FIXME
+    TRANSITION(0, 0); //Used to transition to any state from stowed position FIXME
 
     private double x; //Position relative to the base of the arm, in meters
     private double y; //Position above the carpet, in meters
@@ -296,8 +298,14 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
     setReferences(desiredBaseAngle, desiredElbowAngle);
   }
-  
 
+  public Command transitionToState(ArmState state){
+    return new SequentialCommandGroup(
+      goToState(ArmState.TRANSITION),
+      goToState(state)
+    );
+  }
+  
   public Command goToState(ArmState state){
     //Command for autonomous, obstructs routine until arm is at setpoint
     return new InstantCommand(() -> setState(state), this)
