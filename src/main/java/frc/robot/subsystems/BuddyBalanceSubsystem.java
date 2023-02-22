@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
@@ -26,14 +27,14 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
 public class BuddyBalanceSubsystem extends SubsystemBase {
-  private static double kBalancedPosition; // Buddy balance PID reference point when lifting a robot and engaging charge station
-  private static double kDeployedPosition; // Buddy balance PID reference point when setting down a robot/initial position when deployed
+  private static double kBalancedAngle; // Buddy balance PID reference point when lifting a robot and engaging charge station
+  private static double kDeployedAngle; // Buddy balance PID reference point when setting down a robot/initial position when deployed
   // TODO: Make the reference point constants and default motor PID values final when they are done being tuned with TunableNumbers
   private static final double kDefaultMotorP = 1e-6;
   private static final double kDefaultMotorI = 0;
   private static final double kDefaultMotorD = 1e-6;
   private static final int deployServoID = 1;
-  private static double kServoDeployedPos = 1;
+  private static double kServoDeployedPos;
 
   private TunableNumber refPointBalancedTuner;
   private TunableNumber refPointDeployedTuner;
@@ -48,8 +49,8 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private Servo activateDeploy;
   private CANSparkMax rightMotor;
   private CANSparkMax leftMotor;
-  private SparkMaxPIDController rightPIDController;
-  private SparkMaxPIDController leftPIDController;
+  private PIDController rightPIDController;
+  private PIDController leftPIDController;
   private DutyCycleEncoder rightEncoder;
   private DutyCycleEncoder leftEncoder;
   private boolean isDeployed = false;
@@ -63,14 +64,8 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     rightMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceRight);
     leftMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft);
     activateDeploy = new Servo(deployServoID);
-    rightPIDController = rightMotor.getPIDController();
-    leftPIDController = leftMotor.getPIDController();
-    rightPIDController.setP(kDefaultMotorP);
-    rightPIDController.setI(kDefaultMotorI);
-    rightPIDController.setD(kDefaultMotorD);
-    leftPIDController.setP(kDefaultMotorP);
-    leftPIDController.setI(kDefaultMotorI);
-    leftPIDController.setD(kDefaultMotorD);
+    rightPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
+    leftPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
     rightEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalanceRight);
     leftEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalanceLeft);
 
@@ -81,9 +76,9 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     tunerNumLeftI = new TunableNumber("Buddy Balance Left Motor I", kDefaultMotorI, leftPIDController::setI);
     tunerNumLeftD = new TunableNumber("Buddy Balance Left Motor D", kDefaultMotorD, leftPIDController::setD);
 
-    refPointBalancedTuner = new TunableNumber("Ref Point Balanced", 15, (a) -> {kBalancedPosition = a;});
-    refPointDeployedTuner = new TunableNumber("Ref Point Deployed", 0, (a) -> {kDeployedPosition = a;});
-    refPointServoTuner = new TunableNumber("Ref Point Servo", 1, (a) -> {kServoDeployedPos = a;});
+    refPointBalancedTuner = new TunableNumber("Ref Point Balanced", 15, (a) -> {kBalancedAngle = a;});
+    refPointDeployedTuner = new TunableNumber("Ref Point Deployed", 0, (a) -> {kDeployedAngle = a;});
+    refPointServoTuner = new TunableNumber("Ref Point Servo", 0, (a) -> {kServoDeployedPos = a;});
 
     positionEntry = buddyBalanceTab.add("Buddy Balance Position", 0).getEntry();
   }
@@ -98,13 +93,13 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void retrieveBuddy() { // Used to pick up the buddy robot while the lift is already underneath it
-    rightPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition);
-    leftPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition);
+    rightPIDController.setSetpoint(kBalancedAngle);
+    leftPIDController.setSetpoint(kBalancedAngle);
   }
 
   public void releaseBuddy() { // Used to set down the robot
-    rightPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition);
-    leftPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition);
+    rightPIDController.setSetpoint(kDeployedAngle);
+    leftPIDController.setSetpoint(kDeployedAngle);
   }
 
   @Override
