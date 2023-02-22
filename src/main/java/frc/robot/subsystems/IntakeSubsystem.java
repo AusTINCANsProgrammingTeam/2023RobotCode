@@ -26,7 +26,9 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private CANSparkMax motor3;
   private boolean inOutArm = false;
   private static ShuffleboardTab matchTab;
-  private static GenericEntry intakeEntry;
+  public static ShuffleboardTab competitionTab = Shuffleboard.getTab("Competition");
+  private static GenericEntry intakeEntry = competitionTab.add("Intake Speed", "").getEntry();
+
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);

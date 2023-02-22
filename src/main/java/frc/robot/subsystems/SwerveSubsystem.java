@@ -99,7 +99,11 @@ public class SwerveSubsystem extends SubsystemBase{
     private GenericEntry pitchEntry;
 
     private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
-    private GenericEntry positionEntry = configTab.add("Position", "").getEntry();
+    //private GenericEntry positionEntry = configTab.add("Position", "").getEntry();
+    
+    public ShuffleboardTab competitionTab = Shuffleboard.getTab("Competition");
+    private GenericEntry positionEntry = competitionTab.add("Position", "").getEntry();
+
     public boolean controlOrientationIsFOD;
 
     public Double rotationHold;
@@ -287,10 +291,11 @@ public class SwerveSubsystem extends SubsystemBase{
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());
 
+        positionEntry.setString(getPose().getTranslation().toString());
+        
         if (!Robot.isCompetition) {
             pitchEntry.setDouble(gyro.getPitch());
             headingEntry.setDouble(getHeading());
-            positionEntry.setString(getPose().getTranslation().toString());
         }
 
         Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
