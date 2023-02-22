@@ -124,12 +124,4 @@ gversion {
   dateFormat   = "yyyy-MM-dd HH:mm:ss z"
   timeZone     = "America/Chicago" // Use preferred time zone
   indent       = "  "
-<<<<<<< HEAD
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> c6bc3fe2a33a429a2bf6dac19aebe27f1a6dbde8
-=======
-}
->>>>>>> 0bc0bfd956df80fef16fcfaa119528a4ce181162
