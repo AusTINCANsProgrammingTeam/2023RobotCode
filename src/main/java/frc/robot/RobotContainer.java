@@ -20,6 +20,7 @@ import frc.robot.subsystems.led.BlinkinLedSubsystem;
 import frc.robot.subsystems.led.LedMatrixSubsystem;
 import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.commands.AssistedBalanceCommand;
+import frc.robot.commands.GyroAlignmentCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -50,13 +51,19 @@ public class RobotContainer {
 
   private AssistedBalanceCommand assistedBalanceCommand;
 
+  private GyroAlignmentCommand gyroAlignmentCommand;
+
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     ledSubsystem = Robot.ledSubSelect == LedEnum.STRIP ? new LedSubsystem() : null;
+    subsystemEnabledLog.append(ledSubsystem == null ? "Led: Disabled" : "Led: Enabled");
     ledMatrixSubsystem = Robot.ledSubSelect == LedEnum.MATRIX ? new LedMatrixSubsystem() : null; //PWM port 2
+    subsystemEnabledLog.append(ledSubsystem == null ? "Led Matrix: Disabled" : "Led Matrix: Enabled");
     blinkinLedSubsystem = Robot.ledSubSelect == LedEnum.BLINKIN ? new BlinkinLedSubsystem() : null;
+    subsystemEnabledLog.append(ledSubsystem == null ? "Led Blinkin: Disabled" : "Led Blinkin: Enabled");
+
 
     swerveSubsystem = Robot.swerveEnabled ? new SwerveSubsystem() : null;
     subsystemEnabledLog.append(swerveSubsystem == null ? "Swerve: Disabled" : "Swerve: Enabled");
@@ -76,6 +83,7 @@ public class RobotContainer {
     auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
 
     assistedBalanceCommand = Robot.swerveEnabled ? new AssistedBalanceCommand(swerveSubsystem) : null;
+    gyroAlignmentCommand = new GyroAlignmentCommand(ledSubsystem, swerveSubsystem);
 
     if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
@@ -116,6 +124,7 @@ public class RobotContainer {
     if (Robot.ledSubSelect == LedEnum.STRIP){
       OI.Operator.getLedSwitchButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
       OI.Operator.getLedToggleButton().whileTrue(new StartEndCommand(ledSubsystem::onLed, ledSubsystem::offLed, ledSubsystem));
+      OI.Operator.getGyroAlignmentLedButton().onTrue(gyroAlignmentCommand);
     }
     if (Robot.swerveEnabled) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
