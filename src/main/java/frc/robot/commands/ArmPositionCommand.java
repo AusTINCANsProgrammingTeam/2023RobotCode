@@ -23,7 +23,8 @@ public class ArmPositionCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armSubsystem.setReferences(armSubsystem.getBaseAngle(), armSubsystem.getElbowAngle());
+    armSubsystem.setBaseReference(armSubsystem.getBaseAngle());
+    armSubsystem.setElbowReference(armSubsystem.getElbowAngle());
   }
 
   // Called every time the scheduler runs while the command is scheduled.

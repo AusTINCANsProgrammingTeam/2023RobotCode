@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,6 +23,8 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -91,8 +94,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private double simBaseEncoderPosition;
   private double simElbowEncoderPosition;
 
-  private final PIDController basePIDController;
-  private final PIDController elbowPIDController;
+  private final ProfiledPIDController basePIDController;
+  private final ProfiledPIDController elbowPIDController;
   public static final double kBaseGearing = 40.8333333;
   public static final double kElbowGearing = 4.28571429;
   public static final double kBaseArmLength = Units.inchesToMeters(41);
@@ -122,9 +125,11 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public ShuffleboardTab armTab = Shuffleboard.getTab("Arm");
 
   private GenericEntry actualBaseAngle = armTab.add("Actual Base Angle", 0.0).getEntry();
-  private GenericEntry desiredBaseAngle = armTab.add("Desired Base Angle", 0.0).getEntry();
+  private GenericEntry desiredBaseGoal = armTab.add("Desired Base Goal", 0.0).getEntry();
+  private GenericEntry desiredBaseSetpoint = armTab.add("Desired Base Setpoint", 0.0).getEntry();
   private GenericEntry actualElbowAngle = armTab.add("Actual Elbow Angle", 0.0).getEntry();
-  private GenericEntry desiredElbowAngle = armTab.add("Desired Elbow Angle", 0.0).getEntry();
+  private GenericEntry desiredElbowGoal = armTab.add("Desired Elbow Goal", 0.0).getEntry();
+  private GenericEntry desiredElbowSetpoint = armTab.add("Desired Elbow Setpoint", 0.0).getEntry();
 
   private GenericEntry elbowOutput = armTab.add("Elbow Output", 0.0).getEntry();
   private GenericEntry baseOutput = armTab.add("Base Output", 0.0).getEntry();
@@ -170,11 +175,11 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     elbowAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);
 
     if(Robot.isSimulation()) {
-      basePIDController = new PIDController(kSimBaseP, kSimBaseI, kSimBaseD);
-      elbowPIDController = new PIDController(kSimElbowP, kSimElbowI, kSimElbowD);
+      basePIDController = new ProfiledPIDController(kSimBaseP, kSimBaseI, kSimBaseD, new Constraints(Units.degreesToRadians(15), Units.degreesToRadians(2)));
+      elbowPIDController = new ProfiledPIDController(kSimElbowP, kSimElbowI, kSimElbowD, new Constraints(Units.degreesToRadians(30), Units.degreesToRadians(10)));
     } else {
-      basePIDController = new PIDController(kBaseP, kBaseI, kBaseD);
-      elbowPIDController = new PIDController(kElbowP, kElbowI, kElbowD);
+      basePIDController = new ProfiledPIDController(kBaseP, kBaseI, kBaseD, new Constraints(Units.degreesToRadians(30), Units.degreesToRadians(30)));
+      elbowPIDController = new ProfiledPIDController(kElbowP, kElbowI, kElbowD, new Constraints(Units.degreesToRadians(60), Units.degreesToRadians(45)));
       
       basePTuner = new TunableNumber("baseP", kBaseP, basePIDController::setP);
       baseITuner = new TunableNumber("baseI", kBaseI, basePIDController::setI);
@@ -188,10 +193,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     //baseSetpointTuner = new TunableNumber("base setpoint", getBaseAngle(), this::setBaseReference);
     //elbowSetpointTuner = new TunableNumber("elbow setpoint", getElbowAngle(), this::setElbowReference);
 
-
-    elbowPIDController.setTolerance(Units.degreesToRadians(10));
-    basePIDController.setTolerance(Units.degreesToRadians(10));
-    setReferences(getBaseAngle(), getElbowAngle());
+    basePIDController.reset(getBaseAngle());
+    elbowPIDController.reset(getElbowAngle());
+    setBaseReference(getBaseAngle());
+    setElbowReference(getElbowAngle());
     //setState(ArmState.STOWED);
   }
 
@@ -205,21 +210,16 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void updateReferences(double bJoystickValue, double eJoystickValue) {
-    basePIDController.setSetpoint(MathUtil.clamp(basePIDController.getSetpoint()+Units.degreesToRadians(bJoystickValue),ArmSubsystem.kMinBAngle,ArmSubsystem.kMaxBAngle));
-    elbowPIDController.setSetpoint(MathUtil.clamp(elbowPIDController.getSetpoint()+Units.degreesToRadians(eJoystickValue),ArmSubsystem.kMinEAngle,ArmSubsystem.kMaxEAngle));
+    setBaseReference(MathUtil.clamp(basePIDController.getGoal().position+Units.degreesToRadians(bJoystickValue),ArmSubsystem.kMinBAngle,ArmSubsystem.kMaxBAngle));
+    setElbowReference(MathUtil.clamp(elbowPIDController.getGoal().position+Units.degreesToRadians(eJoystickValue),ArmSubsystem.kMinEAngle,ArmSubsystem.kMaxEAngle));
   }
 
   public void setBaseReference(double setpoint) {
-    basePIDController.setSetpoint(setpoint);
+    basePIDController.setGoal(setpoint);
   }
 
   public void setElbowReference(double setpoint) {
-    elbowPIDController.setSetpoint(setpoint);
-  }
-
-  public void setReferences(double setpointB, double setpointE) {
-    basePIDController.setSetpoint(setpointB);
-    elbowPIDController.setSetpoint(setpointE);
+    elbowPIDController.setGoal(setpoint);
   }
 
   //Sets motor angle setpoints based on a coordinate pair. This uses the same logic as the setState() method,
@@ -228,7 +228,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     double desiredBaseAngle = convertToBaseAngle(x, y);
     double desiredElbowAngle = convertToBaseAngle(x, y);
 
-    setReferences(desiredBaseAngle, desiredElbowAngle);
+    setBaseReference(desiredBaseAngle);
+    setElbowReference(desiredElbowAngle);
   }
 
   
@@ -294,7 +295,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public boolean atSetpoint(){
-    return basePIDController.atSetpoint() && elbowPIDController.atSetpoint();
+    return basePIDController.atGoal() && elbowPIDController.atGoal();
   }
 
   public void setState(ArmState state){
@@ -303,7 +304,11 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     desiredXPosition.setDouble(state.getX());
     desiredYPosition.setDouble(state.getY());
 
-    setReferences(desiredBaseAngle, desiredElbowAngle);
+    basePIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 1);
+    elbowPIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 1);
+
+    setBaseReference(desiredBaseAngle);
+    setElbowReference(desiredElbowAngle);
   }
 
   public Command transitionToState(ArmState state){
@@ -340,8 +345,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     actualElbowAngle.setDouble(Units.radiansToDegrees(getElbowAngle()));
     actualXPosition.setDouble(armXPosition);
     actualYPositon.setDouble(armYPosition);
-    desiredBaseAngle.setDouble(Units.radiansToDegrees(basePIDController.getSetpoint()));
-    desiredElbowAngle.setDouble(Units.radiansToDegrees(elbowPIDController.getSetpoint()));
+    desiredBaseGoal.setDouble(Units.radiansToDegrees(basePIDController.getGoal().position));
+    desiredBaseSetpoint.setDouble(Units.radiansToDegrees(basePIDController.getSetpoint().position));
+    desiredElbowGoal.setDouble(Units.radiansToDegrees(elbowPIDController.getGoal().position));
+    desiredElbowSetpoint.setDouble(Units.radiansToDegrees(elbowPIDController.getSetpoint().position));
     elbowOutput.setDouble(elbowMotor.get());
     baseOutput.setDouble(baseMotor.get());
     SmartDashboard.putData(this);
@@ -362,10 +369,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     //Shuffleboard values
     simBArmAngle.setDouble(Units.radiansToDegrees(baseArmSim.getAngleRads()));
     simBEncoderPos.setDouble(Units.radiansToDegrees(getBaseAngle()));
-    simBOutSet.setDouble(Units.radiansToDegrees(basePIDController.getSetpoint()));
+    simBOutSet.setDouble(Units.radiansToDegrees(basePIDController.getGoal().position));
     simEArmAngle.setDouble(Units.radiansToDegrees(elbowArmSim.getAngleRads()));
     simEEncoderPos.setDouble(Units.radiansToDegrees(getElbowAngle()));
-    simEOutSet.setDouble(Units.radiansToDegrees(elbowPIDController.getSetpoint()));
+    simEOutSet.setDouble(Units.radiansToDegrees(elbowPIDController.getGoal().position));
   }
 
   @Override
@@ -375,7 +382,5 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     baseMotor.close();
     baseAbsoluteEncoder.close();
     elbowMotor.close();
-    basePIDController.close();
-    elbowPIDController.close();
   }
 }
