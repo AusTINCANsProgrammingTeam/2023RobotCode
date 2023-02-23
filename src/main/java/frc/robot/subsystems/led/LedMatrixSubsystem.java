@@ -16,7 +16,9 @@ import frc.robot.Robot;
 
 public class LedMatrixSubsystem extends SubsystemBase{
     private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
-    private GenericEntry ledBrightnessSlider = ledTab.add("Brightness", 0.2).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
+    private GenericEntry ledBrightnessSlider = ledTab.add("Brightness", 0.2)
+      .withWidget(BuiltInWidgets.kNumberSlider)
+      .withProperties(Map.of("min", 0, "max", 1)).getEntry();
 
     public Color hex2Rgb(String colorStr) {
         return new Color(
