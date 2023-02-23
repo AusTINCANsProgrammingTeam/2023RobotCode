@@ -85,8 +85,8 @@ public class RobotContainer {
     }
 
     if (Robot.intakeEnabled) {
-    OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem));
-    OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem));
+      OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem));
+      OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem));
     }
 
     if (Robot.buddyBalanceEnabled) {
@@ -95,9 +95,7 @@ public class RobotContainer {
       OI.Operator.getUpBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::retrieveBuddy, buddyBalanceSubsystem).unless(() -> !buddyBalanceSubsystem.getIsDeployed()));
     }
 
-    if (!Robot.isCompetition) {
-      OI.putControllerButtons();
-    }
+    OI.putControllerButtons();
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
