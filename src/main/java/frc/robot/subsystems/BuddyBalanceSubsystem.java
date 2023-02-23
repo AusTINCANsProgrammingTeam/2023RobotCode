@@ -23,8 +23,6 @@ import frc.robot.hardware.MotorController.MotorConfig;
 import frc.robot.classes.TunableNumber;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
 
 public class BuddyBalanceSubsystem extends SubsystemBase {
   private static double kBalancedAngle; // Buddy balance PID reference point when lifting a robot and engaging charge station
@@ -59,6 +57,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private DoubleLogEntry buddyBalancePosRight = new DoubleLogEntry(datalog, "/buddybalance/position/right");
   private ShuffleboardTab buddyBalanceTab = Shuffleboard.getTab("Buddy Balance"); // TODO: Replace buddy balance tab with whatever tab the position should be logged to
   private GenericEntry positionEntry;
+  private GenericEntry buddyBalancePosEntry;
 
   public BuddyBalanceSubsystem() {
     rightMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceRight);
@@ -76,11 +75,12 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     tunerNumLeftI = new TunableNumber("Buddy Balance Left Motor I", kDefaultMotorI, leftPIDController::setI);
     tunerNumLeftD = new TunableNumber("Buddy Balance Left Motor D", kDefaultMotorD, leftPIDController::setD);
 
-    refPointBalancedTuner = new TunableNumber("Ref Point Balanced", 15, (a) -> {kBalancedAngle = a;});
+    refPointBalancedTuner = new TunableNumber("Ref Point Balanced", 0, (a) -> {kBalancedAngle = a;});
     refPointDeployedTuner = new TunableNumber("Ref Point Deployed", 0, (a) -> {kDeployedAngle = a;});
     refPointServoTuner = new TunableNumber("Ref Point Servo", 0, (a) -> {kServoDeployedPos = a;});
 
     positionEntry = buddyBalanceTab.add("Buddy Balance Position", 0).getEntry();
+    //buddyBalancePosEntry = SwerveSubsystem.matchTab.add("Buddy Balance State", "Docked").getEntry();
   }
 
   public boolean getIsDeployed() {
@@ -95,11 +95,13 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   public void retrieveBuddy() { // Used to pick up the buddy robot while the lift is already underneath it
     rightPIDController.setSetpoint(kBalancedAngle);
     leftPIDController.setSetpoint(kBalancedAngle);
+    //buddyBalancePosEntry.setString("Raised");
   }
 
   public void releaseBuddy() { // Used to set down the robot
     rightPIDController.setSetpoint(kDeployedAngle);
     leftPIDController.setSetpoint(kDeployedAngle);
+    //buddyBalancePosEntry.setString("Lowered");
   }
 
   @Override
