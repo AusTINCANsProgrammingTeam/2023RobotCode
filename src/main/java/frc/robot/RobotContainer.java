@@ -112,7 +112,7 @@ public class RobotContainer {
     }
 
     if (Robot.armEnabled) {
-      OI.Operator.getHighArmButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.setState(ArmState.HIGHSCORE), () -> armSubsystem.setState(ArmState.STOWED)));
+      OI.Operator.getHighArmButton().onTrue(armSubsystem.transitionToState(ArmState.HIGHSCORE));
       OI.Operator.getMidArmButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.setState(ArmState.MIDSCORE), () -> armSubsystem.setState(ArmState.STOWED)));
     }
 
