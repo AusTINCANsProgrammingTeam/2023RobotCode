@@ -39,12 +39,12 @@ import frc.robot.classes.TunableNumber;
 public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public static enum ArmState{
     STOWED(0.4406, 0.0397), //Arm is retracted into the frame perimeter FIXME
-    CONEINTAKE(0, 0), //Arm is in position to intake cones FIXME
+    CONEINTAKE(0.8099, -0.1106), //Arm is in position to intake cones FIXME
     CUBEINTAKE(0, 0), //Arm is in position to intake cubes FIXME
-    SUBSTATIONINTAKE(0, 0), //Arm is in position to intake from substation FIXME
-    MIDSCORE(0, 0), //Arm is in position to score on the mid pole FIXME
-    HIGHSCORE(0, 0), //Arm is in position to score on the high pole FIXME
-    TRANSITION(0, 0); //Used to transition to any state from stowed position FIXME
+    SUBSTATIONINTAKE(1.6145, 1.0866), //Arm is in position to intake from substation FIXME
+    MIDSCORE(1.3116, 0.7540), //Arm is in position to score on the mid pole FIXME
+    HIGHSCORE(1.6685, 1.0699), //Arm is in position to score on the high pole FIXME
+    TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position FIXME
 
     private double x; //Position relative to the base of the arm, in meters
     private double y; //Position above the carpet, in meters
@@ -189,8 +189,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     //elbowSetpointTuner = new TunableNumber("elbow setpoint", getElbowAngle(), this::setElbowReference);
 
 
-    elbowPIDController.setTolerance(Units.degreesToRadians(1));
-    basePIDController.setTolerance(Units.degreesToRadians(1));
+    elbowPIDController.setTolerance(Units.degreesToRadians(10));
+    basePIDController.setTolerance(Units.degreesToRadians(10));
     setReferences(getBaseAngle(), getElbowAngle());
     //setState(ArmState.STOWED);
   }
@@ -344,6 +344,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     desiredElbowAngle.setDouble(Units.radiansToDegrees(elbowPIDController.getSetpoint()));
     elbowOutput.setDouble(elbowMotor.get());
     baseOutput.setDouble(baseMotor.get());
+    SmartDashboard.putData(this);
   }
 
   @Override
