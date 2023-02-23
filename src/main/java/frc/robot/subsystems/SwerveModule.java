@@ -76,7 +76,7 @@ public class SwerveModule extends SubsystemBase {
 
         this.ID = ID;
 
-        absoluteEncoder = Robot.isSimulation() ? null : AbsoluteEncoder.constructEncoder(absoluteEncoderConfig);
+        absoluteEncoder = Robot.isSimulation() ? null : AbsoluteEncoder.constructCANCoder(absoluteEncoderConfig);
 
         driveMotor = MotorController.constructMotor(driveMotorConfig);
         turningMotor = MotorController.constructMotor(turningMotorConfig);
