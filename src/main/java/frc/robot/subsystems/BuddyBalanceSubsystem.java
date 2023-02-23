@@ -4,7 +4,9 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
@@ -25,14 +27,14 @@ import frc.robot.classes.TunableNumber;
 import com.revrobotics.CANSparkMax;
 
 public class BuddyBalanceSubsystem extends SubsystemBase {
-  private static double kBalancedAngle; // Buddy balance PID reference point when lifting a robot and engaging charge station
-  private static double kDeployedAngle; // Buddy balance PID reference point when setting down a robot/initial position when deployed
-  // TODO: Make the reference point constants and default motor PID values final when they are done being tuned with TunableNumbers
+  public static double kRetrievedAngle; // Buddy balance PID reference point when lifting a robot and engaging charge station
+  public static double kDeployedAngle; // Buddy balance PID reference point when setting down a robot/initial position when deployed
+  // TODO: Make the constants final when they are done being tuned with TunableNumbers
   private static final double kDefaultMotorP = 1e-6;
   private static final double kDefaultMotorI = 0;
   private static final double kDefaultMotorD = 1e-6;
   private static final int deployServoID = 1;
-  private static double kServoDeployedPos;
+  public static double kServoDeployedPos; // public because of JUnit
 
   private TunableNumber refPointBalancedTuner;
   private TunableNumber refPointDeployedTuner;
@@ -44,7 +46,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private TunableNumber tunerNumLeftI;
   private TunableNumber tunerNumLeftD;
 
-  private Servo activateDeploy;
+  private Servo activateDeploy; // public because of JUnit
   private CANSparkMax rightMotor;
   private CANSparkMax leftMotor;
   private PIDController rightPIDController;
@@ -63,10 +65,10 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     rightMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceRight);
     leftMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft);
     activateDeploy = new Servo(deployServoID);
-    rightPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
-    leftPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
     rightEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalanceRight);
     leftEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalanceLeft);
+    rightPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
+    leftPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
 
     tunerNumRightP = new TunableNumber("Buddy Balance Right Motor P", kDefaultMotorP, rightPIDController::setP);
     tunerNumRightI = new TunableNumber("Buddy Balance Right Motor I", kDefaultMotorI, rightPIDController::setI);
@@ -75,12 +77,20 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     tunerNumLeftI = new TunableNumber("Buddy Balance Left Motor I", kDefaultMotorI, leftPIDController::setI);
     tunerNumLeftD = new TunableNumber("Buddy Balance Left Motor D", kDefaultMotorD, leftPIDController::setD);
 
-    refPointBalancedTuner = new TunableNumber("Ref Point Balanced", 0, (a) -> {kBalancedAngle = a;});
+    refPointBalancedTuner = new TunableNumber("Ref Point Balanced", 0, (a) -> {kRetrievedAngle = a;});
     refPointDeployedTuner = new TunableNumber("Ref Point Deployed", 0, (a) -> {kDeployedAngle = a;});
     refPointServoTuner = new TunableNumber("Ref Point Servo", 0, (a) -> {kServoDeployedPos = a;});
 
     positionEntry = buddyBalanceTab.add("Buddy Balance Position", 0).getEntry();
     //buddyBalancePosEntry = SwerveSubsystem.matchTab.add("Buddy Balance State", "Docked").getEntry();
+  }
+
+  public double getRightAngle() {
+    return Math.round(AbsoluteEncoder.getPositionRadians(rightEncoder));
+  }
+
+  public double getLeftAngle() {
+    return Math.round(AbsoluteEncoder.getPositionRadians(leftEncoder));
   }
 
   public boolean getIsDeployed() {
@@ -93,8 +103,8 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void retrieveBuddy() { // Used to pick up the buddy robot while the lift is already underneath it
-    rightPIDController.setSetpoint(kBalancedAngle);
-    leftPIDController.setSetpoint(kBalancedAngle);
+    rightPIDController.setSetpoint(kRetrievedAngle);
+    leftPIDController.setSetpoint(kRetrievedAngle);
     //buddyBalancePosEntry.setString("Raised");
   }
 
@@ -104,9 +114,36 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     //buddyBalancePosEntry.setString("Lowered");
   }
 
+  public void updateMotors() {
+    rightMotor.set(MathUtil.clamp(rightPIDController.calculate(getRightAngle()), -1, 1));
+    leftMotor.set(MathUtil.clamp(leftPIDController.calculate(getLeftAngle()), -1, 1));
+  }
+
+
+  public void close() throws Exception {
+    // This method will close all device handles used by this object and release any other dynamic memory.
+    // Mostly for JUnit tests
+    rightMotor.close();
+    leftMotor.close();
+  }
+
+  // These 3 methods are used for JUnit testing only
+  public double getServoAngle() {
+    return activateDeploy.getAngle();
+  }
+
+  public double getEncoderRightAngle() {
+    return rightEncoder.getAbsolutePosition();
+  }
+
+  public double getEncoderLeftAngle() {
+    return leftEncoder.getAbsolutePosition();
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    updateMotors();
     buddyBalancePosLeft.append(AbsoluteEncoder.getPositionRadians(leftEncoder)); // Logging the position of the buddy balance lift
     buddyBalancePosRight.append(AbsoluteEncoder.getPositionRadians(rightEncoder));
     SmartDashboard.putNumber("Buddy Balance Right Position", AbsoluteEncoder.getPositionRadians(rightEncoder));
