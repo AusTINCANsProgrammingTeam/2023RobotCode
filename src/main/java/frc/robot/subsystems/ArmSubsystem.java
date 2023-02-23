@@ -4,29 +4,15 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import frc.robot.hardware.AbsoluteEncoder;
-import frc.robot.hardware.MotorController;
-import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
-import frc.robot.hardware.MotorController.MotorConfig;
-
 import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -37,8 +23,17 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.classes.TunableNumber;
+import frc.robot.hardware.AbsoluteEncoder;
+import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
+import frc.robot.hardware.MotorController;
+import frc.robot.hardware.MotorController.MotorConfig;
 
 
 public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
@@ -109,8 +104,10 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kElbowArmLengthCM = kElbowArmLength*100;
   public static final double kMinBAngle = Units.degreesToRadians(46);
   public static final double kMaxBAngle = Units.degreesToRadians(90);
+  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(30), Units.degreesToRadians(30));
   public static final double kMinEAngle = Units.degreesToRadians(15);
   public static final double kMaxEAngle = Units.degreesToRadians(160);
+  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(60), Units.degreesToRadians(45));
   public static final double kBaseArmMass = Units.lbsToKilograms(20);
   public static final double kElbowArmMass = Units.lbsToKilograms(5);
   public final double baseArmInertia = SingleJointedArmSim.estimateMOI(kBaseArmLength, kBaseArmMass);
@@ -183,11 +180,11 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     elbowAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);
 
     if(Robot.isSimulation()) {
-      basePIDController = new ProfiledPIDController(kSimBaseP, kSimBaseI, kSimBaseD, new Constraints(Units.degreesToRadians(15), Units.degreesToRadians(2)));
-      elbowPIDController = new ProfiledPIDController(kSimElbowP, kSimElbowI, kSimElbowD, new Constraints(Units.degreesToRadians(30), Units.degreesToRadians(10)));
+      basePIDController = new ProfiledPIDController(kSimBaseP, kSimBaseI, kSimBaseD, kBaseConstraints);
+      elbowPIDController = new ProfiledPIDController(kSimElbowP, kSimElbowI, kSimElbowD, kElbowConstraints);
     } else {
-      basePIDController = new ProfiledPIDController(kBaseP, kBaseI, kBaseD, new Constraints(Units.degreesToRadians(30), Units.degreesToRadians(30)));
-      elbowPIDController = new ProfiledPIDController(kElbowP, kElbowI, kElbowD, new Constraints(Units.degreesToRadians(60), Units.degreesToRadians(45)));
+      basePIDController = new ProfiledPIDController(kBaseP, kBaseI, kBaseD, kBaseConstraints);
+      elbowPIDController = new ProfiledPIDController(kElbowP, kElbowI, kElbowD, kElbowConstraints);
       
       basePTuner = new TunableNumber("baseP", kBaseP, basePIDController::setP);
       baseITuner = new TunableNumber("baseI", kBaseI, basePIDController::setI);
@@ -335,6 +332,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   public Command transitionToState(ArmState state){
     currentTransition = state;
+    currentTransitionEntry.setString(currentTransition.toString());
     return new SequentialCommandGroup(
       goToState(ArmState.TRANSITION),
       goToState(state)
@@ -361,7 +359,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   
   @Override
   public void periodic() {
-    currentTransitionEntry.setString(currentTransition.toString());
     // This method will be called once per scheduler run
     calculateCurrentPositions();
     //Shuffleboard + Smartdashboard values 
