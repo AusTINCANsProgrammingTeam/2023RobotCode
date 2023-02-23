@@ -25,7 +25,7 @@ public class LedSubsystem extends SubsystemBase {
   private double ledBrightnessSlider = ledTab.add("Brightness", 0.2).withWidget(BuiltInWidgets.kNumberSlider).getEntry().getDouble(0.2);
 
   public static enum LedMode {
-    CONE, CUBE, OFF;
+    CONE, CUBE;
   }
   private LedMode ledMode = LedMode.CONE;
   /** Configure AddressableLED */
@@ -46,9 +46,6 @@ public class LedSubsystem extends SubsystemBase {
           case CONE:
             solid(new Color(1 * ledBrightnessSlider, 1 * ledBrightnessSlider, 0.0f));
           break;
-          case OFF:
-            solid(new Color(0.0f, 0.0f, 0.0f));
-          break;
       }
       leds.setData(buffer);
   }
@@ -61,13 +58,11 @@ public class LedSubsystem extends SubsystemBase {
   }
 
   public void offLed(){
-    ledMode = LedMode.OFF;
-    setMode(ledMode);
+    solid(new Color(0.0f, 0.0f, 0.0f));
     ledState.setBoolean(false);
     leds.setData(buffer);
   }
   public void onLed(){
-    ledMode = LedMode.CONE;
     setMode(ledMode);
     ledState.setBoolean(true);
     leds.setData(buffer);

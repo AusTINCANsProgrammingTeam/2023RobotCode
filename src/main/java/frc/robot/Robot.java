@@ -46,7 +46,7 @@ public class Robot extends LoggedRobot {
   }
 
   //Subsystem toggle
-  public static final LedEnum ledSubSelect = LedEnum.MATRIX;
+  public static final LedEnum ledSubSelect = LedEnum.STRIP;
 
   public static final boolean batteryEnabled = false;
   public static final boolean cameraEnabled = false;
