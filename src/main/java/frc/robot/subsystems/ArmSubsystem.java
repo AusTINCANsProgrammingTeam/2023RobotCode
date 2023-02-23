@@ -67,6 +67,9 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  private ArmState currentState;
+  private ArmState currentTransition;
+
   //Base arm PID values
   private double kBaseP = 0.8;
   private double kBaseI = 0.1;
@@ -141,7 +144,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   private GenericEntry desiredXPosition = armTab.add("Desired X Position", 0.0).getEntry();
   private GenericEntry desiredYPosition = armTab.add("Desired Y Position", 0.0).getEntry();
 
-  private GenericEntry currentState = armTab.add("Current State","").getEntry();
+  private GenericEntry currentStateEntry = armTab.add("Current State","").getEntry();
+  private GenericEntry currentTransitionEntry = armTab.add("Current Transition","").getEntry();
 
   private TunableNumber basePTuner;
   private TunableNumber baseITuner;
@@ -200,7 +204,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     elbowPIDController.reset(getElbowAngle());
     setBaseReference(getBaseAngle());
     setElbowReference(getElbowAngle());
-    //setState(ArmState.STOWED);
+    setState(ArmState.CONEINTAKE);
+    currentTransition = ArmState.CONEINTAKE;
   }
 
   //Returns sim encoder position (No offset) if in simulation, the actual position otherwise
@@ -306,7 +311,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     double desiredElbowAngle = convertToElbowAngle(state.getX(),state.getY());
     desiredXPosition.setDouble(state.getX());
     desiredYPosition.setDouble(state.getY());
-    currentState.setString(state.toString());
+    currentStateEntry.setString(state.toString());
+    currentState = state;
 
     basePIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 1);
     elbowPIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 1);
@@ -323,10 +329,18 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public Command transitionToState(ArmState state){
+    currentTransition = state;
     return new SequentialCommandGroup(
       goToState(ArmState.TRANSITION),
       goToState(state)
     ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+  }
+
+  public Command transitionToStateTeleop(ArmState state){
+    if(state == currentTransition){
+      return transitionToState(ArmState.STOWED);
+    }
+    return transitionToState(state);
   }
   
   public void stop() {
@@ -342,6 +356,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   
   @Override
   public void periodic() {
+    currentTransitionEntry.setString(currentTransition.toString());
     // This method will be called once per scheduler run
     calculateCurrentPositions();
     //Shuffleboard + Smartdashboard values 

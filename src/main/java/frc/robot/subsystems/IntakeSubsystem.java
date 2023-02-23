@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
-  public static final double kOuttakeSpeed = -1;
+  public static final double kOuttakeSpeed = -0.2;
   public static final double kIntakeSpeed = 0.5;
   private CANSparkMax motor;
   private CANSparkMax motor2;

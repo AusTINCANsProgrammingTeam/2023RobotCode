@@ -20,6 +20,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BuddyBalanceSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -106,9 +107,9 @@ public class RobotContainer {
     }
 
     if (Robot.armEnabled) {
-      OI.Driver.getArmHighButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.transitionToState(ArmState.HIGHSCORE).schedule(), () -> armSubsystem.transitionToState(ArmState.STOWED).schedule()));
-      OI.Driver.getArmMidButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.transitionToState(ArmState.MIDSCORE).schedule(), () -> armSubsystem.transitionToState(ArmState.STOWED).schedule()));
-      OI.Driver.getArmIntakeButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.transitionToState(ArmState.CONEINTAKE).schedule(), () -> armSubsystem.transitionToState(ArmState.STOWED).schedule()));
+      OI.Driver.getArmHighButton().onTrue(new ProxyCommand(() -> armSubsystem.transitionToStateTeleop(ArmState.HIGHSCORE)));
+      OI.Driver.getArmMidButton().onTrue(new ProxyCommand(() -> armSubsystem.transitionToStateTeleop(ArmState.MIDSCORE)));
+      OI.Driver.getArmIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.transitionToStateTeleop(ArmState.CONEINTAKE)));
     }
 
     if (Robot.buddyBalanceEnabled) {
