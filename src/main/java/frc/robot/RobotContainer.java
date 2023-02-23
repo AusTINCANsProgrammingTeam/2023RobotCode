@@ -106,9 +106,9 @@ public class RobotContainer {
     }
 
     if (Robot.armEnabled) {
-      OI.Driver.getArmHighButton().onTrue(armSubsystem.transitionToState(ArmState.HIGHSCORE));
-      OI.Driver.getArmMidButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.setState(ArmState.MIDSCORE), () -> armSubsystem.setState(ArmState.STOWED)));
-      OI.Driver.getArmIntakeButton().onTrue(armSubsystem.transitionToState(ArmState.CONEINTAKE));
+      OI.Driver.getArmHighButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.transitionToState(ArmState.HIGHSCORE).schedule(), () -> armSubsystem.transitionToState(ArmState.STOWED).schedule()));
+      OI.Driver.getArmMidButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.transitionToState(ArmState.MIDSCORE).schedule(), () -> armSubsystem.transitionToState(ArmState.STOWED).schedule()));
+      OI.Driver.getArmIntakeButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.transitionToState(ArmState.CONEINTAKE).schedule(), () -> armSubsystem.transitionToState(ArmState.STOWED).schedule()));
     }
 
     if (Robot.buddyBalanceEnabled) {

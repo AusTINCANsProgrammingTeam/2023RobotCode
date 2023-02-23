@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
@@ -139,6 +140,8 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
 
   private GenericEntry desiredXPosition = armTab.add("Desired X Position", 0.0).getEntry();
   private GenericEntry desiredYPosition = armTab.add("Desired Y Position", 0.0).getEntry();
+
+  private GenericEntry currentState = armTab.add("Current State","").getEntry();
 
   private TunableNumber basePTuner;
   private TunableNumber baseITuner;
@@ -303,6 +306,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     double desiredElbowAngle = convertToElbowAngle(state.getX(),state.getY());
     desiredXPosition.setDouble(state.getX());
     desiredYPosition.setDouble(state.getY());
+    currentState.setString(state.toString());
 
     basePIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 1);
     elbowPIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 1);
@@ -310,19 +314,19 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     setBaseReference(desiredBaseAngle);
     setElbowReference(desiredElbowAngle);
   }
-
-  public Command transitionToState(ArmState state){
-    return new SequentialCommandGroup(
-      goToState(ArmState.TRANSITION),
-      goToState(state)
-    );
-  }
   
   public Command goToState(ArmState state){
     //Command for autonomous, obstructs routine until arm is at setpoint
     return new InstantCommand(() -> setState(state), this)
       .andThen(new RepeatCommand(new InstantCommand(this::updateMotors, this))
       .until(this::atSetpoint));
+  }
+
+  public Command transitionToState(ArmState state){
+    return new SequentialCommandGroup(
+      goToState(ArmState.TRANSITION),
+      goToState(state)
+    ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
   
   public void stop() {
