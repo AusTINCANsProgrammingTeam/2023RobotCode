@@ -22,15 +22,13 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kExtendPosition = .5;
   private CANSparkMax motor;
   private CANSparkMax motor2;
-  private CANSparkMax motor3;
-  private boolean inOutArm = false;
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
     motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
-    motor.follow(motor2);
+    motor2.follow(motor, true);
   }
   
   private void spinWheels(double velocity) {
@@ -73,13 +71,4 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
-
-public void inOutArm() {
-  inOutArm = !inOutArm; //Toggle boolean
-    if (inOutArm) {
-    motor3.getPIDController().setReference(kExtendPosition,ControlType.kPosition);
-  } else {
-    motor3.getPIDController().setReference(kRetractPosition,ControlType.kPosition);
-  }
-}
 }
