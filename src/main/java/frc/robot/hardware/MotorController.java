@@ -30,8 +30,8 @@ public class MotorController {
         IntakeMotor1(4, 40, IdleMode.kBrake),
         IntakeMotor2(5, 40, IdleMode.kBrake),
         //BuddyBalance Motors
-        BuddyBalanceRight(18, 40, IdleMode.kBrake),
-        BuddyBalanceLeft(21, 40, IdleMode.kBrake, true); // TODO: update IDs for buddy balance motors when robot is finalized
+        BuddyBalanceRight(7, 40, IdleMode.kBrake),
+        BuddyBalanceLeft(8, 40, IdleMode.kBrake, true); // TODO: update IDs for buddy balance motors when robot is finalized
 
         private int ID;
         private int currentLimit;
