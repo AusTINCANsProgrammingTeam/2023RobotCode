@@ -323,9 +323,13 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   
   public Command goToState(ArmState state){
     //Command for autonomous, obstructs routine until arm is at setpoint
-    return new InstantCommand(() -> setState(state), this)
-      .andThen(new RepeatCommand(new InstantCommand(this::updateMotors, this))
-      .until(this::atSetpoint));
+    return new FunctionalCommand(
+                () -> setState(state), //Init
+                this::updateMotors, //Execute
+                (b)->{}, //End 
+                this::atSetpoint, //isFinished
+                this
+            );
   }
 
   public Command transitionToState(ArmState state){
