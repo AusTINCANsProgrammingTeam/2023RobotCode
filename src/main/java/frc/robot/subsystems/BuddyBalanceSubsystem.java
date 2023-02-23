@@ -51,14 +51,9 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private boolean isDeployed = false;
   private DataLog datalog = DataLogManager.getLog();
   private DoubleLogEntry buddyBalancePosition = new DoubleLogEntry(datalog, "/buddybalance/position");
-  private ShuffleboardTab buddyBalanceTab; // TODO: Replace buddy balance tab with whatever tab the position should be logged to
-  private GenericEntry positionEntry;
+  //Ryan and zachary are doing this because they have the completed code and variables
 
   public BuddyBalanceSubsystem() {
-
-    if (!Robot.isCompetition){
-      buddyBalanceTab = Shuffleboard.getTab("Buddy Balance");
-    }
 
     rightMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceRight);
     leftMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft);
@@ -85,7 +80,6 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     refPointDeployedTuner = new TunableNumber("Ref Point Deployed", 0, (a) -> {kDeployedPosition = a;});
     refPointServoTuner = new TunableNumber("Ref Point Servo", 1, (a) -> {kServoDeployedPos = a;});
 
-    positionEntry = buddyBalanceTab.add("Buddy Balance Position", 0).getEntry();
   }
 
   public boolean getIsDeployed() {

@@ -8,13 +8,13 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.hardware.MotorController;
-import frc.robot.hardware.MotorController.MotorConfig;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.hardware.MotorController;
+import frc.robot.hardware.MotorController.MotorConfig;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kOuttakeSpeed = -1;
@@ -25,27 +25,19 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private CANSparkMax motor2;
   private CANSparkMax motor3;
   private boolean inOutArm = false;
-  private static ShuffleboardTab matchTab;
-  public static ShuffleboardTab competitionTab = Shuffleboard.getTab("Competition");
-  private static GenericEntry intakeEntry = competitionTab.add("Intake Speed", "").getEntry();
+  private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
+  private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
     motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
     motor.follow(motor2);
-
-    if (!Robot.isCompetition){
-      matchTab = Shuffleboard.getTab("Match");
-      intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
-    }
   }
   
   private void spinWheels(double velocity) {
     motor.set(velocity);
-    if (!Robot.isCompetition) {
-      intakeEntry.setDouble(velocity);
-    }
+    intakeEntry.setDouble(velocity);
   }
 
   public void push() {
