@@ -68,8 +68,8 @@ public class RobotContainer {
 
     auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
 
-    armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getBaseSupplier(), OI.Operator.getElbowSupplier()) : null;
-    armPositionCommand = Robot.armEnabled ? new ArmPositionCommand(armSubsystem, OI.Operator.getBaseSupplier(), OI.Operator.getElbowSupplier()) : null;
+    armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getArmBaseSupplier(), OI.Operator.getArmElbowSupplier()) : null;
+    armPositionCommand = Robot.armEnabled ? new ArmPositionCommand(armSubsystem, OI.Operator.getArmBaseSupplier(), OI.Operator.getArmElbowSupplier()) : null;
 
     if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
@@ -101,19 +101,20 @@ public class RobotContainer {
     }
 
     if (Robot.intakeEnabled) {
-    OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem));
-    OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem));
+      OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem));
+      OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem));
+    }
+
+    if (Robot.armEnabled) {
+      OI.Driver.getArmHighButton().onTrue(armSubsystem.transitionToState(ArmState.HIGHSCORE));
+      OI.Driver.getArmMidButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.setState(ArmState.MIDSCORE), () -> armSubsystem.setState(ArmState.STOWED)));
+      OI.Driver.getArmIntakeButton().onTrue(armSubsystem.transitionToState(ArmState.CONEINTAKE));
     }
 
     if (Robot.buddyBalanceEnabled) {
       OI.Operator.getDownBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::deployBuddyBalance, buddyBalanceSubsystem).unless(() -> buddyBalanceSubsystem.getIsDeployed()));
       OI.Operator.getDownBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::releaseBuddy, buddyBalanceSubsystem).unless(() -> !buddyBalanceSubsystem.getIsDeployed()));
       OI.Operator.getUpBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::retrieveBuddy, buddyBalanceSubsystem).unless(() -> !buddyBalanceSubsystem.getIsDeployed()));
-    }
-
-    if (Robot.armEnabled) {
-      OI.Operator.getHighArmButton().onTrue(armSubsystem.transitionToState(ArmState.HIGHSCORE));
-      OI.Operator.getMidArmButton().toggleOnTrue(new StartEndCommand(() -> armSubsystem.setState(ArmState.MIDSCORE), () -> armSubsystem.setState(ArmState.STOWED)));
     }
 
     if (!Robot.isCompetition) {
