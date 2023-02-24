@@ -41,14 +41,14 @@ import frc.robot.hardware.MotorController.MotorConfig;
 
 public class ArmSubsystem extends SubsystemBase {
   public static enum ArmState{
-    STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter FIXME
-    CONEINTAKE(1.0136, -0.0749), //Arm is in position to intake cones FIXME
+    STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
+    CONEINTAKE(1.0136, -0.0749), //Arm is in position to intake cones
     CUBEINTAKE(0, 0), //Arm is in position to intake cubes FIXME
     SUBSTATIONINTAKE(1.6145, 1.0866), //Arm is in position to intake from substation FIXME
     MIDSCORE(1.3116, 0.7540), //Arm is in position to score on the mid pole FIXME
     HIGHSCORE(1.6685, 1.0699), //Arm is in position to score on the high pole FIXME
-    HIGHTRANSITION(1.0992,1.0309),
-    TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position FIXME
+    HIGHTRANSITION(1.0992,1.0309), //Used as a second step when in transition to high score
+    TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
     private double x; //Position relative to the base of the arm, in meters
     private double y; //Position above the carpet, in meters
