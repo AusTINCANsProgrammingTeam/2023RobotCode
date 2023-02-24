@@ -27,16 +27,17 @@ import frc.robot.classes.TunableNumber;
 import com.revrobotics.CANSparkMax;
 
 public class BuddyBalanceSubsystem extends SubsystemBase {
-  public static double kRetrievedAngle; // Buddy balance PID reference point when lifting a robot and engaging charge station
-  public static double kDeployedAngle; // Buddy balance PID reference point when setting down a robot/initial position when deployed
+  private static final double kRetrievedAngle = 0; // Buddy balance PID reference point when lifting a robot and engaging charge station
+  private static final double kDeployedAngle = 0; // Buddy balance PID reference point when setting down a robot/initial position when deployed
   // TODO: Make the constants final when they are done being tuned with TunableNumbers
   private static final double kDefaultMotorP = 1e-6;
   private static final double kDefaultMotorI = 0;
   private static final double kDefaultMotorD = 1e-6;
   private static final int deployServoID = 1;
-  public static double kServoDeployedPos; // public because of JUnit
-  public static double rightPIDControllerEncoderAngle; 
-  public static double leftPIDControllerEncoderAngle;
+  private static final double kServoDeployedPos = 0;
+  private double tunedRetrievedAngle;
+  private double tunedDeployedAngle;
+  private double tunedServoDeployedPos;
 
   private TunableNumber refPointBalancedTuner;
   private TunableNumber refPointDeployedTuner;
@@ -48,7 +49,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private TunableNumber tunerNumLeftI;
   private TunableNumber tunerNumLeftD;
 
-  private Servo activateDeploy; // public because of JUnit
+  private Servo activateDeploy;
   private CANSparkMax rightMotor;
   private CANSparkMax leftMotor;
   private PIDController rightPIDController;
@@ -63,6 +64,12 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private static GenericEntry positionEntry = buddyBalanceTab.add("Buddy Balance Position", 0).getEntry();
   //private static GenericEntry buddyBalancePosEntry = SwerveSubsystem.matchTab.add("Buddy Balance State", "Docked").getEntry();
 
+  private static double encoderActualRightAngle;
+  private static double encoderActualLeftAngle;
+  private static double encoderCalculatedRightAngle; 
+  private static double encoderCalculatedLeftAngle;
+  private static double servoActualAngle;
+
   public BuddyBalanceSubsystem() {
     rightMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceRight);
     leftMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft);
@@ -71,8 +78,6 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     leftEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalanceLeft);
     rightPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
     leftPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
-    rightPIDControllerEncoderAngle = rightPIDController.calculate(getRightAngle());
-    leftPIDControllerEncoderAngle = leftPIDController.calculate(getLeftAngle());
 
     tunerNumRightP = new TunableNumber("Buddy Balance Right Motor P", kDefaultMotorP, rightPIDController::setP);
     tunerNumRightI = new TunableNumber("Buddy Balance Right Motor I", kDefaultMotorI, rightPIDController::setI);
@@ -81,17 +86,17 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     tunerNumLeftI = new TunableNumber("Buddy Balance Left Motor I", kDefaultMotorI, leftPIDController::setI);
     tunerNumLeftD = new TunableNumber("Buddy Balance Left Motor D", kDefaultMotorD, leftPIDController::setD);
 
-    refPointBalancedTuner = new TunableNumber("Ref Point Balanced", 0, (a) -> {kRetrievedAngle = a;});
-    refPointDeployedTuner = new TunableNumber("Ref Point Deployed", 0, (a) -> {kDeployedAngle = a;});
-    refPointServoTuner = new TunableNumber("Ref Point Servo", 0, (a) -> {kServoDeployedPos = a;});
+    refPointBalancedTuner = new TunableNumber("Ref Point Balanced", kRetrievedAngle, (a) -> {tunedRetrievedAngle = a;});
+    refPointDeployedTuner = new TunableNumber("Ref Point Deployed", kDeployedAngle, (a) -> {tunedDeployedAngle = a;});
+    refPointServoTuner = new TunableNumber("Ref Point Servo", 0, (a) -> {tunedServoDeployedPos = a;});
   }
 
   public double getRightAngle() {
-    return Math.round(AbsoluteEncoder.getPositionRadians(rightEncoder));
+    return Math.round(AbsoluteEncoder.getPositionRadians(rightEncoder)*1000)/1000.0;
   }
 
   public double getLeftAngle() {
-    return Math.round(AbsoluteEncoder.getPositionRadians(leftEncoder));
+    return Math.round(AbsoluteEncoder.getPositionRadians(leftEncoder)*1000)/1000.0;
   }
 
   public boolean getIsDeployed() {
@@ -116,8 +121,10 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void updateMotors() {
-    rightMotor.set(MathUtil.clamp(rightPIDControllerEncoderAngle, -1, 1));
-    leftMotor.set(MathUtil.clamp(leftPIDControllerEncoderAngle, -1, 1));
+    encoderCalculatedRightAngle = rightPIDController.calculate(getRightAngle());
+    encoderCalculatedLeftAngle = leftPIDController.calculate(getLeftAngle());
+    rightMotor.set(MathUtil.clamp(encoderCalculatedRightAngle, -1, 1));
+    leftMotor.set(MathUtil.clamp(encoderCalculatedLeftAngle, -1, 1));
   }
 
   // These 4 methods are used for JUnit testing only
@@ -131,16 +138,32 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     leftEncoder.close();
   }
 
-  public double getServoAngle() {
-    return activateDeploy.getAngle();
+  public static double getServoActualAngle() {
+    return servoActualAngle;
   }
 
-  public double getEncoderRightAngle() {
-    return rightEncoder.getAbsolutePosition();
+  public static double getRetrievedAngle() {
+    return kRetrievedAngle;
   }
 
-  public double getEncoderLeftAngle() {
-    return leftEncoder.getAbsolutePosition();
+  public static double getDeployedAngle() {
+    return kDeployedAngle;
+  }
+
+  public static double getActualEncoderRightAngle() {
+    return encoderActualRightAngle;
+  }
+
+  public static double getActualEncoderLeftAngle() {
+    return encoderActualLeftAngle;
+  }
+
+  public double getCalculatedEncoderRightAngle() {
+    return encoderCalculatedRightAngle;
+  }
+
+  public double getCalculatedEncoderLeftAngle() {
+    return encoderCalculatedLeftAngle;
   }
 
   @Override
@@ -149,6 +172,9 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     updateMotors();
     buddyBalancePosLeft.append(AbsoluteEncoder.getPositionRadians(leftEncoder)); // Logging the position of the buddy balance lift
     buddyBalancePosRight.append(AbsoluteEncoder.getPositionRadians(rightEncoder));
+    encoderActualRightAngle = rightEncoder.getAbsolutePosition();
+    encoderActualLeftAngle = leftEncoder.getAbsolutePosition();
+    servoActualAngle = activateDeploy.getAngle();
     SmartDashboard.putNumber("Buddy Balance Right Position", AbsoluteEncoder.getPositionRadians(rightEncoder));
     SmartDashboard.putNumber("Buddy Balance Left Position", AbsoluteEncoder.getPositionRadians(leftEncoder));
   }
