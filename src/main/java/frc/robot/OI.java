@@ -184,8 +184,8 @@ public class OI {
         private static final Button kConeSignalButton = Button.Y;
         private static final Button kCubeSignalButton = Button.X;
 
-        private static final int kArmElbowAxis = 1;
-        private static final int kArmBaseAxis = 3;
+        private static final int kArmElbowAxis = 3;
+        private static final int kArmBaseAxis = 1;
 
         //TODO: Tune curves to driver preference
         private static final ControlCurve kArmElbowCurve = new ControlCurve(0.65,0.05,1,0.1);

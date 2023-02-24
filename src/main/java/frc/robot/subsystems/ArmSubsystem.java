@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -12,6 +13,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -27,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.classes.TunableNumber;
@@ -38,13 +41,13 @@ import frc.robot.hardware.MotorController.MotorConfig;
 
 public class ArmSubsystem extends SubsystemBase {
   public static enum ArmState{
-    STOWED(0.4406, 0.0397), //Arm is retracted into the frame perimeter FIXME
-    CONEINTAKE(0.8099, -0.1106), //Arm is in position to intake cones FIXME
+    STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter FIXME
+    CONEINTAKE(1.0136, -0.0749), //Arm is in position to intake cones FIXME
     CUBEINTAKE(0, 0), //Arm is in position to intake cubes FIXME
     SUBSTATIONINTAKE(1.6145, 1.0866), //Arm is in position to intake from substation FIXME
     MIDSCORE(1.3116, 0.7540), //Arm is in position to score on the mid pole FIXME
     HIGHSCORE(1.6685, 1.0699), //Arm is in position to score on the high pole FIXME
-    HIGHTRANSITION(0,0),
+    HIGHTRANSITION(1.0992,1.0309),
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position FIXME
 
     private double x; //Position relative to the base of the arm, in meters
@@ -116,6 +119,7 @@ public class ArmSubsystem extends SubsystemBase {
   //Real arm values
   private ShuffleboardTab armTab;
   private ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
+  private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
 
   private GenericEntry actualBaseAngle;
   private GenericEntry desiredBaseGoal;
@@ -154,6 +158,9 @@ public class ArmSubsystem extends SubsystemBase {
   
 
   public ArmSubsystem() {
+      //Add coast mode command to shuffleboard
+      configTab.add(new StartEndCommand(this::coastBase, this::brakeBase, this).ignoringDisable(true).withName("Coast Arm"));
+
     SmartDashboard.putData("Arm Sim", simArmCanvas);
 
     baseMotor = MotorController.constructMotor(MotorConfig.ArmBase1);
@@ -207,8 +214,7 @@ public class ArmSubsystem extends SubsystemBase {
     basePIDController.reset(getBaseAngle());
     elbowPIDController.reset(getElbowAngle());
 
-    setBaseReference(getBaseAngle());
-    setElbowReference(getElbowAngle());
+    holdCurrentPosition();
     
     setState(kDefaultState);
     currentTransition = kDefaultState;
@@ -303,7 +309,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void setDesiredPositions(double x, double y) {
     double desiredBaseAngle = convertToBaseAngle(x, y);
-    double desiredElbowAngle = convertToBaseAngle(x, y);
+    double desiredElbowAngle = convertToElbowAngle(x, y);
     
     desiredXPosition.setDouble(x);
     desiredYPosition.setDouble(y);
@@ -316,10 +322,15 @@ public class ArmSubsystem extends SubsystemBase {
     currentStateEntry.setString(state.toString());
     currentState = state;
 
-    basePIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 1);
-    elbowPIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 1);
+    basePIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 0.5);
+    elbowPIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 0.5);
 
     setDesiredPositions(state.getX(), state.getY());
+  }
+
+  public void holdCurrentPosition(){
+    setBaseReference(getBaseAngle());
+    setElbowReference(getElbowAngle());
   }
   
   public Command goToState(ArmState state){
@@ -357,6 +368,16 @@ public class ArmSubsystem extends SubsystemBase {
     }
     return transitionToState(state);
   }
+
+  public void coastBase() {
+    baseMotor.setIdleMode(IdleMode.kCoast);
+    baseMotor2.setIdleMode(IdleMode.kCoast);
+  }
+
+  public void brakeBase() {
+    baseMotor.setIdleMode(IdleMode.kBrake);
+    baseMotor2.setIdleMode(IdleMode.kBrake);
+  }
   
   public void stop() {
     baseMotor.stopMotor();
@@ -373,6 +394,9 @@ public class ArmSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     calculateCurrentPositions();
+    if(DriverStation.isDisabled()){
+      holdCurrentPosition();
+    }
 
     //Shuffleboard + Smartdashboard values 
     actualBaseAngle.setDouble(Units.radiansToDegrees(getBaseAngle()));

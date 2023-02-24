@@ -27,8 +27,8 @@ public class MotorController {
         ArmBase2(13, 50, IdleMode.kBrake),
         ArmElbow(15, 50),  
         //Intake motors
-        IntakeMotor1(4, 40, IdleMode.kBrake),
-        IntakeMotor2(5, 40, IdleMode.kBrake),
+        IntakeMotor1(4, 20, IdleMode.kBrake),
+        IntakeMotor2(5, 20, IdleMode.kBrake),
         //BuddyBalance Motors
         BuddyBalanceRight(7, 40, IdleMode.kBrake),
         BuddyBalanceLeft(8, 40, IdleMode.kBrake, true); // TODO: update IDs for buddy balance motors when robot is finalized
