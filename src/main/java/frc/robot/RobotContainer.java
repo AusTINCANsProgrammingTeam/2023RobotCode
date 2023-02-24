@@ -104,9 +104,9 @@ public class RobotContainer {
     }
 
     if (Robot.armEnabled) {
-      OI.Driver.getArmHighButton().onTrue(new ProxyCommand(() -> armSubsystem.transitionToStateTeleop(ArmState.HIGHSCORE)));
-      OI.Driver.getArmMidButton().onTrue(new ProxyCommand(() -> armSubsystem.transitionToStateTeleop(ArmState.MIDSCORE)));
-      OI.Driver.getArmIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.transitionToStateTeleop(ArmState.CONEINTAKE)));
+      OI.Driver.getArmHighButton().onTrue(new ProxyCommand(() -> armSubsystem.handleTransitionLogic(ArmState.HIGHSCORE)));
+      OI.Driver.getArmMidButton().onTrue(new ProxyCommand(() -> armSubsystem.handleTransitionLogic(ArmState.MIDSCORE)));
+      OI.Driver.getArmIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleTransitionLogic(ArmState.CONEINTAKE)));
     }
 
     if (Robot.buddyBalanceEnabled) {

@@ -45,8 +45,8 @@ public class ArmSubsystem extends SubsystemBase {
     CONEINTAKE(1.0136, -0.0749), //Arm is in position to intake cones
     CUBEINTAKE(0, 0), //Arm is in position to intake cubes FIXME
     SUBSTATIONINTAKE(1.6145, 1.0866), //Arm is in position to intake from substation FIXME
-    MIDSCORE(1.3116, 0.7540), //Arm is in position to score on the mid pole FIXME
-    HIGHSCORE(1.6685, 1.0699), //Arm is in position to score on the high pole FIXME
+    MIDSCORE(1.3447, 0.9222), //Arm is in position to score on the mid pole FIXME
+    HIGHSCORE(1.6685, 1.2852), //Arm is in position to score on the high pole FIXME
     HIGHTRANSITION(1.0992,1.0309), //Used as a second step when in transition to high score
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
@@ -77,7 +77,7 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseD = 0;
   //Elbow arm PID values
   private double kElbowP = 1.5;
-  private double kElbowI = 0.1;
+  private double kElbowI = 0.15;
   private double kElbowD = 0.2;
   //Sim PID values
   private double kSimBaseP = 0.1;
@@ -104,7 +104,7 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kMinBaseAngle = Units.degreesToRadians(46);
   public static final double kMinElbowAngle = Units.degreesToRadians(15);
   public static final double kMaxBaseAngle = Units.degreesToRadians(90);
-  public static final double kMaxElbowAngle = Units.degreesToRadians(160);
+  public static final double kMaxElbowAngle = Units.degreesToRadians(162);
 
   public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(30), Units.degreesToRadians(30));
   public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(60), Units.degreesToRadians(45));
@@ -206,9 +206,6 @@ public class ArmSubsystem extends SubsystemBase {
 
       desiredXPosition = armTab.add("Desired X Position", 0.0).getEntry();
       desiredYPosition = armTab.add("Desired Y Position", 0.0).getEntry();
-
-      currentStateEntry = armTab.add("Current State","").getEntry();
-      currentTransitionEntry = armTab.add("Current Transition","").getEntry();
     }
 
     basePIDController.reset(getBaseAngle());
@@ -355,7 +352,7 @@ public class ArmSubsystem extends SubsystemBase {
     ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
 
-  public Command transitionToStateTeleop(ArmState state){
+  public Command handleTransitionLogic(ArmState state){
     if(state == currentTransition){
       return transitionToState(ArmState.STOWED);
     }
