@@ -49,16 +49,15 @@ private final AddressableLED leds;
         leds.setLength(ledMatrixLenth);
         leds.setData(buffer);
         leds.start();
-        ledBrightnessSlider.getDouble(0.2);
     }
 
     public void setMode(MatrixMode mode){
         switch (mode) {
             case CUBE: 
-              solid(new Color(0.93333334 * 0.5, 0.50980395 * 0.5, 0.93333334 * 0.5));
+              solid(new Color(0.93333334 * ledBrightnessSlider.getDouble(0.2), 0.50980395 * ledBrightnessSlider.getDouble(0.2), 0.93333334 * ledBrightnessSlider.getDouble(0.2)));
             break;
             case CONE:
-              solid(new Color(1 * 0.5, 1 * 0.5, 0.0f));
+              solid(new Color(1 * ledBrightnessSlider.getDouble(0.2), 1 * ledBrightnessSlider.getDouble(0.2), 0.0f));
             break;
         }
         leds.setData(buffer);
