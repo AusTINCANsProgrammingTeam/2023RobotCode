@@ -9,6 +9,7 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
@@ -97,7 +98,9 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     if (Robot.ledSubSelect == LedEnum.MATRIX){
-     OI.Operator.getYellowCargoButton().onTrue(ledMatrixSubsystem.goCans());
+     // OI.Operator.getYellowCargoButton().onTrue(ledMatrixSubsystem.goCans());
+     OI.Operator.getYellowCargoButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(new Color(0.5, 0.5, 0)), ledMatrixSubsystem::offLed, ledMatrixSubsystem));
+     OI.Operator.getYellowCargoButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(new Color(0.5, 0, 0.5)), ledMatrixSubsystem::offLed, ledMatrixSubsystem));
     }
     if (Robot.ledSubSelect == LedEnum.BLINKIN){
       OI.Operator.getYellowCargoButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_YELLOW), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));

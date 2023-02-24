@@ -79,6 +79,16 @@ private final AddressableLED leds;
         for (int i = 0; i < ledMatrixLenth; i++) {
             buffer.setLED(i, color);
         }
+    }
+
+    public void offLed(){
+        solid(new Color(0.0f, 0.0f, 0.0f));
+        leds.setData(buffer);
+    }
+
+    public void cargoLed(Color color){
+        solid(color);
+        leds.setData(buffer);
       }
 
     public Command goCans(){
