@@ -272,7 +272,7 @@ public class ArmSubsystem extends SubsystemBase {
     double baseOutput = MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1);
     double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
     baseMotor.set(MathUtil.clamp(baseOutput, getBaseAngle() < kMinBaseAngle ? 0 : -1, getBaseAngle() > kMaxBaseAngle ? 0 : 1));
-    elbowMotor.set(MathUtil.clamp(elbowOutput, getBaseAngle() < kMinElbowAngle ? 0 : -1, getBaseAngle() > kMaxElbowAngle ? 0 : 1));
+    elbowMotor.set(MathUtil.clamp(elbowOutput, getElbowAngle() < kMinElbowAngle ? 0 : -1, getElbowAngle() > kMaxElbowAngle ? 0 : 1));
   }
 
 
