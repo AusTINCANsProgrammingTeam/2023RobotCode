@@ -35,6 +35,8 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private static final double kDefaultMotorD = 1e-6;
   private static final int deployServoID = 1;
   public static double kServoDeployedPos; // public because of JUnit
+  public static double rightPIDControllerEncoderAngle; 
+  public static double leftPIDControllerEncoderAngle;
 
   private TunableNumber refPointBalancedTuner;
   private TunableNumber refPointDeployedTuner;
@@ -57,9 +59,9 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private DataLog datalog = DataLogManager.getLog();
   private DoubleLogEntry buddyBalancePosLeft = new DoubleLogEntry(datalog, "/buddybalance/position/left");
   private DoubleLogEntry buddyBalancePosRight = new DoubleLogEntry(datalog, "/buddybalance/position/right");
-  private ShuffleboardTab buddyBalanceTab = Shuffleboard.getTab("Buddy Balance"); // TODO: Replace buddy balance tab with whatever tab the position should be logged to
-  private GenericEntry positionEntry;
-  private GenericEntry buddyBalancePosEntry;
+  private static ShuffleboardTab buddyBalanceTab = Shuffleboard.getTab("Buddy Balance"); // TODO: Replace buddy balance tab with whatever tab the position should be logged to
+  private static GenericEntry positionEntry = buddyBalanceTab.add("Buddy Balance Position", 0).getEntry();
+  //private static GenericEntry buddyBalancePosEntry = SwerveSubsystem.matchTab.add("Buddy Balance State", "Docked").getEntry();
 
   public BuddyBalanceSubsystem() {
     rightMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceRight);
@@ -69,6 +71,8 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     leftEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalanceLeft);
     rightPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
     leftPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
+    rightPIDControllerEncoderAngle = rightPIDController.calculate(getRightAngle());
+    leftPIDControllerEncoderAngle = leftPIDController.calculate(getLeftAngle());
 
     tunerNumRightP = new TunableNumber("Buddy Balance Right Motor P", kDefaultMotorP, rightPIDController::setP);
     tunerNumRightI = new TunableNumber("Buddy Balance Right Motor I", kDefaultMotorI, rightPIDController::setI);
@@ -80,9 +84,6 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     refPointBalancedTuner = new TunableNumber("Ref Point Balanced", 0, (a) -> {kRetrievedAngle = a;});
     refPointDeployedTuner = new TunableNumber("Ref Point Deployed", 0, (a) -> {kDeployedAngle = a;});
     refPointServoTuner = new TunableNumber("Ref Point Servo", 0, (a) -> {kServoDeployedPos = a;});
-
-    positionEntry = buddyBalanceTab.add("Buddy Balance Position", 0).getEntry();
-    //buddyBalancePosEntry = SwerveSubsystem.matchTab.add("Buddy Balance State", "Docked").getEntry();
   }
 
   public double getRightAngle() {
@@ -115,19 +116,21 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void updateMotors() {
-    rightMotor.set(MathUtil.clamp(rightPIDController.calculate(getRightAngle()), -1, 1));
-    leftMotor.set(MathUtil.clamp(leftPIDController.calculate(getLeftAngle()), -1, 1));
+    rightMotor.set(MathUtil.clamp(rightPIDControllerEncoderAngle, -1, 1));
+    leftMotor.set(MathUtil.clamp(leftPIDControllerEncoderAngle, -1, 1));
   }
 
-
+  // These 4 methods are used for JUnit testing only
   public void close() throws Exception {
     // This method will close all device handles used by this object and release any other dynamic memory.
     // Mostly for JUnit tests
     rightMotor.close();
     leftMotor.close();
+    activateDeploy.close();
+    rightEncoder.close();
+    leftEncoder.close();
   }
 
-  // These 3 methods are used for JUnit testing only
   public double getServoAngle() {
     return activateDeploy.getAngle();
   }

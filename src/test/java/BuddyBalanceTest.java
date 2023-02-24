@@ -34,16 +34,21 @@ public class BuddyBalanceTest {
   @Test
   public void testRetrieve() {
     dut.retrieveBuddy();
-    //JUnit Assert class provides this and many other comparision functions.
     assertEquals(BuddyBalanceSubsystem.kRetrievedAngle, dut.getEncoderRightAngle(), kDelta); //Check that right encoder angle matches what we wrote
     assertEquals(BuddyBalanceSubsystem.kRetrievedAngle, dut.getEncoderLeftAngle(), kDelta); //Check that right encoder angle matches what we wrote
   }
   @Test
   public void testRelease() {
     dut.releaseBuddy();
-    //JUnit Assert class provides this and many other comparision functions.
     assertEquals(BuddyBalanceSubsystem.kDeployedAngle, dut.getEncoderRightAngle(), kDelta); //Check that right encoder angle matches what we wrote
     assertEquals(BuddyBalanceSubsystem.kDeployedAngle, dut.getEncoderLeftAngle(), kDelta); //Check that left encoder angle matches what we wrote
+  }
+
+  @Test
+  public void testUpdateMotors() {
+    dut.updateMotors();
+    assertEquals(BuddyBalanceSubsystem.rightPIDControllerEncoderAngle, dut.getEncoderRightAngle(), kDelta);
+    assertEquals(BuddyBalanceSubsystem.leftPIDControllerEncoderAngle, dut.getEncoderLeftAngle(), kDelta);
   }
   // Add more @Test tagged methods to test other things...
 }
