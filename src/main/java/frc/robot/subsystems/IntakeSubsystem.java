@@ -12,7 +12,6 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
 
@@ -27,7 +26,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private boolean inOutArm = false;
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
-
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
@@ -39,6 +37,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     motor.set(velocity);
     intakeEntry.setDouble(velocity);
   }
+  
 
   public void push() {
     spinWheels(kOuttakeSpeed);

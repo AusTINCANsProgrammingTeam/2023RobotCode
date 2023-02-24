@@ -99,7 +99,6 @@ public class SwerveSubsystem extends SubsystemBase{
     private GenericEntry pitchEntry = matchTab.add("NavX Pitch", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
 
     private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
-    //private GenericEntry positionEntry = configTab.add("Position", "").getEntry();
     
 
     private GenericEntry positionEntry = matchTab.add("Position", "").getEntry();
@@ -286,10 +285,9 @@ public class SwerveSubsystem extends SubsystemBase{
         odometer.update(getRotation2d(), getModulePositions());
 
         positionEntry.setString(getPose().getTranslation().toString());
-        
+        headingEntry.setDouble(getHeading());
         if (!Robot.isCompetition) {
             pitchEntry.setDouble(gyro.getPitch());
-            headingEntry.setDouble(getHeading());
         }
 
         Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
