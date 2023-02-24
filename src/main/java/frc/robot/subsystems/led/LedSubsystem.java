@@ -27,7 +27,6 @@ public class LedSubsystem extends SubsystemBase {
   public static enum LedMode {
     CONE, CUBE;
   }
-  private LedMode ledMode = LedMode.CONE;
   /** Configure AddressableLED */
   public LedSubsystem() {
     leds = new AddressableLED(Robot.ledPort);
@@ -42,9 +41,11 @@ public class LedSubsystem extends SubsystemBase {
       switch (mode) {
           case CUBE: 
             solid(new Color(0.93333334 * ledBrightnessSlider, 0.50980395 * ledBrightnessSlider, 0.93333334 * ledBrightnessSlider));
+            ledGamePiece.getEntry().setBoolean(false);
           break;
           case CONE:
             solid(new Color(1 * ledBrightnessSlider, 1 * ledBrightnessSlider, 0.0f));
+            ledGamePiece.getEntry().setBoolean(true);
           break;
       }
       leds.setData(buffer);
@@ -62,21 +63,9 @@ public class LedSubsystem extends SubsystemBase {
     ledState.setBoolean(false);
     leds.setData(buffer);
   }
-  public void onLed(){
-    setMode(ledMode);
-    ledState.setBoolean(true);
-    leds.setData(buffer);
-  }
 
-  public void changeGamePiece(){
-    if (ledMode == LedMode.CONE){
-      ledMode = LedMode.CUBE;
-      ledGamePiece.getEntry().setBoolean(false);
-    } else if (ledMode == LedMode.CUBE){
-      ledMode = LedMode.CONE;
-      ledGamePiece.getEntry().setBoolean(true);
-    }
-    setMode(ledMode);
+  public void cargoLed(LedMode mode){
+    setMode(mode);
     leds.setData(buffer);
   }
 

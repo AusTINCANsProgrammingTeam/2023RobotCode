@@ -1,7 +1,10 @@
 package frc.robot.subsystems.led;
 
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +17,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Robot;
+import frc.robot.hardware.LedMatrixImages;
 
 public class LedMatrixSubsystem extends SubsystemBase{
     private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
@@ -66,7 +70,16 @@ private final AddressableLED leds;
         leds.setData(buffer);
     }
 
-
+    public void goCans(){
+        new SequentialCommandGroup(
+            new InstantCommand(() -> serpentine(LedMatrixImages.three)),
+            new WaitCommand(1),
+            new InstantCommand(() -> serpentine(LedMatrixImages.two)),
+            new WaitCommand(1),
+            new InstantCommand(() -> serpentine(LedMatrixImages.one)),
+            new WaitCommand(1),
+            new InstantCommand(() -> serpentine(LedMatrixImages.gocans)));
+    }
 
     @Override
     public void periodic() {

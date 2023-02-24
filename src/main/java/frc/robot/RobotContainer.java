@@ -9,8 +9,8 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.commands.SwerveTeleopCommand;
-import frc.robot.hardware.LedDriver;
 import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
@@ -19,13 +19,13 @@ import frc.robot.subsystems.BuddyBalanceSubsystem;
 import frc.robot.subsystems.led.BlinkinLedSubsystem;
 import frc.robot.subsystems.led.LedMatrixSubsystem;
 import frc.robot.subsystems.led.LedSubsystem;
+import frc.robot.subsystems.led.BlinkinLedSubsystem.BlinkinMode;
+import frc.robot.subsystems.led.LedSubsystem.LedMode;
 import frc.robot.commands.AssistedBalanceCommand;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.EverybotIntakeSubsystem;
 
@@ -100,24 +100,15 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     if (Robot.ledSubSelect == LedEnum.MATRIX){
-     OI.Operator.getLedToggleButton().onTrue(
-      new SequentialCommandGroup(
-        new InstantCommand(() -> ledMatrixSubsystem.serpentine(LedDriver.three), ledMatrixSubsystem),
-        new WaitCommand(1),
-        new InstantCommand(() -> ledMatrixSubsystem.serpentine(LedDriver.two), ledMatrixSubsystem),
-        new WaitCommand(1),
-        new InstantCommand(() -> ledMatrixSubsystem.serpentine(LedDriver.one), ledMatrixSubsystem),
-        new WaitCommand(1),
-        new InstantCommand(() -> ledMatrixSubsystem.serpentine(LedDriver.gocans), ledMatrixSubsystem))
-      );
+     OI.Operator.getYellowCargoButton().onTrue( new InstantCommand(ledMatrixSubsystem::goCans));
     }
     if (Robot.ledSubSelect == LedEnum.BLINKIN){
-      OI.Operator.getLedToggleButton().onTrue(new InstantCommand(blinkinLedSubsystem::blinkinChangeGamePiece));
-      OI.Operator.getLedSwitchButton().whileTrue(new StartEndCommand(blinkinLedSubsystem::blinkinStartLed, blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
+      OI.Operator.getYellowCargoButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_YELLOW), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
+      OI.Operator.getPurpleCargoButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_PURPLE), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
     }
     if (Robot.ledSubSelect == LedEnum.STRIP){
-      OI.Operator.getLedSwitchButton().onTrue(new InstantCommand(ledSubsystem::changeGamePiece));
-      OI.Operator.getLedToggleButton().whileTrue(new StartEndCommand(ledSubsystem::onLed, ledSubsystem::offLed, ledSubsystem));
+      OI.Operator.getYellowCargoButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(LedMode.CUBE), ledSubsystem::offLed, ledSubsystem));
+      OI.Operator.getPurpleCargoButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(LedMode.CONE), ledSubsystem::offLed, ledSubsystem));
     }
     if (Robot.swerveEnabled) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));

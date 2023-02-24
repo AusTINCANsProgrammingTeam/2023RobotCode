@@ -1,6 +1,6 @@
 package frc.robot.hardware;
-/** REV Robotics Blinkin LED Driver. */
-public class LedDriver {
+
+public class LedMatrixImages {
 
 // ('CanMan_Left', 16x16px) With original color and blending
     public static String[][] canman = {

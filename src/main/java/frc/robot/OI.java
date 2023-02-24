@@ -178,9 +178,6 @@ public class OI {
 
         private static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
 
-        private static final Button ledToggleButton = Button.A;
-        private static final Button ledSwitchButton = Button.B;
-
         private static final Button kBuddyBalanceActivateButton = Button.B; //Activates buddy balance
         private static final Button kDownBuddyBalanceButton = Button.POVDOWN; // Lowers buddy balance lift
         private static final Button kUpBuddyBalanceButton = Button.POVUP; // Raises buddy balance lift
@@ -202,16 +199,6 @@ public class OI {
         public static Supplier<Double> getArmBaseSupplier(){
             //This axis is inverted
             return () -> kArmBaseCurve.calculate(-kJoystick.getRawAxis(kArmBaseAxis));
-        }
-
-        public static JoystickButton getLedToggleButton(){
-            ledToggleButton.setButtonAction("Toggle Leds");
-            return new JoystickButton(kJoystick, ledToggleButton.getButtonID());
-        }
-
-        public static JoystickButton getLedSwitchButton(){
-            ledSwitchButton.setButtonAction("Switch Led Game Piece");
-            return new JoystickButton(kJoystick, ledSwitchButton.getButtonID());
         }
 
         public static JoystickButton getActivateBuddyBalanceButton() {
