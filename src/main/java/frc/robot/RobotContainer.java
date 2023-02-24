@@ -18,9 +18,9 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BuddyBalanceSubsystem;
 import frc.robot.subsystems.led.BlinkinLedSubsystem;
 import frc.robot.subsystems.led.LedMatrixSubsystem;
-import frc.robot.subsystems.led.LedSubsystem;
+import frc.robot.subsystems.led.LedStripSubsystem;
 import frc.robot.subsystems.led.BlinkinLedSubsystem.BlinkinMode;
-import frc.robot.subsystems.led.LedSubsystem.LedMode;
+import frc.robot.subsystems.led.LedStripSubsystem.LedMode;
 import frc.robot.commands.AssistedBalanceCommand;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -43,7 +43,7 @@ public class RobotContainer {
   private final CameraSubsystem cameraSubsystem;
   private final BuddyBalanceSubsystem buddyBalanceSubsystem;
 
-  private LedSubsystem ledSubsystem;
+  private LedStripSubsystem ledSubsystem;
   private LedMatrixSubsystem ledMatrixSubsystem;
   private BlinkinLedSubsystem blinkinLedSubsystem;
 
@@ -55,7 +55,7 @@ public class RobotContainer {
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    ledSubsystem = Robot.ledSubSelect == LedEnum.STRIP ? new LedSubsystem() : null;
+    ledSubsystem = Robot.ledSubSelect == LedEnum.STRIP ? new LedStripSubsystem() : null;
     subsystemEnabledLog.append(ledSubsystem == null ? "Led: Disabled" : "Led: Enabled");
     ledMatrixSubsystem = Robot.ledSubSelect == LedEnum.MATRIX ? new LedMatrixSubsystem() : null; //PWM port 2
     subsystemEnabledLog.append(ledSubsystem == null ? "Led Matrix: Disabled" : "Led Matrix: Enabled");

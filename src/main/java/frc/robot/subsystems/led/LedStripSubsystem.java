@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-public class LedSubsystem extends SubsystemBase {
+public class LedStripSubsystem extends SubsystemBase {
   private final AddressableLEDBuffer buffer;
   private final AddressableLED leds;
 
@@ -31,7 +31,7 @@ public class LedSubsystem extends SubsystemBase {
     CONE, CUBE;
   }
   /** Configure AddressableLED */
-  public LedSubsystem() {
+  public LedStripSubsystem() {
     leds = new AddressableLED(Robot.ledPort);
     buffer = new AddressableLEDBuffer(ledStripLength);
     //leds.setBitTiming(1, 1, 1, 1);
