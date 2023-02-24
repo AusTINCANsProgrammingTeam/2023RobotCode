@@ -19,6 +19,9 @@ import frc.robot.Robot;
 public class LedSubsystem extends SubsystemBase {
   private final AddressableLEDBuffer buffer;
   private final AddressableLED leds;
+
+  private static final int ledStripLength = 256;
+
   private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
   private GenericEntry ledState = ledTab.add("OnOff", false).getEntry();
   private SimpleWidget ledGamePiece = ledTab.add("Color", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow"));
@@ -30,9 +33,9 @@ public class LedSubsystem extends SubsystemBase {
   /** Configure AddressableLED */
   public LedSubsystem() {
     leds = new AddressableLED(Robot.ledPort);
-    buffer = new AddressableLEDBuffer(Robot.ledStripLength);
+    buffer = new AddressableLEDBuffer(ledStripLength);
     //leds.setBitTiming(1, 1, 1, 1);
-    leds.setLength(Robot.ledStripLength);
+    leds.setLength(ledStripLength);
     leds.setData(buffer);
     leds.start();
     }
@@ -53,7 +56,7 @@ public class LedSubsystem extends SubsystemBase {
 
   /* Solid Color */
   private void solid(Color color) {
-    for (int i = 0; i < Robot.ledStripLength; i++) {
+    for (int i = 0; i < ledStripLength; i++) {
         buffer.setLED(i, color);
     }
   }

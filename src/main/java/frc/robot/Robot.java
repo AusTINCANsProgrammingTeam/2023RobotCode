@@ -33,8 +33,6 @@ public class Robot extends LoggedRobot {
   public static final double kDefaultPeriod = 0.02;
 
   public static final int ledPort = 2;
-  public static final int ledStripLength = 256;
-  public static final int ledMatrixLenth = 256;
 
   //RoboRIO serial numbers
   public static final String competitionRobotSerial = "03161743";;

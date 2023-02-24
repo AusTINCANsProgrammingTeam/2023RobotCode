@@ -20,7 +20,11 @@ import frc.robot.Robot;
 import frc.robot.hardware.LedMatrixImages;
 
 public class LedMatrixSubsystem extends SubsystemBase{
+    public static final int ledMatrixLenth = 256;
+
+
     private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
+
     private GenericEntry ledBrightnessSlider = ledTab.add("Brightness", 0.2)
       .withWidget(BuiltInWidgets.kNumberSlider)
       .withProperties(Map.of("min", 0, "max", 1)).getEntry();
@@ -37,8 +41,8 @@ private final AddressableLED leds;
 
     public LedMatrixSubsystem() {
         leds = new AddressableLED(Robot.ledPort);
-        buffer = new AddressableLEDBuffer(Robot.ledMatrixLenth);
-        leds.setLength(Robot.ledMatrixLenth);
+        buffer = new AddressableLEDBuffer(ledMatrixLenth);
+        leds.setLength(ledMatrixLenth);
         leds.setData(buffer);
         leds.start();
         ledBrightnessSlider.getDouble(0.2);
