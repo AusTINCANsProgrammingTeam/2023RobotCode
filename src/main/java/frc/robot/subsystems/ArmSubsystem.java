@@ -44,6 +44,7 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     SUBSTATIONINTAKE(1.6145, 1.0866), //Arm is in position to intake from substation FIXME
     MIDSCORE(1.3116, 0.7540), //Arm is in position to score on the mid pole FIXME
     HIGHSCORE(1.6685, 1.0699), //Arm is in position to score on the high pole FIXME
+    HIGHTRANSITION(0,0),
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position FIXME
 
     private double x; //Position relative to the base of the arm, in meters
@@ -228,17 +229,6 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     elbowPIDController.setGoal(setpoint);
   }
 
-  //Sets motor angle setpoints based on a coordinate pair. This uses the same logic as the setState() method,
-  //except instead of drawing from an enum's x and y, we supply it ourselves.
-  public void setMotorPositions(double x, double y) {
-    double desiredBaseAngle = convertToBaseAngle(x, y);
-    double desiredElbowAngle = convertToBaseAngle(x, y);
-
-    setBaseReference(desiredBaseAngle);
-    setElbowReference(desiredElbowAngle);
-  }
-
-  
   //Gets arm X and Y positions. Desmos simulation link: https://www.desmos.com/calculator/fv7smerzhp
   public double getRMagnitude() {
     //Use law of cosines to find the magnitude of the arm's resultant vector, in meters
@@ -304,19 +294,25 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
     return basePIDController.atGoal() && elbowPIDController.atGoal();
   }
 
+  public void setDesiredPositions(double x, double y) {
+    double desiredBaseAngle = convertToBaseAngle(x, y);
+    double desiredElbowAngle = convertToBaseAngle(x, y);
+    
+    desiredXPosition.setDouble(x);
+    desiredYPosition.setDouble(y);
+
+    setBaseReference(desiredBaseAngle);
+    setElbowReference(desiredElbowAngle);
+  }
+
   public void setState(ArmState state){
-    double desiredBaseAngle = convertToBaseAngle(state.getX(),state.getY());
-    double desiredElbowAngle = convertToElbowAngle(state.getX(),state.getY());
-    desiredXPosition.setDouble(state.getX());
-    desiredYPosition.setDouble(state.getY());
     currentStateEntry.setString(state.toString());
     currentState = state;
 
     basePIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 1);
     elbowPIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 1);
 
-    setBaseReference(desiredBaseAngle);
-    setElbowReference(desiredElbowAngle);
+    setDesiredPositions(state.getX(), state.getY());
   }
   
   public Command goToState(ArmState state){
@@ -342,6 +338,15 @@ public class ArmSubsystem extends SubsystemBase implements AutoCloseable {
   public Command transitionToStateTeleop(ArmState state){
     if(state == currentTransition){
       return transitionToState(ArmState.STOWED);
+    }
+    if(state == ArmState.HIGHSCORE){
+      if(currentTransition == ArmState.HIGHTRANSITION){
+        currentTransition = state;
+        return goToState(ArmState.HIGHSCORE);
+      }
+      if(currentTransition != ArmState.HIGHSCORE){
+        return transitionToState(ArmState.HIGHTRANSITION);
+      }
     }
     return transitionToState(state);
   }
