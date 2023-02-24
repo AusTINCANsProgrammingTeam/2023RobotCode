@@ -9,7 +9,6 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
@@ -20,8 +19,8 @@ import frc.robot.subsystems.led.BlinkinLedSubsystem;
 import frc.robot.subsystems.led.LedMatrixSubsystem;
 import frc.robot.subsystems.led.LedStripSubsystem;
 import frc.robot.subsystems.led.BlinkinLedSubsystem.BlinkinMode;
-import frc.robot.subsystems.led.LedStripSubsystem.LedMode;
-import frc.robot.commands.AssistedBalanceCommand;
+import frc.robot.subsystems.led.LedMatrixSubsystem.MatrixMode;
+import frc.robot.subsystems.led.LedStripSubsystem.StripMode;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -99,16 +98,16 @@ public class RobotContainer {
   private void configureButtonBindings() {
     if (Robot.ledSubSelect == LedEnum.MATRIX){
      // OI.Operator.getYellowCargoButton().onTrue(ledMatrixSubsystem.goCans());
-     OI.Operator.getYellowCargoButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(new Color(0.5, 0.5, 0)), ledMatrixSubsystem::offLed, ledMatrixSubsystem));
-     OI.Operator.getYellowCargoButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(new Color(0.5, 0, 0.5)), ledMatrixSubsystem::offLed, ledMatrixSubsystem));
+     OI.Operator.getYellowCargoButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(MatrixMode.CONE), ledMatrixSubsystem::offLed, ledMatrixSubsystem));
+     OI.Operator.getPurpleCargoButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(MatrixMode.CUBE), ledMatrixSubsystem::offLed, ledMatrixSubsystem));
     }
     if (Robot.ledSubSelect == LedEnum.BLINKIN){
       OI.Operator.getYellowCargoButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_YELLOW), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
       OI.Operator.getPurpleCargoButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_PURPLE), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
     }
     if (Robot.ledSubSelect == LedEnum.STRIP){
-      OI.Operator.getYellowCargoButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(LedMode.CUBE), ledSubsystem::offLed, ledSubsystem));
-      OI.Operator.getPurpleCargoButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(LedMode.CONE), ledSubsystem::offLed, ledSubsystem));
+      OI.Operator.getYellowCargoButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(StripMode.CUBE), ledSubsystem::offLed, ledSubsystem));
+      OI.Operator.getPurpleCargoButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(StripMode.CONE), ledSubsystem::offLed, ledSubsystem));
     }
     if (Robot.swerveEnabled) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));

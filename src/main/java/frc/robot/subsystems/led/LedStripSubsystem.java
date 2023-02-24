@@ -27,7 +27,7 @@ public class LedStripSubsystem extends SubsystemBase {
   private SimpleWidget ledGamePiece = ledTab.add("Color", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow"));
   private double ledBrightnessSlider = ledTab.add("Brightness", 0.2).withWidget(BuiltInWidgets.kNumberSlider).getEntry().getDouble(0.2);
 
-  public static enum LedMode {
+  public static enum StripMode {
     CONE, CUBE;
   }
   /** Configure AddressableLED */
@@ -40,7 +40,7 @@ public class LedStripSubsystem extends SubsystemBase {
     leds.start();
     }
   /** Sends to AddressableLED */
-  public void setMode(LedMode mode){
+  public void setMode(StripMode mode){
       switch (mode) {
           case CUBE: 
             solid(new Color(0.93333334 * ledBrightnessSlider, 0.50980395 * ledBrightnessSlider, 0.93333334 * ledBrightnessSlider));
@@ -67,7 +67,7 @@ public class LedStripSubsystem extends SubsystemBase {
     leds.setData(buffer);
   }
 
-  public void cargoLed(LedMode mode){
+  public void cargoLed(StripMode mode){
     setMode(mode);
     leds.setData(buffer);
   }

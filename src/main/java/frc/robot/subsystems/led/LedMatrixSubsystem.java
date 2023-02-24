@@ -23,6 +23,9 @@ import frc.robot.hardware.LedMatrixImages;
 public class LedMatrixSubsystem extends SubsystemBase{
     public static final int ledMatrixLenth = 256;
 
+    public static enum MatrixMode {
+        CONE, CUBE;
+    }
 
     private ShuffleboardTab ledTab = Shuffleboard.getTab("Led");
 
@@ -47,6 +50,18 @@ private final AddressableLED leds;
         leds.setData(buffer);
         leds.start();
         ledBrightnessSlider.getDouble(0.2);
+    }
+
+    public void setMode(MatrixMode mode){
+        switch (mode) {
+            case CUBE: 
+              solid(new Color(0.93333334 * 0.5, 0.50980395 * 0.5, 0.93333334 * 0.5));
+            break;
+            case CONE:
+              solid(new Color(1 * 0.5, 1 * 0.5, 0.0f));
+            break;
+        }
+        leds.setData(buffer);
     }
 
     public void serpentine(String[][] image){
@@ -86,8 +101,8 @@ private final AddressableLED leds;
         leds.setData(buffer);
     }
 
-    public void cargoLed(Color color){
-        solid(color);
+    public void cargoLed(MatrixMode mode){
+        setMode(mode);
         leds.setData(buffer);
       }
 
