@@ -13,7 +13,6 @@ import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.commands.ArmAnglesCommand;
-import frc.robot.commands.ArmPositionCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ArmSubsystem.ArmState;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -40,8 +39,6 @@ public class RobotContainer {
   private final BuddyBalanceSubsystem buddyBalanceSubsystem;
   private final ArmSubsystem armSubsystem;
   private final ArmAnglesCommand armAnglesCommand;
-  private final ArmPositionCommand armPositionCommand;
-  
 
   private Auton auton;
 
@@ -70,7 +67,6 @@ public class RobotContainer {
     auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
 
     armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getArmBaseSupplier(), OI.Operator.getArmElbowSupplier()) : null;
-    armPositionCommand = Robot.armEnabled ? new ArmPositionCommand(armSubsystem, OI.Operator.getArmBaseSupplier(), OI.Operator.getArmElbowSupplier()) : null;
 
     if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
