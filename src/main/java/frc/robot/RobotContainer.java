@@ -9,7 +9,6 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
@@ -48,8 +47,6 @@ public class RobotContainer {
   private BlinkinLedSubsystem blinkinLedSubsystem;
 
   private Auton auton;
-
-  private AssistedBalanceCommand assistedBalanceCommand;
 
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
@@ -100,7 +97,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     if (Robot.ledSubSelect == LedEnum.MATRIX){
-     OI.Operator.getYellowCargoButton().onTrue( new InstantCommand(ledMatrixSubsystem::goCans));
+     OI.Operator.getYellowCargoButton().onTrue(ledMatrixSubsystem.goCans());
     }
     if (Robot.ledSubSelect == LedEnum.BLINKIN){
       OI.Operator.getYellowCargoButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_YELLOW), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));

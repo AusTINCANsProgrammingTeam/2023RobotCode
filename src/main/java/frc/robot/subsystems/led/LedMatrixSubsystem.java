@@ -1,6 +1,7 @@
 package frc.robot.subsystems.led;
 
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -74,16 +75,22 @@ private final AddressableLED leds;
         leds.setData(buffer);
     }
 
-    public void goCans(){
-        new SequentialCommandGroup(
-            new InstantCommand(() -> serpentine(LedMatrixImages.three)),
-            new WaitCommand(1),
-            new InstantCommand(() -> serpentine(LedMatrixImages.two)),
-            new WaitCommand(1),
-            new InstantCommand(() -> serpentine(LedMatrixImages.one)),
-            new WaitCommand(1),
-            new InstantCommand(() -> serpentine(LedMatrixImages.gocans)));
-    }
+    private void solid(Color color) {
+        for (int i = 0; i < ledMatrixLenth; i++) {
+            buffer.setLED(i, color);
+        }
+      }
+
+    public Command goCans(){
+        return new SequentialCommandGroup(
+                        new InstantCommand(() -> serpentine(LedMatrixImages.three)),
+                        new WaitCommand(1),
+                        new InstantCommand(() -> serpentine(LedMatrixImages.two)),
+                        new WaitCommand(1),
+                        new InstantCommand(() -> serpentine(LedMatrixImages.one)),
+                        new WaitCommand(1),
+                        new InstantCommand(() -> serpentine(LedMatrixImages.gocans)));
+        }
 
     @Override
     public void periodic() {
