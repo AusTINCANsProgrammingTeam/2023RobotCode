@@ -20,12 +20,9 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.ArmSubsystem.ArmState;
 
 public class Auton{
     public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed / 4; //Maximum speed allowed in auton, in meters per second
@@ -63,8 +60,6 @@ public class Auton{
     private StringLogEntry commandLog = new StringLogEntry(datalog, "/auton/command"); //Logs x translation state output
 
     private SwerveSubsystem swerveSubsystem;
-
-    private ArmSubsystem armSubsystem;
 
     private PathConstraints pathConstraints;
 
@@ -152,15 +147,7 @@ public class Auton{
                 return
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-1"),
-                        armSubsystem.goToState(ArmState.HIGHSCORE),
-                        armSubsystem.goToState(ArmState.HIGHDROP),
-                        new ParallelCommandGroup(
-                            swerveSubsystem.followTrajectory("1ScoreCharge-1", getTrajectory("1ScoreCharge-1")),
-                            new SequentialCommandGroup(
-                                delay(0.5),
-                                armSubsystem.goToState(ArmState.STOWED)
-                            )
-                        ),
+                        swerveSubsystem.followTrajectory("1ScoreCharge-1", getTrajectory("1ScoreCharge-1")),
                         swerveSubsystem.assistedBalance()
                     );
             case ONESCORECHARGE2:
