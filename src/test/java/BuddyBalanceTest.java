@@ -28,27 +28,25 @@ public class BuddyBalanceTest {
   public void testDeploy() {
     dut.deployBuddyBalance();
     //JUnit Assert class provides this and many other comparision functions.
-    assertEquals(BuddyBalanceSubsystem.getServoActualAngle(), dut.getServoActualAngle(), kDelta); //Check that motor speed matches what we wrote
+    assertEquals(BuddyBalanceSubsystem.getDesiredServoPosition(), dut.getActualServoPosition(), kDelta); //Check that motor speed matches what we wrote
   }
 
   @Test
   public void testRetrieve() {
     dut.retrieveBuddy();
-    assertEquals(BuddyBalanceSubsystem.getRetrievedAngle(), dut.getRetrievedAngle(), kDelta); //Check that right encoder angle matches what we wrote
-    assertEquals(BuddyBalanceSubsystem.getRetrievedAngle(), dut.getRetrievedAngle(), kDelta); //Check that right encoder angle matches what we wrote
+    testUpdateMotors();
   }
   @Test
   public void testRelease() {
     dut.releaseBuddy();
-    assertEquals(BuddyBalanceSubsystem.getDeployedAngle(), dut.getDeployedAngle(), kDelta); //Check that right encoder angle matches what we wrote
-    assertEquals(BuddyBalanceSubsystem.getDeployedAngle(), dut.getDeployedAngle(), kDelta); //Check that left encoder angle matches what we wrote
+    testUpdateMotors();
   }
 
   @Test
   public void testUpdateMotors() {
     dut.updateMotors();
-    assertEquals(BuddyBalanceSubsystem.getActualEncoderRightAngle(), dut.getCalculatedEncoderRightAngle(), kDelta);
-    assertEquals(BuddyBalanceSubsystem.getActualEncoderLeftAngle(), dut.getCalculatedEncoderLeftAngle(), kDelta);
+    assertEquals(BuddyBalanceSubsystem.getCalculatedEncoderRightAngle(), dut.getActualEncoderRightAngle(), kDelta);
+    assertEquals(BuddyBalanceSubsystem.getCalculatedEncoderLeftAngle(), dut.getActualEncoderLeftAngle(), kDelta);
   }
   // Add more @Test tagged methods to test other things...
 }

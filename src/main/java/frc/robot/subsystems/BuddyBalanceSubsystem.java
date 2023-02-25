@@ -68,7 +68,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private static double encoderActualLeftAngle;
   private static double encoderCalculatedRightAngle; 
   private static double encoderCalculatedLeftAngle;
-  private static double servoActualAngle;
+  private static double servoActualPosition;
 
   public BuddyBalanceSubsystem() {
     rightMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceRight);
@@ -127,7 +127,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     leftMotor.set(MathUtil.clamp(encoderCalculatedLeftAngle, -1, 1));
   }
 
-  // These 4 methods are used for JUnit testing only
+  // These methods are used for JUnit testing only
   public void close() throws Exception {
     // This method will close all device handles used by this object and release any other dynamic memory.
     // Mostly for JUnit tests
@@ -138,31 +138,27 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     leftEncoder.close();
   }
 
-  public static double getServoActualAngle() {
-    return servoActualAngle;
+  public double getActualServoPosition() {
+    return servoActualPosition;
   }
 
-  public static double getRetrievedAngle() {
-    return kRetrievedAngle;
+  public static double getDesiredServoPosition() {
+    return kServoDeployedPos;
   }
 
-  public static double getDeployedAngle() {
-    return kDeployedAngle;
-  }
-
-  public static double getActualEncoderRightAngle() {
+  public double getActualEncoderRightAngle() {
     return encoderActualRightAngle;
   }
 
-  public static double getActualEncoderLeftAngle() {
+  public double getActualEncoderLeftAngle() {
     return encoderActualLeftAngle;
   }
 
-  public double getCalculatedEncoderRightAngle() {
+  public static double getCalculatedEncoderRightAngle() {
     return encoderCalculatedRightAngle;
   }
 
-  public double getCalculatedEncoderLeftAngle() {
+  public static double getCalculatedEncoderLeftAngle() {
     return encoderCalculatedLeftAngle;
   }
 
@@ -174,7 +170,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     buddyBalancePosRight.append(AbsoluteEncoder.getPositionRadians(rightEncoder));
     encoderActualRightAngle = rightEncoder.getAbsolutePosition();
     encoderActualLeftAngle = leftEncoder.getAbsolutePosition();
-    servoActualAngle = activateDeploy.getAngle();
+    servoActualPosition = activateDeploy.get();
     SmartDashboard.putNumber("Buddy Balance Right Position", AbsoluteEncoder.getPositionRadians(rightEncoder));
     SmartDashboard.putNumber("Buddy Balance Left Position", AbsoluteEncoder.getPositionRadians(leftEncoder));
   }
