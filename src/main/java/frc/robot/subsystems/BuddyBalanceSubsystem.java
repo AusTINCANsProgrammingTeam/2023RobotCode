@@ -63,6 +63,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private static ShuffleboardTab buddyBalanceTab = Shuffleboard.getTab("Buddy Balance"); // TODO: Replace buddy balance tab with whatever tab the position should be logged to
   private static GenericEntry positionEntry = buddyBalanceTab.add("Buddy Balance Position", 0).getEntry();
   //private static GenericEntry buddyBalancePosEntry = SwerveSubsystem.matchTab.add("Buddy Balance State", "Docked").getEntry();
+  // TODO: Uncomment comp shuffleboard objects when both comp-shuffleboard and buddy-balance-encoder pull requests go through
 
   private static double encoderActualRightAngle;
   private static double encoderActualLeftAngle;
