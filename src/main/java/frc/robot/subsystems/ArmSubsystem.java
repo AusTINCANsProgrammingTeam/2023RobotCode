@@ -307,10 +307,12 @@ public class ArmSubsystem extends SubsystemBase {
   public void setDesiredPositions(double x, double y) {
     double desiredBaseAngle = convertToBaseAngle(x, y);
     double desiredElbowAngle = convertToElbowAngle(x, y);
-    
-    desiredXPosition.setDouble(x);
-    desiredYPosition.setDouble(y);
 
+    if(!Robot.isCompetition){
+      desiredXPosition.setDouble(x);
+      desiredYPosition.setDouble(y);
+    }
+    
     setBaseReference(desiredBaseAngle);
     setElbowReference(desiredElbowAngle);
   }
