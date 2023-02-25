@@ -27,6 +27,7 @@ import frc.robot.subsystems.led.LedStripSubsystem.StripMode;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -87,6 +88,10 @@ public class RobotContainer {
     auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
 
     armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getArmBaseSupplier(), OI.Operator.getArmElbowSupplier()) : null;
+
+    if (Robot.buddyBalanceEnabled) {
+      buddyBalanceSubsystem.setDefaultCommand(new RepeatCommand(new InstantCommand(buddyBalanceSubsystem::updateMotors)));
+    }
 
     if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
