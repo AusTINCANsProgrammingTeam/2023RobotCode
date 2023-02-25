@@ -87,17 +87,17 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     tunerNumLeftI = new TunableNumber("Buddy Balance Left Motor I", kDefaultMotorI, leftPIDController::setI);
     tunerNumLeftD = new TunableNumber("Buddy Balance Left Motor D", kDefaultMotorD, leftPIDController::setD);
 
-    refPointBalancedTuner = new TunableNumber("Ref Point Balanced", kRetrievedAngle, (a) -> {tunedRetrievedAngle = a;});
-    refPointDeployedTuner = new TunableNumber("Ref Point Deployed", kDeployedAngle, (a) -> {tunedDeployedAngle = a;});
-    refPointServoTuner = new TunableNumber("Ref Point Servo", kServoDeployedPos, (a) -> {tunedServoDeployedPos = a;});
+    refPointBalancedTuner = new TunableNumber("Ref Point Balanced", kRetrievedAngle, (a) -> {tunedRetrievedAngle = Units.degreesToRadians(a);});
+    refPointDeployedTuner = new TunableNumber("Ref Point Deployed", kDeployedAngle, (a) -> {tunedDeployedAngle = Units.degreesToRadians(a);});
+    refPointServoTuner = new TunableNumber("Ref Point Servo", kServoDeployedPos, (a) -> {tunedServoDeployedPos = Units.degreesToRadians(a);});
   }
 
   public double getRightAngle() {
-    return Math.round(AbsoluteEncoder.getPositionRadians(rightEncoder)*1000)/1000.0;
+    return Math.round(AbsoluteEncoder.getPositionRadians(rightEncoder)*100)/100.0;
   }
 
   public double getLeftAngle() {
-    return Math.round(AbsoluteEncoder.getPositionRadians(leftEncoder)*1000)/1000.0;
+    return Math.round(AbsoluteEncoder.getPositionRadians(leftEncoder)*100)/100.0;
   }
 
   public boolean getIsDeployed() {
@@ -172,7 +172,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     encoderActualRightAngle = rightEncoder.getAbsolutePosition();
     encoderActualLeftAngle = leftEncoder.getAbsolutePosition();
     servoActualPosition = activateDeploy.get();
-    SmartDashboard.putNumber("Buddy Balance Right Position", AbsoluteEncoder.getPositionRadians(rightEncoder));
-    SmartDashboard.putNumber("Buddy Balance Left Position", AbsoluteEncoder.getPositionRadians(leftEncoder));
+    SmartDashboard.putNumber("Buddy Balance Right Angle", Units.radiansToDegrees(AbsoluteEncoder.getPositionRadians(rightEncoder)));
+    SmartDashboard.putNumber("Buddy Balance Left Angle", Units.radiansToDegrees(AbsoluteEncoder.getPositionRadians(leftEncoder)));
   }
 }
