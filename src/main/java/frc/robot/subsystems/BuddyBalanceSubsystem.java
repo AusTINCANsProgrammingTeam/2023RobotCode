@@ -89,7 +89,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
 
     refPointBalancedTuner = new TunableNumber("Ref Point Balanced", kRetrievedAngle, (a) -> {tunedRetrievedAngle = a;});
     refPointDeployedTuner = new TunableNumber("Ref Point Deployed", kDeployedAngle, (a) -> {tunedDeployedAngle = a;});
-    refPointServoTuner = new TunableNumber("Ref Point Servo", 0, (a) -> {tunedServoDeployedPos = a;});
+    refPointServoTuner = new TunableNumber("Ref Point Servo", kServoDeployedPos, (a) -> {tunedServoDeployedPos = a;});
   }
 
   public double getRightAngle() {
