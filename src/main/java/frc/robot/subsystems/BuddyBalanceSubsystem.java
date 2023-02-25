@@ -33,22 +33,29 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private static final double kDefaultMotorP = 1e-6;
   private static final double kDefaultMotorI = 0;
   private static final double kDefaultMotorD = 1e-6;
-  private static final int deployServoID = 1;
-  private static final double kServoDeployedPos = 0;
+  private static final int deployServo1ID = 8;
+  private static final int deployServo2ID = 9;
+  private static final double kServoDeployedPos1 = 0;
+  private static final double kServoDeployedPos2 = 0;
   private double tunedRetrievedAngle;
   private double tunedDeployedAngle;
-  private double tunedServoDeployedPos;
+  private double tunedServoDeployedPos1;
+  private double tunedServoDeployedPos2;
 
   private TunableNumber refPointBalancedTuner;
   private TunableNumber refPointDeployedTuner;
-  private TunableNumber refPointServoTuner;
+  private TunableNumber refPointServoTuner1;
+  private TunableNumber refPointServoTuner2;
   private TunableNumber tunerNumP;
   private TunableNumber tunerNumI;
   private TunableNumber tunerNumD;
 
-  private Servo deployServo;
-  private CANSparkMax rightMotor;
-  private CANSparkMax leftMotor;
+  private Servo deployServo1;
+  private Servo deployServo2;
+  private CANSparkMax rightMotor1;
+  private CANSparkMax rightMotor2;
+  private CANSparkMax leftMotor1;
+  private CANSparkMax leftMotor2;
   private PIDController unifiedPIDController; // Never forget
   private DutyCycleEncoder encoder;
   private boolean isDeployed = false;
@@ -63,9 +70,12 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private static double encoderCalculatedAngle; 
 
   public BuddyBalanceSubsystem() {
-    rightMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceRight);
-    leftMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft);
-    deployServo = new Servo(deployServoID);
+    rightMotor1 = MotorController.constructMotor(MotorConfig.BuddyBalanceRight1);
+    rightMotor2 = MotorController.constructMotor(MotorConfig.BuddyBalanceRight2);
+    leftMotor1 = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft1);
+    leftMotor2 = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft2);
+    deployServo1 = new Servo(deployServo1ID);
+    deployServo2 = new Servo(deployServo2ID);
     encoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalance);
     unifiedPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
 
@@ -75,7 +85,8 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
 
     refPointBalancedTuner = new TunableNumber("Ref Point Balanced", kRetrievedAngle, (a) -> {tunedRetrievedAngle = Units.degreesToRadians(a);});
     refPointDeployedTuner = new TunableNumber("Ref Point Deployed", kDeployedAngle, (a) -> {tunedDeployedAngle = Units.degreesToRadians(a);});
-    refPointServoTuner = new TunableNumber("Ref Point Servo", kServoDeployedPos, (a) -> {tunedServoDeployedPos = Units.degreesToRadians(a);});
+    refPointServoTuner1 = new TunableNumber("Ref Point Servo", kServoDeployedPos1, (a) -> {tunedServoDeployedPos1 = Units.degreesToRadians(a);});
+    refPointServoTuner2 = new TunableNumber("Ref Point Servo", kServoDeployedPos2, (a) -> {tunedServoDeployedPos2 = Units.degreesToRadians(a);});
   }
 
   public double getDesiredAngle() {
@@ -87,7 +98,8 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void deployBuddyBalance() {
-    deployServo.set(tunedServoDeployedPos); // TODO: Change tuned value to constant when done testing (tunedServoDeployedPos becomes kServoDeployedPos)
+    deployServo1.set(tunedServoDeployedPos1); // TODO: Change tuned value to constant when done testing (tunedServoDeployedPos becomes kServoDeployedPos)
+    deployServo2.set(tunedServoDeployedPos2);
     isDeployed = true;
   }
 
@@ -102,26 +114,38 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void updateMotors() {
-    rightMotor.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
-    leftMotor.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
+    rightMotor1.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
+    rightMotor2.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
+    leftMotor1.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
+    leftMotor2.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
   }
 
   // These methods are used for JUnit testing only
   public void close() throws Exception {
     // This method will close all device handles used by this object and release any other dynamic memory.
     // Mostly for JUnit tests
-    rightMotor.close();
-    leftMotor.close();
-    deployServo.close();
+    rightMotor1.close();
+    rightMotor2.close();
+    leftMotor1.close();
+    leftMotor2.close();
+    deployServo1.close();
+    deployServo2.close();
     encoder.close();
   }
 
-  public double getActualServoPosition() {
-    return deployServo.get();
+  public double getActualServoPosition1() {
+    return deployServo1.get();
+  }
+  public double getActualServoPosition2() {
+    return deployServo2.get();
   }
 
-  public static double getDesiredServoPosition() {
-    return kServoDeployedPos;
+  public static double getDesiredServoPosition1() {
+    return kServoDeployedPos1;
+  }
+
+  public static double getDesiredServoPosition2() {
+    return kServoDeployedPos2;
   }
 
   public double getActualEncoderAngle() {

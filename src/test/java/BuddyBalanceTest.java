@@ -28,7 +28,8 @@ public class BuddyBalanceTest {
   public void testDeploy() {
     dut.deployBuddyBalance();
     //JUnit Assert class provides this and many other comparision functions.
-    assertEquals(BuddyBalanceSubsystem.getDesiredServoPosition(), dut.getActualServoPosition(), kDelta); //Check that motor speed matches what we wrote
+    assertEquals(BuddyBalanceSubsystem.getDesiredServoPosition1(), dut.getActualServoPosition1(), kDelta); //Check that motor speed matches what we wrote
+    assertEquals(BuddyBalanceSubsystem.getDesiredServoPosition2(), dut.getActualServoPosition2(), kDelta); //Check that motor speed matches what we wrote
   }
 
   @Test
