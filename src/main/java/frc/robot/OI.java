@@ -55,15 +55,15 @@ public class OI {
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
 
         
-        private static final Button kOrientationButton = Button.B1; //1, Toggle swerve orientation
-        private static final Button kZeroButton = Button.Start; //3, Zero the gyroscope
-        private static final Button kOuttakeButton = Button.LB; //Right Bumper, run outtake
-        private static final Button kIntakeButton = Button.LT; //Right Trigger, run intake
-        private static final Button kAlignForwardButton = Button.B4; //4, Align forwards
-        private static final Button kAlignBackwardButton = Button.B2; //2, Align backwards
-        private static final Button kArmHighTrigger = Button.RB;
-        private static final Button kArmMidTrigger = Button.RT;
-        private static final Button kFloorIntake = Button.B3;
+        private static final Button kOrientationButton = Button.B1; //Toggle swerve orientation
+        private static final Button kZeroButton = Button.Start; //Zero the gyroscope
+        private static final Button kOuttakeButton = Button.LT; //Run outtake
+        private static final Button kIntakeButton = Button.LB; //Run intake
+        private static final Button kAlignForwardButton = Button.B4; //Align forwards
+        private static final Button kAlignBackwardButton = Button.B2; //Align backwards
+        private static final Button kArmHighButton = Button.RB; //Arm to high scoring position
+        private static final Button kArmMidButton = Button.RT; //Arm to mid scoring position
+        private static final Button kArmIntakeButton = Button.B3; //Arm to intake position
         
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -88,10 +88,15 @@ public class OI {
             //This axis is inverted
             return () -> kRotationCurve.calculate(-kJoystick.getRawAxis(kRotationAxis));
         }
-
+        
         public static JoystickButton getOrientationButton(){
             kOrientationButton.setButtonAction("Toggle swerve orientation");
             return new JoystickButton(kJoystick, kOrientationButton.getButtonID());
+        }
+
+        public static JoystickButton getZeroButton(){
+            kZeroButton.setButtonAction("Zero the gyroscope");
+            return new JoystickButton(kJoystick, kZeroButton.getButtonID());
         }
 
         public static JoystickButton getAlignForwardButton(){
@@ -104,11 +109,6 @@ public class OI {
             return new JoystickButton(kJoystick, kAlignBackwardButton.getButtonID());
         }
 
-        public static JoystickButton getZeroButton(){
-            kZeroButton.setButtonAction("Zeroing");
-            return new JoystickButton(kJoystick, kZeroButton.getButtonID());
-        }
-
         public static JoystickButton getIntakeButton(){
             kIntakeButton.setButtonAction("Intake");
             return new JoystickButton(kJoystick, kIntakeButton.getButtonID());
@@ -119,21 +119,22 @@ public class OI {
             return new JoystickButton(kJoystick, kOuttakeButton.getButtonID());
         }
         
-        public static JoystickButton getArmHighTrigger(){
-            kArmHighTrigger.setButtonAction("Arm High");
-            return new JoystickButton(kJoystick, kArmHighTrigger.getButtonID());
+        public static JoystickButton getArmHighButton(){
+            kArmHighButton.setButtonAction("Arm High");
+            return new JoystickButton(kJoystick, kArmHighButton.getButtonID());
         }
 
-        public static JoystickButton getArmMidTrigger(){
-            kArmMidTrigger.setButtonAction("Arm Mid");
-            return new JoystickButton(kJoystick, kArmMidTrigger.getButtonID());
+        public static JoystickButton getArmMidButton(){
+            kArmMidButton.setButtonAction("Arm Mid");
+            return new JoystickButton(kJoystick, kArmMidButton.getButtonID());
         }
 
-        public static JoystickButton getFloorIntakeButton(){
-            kFloorIntake.setButtonAction("Floor Intake");
-            return new JoystickButton(kJoystick, kFloorIntake.getButtonID());
-
+        public static JoystickButton getArmIntakeButton(){
+            kArmIntakeButton.setButtonAction("Arm Intake");
+            return new JoystickButton(kJoystick, kArmIntakeButton.getButtonID());
         }
+
+
     }
 
     public static final class Operator{
@@ -181,11 +182,11 @@ public class OI {
         private static final Button kBuddyBalanceActivateButton = Button.B; //Activates buddy balance
         private static final Button kDownBuddyBalanceButton = Button.POVDOWN; // Lowers buddy balance lift
         private static final Button kUpBuddyBalanceButton = Button.POVUP; // Raises buddy balance lift
-        private static final Button kYellowCargo = Button.Y;
-        private static final Button kPurpleCargo = Button.X;
+        private static final Button kConeSignalButton = Button.Y;
+        private static final Button kCubeSignalButton = Button.X;
 
-        private static final int kArmElbowAxis = 0;
-        private static final int kArmBaseAxis = 2;
+        private static final int kArmElbowAxis = 3;
+        private static final int kArmBaseAxis = 1;
 
         //TODO: Tune curves to driver preference
         private static final ControlCurve kArmElbowCurve = new ControlCurve(0.65,0.05,1,0.1);
@@ -216,14 +217,14 @@ public class OI {
             return new POVButton(kJoystick, kUpBuddyBalanceButton.getButtonID()); // This button will move the lift to the balanced position if it was in the deployed position
         }
 
-        public static JoystickButton getYellowCargoButton() {
-            kYellowCargo.setButtonAction("Yellow Cargo Lights");
-            return new JoystickButton(kJoystick, kYellowCargo.getButtonID());
+        public static JoystickButton getConeSignalButton() {
+            kConeSignalButton.setButtonAction("Signal Cone");
+            return new JoystickButton(kJoystick, kConeSignalButton.getButtonID());
         }
 
-        public static JoystickButton getPurpleCargoButton() {
-            kYellowCargo.setButtonAction("Purple Cargo Lights");
-            return new JoystickButton(kJoystick, kPurpleCargo.getButtonID());
+        public static JoystickButton getCubeSignalButton() {
+            kCubeSignalButton.setButtonAction("Signal Cube");
+            return new JoystickButton(kJoystick, kCubeSignalButton.getButtonID());
         }
     }
 

@@ -47,9 +47,9 @@ public class Robot extends LoggedRobot {
   public static final LedEnum ledSubSelect = LedEnum.STRIP;
 
   public static final boolean cameraEnabled = false;
-  public static final boolean everybotIntakeEnabled = false;
   public static final boolean intakeEnabled = true;
   public static final boolean swerveEnabled = true;
+  public static final boolean armEnabled = true;
   public static final boolean buddyBalanceEnabled = false;
   
   private Command m_autonomousCommand;
