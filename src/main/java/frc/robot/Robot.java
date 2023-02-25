@@ -17,7 +17,6 @@ import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -33,18 +32,24 @@ public class Robot extends LoggedRobot {
   public static final boolean isReplayMode = false;
   public static final double kDefaultPeriod = 0.02;
 
+  public static final int ledPort = 2;
+
   //RoboRIO serial numbers
   public static final String competitionRobotSerial = "03161743";;
   public static final String practiceRobotSerial = "03064df0";
   public static final boolean isCompetitionRobot = !HALUtil.getSerialNumber().equals(practiceRobotSerial);
 
+  public static enum LedEnum {
+    BLINKIN, STRIP, MATRIX, NONE;
+  }
+
   //Subsystem toggle
-  public static final boolean batteryEnabled = true;
-  public static final boolean cameraEnabled = true;
-  public static final boolean everybotIntakeEnabled = true;
+  public static final LedEnum ledSubSelect = LedEnum.STRIP;
+
+  public static final boolean cameraEnabled = false;
   public static final boolean intakeEnabled = true;
-  public static final boolean simulationEnabled = true;
   public static final boolean swerveEnabled = true;
+  public static final boolean armEnabled = true;
   public static final boolean buddyBalanceEnabled = false;
   
   private Command m_autonomousCommand;
@@ -83,6 +88,7 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
   }
 
   /**

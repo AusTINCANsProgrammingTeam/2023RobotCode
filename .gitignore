@@ -166,3 +166,4 @@ simgui-ds.json
 *.wpilog
 BuildConstants.java
 networktables.json
+glass.json
