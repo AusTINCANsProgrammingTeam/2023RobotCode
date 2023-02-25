@@ -42,63 +42,44 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private TunableNumber refPointBalancedTuner;
   private TunableNumber refPointDeployedTuner;
   private TunableNumber refPointServoTuner;
-  private TunableNumber tunerNumRightP;
-  private TunableNumber tunerNumRightI;
-  private TunableNumber tunerNumRightD;
-  private TunableNumber tunerNumLeftP;
-  private TunableNumber tunerNumLeftI;
-  private TunableNumber tunerNumLeftD;
+  private TunableNumber tunerNumP;
+  private TunableNumber tunerNumI;
+  private TunableNumber tunerNumD;
 
-  private Servo activateDeploy;
+  private Servo deployServo;
   private CANSparkMax rightMotor;
   private CANSparkMax leftMotor;
-  private PIDController rightPIDController;
-  private PIDController leftPIDController;
-  private DutyCycleEncoder rightEncoder;
-  private DutyCycleEncoder leftEncoder;
+  private PIDController unifiedPIDController; // Never forget
+  private DutyCycleEncoder encoder;
   private boolean isDeployed = false;
   private DataLog datalog = DataLogManager.getLog();
-  private DoubleLogEntry buddyBalancePosLeft = new DoubleLogEntry(datalog, "/buddybalance/position/left");
-  private DoubleLogEntry buddyBalancePosRight = new DoubleLogEntry(datalog, "/buddybalance/position/right");
+  private DoubleLogEntry buddyBalancePos = new DoubleLogEntry(datalog, "/buddybalance/position/");
   private static ShuffleboardTab buddyBalanceTab = Shuffleboard.getTab("Buddy Balance"); // TODO: Replace buddy balance tab with whatever tab the position should be logged to
   private static GenericEntry positionEntry = buddyBalanceTab.add("Buddy Balance Position", 0).getEntry();
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry buddyBalancePosEntry = matchTab.add("Buddy Balance State", "Docked").getEntry();
   // TODO: Uncomment comp shuffleboard objects when both comp-shuffleboard and buddy-balance-encoder pull requests go through
 
-  private static double encoderActualRightAngle;
-  private static double encoderActualLeftAngle;
-  private static double encoderCalculatedRightAngle; 
-  private static double encoderCalculatedLeftAngle;
-  private static double servoActualPosition;
+  private static double encoderCalculatedAngle; 
 
   public BuddyBalanceSubsystem() {
     rightMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceRight);
     leftMotor = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft);
-    activateDeploy = new Servo(deployServoID);
-    rightEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalanceRight);
-    leftEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalanceLeft);
-    rightPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
-    leftPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
+    deployServo = new Servo(deployServoID);
+    encoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalance);
+    unifiedPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
 
-    tunerNumRightP = new TunableNumber("Buddy Balance Right Motor P", kDefaultMotorP, rightPIDController::setP);
-    tunerNumRightI = new TunableNumber("Buddy Balance Right Motor I", kDefaultMotorI, rightPIDController::setI);
-    tunerNumRightD = new TunableNumber("Buddy Balance Right Motor D", kDefaultMotorD, rightPIDController::setD);
-    tunerNumLeftP = new TunableNumber("Buddy Balance Left Motor P", kDefaultMotorP, leftPIDController::setP);
-    tunerNumLeftI = new TunableNumber("Buddy Balance Left Motor I", kDefaultMotorI, leftPIDController::setI);
-    tunerNumLeftD = new TunableNumber("Buddy Balance Left Motor D", kDefaultMotorD, leftPIDController::setD);
+    tunerNumP = new TunableNumber("Buddy Balance Motor P", kDefaultMotorP, unifiedPIDController::setP);
+    tunerNumI = new TunableNumber("Buddy Balance Motor I", kDefaultMotorI, unifiedPIDController::setI);
+    tunerNumD = new TunableNumber("Buddy Balance Motor D", kDefaultMotorD, unifiedPIDController::setD);
 
     refPointBalancedTuner = new TunableNumber("Ref Point Balanced", kRetrievedAngle, (a) -> {tunedRetrievedAngle = Units.degreesToRadians(a);});
     refPointDeployedTuner = new TunableNumber("Ref Point Deployed", kDeployedAngle, (a) -> {tunedDeployedAngle = Units.degreesToRadians(a);});
     refPointServoTuner = new TunableNumber("Ref Point Servo", kServoDeployedPos, (a) -> {tunedServoDeployedPos = Units.degreesToRadians(a);});
   }
 
-  public double getRightAngle() {
-    return Math.round(AbsoluteEncoder.getPositionRadians(rightEncoder)*100)/100.0;
-  }
-
-  public double getLeftAngle() {
-    return Math.round(AbsoluteEncoder.getPositionRadians(leftEncoder)*100)/100.0;
+  public double getDesiredAngle() {
+    return Math.round(AbsoluteEncoder.getPositionRadians(encoder)*100)/100.0;
   }
 
   public boolean getIsDeployed() {
@@ -106,27 +87,23 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void deployBuddyBalance() {
-    activateDeploy.set(kServoDeployedPos); // Change constants to the tuned values while testing (kServoDeployedPos becomes tunedServoDeployedPos)
+    deployServo.set(tunedServoDeployedPos); // TODO: Change tuned value to constant when done testing (tunedServoDeployedPos becomes kServoDeployedPos)
     isDeployed = true;
   }
 
   public void retrieveBuddy() { // Used to pick up the buddy robot while the lift is already underneath it
-    rightPIDController.setSetpoint(kRetrievedAngle); // Change constants to the tuned values while testing (KRetrievedAngle becomes tunedRetrievedAngle)
-    leftPIDController.setSetpoint(kRetrievedAngle);
-    //buddyBalancePosEntry.setString("Raised");
+    unifiedPIDController.setSetpoint(tunedRetrievedAngle); // TODO: Change tuned value to constant when done testing (tunedRetrievedAngle becomes kRetrievedAngle)
+    buddyBalancePosEntry.setString("Raised");
   }
 
   public void releaseBuddy() { // Used to set down the robot
-    rightPIDController.setSetpoint(kDeployedAngle); // Change constants to the tuned values while testing (kDeployedAngle becomes tunedDeployedAngle)
-    leftPIDController.setSetpoint(kDeployedAngle);
-    //buddyBalancePosEntry.setString("Lowered");
+    unifiedPIDController.setSetpoint(tunedDeployedAngle); // TODO: Change tuned value to constant when done testing (tunedDeployedAngle becomes kDeployedAngle)
+    buddyBalancePosEntry.setString("Lowered");
   }
 
   public void updateMotors() {
-    encoderCalculatedRightAngle = rightPIDController.calculate(getRightAngle());
-    encoderCalculatedLeftAngle = leftPIDController.calculate(getLeftAngle());
-    rightMotor.set(MathUtil.clamp(encoderCalculatedRightAngle, -1, 1));
-    leftMotor.set(MathUtil.clamp(encoderCalculatedLeftAngle, -1, 1));
+    rightMotor.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
+    leftMotor.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
   }
 
   // These methods are used for JUnit testing only
@@ -135,44 +112,31 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     // Mostly for JUnit tests
     rightMotor.close();
     leftMotor.close();
-    activateDeploy.close();
-    rightEncoder.close();
-    leftEncoder.close();
+    deployServo.close();
+    encoder.close();
   }
 
   public double getActualServoPosition() {
-    return servoActualPosition;
+    return deployServo.get();
   }
 
   public static double getDesiredServoPosition() {
     return kServoDeployedPos;
   }
 
-  public double getActualEncoderRightAngle() {
-    return encoderActualRightAngle;
+  public double getActualEncoderAngle() {
+    return encoder.getAbsolutePosition();
   }
 
-  public double getActualEncoderLeftAngle() {
-    return encoderActualLeftAngle;
-  }
-
-  public static double getCalculatedEncoderRightAngle() {
-    return encoderCalculatedRightAngle;
-  }
-
-  public static double getCalculatedEncoderLeftAngle() {
-    return encoderCalculatedLeftAngle;
+  public static double getCalculatedEncoderAngle() {
+    return encoderCalculatedAngle;
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    buddyBalancePosLeft.append(AbsoluteEncoder.getPositionRadians(leftEncoder)); // Logging the position of the buddy balance lift
-    buddyBalancePosRight.append(AbsoluteEncoder.getPositionRadians(rightEncoder));
-    encoderActualRightAngle = rightEncoder.getAbsolutePosition();
-    encoderActualLeftAngle = leftEncoder.getAbsolutePosition();
-    servoActualPosition = activateDeploy.get();
-    SmartDashboard.putNumber("Buddy Balance Right Angle", Units.radiansToDegrees(AbsoluteEncoder.getPositionRadians(rightEncoder)));
-    SmartDashboard.putNumber("Buddy Balance Left Angle", Units.radiansToDegrees(AbsoluteEncoder.getPositionRadians(leftEncoder)));
+    // This method will be called once per scheduler run 
+    buddyBalancePos.append(AbsoluteEncoder.getPositionRadians(encoder)); // Logging the position of the buddy balance lift
+    encoderCalculatedAngle = unifiedPIDController.calculate(getDesiredAngle());
+    SmartDashboard.putNumber("Buddy Balance Angle", Units.radiansToDegrees(AbsoluteEncoder.getPositionRadians(encoder)));
   }
 }

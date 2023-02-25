@@ -20,9 +20,8 @@ public class AbsoluteEncoder {
         ArmBase(1, true, Units.degreesToRadians(-74.6)),
         ArmElbow(0, true, Units.degreesToRadians(233.6)),
         // Buddy Balance Encoders (REV)
-        BuddyBalanceLeft(2, false, 0), // placeholder offset
-        BuddyBalanceRight(3, false, 0); // placeholder offset
-        
+        BuddyBalance(2, false, 0); // placeholder offset
+
         private int ID;
         private boolean reversed;
         private double competitionOffset; //Offset in radians, used on competition bot

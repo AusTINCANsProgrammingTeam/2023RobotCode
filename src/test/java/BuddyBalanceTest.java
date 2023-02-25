@@ -34,19 +34,15 @@ public class BuddyBalanceTest {
   @Test
   public void testRetrieve() {
     dut.retrieveBuddy();
-    testUpdateMotors();
+    dut.updateMotors();
+    assertEquals(BuddyBalanceSubsystem.getCalculatedEncoderAngle(), dut.getActualEncoderAngle(), kDelta);
   }
+  
   @Test
   public void testRelease() {
     dut.releaseBuddy();
-    testUpdateMotors();
-  }
-
-  @Test
-  public void testUpdateMotors() {
     dut.updateMotors();
-    assertEquals(BuddyBalanceSubsystem.getCalculatedEncoderRightAngle(), dut.getActualEncoderRightAngle(), kDelta);
-    assertEquals(BuddyBalanceSubsystem.getCalculatedEncoderLeftAngle(), dut.getActualEncoderLeftAngle(), kDelta);
+    assertEquals(BuddyBalanceSubsystem.getCalculatedEncoderAngle(), dut.getActualEncoderAngle(), kDelta);
   }
   // Add more @Test tagged methods to test other things...
 }
