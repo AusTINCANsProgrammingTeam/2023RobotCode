@@ -105,18 +105,18 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void deployBuddyBalance() {
-    activateDeploy.set(kServoDeployedPos);
+    activateDeploy.set(kServoDeployedPos); // Change constants to the tuned values while testing (kServoDeployedPos becomes tunedServoDeployedPos)
     isDeployed = true;
   }
 
   public void retrieveBuddy() { // Used to pick up the buddy robot while the lift is already underneath it
-    rightPIDController.setSetpoint(kRetrievedAngle);
+    rightPIDController.setSetpoint(kRetrievedAngle); // Change constants to the tuned values while testing (KRetrievedAngle becomes tunedRetrievedAngle)
     leftPIDController.setSetpoint(kRetrievedAngle);
     //buddyBalancePosEntry.setString("Raised");
   }
 
   public void releaseBuddy() { // Used to set down the robot
-    rightPIDController.setSetpoint(kDeployedAngle);
+    rightPIDController.setSetpoint(kDeployedAngle); // Change constants to the tuned values while testing (kDeployedAngle becomes tunedDeployedAngle)
     leftPIDController.setSetpoint(kDeployedAngle);
     //buddyBalancePosEntry.setString("Lowered");
   }
