@@ -45,10 +45,10 @@ public class ArmSubsystem extends SubsystemBase {
     CONEINTAKE(1.0136, -0.0749), //Arm is in position to intake cones
     CUBEINTAKE(0, 0), //Arm is in position to intake cubes FIXME
     SUBSTATIONINTAKE(1.6145, 1.0866), //Arm is in position to intake from substation FIXME
-    MIDSCORE(1.3447, 0.9222), //Arm is in position to score on the mid pole FIXME
-    HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole FIXME
-    HIGHTRANSITION(1.0992,1.0309), //Used as a second step when in transition to high score
-    HIGHDROP(1.4433, 0.8766),
+    MIDSCORE(1.3447, 0.9222), //Arm is in position to score on the mid pole
+    HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
+    HIGHTRANSITION(1.0992,1.0309), //Used as an intermediate step when in transition to high score
+    HIGHDROP(1.4433, 0.8766), //High scoring motion
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
     private double x; //Position relative to the base of the arm, in meters
@@ -433,16 +433,18 @@ public class ArmSubsystem extends SubsystemBase {
       holdCurrentPosition();
     }
 
-    //Shuffleboard + Smartdashboard values 
-    actualBaseAngle.setDouble(Units.radiansToDegrees(getBaseAngle()));
-    actualElbowAngle.setDouble(Units.radiansToDegrees(getElbowAngle()));
-    actualXPosition.setDouble(armXPosition);
-    actualYPositon.setDouble(armYPosition);
+    if(!Robot.isCompetition){
+      //Shuffleboard + Smartdashboard values 
+      actualBaseAngle.setDouble(Units.radiansToDegrees(getBaseAngle()));
+      actualElbowAngle.setDouble(Units.radiansToDegrees(getElbowAngle()));
+      actualXPosition.setDouble(armXPosition);
+      actualYPositon.setDouble(armYPosition);
 
-    desiredBaseGoal.setDouble(Units.radiansToDegrees(basePIDController.getGoal().position));
-    desiredBaseSetpoint.setDouble(Units.radiansToDegrees(basePIDController.getSetpoint().position));
-    desiredElbowGoal.setDouble(Units.radiansToDegrees(elbowPIDController.getGoal().position));
-    desiredElbowSetpoint.setDouble(Units.radiansToDegrees(elbowPIDController.getSetpoint().position));
+      desiredBaseGoal.setDouble(Units.radiansToDegrees(basePIDController.getGoal().position));
+      desiredBaseSetpoint.setDouble(Units.radiansToDegrees(basePIDController.getSetpoint().position));
+      desiredElbowGoal.setDouble(Units.radiansToDegrees(elbowPIDController.getGoal().position));
+      desiredElbowSetpoint.setDouble(Units.radiansToDegrees(elbowPIDController.getSetpoint().position));
+    }
   }
 
   @Override
