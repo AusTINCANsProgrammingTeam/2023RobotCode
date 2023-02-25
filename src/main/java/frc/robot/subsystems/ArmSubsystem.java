@@ -70,7 +70,6 @@ public class ArmSubsystem extends SubsystemBase {
 
   private final ArmState kDefaultState = ArmState.STOWED;
   private ArmState currentState;
-  private ArmState currentTransition;
 
   //Base arm PID values
   private double kBaseP = 1;
@@ -136,7 +135,6 @@ public class ArmSubsystem extends SubsystemBase {
   private GenericEntry desiredYPosition;
 
   private GenericEntry currentStateEntry = matchTab.add("Current State","").getEntry();
-  private GenericEntry currentTransitionEntry = matchTab.add("Current Transition","").getEntry();
 
   private TunableNumber basePTuner;
   private TunableNumber baseITuner;
@@ -215,7 +213,6 @@ public class ArmSubsystem extends SubsystemBase {
     holdCurrentPosition();
     
     setState(kDefaultState);
-    currentTransition = kDefaultState;
   }
 
   //Returns sim encoder position (No offset) if in simulation, the actual position otherwise
@@ -345,30 +342,63 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public Command transitionToState(ArmState state){
-    currentTransition = state;
-    currentTransitionEntry.setString(currentTransition.toString());
     return new SequentialCommandGroup(
       goToState(ArmState.TRANSITION),
       goToState(state)
     ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
 
-  public Command handleTransitionLogic(ArmState state){
-    if(state == currentTransition){
-      return transitionToState(ArmState.STOWED);
-    }
-    if(state == ArmState.HIGHSCORE){
-      if(currentState == ArmState.HIGHSCORE){
+  public Command handleHighButton(){
+    switch(currentState){
+      case STOWED:
+      case TRANSITION:
+      case CONEINTAKE:
+      case MIDSCORE:
+        return goToState(ArmState.HIGHTRANSITION);
+      case HIGHSCORE:
         return goToState(ArmState.HIGHDROP);
-      } else {
-        if(currentTransition == ArmState.HIGHTRANSITION){
-          return goToState(ArmState.HIGHSCORE);
-        } else {
-          return transitionToState(ArmState.HIGHTRANSITION);
-        }
-      }
+      case HIGHTRANSITION:
+        return goToState(ArmState.HIGHSCORE);
+      case HIGHDROP:
+        return transitionToState(ArmState.STOWED);
+      default:
+        return null;
     }
-    return transitionToState(state);
+  }
+
+  public Command handleMidButton(){
+    switch(currentState){
+      case STOWED:
+      case TRANSITION:
+      case CONEINTAKE:
+      case HIGHDROP:
+      case HIGHTRANSITION:
+        return goToState(ArmState.MIDSCORE);
+      case MIDSCORE:
+        return goToState(ArmState.STOWED);
+      case HIGHSCORE:
+        return goToState(ArmState.HIGHDROP);
+      default:
+        return null;
+    }
+  }
+
+  public Command handleIntakeButton(){
+    switch(currentState){
+      case STOWED:
+        return transitionToState(ArmState.CONEINTAKE);
+      case CONEINTAKE:
+        return transitionToState(ArmState.STOWED);
+      case HIGHSCORE:
+        return goToState(ArmState.HIGHDROP);
+      case TRANSITION:
+      case MIDSCORE:
+      case HIGHTRANSITION:
+      case HIGHDROP:
+        return goToState(ArmState.CONEINTAKE);
+      default:
+        return null;
+    }
   }
 
   public void coastBase() {

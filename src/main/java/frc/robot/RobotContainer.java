@@ -14,7 +14,6 @@ import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.commands.ArmAnglesCommand;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.ArmSubsystem.ArmState;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BuddyBalanceSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -104,9 +103,9 @@ public class RobotContainer {
     }
 
     if (Robot.armEnabled) {
-      OI.Driver.getArmHighButton().onTrue(new ProxyCommand(() -> armSubsystem.handleTransitionLogic(ArmState.HIGHSCORE)));
-      OI.Driver.getArmMidButton().onTrue(new ProxyCommand(() -> armSubsystem.handleTransitionLogic(ArmState.MIDSCORE)));
-      OI.Driver.getArmIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleTransitionLogic(ArmState.CONEINTAKE)));
+      OI.Driver.getArmHighButton().onTrue(new ProxyCommand(() -> armSubsystem.handleHighButton()));
+      OI.Driver.getArmMidButton().onTrue(new ProxyCommand(() -> armSubsystem.handleMidButton()));
+      OI.Driver.getArmIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleIntakeButton()));
     }
 
     if (Robot.buddyBalanceEnabled) {
