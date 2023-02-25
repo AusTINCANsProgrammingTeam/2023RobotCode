@@ -10,12 +10,20 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
+import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.commands.ArmAnglesCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BuddyBalanceSubsystem;
+import frc.robot.subsystems.led.BlinkinLedSubsystem;
+import frc.robot.subsystems.led.LedMatrixSubsystem;
+import frc.robot.subsystems.led.LedStripSubsystem;
+import frc.robot.subsystems.led.BlinkinLedSubsystem.BlinkinMode;
+import frc.robot.subsystems.led.LedMatrixSubsystem.MatrixMode;
+import frc.robot.subsystems.led.LedStripSubsystem.StripMode;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
@@ -39,15 +47,27 @@ public class RobotContainer {
   private final ArmSubsystem armSubsystem;
   private final ArmAnglesCommand armAnglesCommand;
 
+  private LedStripSubsystem ledSubsystem;
+  private LedMatrixSubsystem ledMatrixSubsystem;
+  private BlinkinLedSubsystem blinkinLedSubsystem;
+
   private Auton auton;
 
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
-  private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/");
-
+  private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     armSubsystem = Robot.armEnabled ? new ArmSubsystem() : null;
     subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
+
+    ledSubsystem = Robot.ledSubSelect == LedEnum.STRIP ? new LedStripSubsystem() : null;
+    subsystemEnabledLog.append(ledSubsystem == null ? "Led: Disabled" : "Led: Enabled");
+
+    ledMatrixSubsystem = Robot.ledSubSelect == LedEnum.MATRIX ? new LedMatrixSubsystem() : null; //PWM port 2
+    subsystemEnabledLog.append(ledSubsystem == null ? "Led Matrix: Disabled" : "Led Matrix: Enabled");
+
+    blinkinLedSubsystem = Robot.ledSubSelect == LedEnum.BLINKIN ? new BlinkinLedSubsystem() : null;
+    subsystemEnabledLog.append(ledSubsystem == null ? "Led Blinkin: Disabled" : "Led Blinkin: Enabled");
 
     swerveSubsystem = Robot.swerveEnabled ? new SwerveSubsystem() : null;
     subsystemEnabledLog.append(swerveSubsystem == null ? "Swerve: Disabled" : "Swerve: Enabled");
@@ -90,6 +110,19 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    if (Robot.ledSubSelect == LedEnum.MATRIX){
+     // OI.Operator.getYellowCargoButton().onTrue(ledMatrixSubsystem.goCans());
+     OI.Operator.getConeSignalButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(MatrixMode.CONE), ledMatrixSubsystem::offLed, ledMatrixSubsystem));
+     OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(MatrixMode.CUBE), ledMatrixSubsystem::offLed, ledMatrixSubsystem));
+    }
+    if (Robot.ledSubSelect == LedEnum.BLINKIN){
+      OI.Operator.getConeSignalButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_YELLOW), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
+      OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_PURPLE), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
+    }
+    if (Robot.ledSubSelect == LedEnum.STRIP){
+      OI.Operator.getConeSignalButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(StripMode.CUBE), ledSubsystem::offLed, ledSubsystem));
+      OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(StripMode.CONE), ledSubsystem::offLed, ledSubsystem));
+    }
     if (Robot.swerveEnabled) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
       OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
