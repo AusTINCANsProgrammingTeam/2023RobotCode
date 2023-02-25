@@ -15,6 +15,7 @@ import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.commands.ArmAnglesCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.BatterySubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BuddyBalanceSubsystem;
 import frc.robot.subsystems.led.BlinkinLedSubsystem;
@@ -45,6 +46,7 @@ public class RobotContainer {
   private final CameraSubsystem cameraSubsystem;
   private final BuddyBalanceSubsystem buddyBalanceSubsystem;
   private final ArmSubsystem armSubsystem;
+  private final BatterySubsystem batterySubsystem;
   private final ArmAnglesCommand armAnglesCommand;
 
   private LedStripSubsystem ledSubsystem;
@@ -59,6 +61,9 @@ public class RobotContainer {
   public RobotContainer() {
     armSubsystem = Robot.armEnabled ? new ArmSubsystem() : null;
     subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
+
+    batterySubsystem = !Robot.isCompetition ? Robot.batteryEnabled ? new BatterySubsystem() : null: null;
+    subsystemEnabledLog.append(batterySubsystem == null ? "Battery: Disabled" : "Battery: Enabled");
 
     ledSubsystem = Robot.ledSubSelect == LedEnum.STRIP ? new LedStripSubsystem() : null;
     subsystemEnabledLog.append(ledSubsystem == null ? "Led: Disabled" : "Led: Enabled");
