@@ -20,7 +20,7 @@ public class EverybotIntakeSubsystem extends SubsystemBase implements AutoClosea
   public static final double kIntakeSpeed = 0.5;
   private CANSparkMax motor;
   private static ShuffleboardTab intakeTab = Shuffleboard.getTab("Match");
-  private static GenericEntry intakeEntry = intakeTab.add("Everybot Intake Speed", 0.0).getEntry();
+  private static GenericEntry intakeEntry = intakeTab.add("EverybotIntake Speed", 0.0).getEntry();
   /** Creates a new IntakeSubsystem. */
   public EverybotIntakeSubsystem() {
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
