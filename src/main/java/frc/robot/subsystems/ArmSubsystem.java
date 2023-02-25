@@ -48,6 +48,7 @@ public class ArmSubsystem extends SubsystemBase {
     MIDSCORE(1.3447, 0.9222), //Arm is in position to score on the mid pole FIXME
     HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole FIXME
     HIGHTRANSITION(1.0992,1.0309), //Used as a second step when in transition to high score
+    HIGHDROP(1.4433, 0.8766),
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
     private double x; //Position relative to the base of the arm, in meters
@@ -358,7 +359,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
     if(state == ArmState.HIGHSCORE){
       if(currentState == ArmState.HIGHSCORE){
-        return goToState(ArmState.HIGHTRANSITION);
+        return goToState(ArmState.HIGHDROP);
       } else {
         if(currentTransition == ArmState.HIGHTRANSITION){
           return goToState(ArmState.HIGHSCORE);
