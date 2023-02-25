@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.classes.TunableNumber;
 import frc.robot.commands.AssistedBalanceCommand;
 import frc.robot.Robot;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
@@ -112,6 +113,11 @@ public class SwerveSubsystem extends SubsystemBase{
     private PIDController yController;
     private PIDController rotationController;
 
+    private TunableNumber translationXTuner;
+    private TunableNumber translationYTuner;
+    private TunableNumber rotationPTuner;
+    private TunableNumber rotationITuner;
+
     public SwerveSubsystem() {
         zeroHeading();
         controlOrientationIsFOD = true;
@@ -124,6 +130,11 @@ public class SwerveSubsystem extends SubsystemBase{
         yController = new PIDController(kYTranslationP, 0, 1e-4);
         rotationController = new PIDController(kRotationP, kRotationI, 0);
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
+
+        translationXTuner = new TunableNumber("X Translation P", kXTranslationP, xController::setP);
+        translationYTuner = new TunableNumber("Y Translation P", kYTranslationP, yController::setP);
+        rotationPTuner = new TunableNumber("Rotation P", kRotationP, rotationController::setP);
+        rotationITuner = new TunableNumber("Rotation I", kRotationI, rotationController::setI);
     }
 
     public void zeroHeading() {
