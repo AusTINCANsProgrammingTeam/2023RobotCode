@@ -56,8 +56,8 @@ public class OI {
         
         private static final Button kOrientationButton = Button.B1; //Toggle swerve orientation
         private static final Button kZeroButton = Button.Start; //Zero the gyroscope
-        private static final Button kOuttakeButton = Button.LB; //Run outtake
-        private static final Button kIntakeButton = Button.LT; //Run intake
+        private static final Button kOuttakeButton = Button.LT; //Run outtake
+        private static final Button kIntakeButton = Button.LB; //Run intake
         private static final Button kAlignForwardButton = Button.B4; //Align forwards
         private static final Button kAlignBackwardButton = Button.B2; //Align backwards
         private static final Button kArmHighButton = Button.RB; //Arm to high scoring position

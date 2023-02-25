@@ -46,7 +46,7 @@ public class ArmSubsystem extends SubsystemBase {
     CUBEINTAKE(0, 0), //Arm is in position to intake cubes FIXME
     SUBSTATIONINTAKE(1.6145, 1.0866), //Arm is in position to intake from substation FIXME
     MIDSCORE(1.3447, 0.9222), //Arm is in position to score on the mid pole FIXME
-    HIGHSCORE(1.6685, 1.2852), //Arm is in position to score on the high pole FIXME
+    HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole FIXME
     HIGHTRANSITION(1.0992,1.0309), //Used as a second step when in transition to high score
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
@@ -72,13 +72,13 @@ public class ArmSubsystem extends SubsystemBase {
   private ArmState currentTransition;
 
   //Base arm PID values
-  private double kBaseP = 0.8;
-  private double kBaseI = 0.1;
+  private double kBaseP = 1;
+  private double kBaseI = 0.3;
   private double kBaseD = 0;
   //Elbow arm PID values
   private double kElbowP = 1.5;
-  private double kElbowI = 0.15;
-  private double kElbowD = 0.2;
+  private double kElbowI = 0.25;
+  private double kElbowD = 0;
   //Sim PID values
   private double kSimBaseP = 0.1;
   private double kSimElbowP = 0.1;
@@ -106,8 +106,8 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kMaxBaseAngle = Units.degreesToRadians(90);
   public static final double kMaxElbowAngle = Units.degreesToRadians(162);
 
-  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(30), Units.degreesToRadians(30));
-  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(60), Units.degreesToRadians(45));
+  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(55), Units.degreesToRadians(45));
+  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(130), Units.degreesToRadians(80));
 
   public static final double kBaseGearing = 40.8333333;
   public static final double kElbowGearing = 4.28571429;
@@ -269,7 +269,7 @@ public class ArmSubsystem extends SubsystemBase {
     double baseOutput = MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1);
     double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
     baseMotor.set(MathUtil.clamp(baseOutput, getBaseAngle() < kMinBaseAngle ? 0 : -1, getBaseAngle() > kMaxBaseAngle ? 0 : 1));
-    elbowMotor.set(MathUtil.clamp(elbowOutput, getElbowAngle() < kMinElbowAngle ? 0 : -1, getElbowAngle() > kMaxElbowAngle ? 0 : 1));
+    elbowMotor.set(elbowOutput);
   }
 
 
@@ -321,8 +321,8 @@ public class ArmSubsystem extends SubsystemBase {
     currentStateEntry.setString(state.toString());
     currentState = state;
 
-    basePIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 0.5);
-    elbowPIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 0.5);
+    basePIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 0.25);
+    elbowPIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 0.25);
 
     setDesiredPositions(state.getX(), state.getY());
   }
@@ -357,12 +357,14 @@ public class ArmSubsystem extends SubsystemBase {
       return transitionToState(ArmState.STOWED);
     }
     if(state == ArmState.HIGHSCORE){
-      if(currentTransition == ArmState.HIGHTRANSITION){
-        currentTransition = state;
-        return goToState(ArmState.HIGHSCORE);
-      }
-      if(currentTransition != ArmState.HIGHSCORE){
-        return transitionToState(ArmState.HIGHTRANSITION);
+      if(currentState == ArmState.HIGHSCORE){
+        return goToState(ArmState.HIGHTRANSITION);
+      } else {
+        if(currentTransition == ArmState.HIGHTRANSITION){
+          return goToState(ArmState.HIGHSCORE);
+        } else {
+          return transitionToState(ArmState.HIGHTRANSITION);
+        }
       }
     }
     return transitionToState(state);
@@ -391,6 +393,9 @@ public class ArmSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
+
+    SmartDashboard.putNumber("Eout", elbowMotor.get());
+    SmartDashboard.putNumber("Bout", baseMotor.get());
     // This method will be called once per scheduler run
     calculateCurrentPositions();
     if(DriverStation.isDisabled()){
