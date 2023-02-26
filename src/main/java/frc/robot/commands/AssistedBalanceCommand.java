@@ -33,8 +33,8 @@ public class AssistedBalanceCommand extends CommandBase {
    */
   public AssistedBalanceCommand(SwerveSubsystem swerveSubsystem) {
     swerve_subsystem = swerveSubsystem;
-    engagedTrigger = new Trigger(() -> (swerve_subsystem.getPitch() < balancingDeadzoneNumber && 
-    swerve_subsystem.getPitch() > -balancingDeadzoneNumber)).debounce(1);
+    engagedTrigger = new Trigger(() -> (swerve_subsystem.getRoll() < balancingDeadzoneNumber && 
+    swerve_subsystem.getRoll() > -balancingDeadzoneNumber)).debounce(1);
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveSubsystem); 
