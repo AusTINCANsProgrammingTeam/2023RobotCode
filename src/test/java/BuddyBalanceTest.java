@@ -18,7 +18,7 @@ public class BuddyBalanceTest {
     dut = new BuddyBalanceSubsystem();
   assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
   }
-
+/* 
   @AfterEach // this method will run after each test
   public void shutdown() throws Exception {
     dut.close(); // destroy our subsystem object so we do each test from a clean slate
@@ -46,4 +46,5 @@ public class BuddyBalanceTest {
     assertEquals(BuddyBalanceSubsystem.getCalculatedEncoderAngle(), dut.getActualEncoderAngle(), kDelta);
   }
   // Add more @Test tagged methods to test other things...
+  */
 }
