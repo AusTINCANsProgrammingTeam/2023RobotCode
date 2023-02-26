@@ -48,7 +48,7 @@ public class ArmSubsystem extends SubsystemBase {
     SUBSTATIONINTAKE(1.6145, 1.0866), //Arm is in position to intake from substation FIXME
     MIDSCORE(1.3447, 0.9222), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
-    HIGHTRANSITION(1.0992,1.0309), //Used as an intermediate step when in transition to high score
+    HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
     HIGHDROP(1.4433, 0.8766), //High scoring motion
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
@@ -267,7 +267,7 @@ public class ArmSubsystem extends SubsystemBase {
   public void updateMotors() {
     double baseOutput = MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1);
     double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
-    baseMotor.set(MathUtil.clamp(baseOutput, getBaseAngle() < kMinBaseAngle ? 0 : -1, getBaseAngle() > kMaxBaseAngle ? 0 : 1));
+    baseMotor.set(((getBaseAngle() < kMinBaseAngle || getBaseAngle() > kMaxBaseAngle) ? -1 : 1) * baseOutput);
     elbowMotor.set(elbowOutput);
   }
 
