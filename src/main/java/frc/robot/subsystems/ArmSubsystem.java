@@ -43,8 +43,7 @@ public class ArmSubsystem extends SubsystemBase {
   public static enum ArmState{
     STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
     CONEINTAKE(1.0136, -0.0749), //Arm is in position to intake cones
-    CUBEINTAKE(0, 0), //Arm is in position to intake cubes FIXME
-    SUBSTATIONINTAKE(1.6145, 1.0866), //Arm is in position to intake from substation FIXME
+    CUBEINTAKE(0.9743, -0.2507), //Arm is in position to intake cubes
     MIDSCORE(1.3447, 0.9222), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
     HIGHTRANSITION(1.0992,1.0309), //Used as an intermediate step when in transition to high score
@@ -157,10 +156,8 @@ public class ArmSubsystem extends SubsystemBase {
   
 
   public ArmSubsystem() {
-      //Add coast mode command to shuffleboard
-      configTab.add(new StartEndCommand(this::coastBase, this::brakeBase, this).ignoringDisable(true).withName("Coast Arm"));
-
-    SmartDashboard.putData("Arm Sim", simArmCanvas);
+    //Add coast mode command to shuffleboard
+    configTab.add(new StartEndCommand(this::coastBase, this::brakeBase, this).ignoringDisable(true).withName("Coast Arm"));
 
     baseMotor = MotorController.constructMotor(MotorConfig.ArmBase1);
     baseMotor2 = MotorController.constructMotor(MotorConfig.ArmBase2);
@@ -186,6 +183,7 @@ public class ArmSubsystem extends SubsystemBase {
       elbowITuner = new TunableNumber("elbowI", kElbowI, elbowPIDController::setI);
       elbowDTuner = new TunableNumber("elbowD", kElbowD, elbowPIDController::setD);
     } else {
+      SmartDashboard.putData("Arm Sim", simArmCanvas);
       basePIDController = new ProfiledPIDController(kSimBaseP, 0, 0, kBaseConstraints);
       elbowPIDController = new ProfiledPIDController(kSimElbowP, 0, 0, kElbowConstraints);
     }
@@ -355,6 +353,7 @@ public class ArmSubsystem extends SubsystemBase {
       case STOWED:
       case TRANSITION:
       case CONEINTAKE:
+      case CUBEINTAKE:
       case MIDSCORE:
         return goToState(ArmState.HIGHTRANSITION);
       case HIGHSCORE:
@@ -373,6 +372,7 @@ public class ArmSubsystem extends SubsystemBase {
       case STOWED:
       case TRANSITION:
       case CONEINTAKE:
+      case CUBEINTAKE:
       case HIGHDROP:
       case HIGHTRANSITION:
         return goToState(ArmState.MIDSCORE);
@@ -385,7 +385,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
-  public Command handleIntakeButton(){
+  public Command handleConeIntakeButton(){
     switch(currentState){
       case STOWED:
         return transitionToState(ArmState.CONEINTAKE);
@@ -394,10 +394,30 @@ public class ArmSubsystem extends SubsystemBase {
       case HIGHSCORE:
         return goToState(ArmState.HIGHDROP);
       case TRANSITION:
+      case CUBEINTAKE:
       case MIDSCORE:
       case HIGHTRANSITION:
       case HIGHDROP:
         return goToState(ArmState.CONEINTAKE);
+      default:
+        return null;
+    }
+  }
+
+  public Command handleCubeIntakeButton(){
+    switch(currentState){
+      case STOWED:
+        return transitionToState(ArmState.CUBEINTAKE);
+      case CUBEINTAKE:
+        return transitionToState(ArmState.STOWED);
+      case HIGHSCORE:
+        return goToState(ArmState.HIGHDROP);
+      case TRANSITION:
+      case CONEINTAKE:
+      case MIDSCORE:
+      case HIGHTRANSITION:
+      case HIGHDROP:
+        return goToState(ArmState.CUBEINTAKE);
       default:
         return null;
     }
@@ -426,7 +446,6 @@ public class ArmSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
-
     SmartDashboard.putNumber("Eout", elbowMotor.get());
     SmartDashboard.putNumber("Bout", baseMotor.get());
     // This method will be called once per scheduler run

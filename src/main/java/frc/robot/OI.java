@@ -54,16 +54,16 @@ public class OI {
 
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
 
-        
-        private static final Button kOrientationButton = Button.B1; //Toggle swerve orientation
-        private static final Button kZeroButton = Button.Start; //Zero the gyroscope
+        private static final Button kOrientationButton = Button.Start; //Toggle swerve orientation
+        private static final Button kZeroButton = Button.Back; //Zero the gyroscope
         private static final Button kOuttakeButton = Button.LT; //Run outtake
         private static final Button kIntakeButton = Button.LB; //Run intake
         private static final Button kAlignForwardButton = Button.B4; //Align forwards
         private static final Button kAlignBackwardButton = Button.B2; //Align backwards
         private static final Button kArmHighButton = Button.RB; //Arm to high scoring position
         private static final Button kArmMidButton = Button.RT; //Arm to mid scoring position
-        private static final Button kArmIntakeButton = Button.B3; //Arm to intake position
+        private static final Button kArmConeIntakeButton = Button.B3; //Arm to cone intake position
+        private static final Button kArmCubeIntakeButton = Button.B1; //Arm to cube intake position
         
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -129,12 +129,15 @@ public class OI {
             return new JoystickButton(kJoystick, kArmMidButton.getButtonID());
         }
 
-        public static JoystickButton getArmIntakeButton(){
-            kArmIntakeButton.setButtonAction("Arm Intake");
-            return new JoystickButton(kJoystick, kArmIntakeButton.getButtonID());
+        public static JoystickButton getArmConeIntakeButton(){
+            kArmConeIntakeButton.setButtonAction("Cone Intake");
+            return new JoystickButton(kJoystick, kArmConeIntakeButton.getButtonID());
         }
 
-
+        public static JoystickButton getArmCubeIntakeButton(){
+            kArmCubeIntakeButton.setButtonAction("Cube Intake");
+            return new JoystickButton(kJoystick, kArmCubeIntakeButton.getButtonID());
+        }
     }
 
     public static final class Operator{
