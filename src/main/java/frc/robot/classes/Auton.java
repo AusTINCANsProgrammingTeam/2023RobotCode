@@ -26,7 +26,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class Auton{
-    public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed / 4; //Maximum speed allowed in auton, in meters per second
+    public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed / 2; //Maximum speed allowed in auton, in meters per second
     public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
 
     private enum AutonModes{
@@ -152,7 +152,7 @@ public class Auton{
                         resetOdometry("1ScoreCharge-1"),
                         armSubsystem.highScoreSequence(),
                         swerveSubsystem.followTrajectory("1ScoreCharge-1", getTrajectory("1ScoreCharge-1"))
-                        .alongWith(armSubsystem.stowArmParallel()),
+                        .deadlineWith(armSubsystem.stowArmParallel()),
                         swerveSubsystem.assistedBalance()
                     );
             case ONESCORECHARGE2:
