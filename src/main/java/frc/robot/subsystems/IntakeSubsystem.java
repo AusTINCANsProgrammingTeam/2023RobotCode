@@ -40,16 +40,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void push() {
-    motor.set(0.2);
-    motor2.set(-0.2);
-    motor.setIdleMode(IdleMode.kCoast);
-    motor2.setIdleMode(IdleMode.kCoast);
+    spinWheels(kOuttakeSpeed);
   }
 
   public void pull() {
     spinWheels(kIntakeSpeed);
-    motor.setIdleMode(IdleMode.kBrake);
-    motor2.setIdleMode(IdleMode.kBrake);
   }
   
   public double getSpeed(){

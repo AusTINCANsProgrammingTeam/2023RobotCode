@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.classes.TunableNumber;
@@ -19,7 +20,7 @@ public class AssistedBalanceCommand extends CommandBase {
   private final double kIBalancing = 0;
   private final double kDBalancing = 0;
   private final double balancingDeadzoneNumber = 2.5;
-  private double pidControllerMaxSpeed = 0.1;
+  private double pidControllerMaxSpeed = 0.15;
   private Trigger engagedTrigger;
   PIDController pidController = new PIDController(kPBalancing, kIBalancing, kDBalancing);
   TunableNumber tunableP = new TunableNumber("Balancing P", kPBalancing, pidController::setP);
@@ -47,10 +48,10 @@ public class AssistedBalanceCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
+    SmartDashboard.putNumber("PIDOut", pidController.calculate(swerve_subsystem.getRoll(), 0.0));
     swerve_subsystem.setModuleStates(
       swerve_subsystem.convertToModuleStates(
-        0.0, MathUtil.clamp(-pidController.calculate(swerve_subsystem.getPitch(), 0.0), -pidControllerMaxSpeed, pidControllerMaxSpeed), 0.0));  
+        0.0, MathUtil.clamp(pidController.calculate(swerve_subsystem.getRoll(), 0.0), -pidControllerMaxSpeed, pidControllerMaxSpeed), 0.0));  
   }
 
   // Called once the command ends or is interrupted.

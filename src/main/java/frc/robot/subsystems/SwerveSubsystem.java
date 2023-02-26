@@ -56,10 +56,10 @@ public class SwerveSubsystem extends SubsystemBase{
         new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
         
-    public static final double kXTranslationP = 1.5;
-    public static final double kYTranslationP = 1.5;
-    public static final double kRotationP = 1.5;
-    public static final double kRotationI = 1e-5;
+    public static final double kXTranslationP = 1.75;
+    public static final double kYTranslationP = 1.75;
+    public static final double kRotationP = 1.75;
+    public static final double kRotationI = 1e-6;
 
     private final SwerveModule frontLeft = new SwerveModule(
         MotorConfig.FrontLeftModuleDrive,
@@ -100,7 +100,7 @@ public class SwerveSubsystem extends SubsystemBase{
     private ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
     private GenericEntry controlOrientationEntry = matchTab.add("FOD", true).getEntry();
     private GenericEntry headingEntry = matchTab.add("NavX Yaw", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
-    private GenericEntry pitchEntry = matchTab.add("NavX Pitch", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
+    private GenericEntry rollEntry = matchTab.add("NavX Roll", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
 
     private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
     private GenericEntry positionEntry = configTab.add("Position", "").getEntry();
@@ -153,8 +153,8 @@ public class SwerveSubsystem extends SubsystemBase{
         return Math.IEEEremainder(gyro.getAngle() + gyroOffset, 360);
     }
 
-    public double getPitch() {
-        return gyro.getPitch();
+    public double getRoll() {
+        return Math.IEEEremainder(gyro.getRoll() + 180, 360);
     }
 
     public Rotation2d getRotation2d() {
@@ -306,7 +306,7 @@ public class SwerveSubsystem extends SubsystemBase{
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());
 
-        pitchEntry.setDouble(gyro.getPitch());
+        rollEntry.setDouble(getRoll());
         headingEntry.setDouble(getHeading());
         positionEntry.setString(getPose().getTranslation().toString());
         Logger.getInstance().recordOutput("Actual Module States", getModuleStates());

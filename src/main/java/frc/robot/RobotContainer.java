@@ -14,6 +14,7 @@ import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.commands.ArmAnglesCommand;
+import frc.robot.commands.AssistedBalanceCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.BuddyBalanceSubsystem;
@@ -84,7 +85,7 @@ public class RobotContainer {
     buddyBalanceSubsystem = Robot.buddyBalanceEnabled ? new BuddyBalanceSubsystem() : null;
     subsystemEnabledLog.append(buddyBalanceSubsystem == null ? "Buddy Balance: Disabled" : "Buddy Balance Enabled");
 
-    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
+    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem, armSubsystem) : null;
 
     armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getArmBaseSupplier(), OI.Operator.getArmElbowSupplier()) : null;
 
@@ -132,7 +133,7 @@ public class RobotContainer {
 
     if (Robot.intakeEnabled) {
       OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem));
-      OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem));
+      OI.Driver.getOuttakeButton().whileTrue(new AssistedBalanceCommand(swerveSubsystem));
     }
 
     if (Robot.armEnabled) {
@@ -148,6 +149,7 @@ public class RobotContainer {
     }
 
     OI.putControllerButtons();
+    
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

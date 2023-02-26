@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.classes.TunableNumber;
 import frc.robot.hardware.AbsoluteEncoder;
@@ -42,12 +43,12 @@ import frc.robot.hardware.MotorController.MotorConfig;
 public class ArmSubsystem extends SubsystemBase {
   public static enum ArmState{
     STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
-    CONEINTAKE(1.0136, -0.0749), //Arm is in position to intake cones
-    CUBEINTAKE(0, 0), //Arm is in position to intake cubes FIXME
+    CONEINTAKE(0.8852, -0.2419), //Arm is in position to intake cones
+    CUBEINTAKE(0.9743, -0.2507), //Arm is in position to intake cubes FIXME
     SUBSTATIONINTAKE(1.6145, 1.0866), //Arm is in position to intake from substation FIXME
     MIDSCORE(1.3447, 0.9222), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
-    HIGHTRANSITION(1.0992,1.0309), //Used as an intermediate step when in transition to high score
+    HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
     HIGHDROP(1.4433, 0.8766), //High scoring motion
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
@@ -266,7 +267,7 @@ public class ArmSubsystem extends SubsystemBase {
   public void updateMotors() {
     double baseOutput = MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1);
     double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
-    baseMotor.set(MathUtil.clamp(baseOutput, getBaseAngle() < kMinBaseAngle ? 0 : -1, getBaseAngle() > kMaxBaseAngle ? 0 : 1));
+    baseMotor.set(((getBaseAngle() < kMinBaseAngle || getBaseAngle() > kMaxBaseAngle) ? -1 : 1) * baseOutput);
     elbowMotor.set(elbowOutput);
   }
 
@@ -401,6 +402,19 @@ public class ArmSubsystem extends SubsystemBase {
       default:
         return null;
     }
+  }
+
+  public Command highScoreSequence() {
+    return new SequentialCommandGroup(
+      goToState(ArmState.HIGHTRANSITION),
+      goToState(ArmState.HIGHSCORE),
+      goToState(ArmState.HIGHDROP)
+    );
+  }
+
+  public Command stowArmParallel() {
+    //Run along with a trajectory to stow arm after scoring
+    return new WaitCommand(0.5).andThen(goToState(ArmState.STOWED));
   }
 
   public void coastBase() {
