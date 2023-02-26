@@ -4,12 +4,13 @@
 
 package frc.robot.commands;
 
-import frc.robot.classes.TunableNumber;
-import frc.robot.subsystems.SwerveSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.classes.TunableNumber;
+import frc.robot.subsystems.SwerveSubsystem;
 
 /** An AssistedBalaceCommand command that uses SwerveSubsystem and SimulationSubsystemd */
 public class AssistedBalanceCommand extends CommandBase {
@@ -20,6 +21,7 @@ public class AssistedBalanceCommand extends CommandBase {
   private final double kDBalancing = 0;
   private final double balancingDeadzoneNumber = 2.5;
   private double pidControllerMaxSpeed = 0.15;
+  private Trigger engagedTrigger;
   PIDController pidController = new PIDController(kPBalancing, kIBalancing, kDBalancing);
   TunableNumber tunableP = new TunableNumber("Balancing P", kPBalancing, pidController::setP);
   TunableNumber tunableI = new TunableNumber("Balancing I", kIBalancing, pidController::setI);
@@ -32,6 +34,8 @@ public class AssistedBalanceCommand extends CommandBase {
    */
   public AssistedBalanceCommand(SwerveSubsystem swerveSubsystem) {
     swerve_subsystem = swerveSubsystem;
+    engagedTrigger = new Trigger(() -> (swerve_subsystem.getPitch() < balancingDeadzoneNumber && 
+    swerve_subsystem.getPitch() > -balancingDeadzoneNumber)).debounce(1);
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveSubsystem); 
@@ -59,7 +63,6 @@ public class AssistedBalanceCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return swerve_subsystem.getRoll() < balancingDeadzoneNumber && 
-    swerve_subsystem.getRoll() > -balancingDeadzoneNumber;
+    return engagedTrigger.getAsBoolean();
   }
 }
