@@ -16,16 +16,12 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class AssistedBalanceCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveSubsystem swerve_subsystem;
-  private final double kPBalancing = 0.2;
+  private final double kPBalancing = 0.01;
   private final double kIBalancing = 0;
   private final double kDBalancing = 0;
   private final double balancingDeadzoneNumber = 2.5;
   private double pidControllerMaxSpeed = 0.15;
-  private Trigger engagedTrigger;
   PIDController pidController = new PIDController(kPBalancing, kIBalancing, kDBalancing);
-  TunableNumber tunableP = new TunableNumber("Balancing P", kPBalancing, pidController::setP);
-  TunableNumber tunableI = new TunableNumber("Balancing I", kIBalancing, pidController::setI);
-  TunableNumber tunableD = new TunableNumber("Balancing D", kDBalancing, pidController::setD);
   
   /**
    * Creates a new AssistedBalanceCommand
@@ -34,8 +30,7 @@ public class AssistedBalanceCommand extends CommandBase {
    */
   public AssistedBalanceCommand(SwerveSubsystem swerveSubsystem) {
     swerve_subsystem = swerveSubsystem;
-    engagedTrigger = new Trigger(() -> (swerve_subsystem.getRoll() < balancingDeadzoneNumber && 
-    swerve_subsystem.getRoll() > -balancingDeadzoneNumber)).debounce(1);
+    pidController.setTolerance(balancingDeadzoneNumber);
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveSubsystem); 
@@ -63,6 +58,6 @@ public class AssistedBalanceCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return engagedTrigger.getAsBoolean();
+    return false;
   }
 }
