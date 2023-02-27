@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.classes.ChooChooMap;
 import frc.robot.classes.TunableNumber;
 import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
@@ -90,7 +91,9 @@ public class ArmSubsystem extends SubsystemBase {
   private CANSparkMax elbowMotor;
 
   private final DutyCycleEncoder baseAbsoluteEncoder;
+  private final DutyCycleEncoder chooChooAbsoluteEncoder;
   private final DutyCycleEncoder elbowAbsoluteEncoder;
+
   private double simBaseEncoderPosition;
   private double simElbowEncoderPosition;
 
@@ -100,9 +103,9 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kBaseLength = Units.inchesToMeters(41);
   public static final double kElbowLength = Units.inchesToMeters(43);
 
-  public static final double kMinBaseAngle = Units.degreesToRadians(46);
+  public static final double kMinBaseAngle = Units.degreesToRadians(56);
   public static final double kMinElbowAngle = Units.degreesToRadians(15);
-  public static final double kMaxBaseAngle = Units.degreesToRadians(90);
+  public static final double kMaxBaseAngle = Units.degreesToRadians(273);
   public static final double kMaxElbowAngle = Units.degreesToRadians(162);
 
   public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(55), Units.degreesToRadians(45));
@@ -114,6 +117,8 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kElbowMass = Units.lbsToKilograms(5);
   public static final double kBaseInertia = SingleJointedArmSim.estimateMOI(kBaseLength, kBaseMass);
   public static final double kElbowInertia = SingleJointedArmSim.estimateMOI(kElbowLength, kElbowMass);
+
+  private ChooChooMap chooChooMap = new ChooChooMap();
 
   //Real arm values
   private ShuffleboardTab armTab;
@@ -153,7 +158,6 @@ public class ArmSubsystem extends SubsystemBase {
   //Sets the base arm to the root, then the elbow arm to the end of the base arm
   MechanismLigament2d baseLigament = baseRoot.append(new MechanismLigament2d("Base Arm", kBaseLength*3, baseArmSim.getAngleRads()));
   MechanismLigament2d elbowLigament = baseLigament.append(new MechanismLigament2d("Elbow Arm", kElbowLength*3, elbowArmSim.getAngleRads()));
-  
 
   public ArmSubsystem() {
     //Add coast mode command to shuffleboard
@@ -169,6 +173,7 @@ public class ArmSubsystem extends SubsystemBase {
     elbowMotor.enableVoltageCompensation(11);
 
     baseAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmBase);
+    chooChooAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmChooChoo);
     elbowAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);
 
     if(Robot.isReal()) {
@@ -205,7 +210,7 @@ public class ArmSubsystem extends SubsystemBase {
       desiredYPosition = armTab.add("Desired Y Position", 0.0).getEntry();
     }
 
-    basePIDController.reset(getBaseAngle());
+    basePIDController.reset(getChooChooAngle());
     elbowPIDController.reset(getElbowAngle());
 
     holdCurrentPosition();
@@ -215,11 +220,15 @@ public class ArmSubsystem extends SubsystemBase {
 
   //Returns sim encoder position (No offset) if in simulation, the actual position otherwise
   public double getBaseAngle() {
-    return Robot.isSimulation() ? simBaseEncoderPosition : Math.round(AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder)*1000)/1000.0;
+    return Robot.isSimulation() ? simBaseEncoderPosition : AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder, 3);
+  }
+
+  public double getChooChooAngle() {
+    return Math.round(AbsoluteEncoder.getPositionRadians(chooChooAbsoluteEncoder, 3));
   }
 
   public double getElbowAngle() {
-    return Robot.isSimulation() ? simElbowEncoderPosition : Math.round(AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder)*1000)/1000.0;
+    return Robot.isSimulation() ? simElbowEncoderPosition : AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder, 3);
   }
 
   public void updateReferences(double bJoystickValue, double eJoystickValue) {
@@ -262,9 +271,9 @@ public class ArmSubsystem extends SubsystemBase {
   
 
   public void updateMotors() {
-    double baseOutput = MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1);
+    double baseOutput = MathUtil.clamp(basePIDController.calculate(getChooChooAngle()),-1,1);
     double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
-    baseMotor.set(MathUtil.clamp(baseOutput, getBaseAngle() < kMinBaseAngle ? 0 : -1, getBaseAngle() > kMaxBaseAngle ? 0 : 1));
+    baseMotor.set((getChooChooAngle() < kMinBaseAngle || getChooChooAngle() > kMaxBaseAngle ? -1 : 1) * baseOutput);
     elbowMotor.set(elbowOutput);
   }
 
@@ -311,7 +320,7 @@ public class ArmSubsystem extends SubsystemBase {
       desiredYPosition.setDouble(y);
     }
     
-    setBaseReference(desiredBaseAngle);
+    setBaseReference(chooChooMap.toChooChooAngle(desiredBaseAngle));
     setElbowReference(desiredElbowAngle);
   }
 
@@ -326,7 +335,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void holdCurrentPosition(){
-    setBaseReference(getBaseAngle());
+    setBaseReference(getChooChooAngle());
     setElbowReference(getElbowAngle());
   }
   

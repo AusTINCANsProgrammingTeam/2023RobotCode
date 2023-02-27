@@ -18,6 +18,7 @@ public class AbsoluteEncoder {
         BackRightModule(4, false, -3.995, -4.686),
         //Arm Encoders (REV)
         ArmBase(1, true, Units.degreesToRadians(-74.6)),
+        ArmChooChoo(2),
         ArmElbow(0, true, Units.degreesToRadians(233.6));
         
         private int ID;
@@ -90,5 +91,10 @@ public class AbsoluteEncoder {
             position++;
         }
         return Units.rotationsToRadians(position);
+    }
+
+    public static double getPositionRadians(DutyCycleEncoder encoder, int places){
+        //Truncates measure to places decimal points
+        return Math.round(getPositionRadians(encoder) * Math.pow(10, places)) / Math.pow(10, places);
     }
 }
