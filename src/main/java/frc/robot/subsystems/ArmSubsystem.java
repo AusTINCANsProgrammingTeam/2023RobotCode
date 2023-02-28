@@ -232,7 +232,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void updateReferences(double bJoystickValue, double eJoystickValue) {
-    setBaseReference(MathUtil.clamp(basePIDController.getGoal().position+Units.degreesToRadians(bJoystickValue),ArmSubsystem.kMinBaseAngle,ArmSubsystem.kMaxBaseAngle));
+    setBaseReference(MathUtil.clamp(basePIDController.getGoal().position + Units.degreesToRadians(bJoystickValue),ArmSubsystem.kMinBaseAngle,ArmSubsystem.kMaxBaseAngle));
     setElbowReference(MathUtil.clamp(elbowPIDController.getGoal().position+Units.degreesToRadians(eJoystickValue),ArmSubsystem.kMinElbowAngle,ArmSubsystem.kMaxElbowAngle));
   }
 
@@ -273,7 +273,7 @@ public class ArmSubsystem extends SubsystemBase {
   public void updateMotors() {
     double baseOutput = MathUtil.clamp(basePIDController.calculate(getChooChooAngle()),-1,1);
     double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
-    baseMotor.set((getChooChooAngle() < kMinBaseAngle || getChooChooAngle() > kMaxBaseAngle ? -1 : 1) * baseOutput);
+    baseMotor.set(baseOutput);
     elbowMotor.set(elbowOutput);
   }
 
