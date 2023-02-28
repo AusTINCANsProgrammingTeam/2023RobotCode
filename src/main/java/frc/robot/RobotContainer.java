@@ -16,6 +16,7 @@ import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.commands.ArmAnglesCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.ArmSubsystem.ArmState;
 import frc.robot.subsystems.BuddyBalanceSubsystem;
 import frc.robot.subsystems.led.BlinkinLedSubsystem;
 import frc.robot.subsystems.led.LedMatrixSubsystem;
@@ -140,6 +141,7 @@ public class RobotContainer {
       OI.Driver.getArmMidButton().onTrue(new ProxyCommand(() -> armSubsystem.handleMidButton()));
       OI.Driver.getArmConeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleConeIntakeButton()).andThen(() -> intakeSubsystem.setMode(true)));
       OI.Driver.getArmCubeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleCubeIntakeButton()).andThen(() -> intakeSubsystem.setMode(false)));
+      OI.Operator.getHighScoreButton().onTrue(armSubsystem.goToState(ArmState.HIGHSCORE));
     }
 
     if (Robot.buddyBalanceEnabled) {
