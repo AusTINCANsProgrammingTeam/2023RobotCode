@@ -44,9 +44,9 @@ public class ArmSubsystem extends SubsystemBase {
     STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
     CONEINTAKE(1.0136, -0.0749), //Arm is in position to intake cones
     CUBEINTAKE(0.9743, -0.2507), //Arm is in position to intake cubes
-    MIDSCORE(1.3447, 0.9222), //Arm is in position to score on the mid pole
+    MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
-    HIGHTRANSITION(1.0992,1.0309), //Used as an intermediate step when in transition to high score
+    HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
     HIGHDROP(1.4433, 0.8766), //High scoring motion
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
@@ -106,7 +106,7 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kMaxElbowAngle = Units.degreesToRadians(162);
 
   public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(55), Units.degreesToRadians(45));
-  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(130), Units.degreesToRadians(80));
+  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(180), Units.degreesToRadians(80));
 
   public static final double kBaseGearing = 40.8333333;
   public static final double kElbowGearing = 4.28571429;
@@ -408,6 +408,7 @@ public class ArmSubsystem extends SubsystemBase {
     switch(currentState){
       case STOWED:
         return transitionToState(ArmState.CUBEINTAKE);
+      case HIGHTRANSITION:
       case CUBEINTAKE:
         return transitionToState(ArmState.STOWED);
       case HIGHSCORE:
@@ -415,7 +416,6 @@ public class ArmSubsystem extends SubsystemBase {
       case TRANSITION:
       case CONEINTAKE:
       case MIDSCORE:
-      case HIGHTRANSITION:
       case HIGHDROP:
         return goToState(ArmState.CUBEINTAKE);
       default:
