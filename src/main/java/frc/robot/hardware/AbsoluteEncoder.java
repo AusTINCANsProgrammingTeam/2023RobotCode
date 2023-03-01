@@ -20,7 +20,7 @@ public class AbsoluteEncoder {
         ArmBase(1, true, Units.degreesToRadians(-74.6)),
         ArmElbow(0, true, Units.degreesToRadians(233.6)),
         // Buddy Balance Encoders (REV)
-        BuddyBalance(3, true, 0, 2.709); // placeholder offset
+        BuddyBalance(3, true, 0, 1.661); // placeholder offset
 
         private int ID;
         private boolean reversed;
