@@ -319,8 +319,8 @@ public class ArmSubsystem extends SubsystemBase {
       desiredXPosition.setDouble(x);
       desiredYPosition.setDouble(y);
     }
-    
-    setBaseReference(chooChooMap.toChooChooAngle(desiredBaseAngle));
+
+    setBaseReference(chooChooMap.toChooChooAngle(Units.radiansToDegrees(desiredBaseAngle)));
     setElbowReference(desiredElbowAngle);
   }
 
