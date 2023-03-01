@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
@@ -38,6 +40,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private static final double kServoInitialPos = 0.5;
   private static final double kServoDeployedPos1 = 0;
   private static final double kServoDeployedPos2 = 1;
+  private static final Constraints kConstraints = new Constraints(Units.degreesToRadians(180), Units.degreesToRadians(0));
   private double tunedRetrievedAngle;
   private double tunedDeployedAngle;
   private double tunedServoDeployedPos1;
@@ -57,7 +60,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private CANSparkMax rightMotor2;
   private CANSparkMax leftMotor1;
   private CANSparkMax leftMotor2;
-  private PIDController unifiedPIDController; // Never forget
+  private ProfiledPIDController unifiedPIDController; // Never forget
   private DutyCycleEncoder encoder;
   private boolean isDeployed = false;
   private DataLog datalog = DataLogManager.getLog();
@@ -74,6 +77,8 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
 
   private static double encoderCalculatedAngle; 
 
+  public static final Constraints kBalanceConstraints = new Constraints(Units.degreesToRadians(180), Units.degreesToRadians(0));
+
   public BuddyBalanceSubsystem() {
     rightMotor1 = MotorController.constructMotor(MotorConfig.BuddyBalanceRight1);
     rightMotor2 = MotorController.constructMotor(MotorConfig.BuddyBalanceRight2);
@@ -81,8 +86,9 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     leftMotor2 = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft2);
     deployServo1 = new Servo(deployServo1ID);
     deployServo2 = new Servo(deployServo2ID);
+    
     encoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalance);
-    unifiedPIDController = new PIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD);
+    unifiedPIDController = new ProfiledPIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD, kConstraints);
 
     tunerNumP = new TunableNumber("Buddy Balance Motor P", kDefaultMotorP, unifiedPIDController::setP);
     tunerNumI = new TunableNumber("Buddy Balance Motor I", kDefaultMotorI, unifiedPIDController::setI);
@@ -115,12 +121,12 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void retrieveBuddy() { // Used to pick up the buddy robot while the lift is already underneath it
-    unifiedPIDController.setSetpoint(Units.degreesToRadians(kRetrievedAngle));
+    unifiedPIDController.setGoal(Units.degreesToRadians(kRetrievedAngle));
     buddyBalancePosEntry.setString("Raised");
   }
 
   public void releaseBuddy() { // Used to set down the robot
-    unifiedPIDController.setSetpoint(Units.degreesToRadians(kDeployedAngle));
+    unifiedPIDController.setGoal(Units.degreesToRadians(kDeployedAngle));
     buddyBalancePosEntry.setString("Lowered");
   }
 
@@ -131,7 +137,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     leftMotor2.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
     rightMotorOutputEntry.setDouble(rightMotor1.get());
     leftMotorOutputEntry.setDouble(leftMotor1.get());
-    setpointEntry.setDouble(unifiedPIDController.getSetpoint());
+    setpointEntry.setDouble(unifiedPIDController.getGoal().position);
   }
 
   // These methods are used for JUnit testing only
@@ -184,7 +190,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
       rightMotor2.set(0);
       leftMotor1.set(0);
       leftMotor2.set(0);
-      unifiedPIDController.setSetpoint(Units.degreesToRadians(90));
+      unifiedPIDController.setGoal(Units.degreesToRadians(90));
     }
   }
 }
