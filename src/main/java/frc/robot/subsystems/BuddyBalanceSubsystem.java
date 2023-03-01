@@ -81,10 +81,6 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     rightMotor2 = MotorController.constructMotor(MotorConfig.BuddyBalanceRight2);
     leftMotor1 = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft1);
     leftMotor2 = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft2);
-    rightMotor1.setSmartCurrentLimit(10);
-    rightMotor2.setSmartCurrentLimit(10);
-    leftMotor1.setSmartCurrentLimit(10);
-    leftMotor2.setSmartCurrentLimit(10);
     deployServo1 = new Servo(deployServo1ID);
     deployServo2 = new Servo(deployServo2ID);
     
