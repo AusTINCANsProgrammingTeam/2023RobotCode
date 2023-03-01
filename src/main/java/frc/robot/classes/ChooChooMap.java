@@ -6,7 +6,7 @@ public class ChooChooMap{
     private HashMap<Double, Double> chooChooMap = new HashMap<Double,Double>();
 
     public double toChooChooAngle(double armAngle){
-        return chooChooMap.get(truncate(armAngle, 2));
+        return chooChooMap.get(truncate(armAngle, 1));
     }
 
     private double truncate(double a, int places){
