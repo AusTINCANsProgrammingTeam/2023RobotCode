@@ -180,7 +180,6 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run 
-    updateMotors();
     buddyBalancePos.append(AbsoluteEncoder.getPositionRadians(encoder)); // Logging the position of the buddy balance lift
     positionEntry.setDouble(AbsoluteEncoder.getPositionRadians(encoder));
     encoderCalculatedAngle = unifiedPIDController.calculate(getDesiredAngle());

@@ -89,9 +89,9 @@ public class RobotContainer {
 
     armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getArmBaseSupplier(), OI.Operator.getArmElbowSupplier()) : null;
 
-    //if (Robot.buddyBalanceEnabled) {
-     // buddyBalanceSubsystem.setDefaultCommand(new InstantCommand(buddyBalanceSubsystem::updateMotors, buddyBalanceSubsystem));
-    //}
+    if (Robot.buddyBalanceEnabled) {
+      buddyBalanceSubsystem.setDefaultCommand(new InstantCommand(buddyBalanceSubsystem::updateMotors, buddyBalanceSubsystem));
+    }
 
     if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
