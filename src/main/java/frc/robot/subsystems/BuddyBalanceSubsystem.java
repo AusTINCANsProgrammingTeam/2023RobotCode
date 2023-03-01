@@ -74,7 +74,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
 
   private static double encoderCalculatedAngle; 
 
-  public static final Constraints kBalanceConstraints = new Constraints(Units.degreesToRadians(180), Units.degreesToRadians(0));
+  public static final Constraints kBalanceConstraints = new Constraints(Units.degreesToRadians(360), Units.degreesToRadians(360));
 
   public BuddyBalanceSubsystem() {
     rightMotor1 = MotorController.constructMotor(MotorConfig.BuddyBalanceRight1);
