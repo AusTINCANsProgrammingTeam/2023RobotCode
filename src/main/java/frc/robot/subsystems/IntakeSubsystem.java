@@ -24,8 +24,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
 
-  private TunableNumber speedOneTuner = new TunableNumber("Motor 4", 0, (a) -> {});
-  private TunableNumber speedTwoTuner = new TunableNumber("Motor 5", 0, (a) -> {});
+  private static TunableNumber speedOneTuner = new TunableNumber("Motor 4", 0, (a) -> {});
+  private static TunableNumber speedTwoTuner = new TunableNumber("Motor 5", 0, (a) -> {});
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
