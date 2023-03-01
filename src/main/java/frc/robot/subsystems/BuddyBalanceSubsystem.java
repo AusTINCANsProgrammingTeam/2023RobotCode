@@ -68,6 +68,10 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     rightMotor2 = MotorController.constructMotor(MotorConfig.BuddyBalanceRight2);
     leftMotor1 = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft1);
     leftMotor2 = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft2);
+    rightMotor1.setSmartCurrentLimit(10);
+    rightMotor2.setSmartCurrentLimit(10);
+    leftMotor1.setSmartCurrentLimit(10);
+    leftMotor2.setSmartCurrentLimit(10);
     deployServo1 = new Servo(deployServo1ID);
     deployServo2 = new Servo(deployServo2ID);
     encoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalance);
@@ -91,6 +95,10 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   public void deployBuddyBalance() { // Removes servo locking mechanism, releasing gas shocks
     deployServo1.set(kServoDeployedPos1);
     deployServo2.set(kServoDeployedPos2);
+    rightMotor1.setSmartCurrentLimit(60);
+    rightMotor2.setSmartCurrentLimit(60);
+    leftMotor1.setSmartCurrentLimit(60);
+    leftMotor2.setSmartCurrentLimit(60);
     isDeployed = true;
     buddyBalancePosEntry.setString("Deployed");
     servoPositionEntry.setDouble(deployServo1.get());
