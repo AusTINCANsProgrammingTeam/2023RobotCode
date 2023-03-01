@@ -12,8 +12,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 // See https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/robot-simulation/unit-testing.html for a slightly more detailed example
 public class IntakeTest {
 
-  //private static final double kDelta = 1e-2;
-  private static final double kDelta = 1;
+  private static final double kDelta = 1e-2;
 
   //DUT -> Device Under Test
   private IntakeSubsystem dut;
