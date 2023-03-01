@@ -13,7 +13,6 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -31,7 +30,6 @@ import com.revrobotics.CANSparkMax;
 public class BuddyBalanceSubsystem extends SubsystemBase {
   private static final double kRetrievedAngle = 180; // Buddy balance PID reference point when lifting a robot and engaging charge station
   private static final double kDeployedAngle = 0; // Buddy balance PID reference point when setting down a robot/initial position when deployed
-  // TODO: Make the constants final when they are done being tuned with TunableNumbers
   private static final double kDefaultMotorP = 0.0001;
   private static final double kDefaultMotorI = 0;
   private static final double kDefaultMotorD = 0;
@@ -66,7 +64,6 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private DataLog datalog = DataLogManager.getLog();
   private DoubleLogEntry buddyBalancePos = new DoubleLogEntry(datalog, "/buddybalance/position/");
   private static ShuffleboardTab buddyBalanceTab = Shuffleboard.getTab("Buddy Balance"); // TODO: Replace buddy balance tab with whatever tab the position should be logged to
-  private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry buddyBalancePosEntry = buddyBalanceTab.add("Buddy Balance State", "Docked").getEntry();
   private static GenericEntry positionEntry = buddyBalanceTab.add("Buddy Balance Position", 0).getEntry();
   private GenericEntry rightMotorOutputEntry = buddyBalanceTab.add("Buddy Balance Right Motor Speed", 0).getEntry();// TODO: move to match tab when pull request goes through
