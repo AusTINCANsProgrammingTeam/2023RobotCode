@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.MotorController;
@@ -26,6 +27,7 @@ import frc.robot.hardware.MotorController.MotorConfig;
 import frc.robot.classes.TunableNumber;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 
 public class BuddyBalanceSubsystem extends SubsystemBase {
   private static final double kRetrievedAngle = 180; // Buddy balance PID reference point when lifting a robot and engaging charge station
@@ -73,10 +75,12 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   // TODO: Uncomment comp shuffleboard objects when both comp-shuffleboard and buddy-balance-encoder pull requests go through
 
   private static double encoderCalculatedAngle; 
-
+  private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
   public static final Constraints kBalanceConstraints = new Constraints(Units.degreesToRadians(360), Units.degreesToRadians(360));
 
   public BuddyBalanceSubsystem() {
+    //Add coast mode command to shuffleboard
+    configTab.add(new StartEndCommand(this::coastMotors, this::brakeMotors, this).ignoringDisable(true).withName("Coast Arm"));
     rightMotor1 = MotorController.constructMotor(MotorConfig.BuddyBalanceRight1);
     rightMotor2 = MotorController.constructMotor(MotorConfig.BuddyBalanceRight2);
     leftMotor1 = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft1);
@@ -139,6 +143,18 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     rightMotorOutputEntry.setDouble(rightMotor1.get());
     leftMotorOutputEntry.setDouble(leftMotor1.get());
     setpointEntry.setDouble(unifiedPIDController.getGoal().position);
+  }
+  public void coastMotors() {
+    rightMotor1.setIdleMode(IdleMode.kCoast);
+    leftMotor1.setIdleMode(IdleMode.kCoast);
+    rightMotor2.setIdleMode(IdleMode.kCoast);
+    leftMotor2.setIdleMode(IdleMode.kCoast);
+  }
+  public void brakeMotors() {
+    rightMotor1.setIdleMode(IdleMode.kBrake);
+    leftMotor1.setIdleMode(IdleMode.kBrake);
+    rightMotor2.setIdleMode(IdleMode.kBrake);
+    leftMotor2.setIdleMode(IdleMode.kBrake);
   }
 
   // These methods are used for JUnit testing only
