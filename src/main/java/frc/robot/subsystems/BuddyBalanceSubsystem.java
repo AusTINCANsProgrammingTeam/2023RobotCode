@@ -196,18 +196,18 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run 
-    updateMotors();
     buddyBalancePos.append(AbsoluteEncoder.getPositionRadians(encoder)); // Logging the position of the buddy balance lift
     positionEntry.setDouble(AbsoluteEncoder.getPositionRadians(encoder));
     encoderCalculatedAngle = unifiedPIDController.calculate(getDesiredAngle());
     SmartDashboard.putNumber("Buddy Balance Angle", Units.radiansToDegrees(AbsoluteEncoder.getPositionRadians(encoder)));
     // to prevent the world from ending (cam breaking swerve modules)
     if ((AbsoluteEncoder.getPositionRadians(encoder) > Math.PI) || (AbsoluteEncoder.getPositionRadians(encoder) < 0)) {
-      rightMotor1.set(0);
-      rightMotor2.set(0);
-      leftMotor1.set(0);
-      leftMotor2.set(0);
-      unifiedPIDController.setGoal(Units.degreesToRadians(90));
+      rightMotor1.stopMotor();
+      rightMotor2.stopMotor();
+      leftMotor1.stopMotor();
+      leftMotor2.stopMotor();
+      this.setDefaultCommand(null);
+      this.getCurrentCommand().cancel();
     }
   }
 }
