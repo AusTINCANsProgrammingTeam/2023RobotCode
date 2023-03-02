@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class Auton{
@@ -34,6 +35,7 @@ public class Auton{
         BACKWARD, // Wait 3 seconds, go backward 1 meter
         FORWARD180, // Go forward 2 meters and rotate 180 degrees
         CURVE, // Go forward 1 meter and left 1 meter
+        ONESCORE, // Score and drive backwards
         ONESCORECHARGE1, // Score preloaded game piece from first starting position and engage charge pad
         ONESCORECHARGE2, // Score preloaded game piece from second starting position and engage charge pad
         ONESCORECHARGE3, // Score preloaded game piece from third starting position and engage charge pad
@@ -62,14 +64,16 @@ public class Auton{
 
     private SwerveSubsystem swerveSubsystem;
     private ArmSubsystem armSubsystem;
+    private IntakeSubsystem intakeSubsystem;
 
     private PathConstraints pathConstraints;
 
     private AutonModes autonMode;
 
-    public Auton(SwerveSubsystem swerveSubsystem, ArmSubsystem armSubsystem){
+    public Auton(SwerveSubsystem swerveSubsystem, ArmSubsystem armSubsystem, IntakeSubsystem intakeSubsystem){
         this.swerveSubsystem = swerveSubsystem;
         this.armSubsystem = armSubsystem;
+        this.intakeSubsystem = intakeSubsystem;
 
         //Add auton modes to chooser
         for(AutonModes mode : AutonModes.values()){
@@ -146,11 +150,19 @@ public class Auton{
                         resetOdometry("Curve"),
                         swerveSubsystem.followTrajectory("Curve", getTrajectory("Curve"))
                     );
+            case ONESCORE:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("1Score"),
+                        armSubsystem.highScoreSequence().alongWith(intakeSubsystem.autonIntake()),
+                        swerveSubsystem.followTrajectory("1Score", getTrajectory("1Score"))
+                        .deadlineWith(armSubsystem.stowArmParallel())
+                    );
             case ONESCORECHARGE1:
                 return
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-1"),
-                        armSubsystem.highScoreSequence(),
+                        armSubsystem.highScoreSequence().alongWith(intakeSubsystem.autonIntake()),
                         swerveSubsystem.followTrajectory("1ScoreCharge-1", getTrajectory("1ScoreCharge-1"))
                         .deadlineWith(armSubsystem.stowArmParallel()),
                         swerveSubsystem.assistedBalance()
@@ -159,7 +171,7 @@ public class Auton{
                 return
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-2"),
-                        armSubsystem.highScoreSequence(),
+                        armSubsystem.highScoreSequence().alongWith(intakeSubsystem.autonIntake()),
                         swerveSubsystem.followTrajectory("1ScoreCharge-2", getTrajectory("1ScoreCharge-2"))
                         .alongWith(armSubsystem.stowArmParallel()),
                         swerveSubsystem.assistedBalance()
@@ -168,7 +180,7 @@ public class Auton{
                 return
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-3"),
-                        armSubsystem.highScoreSequence(),
+                        armSubsystem.highScoreSequence().alongWith(intakeSubsystem.autonIntake()),
                         swerveSubsystem.followTrajectory("1ScoreCharge-3", getTrajectory("1ScoreCharge-3"))
                         .alongWith(armSubsystem.stowArmParallel()),
                         swerveSubsystem.assistedBalance()
@@ -177,7 +189,7 @@ public class Auton{
                 return
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-4"),
-                        armSubsystem.highScoreSequence(),
+                        armSubsystem.highScoreSequence().alongWith(intakeSubsystem.autonIntake()),
                         swerveSubsystem.followTrajectory("1ScoreCharge-4", getTrajectory("1ScoreCharge-4"))
                         .alongWith(armSubsystem.stowArmParallel()),
                         swerveSubsystem.assistedBalance()
@@ -186,7 +198,7 @@ public class Auton{
                 return
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-5"),
-                        armSubsystem.highScoreSequence(),
+                        armSubsystem.highScoreSequence().alongWith(intakeSubsystem.autonIntake()),
                         swerveSubsystem.followTrajectory("1ScoreCharge-5", getTrajectory("1ScoreCharge-5"))
                         .alongWith(armSubsystem.stowArmParallel()),
                         swerveSubsystem.assistedBalance()
@@ -195,7 +207,7 @@ public class Auton{
                 return
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-6"),
-                        armSubsystem.highScoreSequence(),
+                        armSubsystem.highScoreSequence().alongWith(intakeSubsystem.autonIntake()),
                         swerveSubsystem.followTrajectory("1ScoreCharge-6", getTrajectory("1ScoreCharge-6"))
                         .alongWith(armSubsystem.stowArmParallel()),
                         swerveSubsystem.assistedBalance()
@@ -317,7 +329,7 @@ public class Auton{
         }
         }catch(NullPointerException e){
             DriverStation.reportError("Was unable to access a trajectory", e.getStackTrace());
-            return getBackupSequence();
+            return getBackupSequence();        
         }
     }
 

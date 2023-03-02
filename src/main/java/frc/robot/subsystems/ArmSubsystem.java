@@ -439,7 +439,8 @@ public class ArmSubsystem extends SubsystemBase {
     return new SequentialCommandGroup(
       goToState(ArmState.HIGHTRANSITION),
       goToState(ArmState.HIGHSCORE),
-      goToState(ArmState.HIGHDROP)
+      goToState(ArmState.HIGHDROP),
+      new WaitCommand(0.5)
     );
   }
 
