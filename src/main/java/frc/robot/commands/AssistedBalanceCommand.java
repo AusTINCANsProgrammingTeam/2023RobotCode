@@ -21,10 +21,8 @@ public class AssistedBalanceCommand extends CommandBase {
   private final double kIBalancing = 0;
   private final double kDBalancing = 0;
   private final double balancingDeadzoneNumber = 2.5;
-  private final double kDebounceTime = 2;
   private double pidControllerMaxSpeed = 0.15;
   PIDController pidController = new PIDController(kPBalancing, kIBalancing, kDBalancing);
-  Debouncer buddyBalanceDebouncer = new Debouncer(kDebounceTime, Debouncer.DebounceType.kBoth);
   
   /**
    * Creates a new AssistedBalanceCommand
@@ -61,7 +59,6 @@ public class AssistedBalanceCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return buddyBalanceDebouncer.calculate(swerve_subsystem.getRoll() < balancingDeadzoneNumber && 
-    swerve_subsystem.getRoll() > -balancingDeadzoneNumber);
+    return false;
   }
 }

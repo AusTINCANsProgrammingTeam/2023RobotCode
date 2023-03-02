@@ -26,7 +26,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class Auton{
-    public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed / 2; //Maximum speed allowed in auton, in meters per second
+    public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed * 0.75; //Maximum speed allowed in auton, in meters per second
     public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
 
     private enum AutonModes{
