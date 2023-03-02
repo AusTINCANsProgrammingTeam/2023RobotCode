@@ -33,7 +33,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 public class BuddyBalanceSubsystem extends SubsystemBase {
   private static final double kRetrievedAngle = 180; // Buddy balance PID reference point when lifting a robot and engaging charge station
   private static final double kDeployedAngle = 0; // Buddy balance PID reference point when setting down a robot/initial position when deployed
-  private static final double kDefaultMotorP = 0.1;
+  private static final double kDefaultMotorP = 0.175;
   private static final double kDefaultMotorI = 0;
   private static final double kDefaultMotorD = 0;
   private static final int deployServo1ID = 8;
