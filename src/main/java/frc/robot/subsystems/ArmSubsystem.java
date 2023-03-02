@@ -43,7 +43,7 @@ public class ArmSubsystem extends SubsystemBase {
   public static enum ArmState{
     STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
     CONEINTAKE(1.0136, -0.0749), //Arm is in position to intake cones
-    CUBEINTAKE(0.9743, -0.2507), //Arm is in position to intake cubes
+    CUBEINTAKE(0.7619, -0.2932), //Arm is in position to intake cubes
     MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
