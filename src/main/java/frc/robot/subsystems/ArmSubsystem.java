@@ -90,12 +90,16 @@ public class ArmSubsystem extends SubsystemBase {
   private CANSparkMax elbowMotor;
 
   private final DutyCycleEncoder baseAbsoluteEncoder;
+  private final DutyCycleEncoder choochooAbsoluteEncoder;
   private final DutyCycleEncoder elbowAbsoluteEncoder;
   private double simBaseEncoderPosition;
   private double simElbowEncoderPosition;
 
   private final ProfiledPIDController basePIDController;
   private final ProfiledPIDController elbowPIDController;
+
+  public static final double kMinChooChooAngle = Units.degreesToRadians(55);
+  public static final double kMaxChooChooAngle = Units.degreesToRadians(273);
 
   public static final double kBaseLength = Units.inchesToMeters(41);
   public static final double kElbowLength = Units.inchesToMeters(43);
@@ -170,6 +174,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     baseAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmBase);
     elbowAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);
+    choochooAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmChooChoo);
 
     if(Robot.isReal()) {
       basePIDController = new ProfiledPIDController(kBaseP, kBaseI, kBaseD, kBaseConstraints);
@@ -215,11 +220,15 @@ public class ArmSubsystem extends SubsystemBase {
 
   //Returns sim encoder position (No offset) if in simulation, the actual position otherwise
   public double getBaseAngle() {
-    return Robot.isSimulation() ? simBaseEncoderPosition : Math.round(AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder)*1000)/1000.0;
+    return Robot.isSimulation() ? simBaseEncoderPosition : AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder,3);
   }
 
   public double getElbowAngle() {
-    return Robot.isSimulation() ? simElbowEncoderPosition : Math.round(AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder)*1000)/1000.0;
+    return Robot.isSimulation() ? simElbowEncoderPosition : AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder,3);
+  }
+
+  public double getChooChooAngle() {
+    return AbsoluteEncoder.getPositionRadians(choochooAbsoluteEncoder,3);
   }
 
   public void updateReferences(double bJoystickValue, double eJoystickValue) {
@@ -262,9 +271,10 @@ public class ArmSubsystem extends SubsystemBase {
   
 
   public void updateMotors() {
-    double baseOutput = MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1);
-    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
-    baseMotor.set(MathUtil.clamp(baseOutput, getBaseAngle() < kMinBaseAngle ? 0 : -1, getBaseAngle() > kMaxBaseAngle ? 0 : 1));
+    double baseOutput = MathUtil.clamp(basePIDController.calculate(getBaseAngle())*((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? 1 : -1),-1,1);
+    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle())*((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? 1 : -1),0,1);
+    //baseMotor.set(MathUtil.clamp(baseOutput, getBaseAngle() < kMinBaseAngle ? 0 : -1, getBaseAngle() > kMaxBaseAngle ? 0 : 1));
+    baseMotor.set(baseOutput);
     elbowMotor.set(elbowOutput);
   }
 
