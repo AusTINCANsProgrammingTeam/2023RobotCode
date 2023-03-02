@@ -28,13 +28,13 @@ public class IntakeTest {
   public void testPull() {
     dut.pull();
     //JUnit Assert class provides this and many other comparision functions.
-    assertEquals(IntakeSubsystem.kIntakeSpeed, dut.getSpeed(), kDelta); //Check that motor speed matches what we wrote
+    assertEquals(IntakeSubsystem.kConeIntakeSpeed, dut.getSpeed(), kDelta); //Check that motor speed matches what we wrote
   }
   @Test
   public void testPush() {
     dut.push();
     //JUnit Assert class provides this and many other comparision functions.
-    assertEquals(IntakeSubsystem.kOuttakeSpeed, dut.getSpeed(), kDelta);
+    assertEquals(IntakeSubsystem.kConeOuttakeSpeed, dut.getSpeed(), kDelta);
   }
   // Add more @Test tagged methods to test other things...
 }
