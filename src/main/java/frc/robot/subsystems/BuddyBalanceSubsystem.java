@@ -38,7 +38,8 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private static final double kDefaultMotorD = 0;
   private static final int deployServo1ID = 8;
   private static final int deployServo2ID = 9;
-  private static final double kServoInitialPos = 0.5;
+  private static final double kServoInitialPos1 = 0.75;
+  private static final double kServoInitialPos2 = 0.25;
   private static final double kServoDeployedPos1 = 0;
   private static final double kServoDeployedPos2 = 1;
   private static final Constraints kConstraints = new Constraints(Units.degreesToRadians(180), Units.degreesToRadians(0));
@@ -121,8 +122,8 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void returnServos() { // Returns servos to the docked position
-    deployServo1.set(kServoInitialPos);
-    deployServo2.set(kServoInitialPos);
+    deployServo1.set(kServoInitialPos1);
+    deployServo2.set(kServoInitialPos2);
     buddyBalancePosEntry.setString("Docked");
     servoPositionEntry.setDouble(deployServo1.get());
   }
