@@ -2,17 +2,42 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 6.5,
-        "y": 3.4
+        "x": 1.85,
+        "y": 2.2
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.5,
-        "y": 4.65924134980689
+        "x": 2.67495001155416,
+        "y": 2.149722795686194
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 2.85,
+        "y": 2.15
+      },
+      "prevControl": {
+        "x": 2.918726097138878,
+        "y": 2.15
+      },
+      "nextControl": {
+        "x": 2.7136774872622227,
+        "y": 2.15
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": 0.5,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
@@ -25,36 +50,11 @@
     {
       "anchorPoint": {
         "x": 3.9,
-        "y": 4.85
+        "y": 2.15
       },
       "prevControl": {
-        "x": 4.9230140298030385,
-        "y": 4.85
-      },
-      "nextControl": {
-        "x": 2.5644335827859903,
-        "y": 4.85
-      },
-      "holonomicAngle": 90.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 1.8502623528142021,
-        "y": 2.2
-      },
-      "prevControl": {
-        "x": 1.850262352814202,
-        "y": 4.063345942891955
+        "x": 4.305938895246028,
+        "y": 2.15
       },
       "nextControl": null,
       "holonomicAngle": 180.0,
@@ -70,8 +70,5 @@
       }
     }
   ],
-  "maxVelocity": 2.0,
-  "maxAcceleration": 2.0,
-  "isReversed": null,
   "markers": []
 }

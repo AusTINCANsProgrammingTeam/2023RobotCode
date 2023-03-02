@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.classes.TunableNumber;
 import frc.robot.hardware.AbsoluteEncoder;
@@ -432,6 +433,19 @@ public class ArmSubsystem extends SubsystemBase {
       default:
         return null;
     }
+  }
+
+  public Command highScoreSequence() {
+    return new SequentialCommandGroup(
+      goToState(ArmState.HIGHTRANSITION),
+      goToState(ArmState.HIGHSCORE),
+      goToState(ArmState.HIGHDROP)
+    );
+  }
+
+  public Command stowArmParallel() {
+    //Run along with a trajectory to stow arm after scoring
+    return new WaitCommand(0.5).andThen(goToState(ArmState.STOWED));
   }
 
   public void coastBase() {
