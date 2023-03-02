@@ -43,7 +43,7 @@ public class ArmSubsystem extends SubsystemBase {
   public static enum ArmState{
     STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
     CONEINTAKE(1.0136, -0.0749), //Arm is in position to intake cones
-    CUBEINTAKE(0.9743, -0.2507), //Arm is in position to intake cubes
+    CUBEINTAKE(0.7984, -0.2416), //Arm is in position to intake cubes
     MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
@@ -72,7 +72,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   //Base arm PID values
   private double kBaseP = 1;
-  private double kBaseI = 0.3;
+  private double kBaseI = 0.35;
   private double kBaseD = 0;
   //Elbow arm PID values
   private double kElbowP = 1.5;
@@ -90,12 +90,16 @@ public class ArmSubsystem extends SubsystemBase {
   private CANSparkMax elbowMotor;
 
   private final DutyCycleEncoder baseAbsoluteEncoder;
+  private final DutyCycleEncoder choochooAbsoluteEncoder;
   private final DutyCycleEncoder elbowAbsoluteEncoder;
   private double simBaseEncoderPosition;
   private double simElbowEncoderPosition;
 
   private final ProfiledPIDController basePIDController;
   private final ProfiledPIDController elbowPIDController;
+
+  public static final double kMinChooChooAngle = Units.degreesToRadians(208);
+  public static final double kMaxChooChooAngle = Units.degreesToRadians(326);
 
   public static final double kBaseLength = Units.inchesToMeters(41);
   public static final double kElbowLength = Units.inchesToMeters(43);
@@ -121,6 +125,7 @@ public class ArmSubsystem extends SubsystemBase {
   private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
 
   private GenericEntry actualBaseAngle;
+  private GenericEntry actualChooChooAngle;
   private GenericEntry desiredBaseGoal;
   private GenericEntry desiredBaseSetpoint;
   private GenericEntry actualElbowAngle;
@@ -170,6 +175,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     baseAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmBase);
     elbowAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);
+    choochooAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmChooChoo);
 
     if(Robot.isReal()) {
       basePIDController = new ProfiledPIDController(kBaseP, kBaseI, kBaseD, kBaseConstraints);
@@ -192,6 +198,7 @@ public class ArmSubsystem extends SubsystemBase {
       armTab = Shuffleboard.getTab("Arm");
 
       actualBaseAngle = armTab.add("Actual Base Angle", 0.0).getEntry();
+      actualChooChooAngle = armTab.add("Actual Choo Choo Angle", 0.0).getEntry();
       desiredBaseGoal = armTab.add("Desired Base Goal", 0.0).getEntry();
       desiredBaseSetpoint = armTab.add("Desired Base Setpoint", 0.0).getEntry();
       actualElbowAngle = armTab.add("Actual Elbow Angle", 0.0).getEntry();
@@ -215,11 +222,15 @@ public class ArmSubsystem extends SubsystemBase {
 
   //Returns sim encoder position (No offset) if in simulation, the actual position otherwise
   public double getBaseAngle() {
-    return Robot.isSimulation() ? simBaseEncoderPosition : Math.round(AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder)*1000)/1000.0;
+    return Robot.isSimulation() ? simBaseEncoderPosition : AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder,3);
   }
 
   public double getElbowAngle() {
-    return Robot.isSimulation() ? simElbowEncoderPosition : Math.round(AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder)*1000)/1000.0;
+    return Robot.isSimulation() ? simElbowEncoderPosition : AbsoluteEncoder.getPositionRadians(elbowAbsoluteEncoder,3);
+  }
+
+  public double getChooChooAngle() {
+    return AbsoluteEncoder.getPositionRadians(choochooAbsoluteEncoder,3);
   }
 
   public void updateReferences(double bJoystickValue, double eJoystickValue) {
@@ -262,9 +273,9 @@ public class ArmSubsystem extends SubsystemBase {
   
 
   public void updateMotors() {
-    double baseOutput = MathUtil.clamp(basePIDController.calculate(getBaseAngle()),-1,1);
+    double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? -1 : 1) * basePIDController.calculate(getBaseAngle()),-1,1);
     double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
-    baseMotor.set(MathUtil.clamp(baseOutput, getBaseAngle() < kMinBaseAngle ? 0 : -1, getBaseAngle() > kMaxBaseAngle ? 0 : 1));
+    baseMotor.set(baseOutput);
     elbowMotor.set(elbowOutput);
   }
 
@@ -446,8 +457,7 @@ public class ArmSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Eout", elbowMotor.get());
-    SmartDashboard.putNumber("Bout", baseMotor.get());
+    SmartDashboard.putBoolean("Safety", getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
     // This method will be called once per scheduler run
     calculateCurrentPositions();
     if(DriverStation.isDisabled()){
@@ -457,6 +467,7 @@ public class ArmSubsystem extends SubsystemBase {
     if(!Robot.isCompetition){
       //Shuffleboard + Smartdashboard values 
       actualBaseAngle.setDouble(Units.radiansToDegrees(getBaseAngle()));
+      actualChooChooAngle.setDouble(Units.radiansToDegrees(getChooChooAngle()));
       actualElbowAngle.setDouble(Units.radiansToDegrees(getElbowAngle()));
       actualXPosition.setDouble(armXPosition);
       actualYPositon.setDouble(armYPosition);
