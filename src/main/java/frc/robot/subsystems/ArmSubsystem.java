@@ -105,8 +105,8 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kMaxBaseAngle = Units.degreesToRadians(90);
   public static final double kMaxElbowAngle = Units.degreesToRadians(162);
 
-  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(55), Units.degreesToRadians(45));
-  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(180), Units.degreesToRadians(80));
+  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(80), Units.degreesToRadians(80));
+  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(180), Units.degreesToRadians(180));
 
   public static final double kBaseGearing = 40.8333333;
   public static final double kElbowGearing = 4.28571429;

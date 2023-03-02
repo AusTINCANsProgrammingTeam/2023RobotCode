@@ -24,6 +24,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private CANSparkMax motor2;
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
+  private GenericEntry intakeMode = matchTab.add("Intake Mode", "Cone Mode").getEntry();
 
   private boolean isConeMode;
 
@@ -52,6 +53,10 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public void setMode(boolean isConeMode) {
     this.isConeMode = isConeMode;
   }
+
+  public void toggleConeMode() {
+    isConeMode = !isConeMode;
+  }
   
   public double getSpeed(){
     return motor.get();
@@ -72,6 +77,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
+    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
     // This method will be called once per scheduler run
   }
 
