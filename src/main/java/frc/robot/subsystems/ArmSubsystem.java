@@ -76,9 +76,9 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseI = 0.35;
   private double kBaseD = 0;
   //Elbow arm PID values
-  private double kElbowP = 1.5;
+  private double kElbowP = 1.3;
   private double kElbowI = 0.25;
-  private double kElbowD = 0;
+  private double kElbowD = 0.015;
   //Sim PID values
   private double kSimBaseP = 0.1;
   private double kSimElbowP = 0.1;
@@ -275,7 +275,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void updateMotors() {
     double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? -1 : 1) * basePIDController.calculate(getBaseAngle()),-1,1);
-    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
+    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),-0.175,1);
     baseMotor.set(baseOutput);
     elbowMotor.set(elbowOutput);
   }
@@ -440,7 +440,7 @@ public class ArmSubsystem extends SubsystemBase {
       goToState(ArmState.HIGHTRANSITION),
       goToState(ArmState.HIGHSCORE),
       goToState(ArmState.HIGHDROP),
-      new WaitCommand(0.5)
+      new WaitCommand(0.75)
     ).withTimeout(8);
   }
 
