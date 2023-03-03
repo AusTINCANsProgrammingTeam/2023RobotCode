@@ -54,16 +54,16 @@ public class OI {
 
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
 
-        
-        private static final Button kOrientationButton = Button.B1; //Toggle swerve orientation
-        private static final Button kZeroButton = Button.Start; //Zero the gyroscope
+        private static final Button kOrientationButton = Button.Start; //Toggle swerve orientation
+        private static final Button kZeroButton = Button.Back; //Zero the gyroscope
         private static final Button kOuttakeButton = Button.LT; //Run outtake
         private static final Button kIntakeButton = Button.LB; //Run intake
         private static final Button kAlignForwardButton = Button.B4; //Align forwards
         private static final Button kAlignBackwardButton = Button.B2; //Align backwards
         private static final Button kArmHighButton = Button.RB; //Arm to high scoring position
         private static final Button kArmMidButton = Button.RT; //Arm to mid scoring position
-        private static final Button kArmIntakeButton = Button.B3; //Arm to intake position
+        private static final Button kArmConeIntakeButton = Button.B3; //Arm to cone intake position
+        private static final Button kArmCubeIntakeButton = Button.B1; //Arm to cube intake position
         
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
@@ -72,7 +72,7 @@ public class OI {
         //TODO: Tune curves to driver preference
         private static final ControlCurve kXTranslationCurve = new ControlCurve(0.85,0.05,0.85,0.1);
         private static final ControlCurve kYTranslationCurve = new ControlCurve(0.85,0.05,0.85,0.1);
-        private static final ControlCurve kRotationCurve = new ControlCurve(1,0,1,0.1);
+        private static final ControlCurve kRotationCurve = new ControlCurve(0.8,0,1,0.1);
 
         public static Supplier<Double> getXTranslationSupplier(){
             //This axis is inverted
@@ -129,12 +129,15 @@ public class OI {
             return new JoystickButton(kJoystick, kArmMidButton.getButtonID());
         }
 
-        public static JoystickButton getArmIntakeButton(){
-            kArmIntakeButton.setButtonAction("Arm Intake");
-            return new JoystickButton(kJoystick, kArmIntakeButton.getButtonID());
+        public static JoystickButton getArmConeIntakeButton(){
+            kArmConeIntakeButton.setButtonAction("Cone Intake");
+            return new JoystickButton(kJoystick, kArmConeIntakeButton.getButtonID());
         }
 
-
+        public static JoystickButton getArmCubeIntakeButton(){
+            kArmCubeIntakeButton.setButtonAction("Cube Intake");
+            return new JoystickButton(kJoystick, kArmCubeIntakeButton.getButtonID());
+        }
     }
 
     public static final class Operator{
@@ -184,6 +187,8 @@ public class OI {
         private static final Button kUpBuddyBalanceButton = Button.POVUP; // Raises buddy balance lift
         private static final Button kConeSignalButton = Button.Y;
         private static final Button kCubeSignalButton = Button.X;
+        private static final Button kHighScoreButton = Button.RB; // Sets arm state to highscore
+        private static final Button kIntakeButton = Button.LB; // Toggles intake mode between cone and cube
 
         private static final int kArmElbowAxis = 3;
         private static final int kArmBaseAxis = 1;
@@ -225,6 +230,16 @@ public class OI {
         public static JoystickButton getCubeSignalButton() {
             kCubeSignalButton.setButtonAction("Signal Cube");
             return new JoystickButton(kJoystick, kCubeSignalButton.getButtonID());
+        }
+
+        public static JoystickButton getHighScoreButton() {
+            kHighScoreButton.setButtonAction("High Score");
+            return new JoystickButton(kJoystick, kHighScoreButton.getButtonID());
+        }
+
+        public static JoystickButton getIntakeButton(){
+            kIntakeButton.setButtonAction("Toggle Intake Mode");
+            return new JoystickButton(kJoystick, kIntakeButton.getButtonID());
         }
     }
 
