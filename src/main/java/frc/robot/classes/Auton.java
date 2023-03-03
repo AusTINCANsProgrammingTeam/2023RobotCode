@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -35,6 +36,9 @@ public class Auton{
         BACKWARD, // Wait 3 seconds, go backward 1 meter
         FORWARD180, // Go forward 2 meters and rotate 180 degrees
         CURVE, // Go forward 1 meter and left 1 meter
+        ONESCORETEST,
+        CHARGE1,
+        CHARGE6,
         ONESCORE, // Score and drive backwards
         ONESCORECHARGE1, // Score preloaded game piece from first starting position and engage charge pad
         ONESCORECHARGE2, // Score preloaded game piece from second starting position and engage charge pad
@@ -150,6 +154,13 @@ public class Auton{
                         resetOdometry("Curve"),
                         swerveSubsystem.followTrajectory("Curve", getTrajectory("Curve"))
                     );
+            case ONESCORETEST:
+                return 
+                    new SequentialCommandGroup(
+                        resetOdometry("1Score"),
+                        armSubsystem.highScoreSequence().alongWith(intakeSubsystem.autonIntake()),
+                        new InstantCommand(() -> SmartDashboard.putBoolean("next", true))
+                    );
             case ONESCORE:
                 return
                     new SequentialCommandGroup(
@@ -157,6 +168,20 @@ public class Auton{
                         armSubsystem.highScoreSequence().alongWith(intakeSubsystem.autonIntake()),
                         swerveSubsystem.followTrajectory("1Score", getTrajectory("1Score"))
                         .deadlineWith(armSubsystem.stowArmParallel())
+                    );
+            case CHARGE1:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("1ScoreCharge-1"),
+                        swerveSubsystem.followTrajectory("1ScoreCharge-1", getTrajectory("1ScoreCharge-1")),
+                        swerveSubsystem.assistedBalance()
+                    );
+            case CHARGE6:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("1ScoreCharge-6"),
+                        swerveSubsystem.followTrajectory("1ScoreCharge-6", getTrajectory("1ScoreCharge-6")),
+                        swerveSubsystem.assistedBalance()
                     );
             case ONESCORECHARGE1:
                 return
