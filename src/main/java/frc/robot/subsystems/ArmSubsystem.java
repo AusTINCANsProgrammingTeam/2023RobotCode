@@ -441,7 +441,7 @@ public class ArmSubsystem extends SubsystemBase {
       goToState(ArmState.HIGHSCORE),
       goToState(ArmState.HIGHDROP),
       new WaitCommand(0.5)
-    );
+    ).withTimeout(8);
   }
 
   public Command stowArmParallel() {
