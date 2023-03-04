@@ -28,7 +28,7 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -85,7 +85,7 @@ public class SwerveSubsystem extends SubsystemBase{
         EncoderConfig.BackRightModule,
         "BR");
 
-    private AHRS gyro = new AHRS(I2C.Port.kMXP);
+    private AHRS gyro = new AHRS(SPI.Port.kMXP);
     private double gyroOffset; //Offset in degrees
     private SwerveDriveOdometry odometer = new SwerveDriveOdometry(kDriveKinematics, getRotation2d(), getModulePositions());
 
@@ -100,7 +100,7 @@ public class SwerveSubsystem extends SubsystemBase{
     private ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
     private GenericEntry controlOrientationEntry = matchTab.add("FOD", true).getEntry();
     private GenericEntry headingEntry = matchTab.add("NavX Yaw", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
-    private GenericEntry rollEntry = matchTab.add("NavX Roll", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
+    private GenericEntry rollEntry = matchTab.add("NavX Pitch", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
 
     private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
     private GenericEntry positionEntry = configTab.add("Position", "").getEntry();
@@ -157,8 +157,8 @@ public class SwerveSubsystem extends SubsystemBase{
         return Math.IEEEremainder(gyro.getAngle() + gyroOffset, 360);
     }
 
-    public double getRoll() {
-        return Math.IEEEremainder(gyro.getRoll() + 180, 360);
+    public double getPitch() {
+        return gyro.getPitch();
     }
 
     public Rotation2d getRotation2d() {
@@ -310,7 +310,7 @@ public class SwerveSubsystem extends SubsystemBase{
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());
 
-        rollEntry.setDouble(getRoll());
+        rollEntry.setDouble(getPitch());
         headingEntry.setDouble(getHeading());
         positionEntry.setString(getPose().getTranslation().toString());
         Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
