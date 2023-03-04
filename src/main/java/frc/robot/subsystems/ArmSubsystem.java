@@ -276,7 +276,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void updateMotors() {
     double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? -1 : 1) * basePIDController.calculate(getBaseAngle()),-1,1);
-    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),-0.175,1);
+    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
     baseMotor.set(baseOutput);
     elbowMotor.set(elbowOutput);
   }
@@ -440,10 +440,8 @@ public class ArmSubsystem extends SubsystemBase {
     return new SequentialCommandGroup(
       goToState(ArmState.HIGHTRANSITION),
       goToState(ArmState.HIGHSCORE),
-      goToState(ArmState.HIGHDROP),
-      goToState(ArmState.HIGHDROP2),
-      new WaitCommand(0.75)
-    ).withTimeout(8);
+      goToState(ArmState.HIGHDROP)
+    );
   }
 
   public Command stowArmParallel() {
