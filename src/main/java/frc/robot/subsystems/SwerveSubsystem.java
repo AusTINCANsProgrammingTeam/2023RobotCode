@@ -127,9 +127,17 @@ public class SwerveSubsystem extends SubsystemBase{
         if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");} 
         gyro.reset();
     }
-
+    public int freshGyro = 9;
+    public float fillerGyro;
     public double getHeading() {
-        return gyro.getYaw();
+        if(freshGyro <= 0){
+            fillerGyro = gyro.getYaw();
+            freshGyro = 9;
+            return gyro.getYaw();
+        }else{
+            freshGyro = freshGyro-1;
+        }
+        return fillerGyro;
     }
 
     public double getPitch() {
@@ -275,13 +283,18 @@ public class SwerveSubsystem extends SubsystemBase{
         ).beforeStarting(() -> trajectoryLog.append("Following trajectory " + name)
         ).alongWith(new InstantCommand(() -> Logger.getInstance().recordOutput("trajectory " + name, trajectory)));
     }
-    
+    int getHeadingEntry;
     @Override
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());
 
         pitchEntry.setDouble(gyro.getPitch());
+        if(getHeadingEntry <= 0){
         headingEntry.setDouble(getHeading());
+        getHeadingEntry = 3;
+        }else{  
+        getHeadingEntry = getHeadingEntry-1;
+    }
         positionEntry.setString(getPose().getTranslation().toString());
         Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
         Logger.getInstance().recordOutput("Pose 2D", getPose());
