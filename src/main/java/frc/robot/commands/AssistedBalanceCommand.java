@@ -17,7 +17,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class AssistedBalanceCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveSubsystem swerve_subsystem;
-  private final double kPBalancing = 0.01;
+  private final double kPBalancing = 0.008;
   private final double kIBalancing = 0;
   private final double kDBalancing = 0;
   private final double balancingDeadzoneNumber = 2.5;
