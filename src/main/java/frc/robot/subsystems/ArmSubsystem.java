@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.classes.DebugLog;
 import frc.robot.classes.TunableNumber;
@@ -48,7 +49,7 @@ public class ArmSubsystem extends SubsystemBase {
     MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
-    HIGHDROP(1.4433, 0.8766), //High scoring motion
+    HIGHDROP(1.4433, 0.9266), //High scoring motion
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
     private double x; //Position relative to the base of the arm, in meters
@@ -76,9 +77,9 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseI = 0.35;
   private double kBaseD = 0;
   //Elbow arm PID values
-  private double kElbowP = 1.5;
+  private double kElbowP = 1.3;
   private double kElbowI = 0.25;
-  private double kElbowD = 0;
+  private double kElbowD = 0.015;
   //Sim PID values
   private double kSimBaseP = 0.1;
   private double kSimElbowP = 0.1;
@@ -417,6 +418,11 @@ public class ArmSubsystem extends SubsystemBase {
       default:
         return null;
     }
+  }
+
+  public Command stowArmParallel() {
+    //Run along with a trajectory to stow arm after scoring
+    return new WaitCommand(0.5).andThen(goToState(ArmState.STOWED));
   }
 
   public void coastBase() {

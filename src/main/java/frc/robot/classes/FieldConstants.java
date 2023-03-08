@@ -9,7 +9,6 @@ package frc.robot.classes;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -266,7 +265,7 @@ public final class FieldConstants {
       return new Pose2d(
           pose.getX(),
           fieldWidth - pose.getY(),
-          new Rotation2d(0));
+          pose.getRotation());
     } else {
       return pose;
     }
