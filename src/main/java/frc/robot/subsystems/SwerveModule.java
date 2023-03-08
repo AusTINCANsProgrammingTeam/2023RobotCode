@@ -66,8 +66,7 @@ public class SwerveModule extends SubsystemBase {
     private DoubleLogEntry desiredSpeedLog;
     private DoubleLogEntry actualSpeedLog;
     private DoubleLogEntry desiredAngleLog;
-    private DoubleLogEntry actualAbsoluteAngleLog;
-    private DoubleLogEntry actualRelativeAngleLog;
+    private DoubleLogEntry actualAngleLog;
     private DoubleLogEntry rotationSpeedLog;
 
     private final String ID;
@@ -113,8 +112,7 @@ public class SwerveModule extends SubsystemBase {
         desiredSpeedLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setSpeed"); //Logs desired speed in meters per second
         actualSpeedLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setSpeed"); //Logs actual speed in meters per second
         desiredAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setAngle"); //Logs desired angle in radians
-        actualAbsoluteAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualAbsAngle"); //Logs actual absolute angle in radians
-        actualRelativeAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualRelAngle"); //Logs actual relative angle in radians
+        actualAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualAngle"); //Logs actual relative angle in radians
     }
 
     public SwerveModulePosition getPosition() {
@@ -147,6 +145,7 @@ public class SwerveModule extends SubsystemBase {
     public void resetEncoders() {
         driveEncoder.setPosition(0);
         turningEncoder.setPosition(getAbsoluteTurningPosition());
+        absoluteEncoder.close();
     }
 
     public SwerveModuleState getState() {
@@ -218,7 +217,6 @@ public class SwerveModule extends SubsystemBase {
     @Override
     public void periodic(){
         actualSpeedLog.append(driveEncoder.getVelocity());
-        actualAbsoluteAngleLog.append(getAbsoluteTurningPosition());
-        actualRelativeAngleLog.append(getTurningPosition());
+        actualAngleLog.append(getTurningPosition());
     }
 }
