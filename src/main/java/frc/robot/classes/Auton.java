@@ -32,32 +32,27 @@ public class Auton{
     public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
 
     private enum AutonModes{
-        FORWARD, // Go forward 1 meter
-        BACKWARD, // Wait 3 seconds, go backward 1 meter
-        FORWARD180, // Go forward 2 meters and rotate 180 degrees
-        CURVE, // Go forward 1 meter and left 1 meter
+        //Number after a path name corresponds to its starting position
+        //Path that allows us to test auton scoring at the competition's practice field
         ONESCORETEST,
-        CHARGE1,
-        CHARGE6,
-        ONESCORE, // Score and drive backwards
-        ONESCORECHARGE1, // Score preloaded game piece from first starting position and engage charge pad
-        ONESCORECHARGE2, // Score preloaded game piece from second starting position and engage charge pad
-        ONESCORECHARGE3, // Score preloaded game piece from third starting position and engage charge pad
-        ONESCORECHARGE4, // Score preloaded game piece from fourth starting position and engage charge pad
-        ONESCORECHARGE5, // Score preloaded game piece from fifth starting position and engage charge pad
-        ONESCORECHARGE6, // Score preloaded game piece from sixth starting position and engage charge pad
-        TWOSCORE1, // Score preloaded game piece from first starting position and score another game piece
-        TWOSCORE6, // Score preloaded game piece from sixth starting position and score another game piece
-        TWOSCORECHARGE1, // Score preloaded game piece from first starting position, score another game piece, and engage charge pad
-        TWOSCORECHARGE6, // Score preloaded game piece from sixth starting position, score another game piece, and engage charge pad
-        THREESCORE1, // Score preloaded game piece from first starting position, score another game piece, and score another game piece
-        THREESCORE6, // Score preloaded game piece from sixth starting position, score another game piece, and score another game piece
-        TWOSCORELOADCHARGE1, // Score preloaded game piece from first starting position, score another game piece, intake another game piece, and engage charge pad
-        TWOSCORELOADCHARGE6, // Score preloaded game piece from sixth starting position, score another game piece, intake another game piece, and engage charge pad
-        THREESCORECHARGE1, // Score preloaded game piece from first starting position, score another game piece, score another game piece, and engage charge pad
-        THREESCORECHARGE6, // Score preloaded game piece from sixth starting position, score another game piece, score another game piece, and engage charge pad
+        //Skip scoring and balance
+        CHARGE1, CHARGE6,
+        //Score preload and drive out of the community
+        ONESCORE,
+        //Score preload and balance
+        ONESCORECHARGE1, ONESCORECHARGE2, ONESCORECHARGE3, ONESCORECHARGE4, ONESCORECHARGE5, ONESCORECHARGE6,
+        //Score preload then score another game piece
+        TWOSCORE1, TWOSCORE6,
+        //Score preload, score another game piece, then balance
+        TWOSCORECHARGE1, TWOSCORECHARGE6,
+        //Score preload, score another game piece, intake another game piece, then balance
+        TWOSCORELOADCHARGE1, TWOSCORELOADCHARGE6,
+        //Score preload, then score two other game pieces
+        THREESCORE1, THREESCORE6,
+        //Score preload, score two other game pieces, then balance
+        THREESCORECHARGE1, THREESCORECHARGE6
     }
-    private final AutonModes kDefaultAutonMode = AutonModes.FORWARD;
+    private final AutonModes kDefaultAutonMode = AutonModes.ONESCORE;
 
     private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
     private GenericEntry delayEntry = configTab.add("Auton Delay", 0.0).getEntry();
