@@ -18,8 +18,10 @@ public class DebugLog<T> {
     private GenericEntry networkEntry;
     private Integer localEntry;
     private Consumer<T> localConsumer;
+    private String name;
 
     public DebugLog(T defaultValue, String name, SubsystemBase subsystem){
+        this.name = name;
         if(defaultValue instanceof Double){
             localEntry = datalog.start("/" + subsystem.getName() + "/" + name, "double");
             localConsumer = (a) -> datalog.appendDouble(localEntry, (Double)a, 0);
@@ -48,7 +50,7 @@ public class DebugLog<T> {
             }
             localConsumer.accept(newValue);
         } catch(NullPointerException e){
-            DriverStation.reportError("Invalid type", true);
+            DriverStation.reportError("Invalid type for log " + name, false);
         }
     }
 }
