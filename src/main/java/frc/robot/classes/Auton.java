@@ -129,31 +129,6 @@ public class Auton{
         //Sequence of actions to be performed during the autonomous period
         try{
         switch(autonMode){
-            case FORWARD:
-               return 
-                    new SequentialCommandGroup(
-                        resetOdometry("Forward"),
-                        swerveSubsystem.followTrajectory("Forward", getTrajectory("Forward"))
-                    );
-            case BACKWARD:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("Backward"),
-                        delay(3),
-                        swerveSubsystem.followTrajectory("Backward", getTrajectory("Backward"))
-                    );
-            case FORWARD180:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("Forward180"),
-                        swerveSubsystem.followTrajectory("Forward180", getTrajectory("Forward180"))
-                    );
-            case CURVE:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("Curve"),
-                        swerveSubsystem.followTrajectory("Curve", getTrajectory("Curve"))
-                    );
             case ONESCORETEST:
                 return 
                     new SequentialCommandGroup(
@@ -361,20 +336,14 @@ public class Auton{
     private Command getBackupSequence(){
         //Backup sequence in case a trajectory fails to load
         return new SequentialCommandGroup(
-            swerveSubsystem.followTrajectory(
-                "Up",
-                generateTrajectory(
-                    constructPoint(0, 0, 0, 90),
-                    constructPoint(0, 1, 0, 0)
-                )
-            )
+            armSubsystem.highScoreSequence(intakeSubsystem)
         );
     }
 
     private Command getAutonEnd(){
         //Actions to be performed unconditionally after the autonomous sequence has ended (Stop motors)
         return new SequentialCommandGroup(
-            new InstantCommand(() -> swerveSubsystem.stopModules())
+            new InstantCommand(swerveSubsystem::stopModules)
         );
     }
 

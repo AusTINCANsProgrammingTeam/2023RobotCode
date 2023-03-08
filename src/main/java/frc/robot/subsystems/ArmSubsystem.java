@@ -439,10 +439,10 @@ public class ArmSubsystem extends SubsystemBase {
 
   public Command highScoreSequence(IntakeSubsystem intakeSubsystem) {
     return new SequentialCommandGroup(
-      new InstantCommand(() -> intakeSubsystem.pull()),
+      new InstantCommand(intakeSubsystem::pull),
       goToState(ArmState.HIGHTRANSITION),
       goToState(ArmState.HIGHSCORE),
-      new InstantCommand(() -> intakeSubsystem.stop()),
+      new InstantCommand(intakeSubsystem::stop),
       goToState(ArmState.HIGHDROP)
     );
   }
