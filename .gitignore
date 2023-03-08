@@ -167,4 +167,5 @@ simgui-ds.json
 BuildConstants.java
 networktables.json
 glass.json
-.pathplanner
+.pathplanner/*
+!.pathplanner/settings.json
