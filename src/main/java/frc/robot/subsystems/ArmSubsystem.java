@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.classes.DebugLog;
 import frc.robot.classes.TunableNumber;
 import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
@@ -120,23 +121,27 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kElbowInertia = SingleJointedArmSim.estimateMOI(kElbowLength, kElbowMass);
 
   //Real arm values
-  private ShuffleboardTab armTab;
   private ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
 
-  private GenericEntry actualBaseAngle;
-  private GenericEntry actualChooChooAngle;
-  private GenericEntry desiredBaseGoal;
-  private GenericEntry desiredBaseSetpoint;
-  private GenericEntry actualElbowAngle;
-  private GenericEntry desiredElbowGoal;
-  private GenericEntry desiredElbowSetpoint;
+  private DebugLog<Double> actualBaseAngleLog = new DebugLog<Double>(0.0, "Actual Base Angle", this);
+  private DebugLog<Double> actualChooChooAngleLog = new DebugLog<Double>(0.0, "Actual Choo Choo Angle", this);
+  private DebugLog<Double> desiredBaseGoalLog = new DebugLog<Double>(0.0, "Desired Base Goal", this);
+  private DebugLog<Double> desiredBaseSetpointLog = new DebugLog<Double>(0.0, "Desired Base Setpoint", this);
+  private DebugLog<Double> baseOutputLog = new DebugLog<Double>(0.0, "Base Output", this);
 
-  private GenericEntry actualXPosition;
-  private GenericEntry actualYPositon;
+  private DebugLog<Double> actualElbowAngleLog = new DebugLog<Double>(0.0, "Actual Elbow Angle", this);
+  private DebugLog<Double> desiredElbowGoalLog = new DebugLog<Double>(0.0, "Desired Elbow Goal", this);
+  private DebugLog<Double> desiredElbowSetpointLog = new DebugLog<Double>(0.0, "Desired Elbow Setpoint", this);
+  private DebugLog<Double> elbowOutputLog = new DebugLog<Double>(0.0, "Elbow Output", this);
 
-  private GenericEntry desiredXPosition;
-  private GenericEntry desiredYPosition;
+  private DebugLog<Double> actualXPositionLog = new DebugLog<Double>(0.0, "Actual X Position", this);
+  private DebugLog<Double> actualYPositionLog = new DebugLog<Double>(0.0, "Actual Y Position", this);
+
+  private DebugLog<Double> desiredXPositionLog = new DebugLog<Double>(0.0, "Desired X Position", this);
+  private DebugLog<Double> desiredYPositionLog = new DebugLog<Double>(0.0, "Desired Y Position", this);
+
+  private DebugLog<Boolean> rolloverLog = new DebugLog<Boolean>(false, "Choo Choo Rollover", this);
 
   private GenericEntry currentStateEntry = matchTab.add("Current State","").getEntry();
 
@@ -192,24 +197,6 @@ public class ArmSubsystem extends SubsystemBase {
       SmartDashboard.putData("Arm Sim", simArmCanvas);
       basePIDController = new ProfiledPIDController(kSimBaseP, 0, 0, kBaseConstraints);
       elbowPIDController = new ProfiledPIDController(kSimElbowP, 0, 0, kElbowConstraints);
-    }
-
-    if(!Robot.isCompetition){
-      armTab = Shuffleboard.getTab("Arm");
-
-      actualBaseAngle = armTab.add("Actual Base Angle", 0.0).getEntry();
-      actualChooChooAngle = armTab.add("Actual Choo Choo Angle", 0.0).getEntry();
-      desiredBaseGoal = armTab.add("Desired Base Goal", 0.0).getEntry();
-      desiredBaseSetpoint = armTab.add("Desired Base Setpoint", 0.0).getEntry();
-      actualElbowAngle = armTab.add("Actual Elbow Angle", 0.0).getEntry();
-      desiredElbowGoal = armTab.add("Desired Elbow Goal", 0.0).getEntry();
-      desiredElbowSetpoint = armTab.add("Desired Elbow Setpoint", 0.0).getEntry();
-
-      actualXPosition = armTab.add("Actual X Position", 0).getEntry();
-      actualYPositon = armTab.add("Actual Y Position", 0).getEntry();
-
-      desiredXPosition = armTab.add("Desired X Position", 0.0).getEntry();
-      desiredYPosition = armTab.add("Desired Y Position", 0.0).getEntry();
     }
 
     basePIDController.reset(getBaseAngle());
@@ -317,10 +304,8 @@ public class ArmSubsystem extends SubsystemBase {
     double desiredBaseAngle = convertToBaseAngle(x, y);
     double desiredElbowAngle = convertToElbowAngle(x, y);
 
-    if(!Robot.isCompetition){
-      desiredXPosition.setDouble(x);
-      desiredYPosition.setDouble(y);
-    }
+    desiredXPositionLog.log(x);
+    desiredYPositionLog.log(y);
     
     setBaseReference(desiredBaseAngle);
     setElbowReference(desiredElbowAngle);
@@ -457,26 +442,27 @@ public class ArmSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("Safety", getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
     // This method will be called once per scheduler run
     calculateCurrentPositions();
     if(DriverStation.isDisabled()){
       holdCurrentPosition();
     }
 
-    if(!Robot.isCompetition){
-      //Shuffleboard + Smartdashboard values 
-      actualBaseAngle.setDouble(Units.radiansToDegrees(getBaseAngle()));
-      actualChooChooAngle.setDouble(Units.radiansToDegrees(getChooChooAngle()));
-      actualElbowAngle.setDouble(Units.radiansToDegrees(getElbowAngle()));
-      actualXPosition.setDouble(armXPosition);
-      actualYPositon.setDouble(armYPosition);
+    rolloverLog.log(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
 
-      desiredBaseGoal.setDouble(Units.radiansToDegrees(basePIDController.getGoal().position));
-      desiredBaseSetpoint.setDouble(Units.radiansToDegrees(basePIDController.getSetpoint().position));
-      desiredElbowGoal.setDouble(Units.radiansToDegrees(elbowPIDController.getGoal().position));
-      desiredElbowSetpoint.setDouble(Units.radiansToDegrees(elbowPIDController.getSetpoint().position));
-    }
+    actualBaseAngleLog.log(Units.radiansToDegrees(getBaseAngle()));
+    actualChooChooAngleLog.log(Units.radiansToDegrees(getChooChooAngle()));
+    desiredBaseGoalLog.log(Units.radiansToDegrees(basePIDController.getGoal().position));
+    desiredBaseSetpointLog.log(Units.radiansToDegrees(basePIDController.getSetpoint().position));
+    baseOutputLog.log(baseMotor.get());
+
+    actualElbowAngleLog.log(Units.radiansToDegrees(getElbowAngle()));
+    desiredElbowGoalLog.log(Units.radiansToDegrees(elbowPIDController.getGoal().position));
+    desiredElbowSetpointLog.log(Units.radiansToDegrees(elbowPIDController.getSetpoint().position));
+    elbowOutputLog.log(elbowMotor.get());
+
+    actualXPositionLog.log(armXPosition);
+    actualYPositionLog.log(armYPosition);
   }
 
   @Override
