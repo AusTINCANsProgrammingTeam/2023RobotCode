@@ -14,7 +14,6 @@ import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.commands.ArmAnglesCommand;
-import frc.robot.commands.AssistedBalanceCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ArmSubsystem.ArmState;

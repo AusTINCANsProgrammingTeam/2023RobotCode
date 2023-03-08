@@ -7,8 +7,6 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
@@ -66,10 +64,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   public void stop() {
     spinWheels(0);
-  }
-
-  public Command autonIntake() {
-    return new StartEndCommand(this::pull, this::stop, this).withTimeout(1);
   }
 
   @Override

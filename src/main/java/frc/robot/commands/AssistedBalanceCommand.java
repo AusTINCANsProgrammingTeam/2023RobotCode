@@ -44,7 +44,6 @@ public class AssistedBalanceCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    SmartDashboard.putNumber("PIDOut", -pidController.calculate(swerve_subsystem.getPitch(), 0.0));
     swerve_subsystem.setModuleStates(
       swerve_subsystem.convertToModuleStates(
         0.0, MathUtil.clamp(-pidController.calculate(swerve_subsystem.getPitch(), 0.0), -pidControllerMaxSpeed, pidControllerMaxSpeed), 0.0));  

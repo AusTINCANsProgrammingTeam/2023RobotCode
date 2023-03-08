@@ -100,7 +100,7 @@ public class SwerveSubsystem extends SubsystemBase{
     private ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
     private GenericEntry controlOrientationEntry = matchTab.add("FOD", true).getEntry();
     private GenericEntry headingEntry = matchTab.add("NavX Yaw", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
-    private GenericEntry rollEntry = matchTab.add("NavX Pitch", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
+    private GenericEntry pitchEntry = matchTab.add("NavX Pitch", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
 
     private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
     private GenericEntry positionEntry = configTab.add("Position", "").getEntry();
@@ -310,7 +310,7 @@ public class SwerveSubsystem extends SubsystemBase{
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());
 
-        rollEntry.setDouble(getPitch());
+        pitchEntry.setDouble(getPitch());
         headingEntry.setDouble(getHeading());
         positionEntry.setString(getPose().getTranslation().toString());
         Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
