@@ -107,6 +107,7 @@ public class RobotContainer {
       OI.Driver.getArmHighButton().onTrue(new ProxyCommand(() -> armSubsystem.handleTransitionLogic(ArmState.HIGHSCORE)));
       OI.Driver.getArmMidButton().onTrue(new ProxyCommand(() -> armSubsystem.handleTransitionLogic(ArmState.MIDSCORE)));
       OI.Driver.getArmIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleTransitionLogic(ArmState.CONEINTAKE)));
+      OI.Operator.getArmStopButton().onTrue(new InstantCommand(() -> armSubsystem.getCurrentCommand().cancel()));
     }
 
     if (Robot.buddyBalanceEnabled) {

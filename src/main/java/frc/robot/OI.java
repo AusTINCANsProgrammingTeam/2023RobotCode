@@ -183,6 +183,7 @@ public class OI {
         private static final Button kUpBuddyBalanceButton = Button.POVUP; // Raises buddy balance lift
         private static final Button kConeSignalButton = Button.Y;
         private static final Button kCubeSignalButton = Button.X;
+        private static final Button kArmStopButton = Button.A;
 
         private static final int kArmElbowAxis = 3;
         private static final int kArmBaseAxis = 1;
@@ -224,6 +225,11 @@ public class OI {
         public static JoystickButton getCubeSignalButton() {
             kCubeSignalButton.setButtonAction("Signal Cube");
             return new JoystickButton(kJoystick, kCubeSignalButton.getButtonID());
+        }
+
+        public static JoystickButton getArmStopButton() {
+            kArmStopButton.setButtonAction("Stop Arm");
+            return new JoystickButton(kJoystick, kArmStopButton.getButtonID());
         }
     }
 
