@@ -145,7 +145,9 @@ public class SwerveModule extends SubsystemBase {
     public void resetEncoders() {
         driveEncoder.setPosition(0);
         turningEncoder.setPosition(getAbsoluteTurningPosition());
-        absoluteEncoder.close();
+        if(Robot.isReal()){
+            absoluteEncoder.close();
+        }
     }
 
     public SwerveModuleState getState() {
