@@ -50,7 +50,6 @@ public class ArmSubsystem extends SubsystemBase {
     HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
     HIGHDROP(1.4433, 0.9266), //High scoring motion
-    HIGHDROP2(1.4433, 1.3305),
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
     private double x; //Position relative to the base of the arm, in meters
