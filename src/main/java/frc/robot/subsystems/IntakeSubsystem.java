@@ -8,6 +8,8 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.classes.TimeOfFlightSensor;
+import frc.robot.classes.TimeOfFlightSensor.RawDistance;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
 import edu.wpi.first.networktables.GenericEntry;
@@ -25,6 +27,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kConeOuttakeSpeed = 0.75;
   public static final double kCubeIntakeSpeed = 0.55;
   public static final double kCubeOuttakeSpeed = -0.55;
+  private TimeOfFlightSensor timeOfFlightSensor;
 
   private final double coneActivationThreshold = 25.0; // placeholder value for how small values have to be for cone to be there
   private final double cubeActivationThreshold = 25.0; // placeholder value for how small values have to be for cube to be there
@@ -38,8 +41,9 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private boolean isConeMode;
 
   /** Creates a new IntakeSubsystem. */
-  public IntakeSubsystem() {
+  public IntakeSubsystem(TimeOfFlightSensor timeOfFlightSensor) {
     isConeMode = true;
+    this.timeOfFlightSensor = timeOfFlightSensor;
 
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
     motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
@@ -84,11 +88,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public double getConeDist() {
-    return 76.2; // Placeholder output for cone time of flight sensor (in mm)
+    return timeOfFlightSensor.getRawDistance0().classDistance;
   }
 
   public double getCubeDist() {
-    return 3.0; // Placeholder output for cube time of flight sensor (in mm)
+    return timeOfFlightSensor.getRawDistance1().classDistance;
   }
 
   public void changeFlightState() {

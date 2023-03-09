@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
+import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.commands.ArmAnglesCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -54,6 +55,7 @@ public class RobotContainer {
   private BlinkinLedSubsystem blinkinLedSubsystem;
   
   private Auton auton;
+  private TimeOfFlightSensor timeOfFlightSensor = new TimeOfFlightSensor();
 
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
@@ -77,7 +79,7 @@ public class RobotContainer {
     simulationSubsystem = Robot.isSimulation() && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
     subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
 
-    intakeSubsystem = Robot.intakeEnabled ? new IntakeSubsystem() : null;
+    intakeSubsystem = Robot.intakeEnabled ? new IntakeSubsystem(timeOfFlightSensor) : null;
     subsystemEnabledLog.append(intakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
 
     cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
