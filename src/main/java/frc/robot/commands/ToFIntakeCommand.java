@@ -40,6 +40,10 @@ public class ToFIntakeCommand extends CommandBase {
         intakeSubsystem.setMode(false);
         intakeSubsystem.pull();
         break;
+
+      case OFFLINE:
+        // If one or more sensors are offline, do nothing
+        break;
     }
   }
 

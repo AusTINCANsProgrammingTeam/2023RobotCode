@@ -19,7 +19,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public enum tofStates{
     IDLE,
     CUBE,
-    CONE
+    CONE,
+    OFFLINE
   }
 
   public static final double kConeIntakeSpeed = -0.75;
@@ -100,6 +101,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
     if (coneDistance <= coneActivationThreshold) {tofState = tofStates.CONE;}
     else if (cubeDistance <= cubeActivationThreshold) {tofState = tofStates.CUBE;}
+    else if (cubeDistance == -1 || coneDistance == -1) {tofState = tofStates.OFFLINE;}
     else {tofState = tofStates.IDLE;}
   }
 
