@@ -24,6 +24,7 @@ import frc.robot.subsystems.led.LedStripSubsystem;
 import frc.robot.subsystems.led.BlinkinLedSubsystem.BlinkinMode;
 import frc.robot.subsystems.led.LedMatrixSubsystem.MatrixMode;
 import frc.robot.subsystems.led.LedStripSubsystem.StripMode;
+import frc.robot.commands.ToFIntakeCommand;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -51,7 +52,7 @@ public class RobotContainer {
   private LedStripSubsystem ledSubsystem;
   private LedMatrixSubsystem ledMatrixSubsystem;
   private BlinkinLedSubsystem blinkinLedSubsystem;
-
+  
   private Auton auton;
 
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
@@ -132,6 +133,8 @@ public class RobotContainer {
     }
 
     if (Robot.intakeEnabled) {
+      intakeSubsystem.setDefaultCommand(new ToFIntakeCommand(intakeSubsystem));
+
       OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem));
       OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem));
       OI.Operator.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::toggleConeMode));

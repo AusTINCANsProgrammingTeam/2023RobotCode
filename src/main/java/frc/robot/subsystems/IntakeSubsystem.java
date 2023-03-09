@@ -15,10 +15,20 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
+  public enum tofStates{
+    IDLE,
+    CUBE,
+    CONE
+  }
+
   public static final double kConeIntakeSpeed = -0.75;
   public static final double kConeOuttakeSpeed = 0.75;
   public static final double kCubeIntakeSpeed = 0.55;
   public static final double kCubeOuttakeSpeed = -0.55;
+
+  private final double coneActivationThreshold = 25.0; // placeholder value for how small values have to be for cone to be there
+  private final double cubeActivationThreshold = 25.0; // placeholder value for how small values have to be for cube to be there
+  private tofStates tofState = tofStates.IDLE;
 
   private CANSparkMax motor;
   private CANSparkMax motor2;
@@ -71,13 +81,35 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     // Mostly for JUnit tests
     motor.close();
     motor2.close();
-    
+  }
+
+  public double getConeDist() {
+    return 76.2; // Placeholder output for cone time of flight sensor (in mm)
+  }
+
+  public double getCubeDist() {
+    return 3.0; // Placeholder output for cube time of flight sensor (in mm)
+  }
+
+  public void changeFlightState() {
+    double coneDistance = getConeDist();
+    double cubeDistance = getCubeDist();
+
+    if (coneDistance <= coneActivationThreshold) {tofState = tofStates.CONE;}
+    else if (cubeDistance <= cubeActivationThreshold) {tofState = tofStates.CUBE;}
+    else {tofState = tofStates.IDLE;}
+  }
+
+  public tofStates getFlightState() {
+    // Check if state has changed before returning it
+    changeFlightState();
+    return tofState;
   }
 
   @Override
   public void periodic() {
-    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
     // This method will be called once per scheduler run
+    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
   }
 
   @Override
