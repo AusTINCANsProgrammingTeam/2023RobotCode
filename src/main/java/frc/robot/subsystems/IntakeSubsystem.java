@@ -9,7 +9,6 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.classes.TimeOfFlightSensor;
-import frc.robot.classes.TimeOfFlightSensor.RawDistance;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
 import edu.wpi.first.networktables.GenericEntry;

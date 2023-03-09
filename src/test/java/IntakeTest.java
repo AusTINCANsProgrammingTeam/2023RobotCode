@@ -1,6 +1,8 @@
 import static org.junit.jupiter.api.Assertions.*; 
 import edu.wpi.first.hal.HAL;
 import org.junit.jupiter.api.*;
+
+import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.subsystems.IntakeSubsystem;
 
 
@@ -9,13 +11,14 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class IntakeTest {
 
   private static final double kDelta = 1e-2;
+  TimeOfFlightSensor timeOfFlightSensor = new TimeOfFlightSensor();
 
   //DUT -> Device Under Test
   private IntakeSubsystem dut;
 
   @BeforeEach // this method will run before each test
   public void setup() {
-    dut = new IntakeSubsystem();
+    dut = new IntakeSubsystem(timeOfFlightSensor);
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
   }
 
