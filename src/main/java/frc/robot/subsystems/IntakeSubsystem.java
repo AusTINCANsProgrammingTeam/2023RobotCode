@@ -14,6 +14,7 @@ import frc.robot.hardware.MotorController.MotorConfig;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public enum tofStates{
@@ -98,6 +99,10 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public void changeFlightState() {
     double coneDistance = getConeDist();
     double cubeDistance = getCubeDist();
+    SmartDashboard.putNumber("Cone Distance", coneDistance);
+    SmartDashboard.putNumber("Cube Distance", cubeDistance);
+    SmartDashboard.putBoolean("Has Cone", coneDistance <= coneActivationThreshold);
+    SmartDashboard.putBoolean("Has Cube", cubeDistance <= cubeActivationThreshold);
 
     if (coneDistance <= coneActivationThreshold) {tofState = tofStates.CONE;}
     else if (cubeDistance <= cubeActivationThreshold) {tofState = tofStates.CUBE;}
