@@ -463,8 +463,6 @@ public class ArmSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
-    SmartDashboard.putData(this);
-    SmartDashboard.putBoolean("Safety", getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
     // This method will be called once per scheduler run
     calculateCurrentPositions();
     if(DriverStation.isDisabled()){

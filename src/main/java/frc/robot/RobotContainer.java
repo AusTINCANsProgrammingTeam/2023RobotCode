@@ -140,7 +140,7 @@ public class RobotContainer {
     if (Robot.armEnabled) {
       OI.Driver.getArmHighButton().onTrue(new ProxyCommand(() -> armSubsystem.handleHighButton()));
       OI.Driver.getArmMidButton().onTrue(new ProxyCommand(() -> armSubsystem.handleMidButton()));
-      OI.Operator.getArmStopButton().onTrue(new InstantCommand(() -> armSubsystem.cancelCommands()));
+      OI.Operator.getArmStopButton().onTrue(new InstantCommand(() -> armSubsystem.cancelCommands()).withName("Cancel Arm"));
       if (Robot.intakeEnabled){
         OI.Driver.getArmConeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleConeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setMode(true))));
         OI.Driver.getArmCubeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleCubeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setMode(false))));
