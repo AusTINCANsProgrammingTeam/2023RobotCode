@@ -29,7 +29,6 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -38,7 +37,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
+import frc.robot.classes.TunableNumber;
+import frc.robot.commands.AssistedBalanceCommand;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController.MotorConfig;
 
@@ -54,9 +54,12 @@ public class SwerveSubsystem extends SubsystemBase{
         new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
         
-    public static final double kXTranslationP = 1.5;
-    public static final double kYTranslationP = 1.5;
-    public static final double kRotationP = 0.575;
+    public static final double kXTranslationP = 1.75;
+    public static final double kYTranslationP = 1.75;
+    public static final double kRotationP = 1.75;
+    public static final double kRotationI = 1e-6;
+
+    public static final double kAutoRotationP = 0.575;
 
     private final SwerveModule frontLeft = new SwerveModule(
         MotorConfig.FrontLeftModuleDrive,
@@ -82,7 +85,8 @@ public class SwerveSubsystem extends SubsystemBase{
         EncoderConfig.BackRightModule,
         "BR");
 
-    private AHRS gyro = Robot.isCompetitionRobot ? new AHRS(Port.kUSB1) : new AHRS(SPI.Port.kMXP);
+    private AHRS gyro = new AHRS(SPI.Port.kMXP);
+    private double gyroOffset; //Offset in degrees
     private SwerveDriveOdometry odometer = new SwerveDriveOdometry(kDriveKinematics, getRotation2d(), getModulePositions());
 
     private DataLog datalog = DataLogManager.getLog();
@@ -108,6 +112,12 @@ public class SwerveSubsystem extends SubsystemBase{
     private PIDController xController;
     private PIDController yController;
     private PIDController rotationController;
+    private PIDController autoRotationController;
+
+    private TunableNumber translationXTuner;
+    private TunableNumber translationYTuner;
+    private TunableNumber rotationPTuner;
+    private TunableNumber rotationITuner;
 
     public SwerveSubsystem() {
         zeroHeading();
@@ -117,19 +127,34 @@ public class SwerveSubsystem extends SubsystemBase{
         configTab.add(new StartEndCommand(this::coastModules, this::brakeModules, this).ignoringDisable(true).withName("Coast Modules"));
 
         //Define PID controllers for tracking trajectory
-        xController = new PIDController(kXTranslationP, 0, 0);
-        yController = new PIDController(kYTranslationP, 0, 0);
-        rotationController = new PIDController(kRotationP, 0, 0);
+        xController = new PIDController(kXTranslationP, 0, 1e-4);
+        yController = new PIDController(kYTranslationP, 0, 1e-4);
+        rotationController = new PIDController(kRotationP, kRotationI, 0);
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
+
+        autoRotationController = new PIDController(kAutoRotationP, 0, 0);
+        autoRotationController.enableContinuousInput(-Math.PI, Math.PI);
+
+        translationXTuner = new TunableNumber("X Translation P", kXTranslationP, xController::setP);
+        translationYTuner = new TunableNumber("Y Translation P", kYTranslationP, yController::setP);
+        rotationPTuner = new TunableNumber("Rotation P", kRotationP, rotationController::setP);
+        rotationITuner = new TunableNumber("Rotation I", kRotationI, rotationController::setI);
     }
 
     public void zeroHeading() {
         if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");} 
         gyro.reset();
+        gyroOffset = 0;
+    }
+
+    public void zeroHeading(Rotation2d rotation2d) {
+        if (gyro.isCalibrating()){errors.append("gyro failed to calibrate before zero");} 
+        gyro.reset();
+        gyroOffset = rotation2d.getDegrees();
     }
 
     public double getHeading() {
-        return gyro.getYaw();
+        return Math.IEEEremainder(gyro.getAngle() + gyroOffset, 360);
     }
 
     public double getPitch() {
@@ -175,7 +200,7 @@ public class SwerveSubsystem extends SubsystemBase{
             disableRotationHold();
         }
         else if(rotationHold != null){
-            r = rotationController.calculate(Units.degreesToRadians(getHeading()), rotationHold);
+            r = autoRotationController.calculate(Units.degreesToRadians(getHeading()), rotationHold);
         }
 
         //Map to speeds in meters/radians per second
@@ -271,16 +296,21 @@ public class SwerveSubsystem extends SubsystemBase{
             yController, 
             rotationController, 
             this::setModuleStates, 
+            true,
             this
         ).beforeStarting(() -> trajectoryLog.append("Following trajectory " + name)
         ).alongWith(new InstantCommand(() -> Logger.getInstance().recordOutput("trajectory " + name, trajectory)));
+    }
+
+    public Command assistedBalance(){
+        return new AssistedBalanceCommand(this);
     }
     
     @Override
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());
 
-        pitchEntry.setDouble(gyro.getPitch());
+        pitchEntry.setDouble(getPitch());
         headingEntry.setDouble(getHeading());
         positionEntry.setString(getPose().getTranslation().toString());
         Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
