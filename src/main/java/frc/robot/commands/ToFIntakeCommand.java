@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.IntakeSubsystem.tofStates;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -11,13 +12,16 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class ToFIntakeCommand extends CommandBase {
   /** Creates a new ToFIntakeCommand. */
   private final IntakeSubsystem intakeSubsystem;
+  private final ArmSubsystem armSubsystem;
   private final double coneKeepSpeed = 0.35; // change after testing
   private final double cubeKeepSpeed = 0.25; // change after testing
 
 
-  public ToFIntakeCommand(IntakeSubsystem intakeSubsystem) {
+  public ToFIntakeCommand(IntakeSubsystem intakeSubsystem, ArmSubsystem armSubsystem) {
     this.intakeSubsystem = intakeSubsystem;
+    this.armSubsystem = armSubsystem;
     addRequirements(intakeSubsystem);
+    addRequirements(armSubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -44,6 +48,10 @@ public class ToFIntakeCommand extends CommandBase {
       case CUBE:
         intakeSubsystem.setMode(false);
         intakeSubsystem.spinWheels(cubeKeepSpeed);
+        break;
+
+      case CONE_SCORE:
+        intakeSubsystem.stop();
         break;
 
       case OFFLINE:

@@ -21,7 +21,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     IDLE,
     CUBE,
     CONE,
-    OFFLINE
+    OFFLINE,
+    CONE_SCORE
   }
 
   public static final double kConeIntakeSpeed = -0.75;
@@ -104,10 +105,19 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putBoolean("Has Cone", coneDistance <= coneActivationThreshold);
     SmartDashboard.putBoolean("Has Cube", cubeDistance <= cubeActivationThreshold);
 
-    if (coneDistance <= coneActivationThreshold) {tofState = tofStates.CONE;}
-    else if (cubeDistance <= cubeActivationThreshold) {tofState = tofStates.CUBE;}
-    else if (cubeDistance == -1 || coneDistance == -1) {tofState = tofStates.OFFLINE;}
-    else {tofState = tofStates.IDLE;}
+    if (coneDistance <= coneActivationThreshold) {
+    if (ArmSubsystem.)
+      tofState = tofStates.CONE;
+    } 
+    else if (cubeDistance <= cubeActivationThreshold) {
+      tofState = tofStates.CUBE;
+    } 
+    else if (cubeDistance == -1 || coneDistance == -1) { 
+      tofState = tofStates.OFFLINE;
+    }
+    else {
+      tofState = tofStates.IDLE;
+    }
   }
 
   public tofStates getFlightState() {
