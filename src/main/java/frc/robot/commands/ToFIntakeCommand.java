@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class ToFIntakeCommand extends CommandBase {
   /** Creates a new ToFIntakeCommand. */
   private final IntakeSubsystem intakeSubsystem;
+  private final double coneKeepSpeed = 0.35; // change after testing
+  private final double cubeKeepSpeed = 0.25; // change after testing
+
 
   public ToFIntakeCommand(IntakeSubsystem intakeSubsystem) {
     this.intakeSubsystem = intakeSubsystem;
@@ -28,17 +31,19 @@ public class ToFIntakeCommand extends CommandBase {
 
     switch (tofState) {
       case IDLE:
-        intakeSubsystem.stop();
+        if (intakeSubsystem.getSpeed() != 0) {
+          intakeSubsystem.stop();
+        }
         break;
 
       case CONE:
         intakeSubsystem.setMode(true);
-        intakeSubsystem.pull();
+        intakeSubsystem.spinWheels(coneKeepSpeed);
         break;
 
       case CUBE:
         intakeSubsystem.setMode(false);
-        intakeSubsystem.pull();
+        intakeSubsystem.spinWheels(cubeKeepSpeed);
         break;
 
       case OFFLINE:
