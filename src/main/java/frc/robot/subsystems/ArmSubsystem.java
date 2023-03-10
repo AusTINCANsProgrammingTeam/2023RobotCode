@@ -165,6 +165,7 @@ public class ArmSubsystem extends SubsystemBase {
   MechanismLigament2d baseLigament = baseRoot.append(new MechanismLigament2d("Base Arm", kBaseLength*3, baseArmSim.getAngleRads()));
   MechanismLigament2d elbowLigament = baseLigament.append(new MechanismLigament2d("Elbow Arm", kElbowLength*3, elbowArmSim.getAngleRads()));
   
+  
 
   public ArmSubsystem() {
     //Add coast mode command to shuffleboard
@@ -454,6 +455,8 @@ public class ArmSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
+    baseLigament.setAngle(Units.radiansToDegrees(getBaseAngle()));
+    elbowLigament.setAngle(Units.radiansToDegrees(getElbowAngle()));
     // This method will be called once per scheduler run
     calculateCurrentPositions();
     if(DriverStation.isDisabled()){
