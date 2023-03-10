@@ -11,13 +11,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
+import frc.robot.subsystems.ArmSubsystem.ArmState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
-  public enum tofStates{
+  public enum FlightStates{
     IDLE,
     CUBE,
     CONE,
@@ -33,7 +34,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   private final double coneActivationThreshold = 25.0; // placeholder value for how small values have to be for cone to be there
   private final double cubeActivationThreshold = 25.0; // placeholder value for how small values have to be for cube to be there
-  private tofStates tofState = tofStates.IDLE;
+  private FlightStates tofState = FlightStates.IDLE;
 
   private CANSparkMax motor;
   private CANSparkMax motor2;
@@ -106,21 +107,20 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putBoolean("Has Cube", cubeDistance <= cubeActivationThreshold);
 
     if (coneDistance <= coneActivationThreshold) {
-    if (ArmSubsystem.)
-      tofState = tofStates.CONE;
+      tofState = FlightStates.CONE;
     } 
     else if (cubeDistance <= cubeActivationThreshold) {
-      tofState = tofStates.CUBE;
+      tofState = FlightStates.CUBE;
     } 
     else if (cubeDistance == -1 || coneDistance == -1) { 
-      tofState = tofStates.OFFLINE;
+      tofState = FlightStates.OFFLINE;
     }
     else {
-      tofState = tofStates.IDLE;
+      tofState = FlightStates.IDLE;
     }
   }
 
-  public tofStates getFlightState() {
+  public FlightStates getFlightState() {
     // Check if state has changed before returning it
     changeFlightState();
     return tofState;

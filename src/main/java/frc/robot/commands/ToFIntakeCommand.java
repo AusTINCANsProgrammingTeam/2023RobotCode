@@ -6,7 +6,9 @@ package frc.robot.commands;
 
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.IntakeSubsystem.tofStates;
+import frc.robot.subsystems.ArmSubsystem.ArmState;
+import frc.robot.subsystems.IntakeSubsystem.FlightStates;
+import frc.robot.subsystems.IntakeSubsystem.FlightStates;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ToFIntakeCommand extends CommandBase {
@@ -31,7 +33,7 @@ public class ToFIntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    tofStates tofState = intakeSubsystem.getFlightState();
+    FlightStates tofState = intakeSubsystem.getFlightState();
 
     switch (tofState) {
       case IDLE:
@@ -41,9 +43,14 @@ public class ToFIntakeCommand extends CommandBase {
         break;
 
       case CONE:
-        intakeSubsystem.setMode(true);
-        intakeSubsystem.spinWheels(coneKeepSpeed);
-        break;
+        // If we're about to shoot, make sure not to stay running intake normally
+        if (armSubsystem.getArmState().equals(ArmState.HIGHSCORE)) {
+          tofState = FlightStates.CONE_SCORE;
+        } else {
+          intakeSubsystem.setMode(true);
+          intakeSubsystem.spinWheels(coneKeepSpeed);
+          break;
+        }
 
       case CUBE:
         intakeSubsystem.setMode(false);
@@ -51,6 +58,7 @@ public class ToFIntakeCommand extends CommandBase {
         break;
 
       case CONE_SCORE:
+        // Turn off intake when about to score
         intakeSubsystem.stop();
         break;
 

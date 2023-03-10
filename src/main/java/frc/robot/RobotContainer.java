@@ -135,8 +135,6 @@ public class RobotContainer {
     }
 
     if (Robot.intakeEnabled) {
-      intakeSubsystem.setDefaultCommand(new ToFIntakeCommand(intakeSubsystem));
-
       OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem));
       OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem));
       OI.Operator.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::toggleConeMode));
@@ -146,6 +144,8 @@ public class RobotContainer {
       OI.Driver.getArmHighButton().onTrue(new ProxyCommand(() -> armSubsystem.handleHighButton()));
       OI.Driver.getArmMidButton().onTrue(new ProxyCommand(() -> armSubsystem.handleMidButton()));
       if (Robot.intakeEnabled){
+        intakeSubsystem.setDefaultCommand(new ToFIntakeCommand(intakeSubsystem, armSubsystem));
+
         OI.Driver.getArmConeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleConeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setMode(true))));
         OI.Driver.getArmCubeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleCubeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setMode(false))));
       }
