@@ -452,6 +452,8 @@ public class ArmSubsystem extends SubsystemBase {
     calculateCurrentPositions();
     if(DriverStation.isDisabled()){
       holdCurrentPosition();
+      basePIDController.reset(getBaseAngle());
+      elbowPIDController.reset(getElbowAngle());
     }
 
     rolloverLog.log(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
