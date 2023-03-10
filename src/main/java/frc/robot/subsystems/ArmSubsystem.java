@@ -338,6 +338,11 @@ public class ArmSubsystem extends SubsystemBase {
             );
   }
 
+  public Command goToStateDelay(ArmState state) {
+    //Intended for use after scoring
+    return new WaitCommand(0.5).andThen(goToState(state));
+  }
+
   public Command transitionToState(ArmState state){
     return new SequentialCommandGroup(
       goToState(ArmState.TRANSITION),
@@ -420,11 +425,6 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
-  public Command stowArmParallel() {
-    //Run along with a trajectory to stow arm after scoring
-    return new WaitCommand(0.5).andThen(goToState(ArmState.STOWED));
-  }
-
   public void coastBase() {
     baseMotor.setIdleMode(IdleMode.kCoast);
     baseMotor2.setIdleMode(IdleMode.kCoast);
@@ -452,6 +452,8 @@ public class ArmSubsystem extends SubsystemBase {
     calculateCurrentPositions();
     if(DriverStation.isDisabled()){
       holdCurrentPosition();
+      basePIDController.reset(getBaseAngle());
+      elbowPIDController.reset(getElbowAngle());
     }
 
     rolloverLog.log(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
