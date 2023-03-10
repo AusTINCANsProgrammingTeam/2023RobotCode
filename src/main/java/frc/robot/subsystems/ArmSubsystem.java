@@ -406,13 +406,13 @@ public class ArmSubsystem extends SubsystemBase {
       case STOWED:
         return transitionToState(ArmState.CUBEINTAKE);
       case HIGHTRANSITION:
+      case MIDSCORE:
       case CUBEINTAKE:
         return transitionToState(ArmState.STOWED);
       case HIGHSCORE:
         return goToState(ArmState.HIGHDROP);
       case TRANSITION:
       case CONEINTAKE:
-      case MIDSCORE:
       case HIGHDROP:
         return goToState(ArmState.CUBEINTAKE);
       default:
