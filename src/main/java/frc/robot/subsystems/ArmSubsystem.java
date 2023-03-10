@@ -160,10 +160,13 @@ public class ArmSubsystem extends SubsystemBase {
   //The "canvas" that both arms are drawn on
   Mechanism2d simArmCanvas = new Mechanism2d(7,7);
   //Where the base arm begins
-  MechanismRoot2d baseRoot = simArmCanvas.getRoot("Base Arm Root", 0, 0);
+  MechanismRoot2d baseRoot = simArmCanvas.getRoot("Base Arm Root", 3.5, 0);
+  MechanismRoot2d baseRootDesired = simArmCanvas.getRoot("Base Arm Root (Desired)", 3.5, 0);
   //Sets the base arm to the root, then the elbow arm to the end of the base arm
   MechanismLigament2d baseLigament = baseRoot.append(new MechanismLigament2d("Base Arm", kBaseLength*3, baseArmSim.getAngleRads()));
   MechanismLigament2d elbowLigament = baseLigament.append(new MechanismLigament2d("Elbow Arm", kElbowLength*3, elbowArmSim.getAngleRads()));
+  MechanismLigament2d baseLigamentDesired;
+  MechanismLigament2d elbowLigamentDesired;
   
   
 
@@ -207,6 +210,8 @@ public class ArmSubsystem extends SubsystemBase {
     holdCurrentPosition();
     
     setState(kDefaultState);
+    baseLigamentDesired = baseRoot.append(new MechanismLigament2d("Base Arm (Desired)", kBaseLength*3, Units.radiansToDegrees(basePIDController.getGoal().position)));
+    elbowLigamentDesired = baseLigament.append(new MechanismLigament2d("Elbow Arm (Desired)", kElbowLength*3, Units.radiansToDegrees(elbowPIDController.getGoal().position)));
   }
 
   //Returns sim encoder position (No offset) if in simulation, the actual position otherwise
@@ -455,8 +460,14 @@ public class ArmSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
-    baseLigament.setAngle(Units.radiansToDegrees(getBaseAngle()));
-    elbowLigament.setAngle(Units.radiansToDegrees(getElbowAngle()));
+    double baseAngle = Units.radiansToDegrees(getBaseAngle());
+    double elbowAngle = Units.radiansToDegrees(getElbowAngle());
+    double baseDesired = Units.radiansToDegrees(basePIDController.getGoal().position);
+    double elbowDesired = Units.radiansToDegrees(elbowPIDController.getGoal().position);
+    baseLigament.setAngle(baseAngle);
+    elbowLigament.setAngle(elbowAngle+180);
+    baseLigamentDesired.setAngle(baseDesired);
+    elbowLigamentDesired.setAngle(elbowDesired);
     Logger.getInstance().recordOutput("Arm Mechanism2D", simArmCanvas);
     // This method will be called once per scheduler run
     calculateCurrentPositions();
@@ -466,13 +477,13 @@ public class ArmSubsystem extends SubsystemBase {
 
     rolloverLog.log(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
 
-    actualBaseAngleLog.log(Units.radiansToDegrees(getBaseAngle()));
+    actualBaseAngleLog.log(baseAngle);
     actualChooChooAngleLog.log(Units.radiansToDegrees(getChooChooAngle()));
     desiredBaseGoalLog.log(Units.radiansToDegrees(basePIDController.getGoal().position));
     desiredBaseSetpointLog.log(Units.radiansToDegrees(basePIDController.getSetpoint().position));
     baseOutputLog.log(baseMotor.get());
 
-    actualElbowAngleLog.log(Units.radiansToDegrees(getElbowAngle()));
+    actualElbowAngleLog.log(elbowAngle);
     desiredElbowGoalLog.log(Units.radiansToDegrees(elbowPIDController.getGoal().position));
     desiredElbowSetpointLog.log(Units.radiansToDegrees(elbowPIDController.getSetpoint().position));
     elbowOutputLog.log(elbowMotor.get());
