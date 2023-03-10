@@ -6,7 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
-
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -457,6 +457,7 @@ public class ArmSubsystem extends SubsystemBase {
   public void periodic() {
     baseLigament.setAngle(Units.radiansToDegrees(getBaseAngle()));
     elbowLigament.setAngle(Units.radiansToDegrees(getElbowAngle()));
+    Logger.getInstance().recordOutput("Arm Mechanism2D", simArmCanvas);
     // This method will be called once per scheduler run
     calculateCurrentPositions();
     if(DriverStation.isDisabled()){
