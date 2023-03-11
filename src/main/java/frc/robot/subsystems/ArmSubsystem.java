@@ -265,6 +265,12 @@ public class ArmSubsystem extends SubsystemBase {
     double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
     baseMotor.set(baseOutput);
     elbowMotor.set(elbowOutput);
+    
+  }
+
+  //Cancels commmand, but profPIDcontroller keeps going to next setpoint, before dropping back to where the button was pressed.
+  public void cancelCommands() {
+    getCurrentCommand().cancel();
   }
 
 
@@ -335,7 +341,7 @@ public class ArmSubsystem extends SubsystemBase {
                 (b)->{}, //End 
                 this::atSetpoint, //isFinished
                 this
-            );
+            ).withName("goToState " + state);
   }
 
   public Command transitionToState(ArmState state){
