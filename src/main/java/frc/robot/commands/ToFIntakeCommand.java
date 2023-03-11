@@ -62,10 +62,6 @@ public class ToFIntakeCommand extends CommandBase {
         // Turn off intake when about to score
         intakeSubsystem.stop();
         break;
-
-      case OFFLINE:
-        // If one or more sensors are offline, do nothing
-        break;
     }
   }
 

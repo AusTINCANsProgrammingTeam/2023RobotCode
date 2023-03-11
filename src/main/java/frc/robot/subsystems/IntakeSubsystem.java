@@ -22,7 +22,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     IDLE,
     CUBE,
     CONE,
-    OFFLINE,
     CONE_SCORE
   }
 
@@ -101,22 +100,28 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public void changeFlightState() {
     double coneDistance = getConeDist();
     double cubeDistance = getCubeDist();
+
+    boolean coneSensorUp = coneDistance != -1;
+    boolean cubeSensorUp = cubeDistance != -1;
+
     SmartDashboard.putNumber("Cone Distance", coneDistance);
     SmartDashboard.putNumber("Cube Distance", cubeDistance);
     SmartDashboard.putBoolean("Has Cone", coneDistance <= coneActivationThreshold);
     SmartDashboard.putBoolean("Has Cube", cubeDistance <= cubeActivationThreshold);
+    SmartDashboard.putBoolean("Cone Sensor Working", coneSensorUp);
+    SmartDashboard.putBoolean("Cube Sensor Working", cubeSensorUp);
 
-    if (coneDistance <= coneActivationThreshold) {
-      tofState = FlightStates.CONE;
-    } 
-    else if (cubeDistance <= cubeActivationThreshold) {
-      tofState = FlightStates.CUBE;
-    } 
-    else if (cubeDistance == -1 || coneDistance == -1) { 
-      tofState = FlightStates.OFFLINE;
-    }
-    else {
-      tofState = FlightStates.IDLE;
+    if (coneSensorUp && cubeSensorUp) {
+      // Only change state if both sensors are up, otherwise stay in last state
+      if (coneDistance <= coneActivationThreshold) {
+        tofState = FlightStates.CONE;
+      } 
+      else if (cubeDistance <= cubeActivationThreshold) {
+        tofState = FlightStates.CUBE;
+      } 
+      else {
+        tofState = FlightStates.IDLE;
+      }
     }
   }
 
