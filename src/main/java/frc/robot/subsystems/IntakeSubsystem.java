@@ -66,6 +66,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void setMode(boolean isConeMode) {
+    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
     this.isConeMode = isConeMode;
   }
 
@@ -111,17 +112,15 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putBoolean("Cone Sensor Working", coneSensorUp);
     SmartDashboard.putBoolean("Cube Sensor Working", cubeSensorUp);
 
-    if (coneSensorUp && cubeSensorUp) {
-      // Only change state if both sensors are up, otherwise stay in last state
-      if (coneDistance <= coneActivationThreshold) {
-        tofState = FlightStates.CONE;
-      } 
-      else if (cubeDistance <= cubeActivationThreshold) {
-        tofState = FlightStates.CUBE;
-      } 
-      else {
-        tofState = FlightStates.IDLE;
-      }
+    // Only change state if both sensors are up, otherwise stay in last state
+    if (coneDistance <= coneActivationThreshold && coneSensorUp) {
+      tofState = FlightStates.CONE;
+    } 
+    else if (cubeDistance <= cubeActivationThreshold && cubeSensorUp) {
+      tofState = FlightStates.CUBE;
+    } 
+    else {
+      tofState = FlightStates.IDLE;
     }
   }
 
@@ -132,10 +131,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
-  }
+  public void periodic() {}
 
   @Override
   public void simulationPeriodic() {
