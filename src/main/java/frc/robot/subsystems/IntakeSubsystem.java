@@ -8,6 +8,7 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.classes.DebugLog;
 import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
@@ -40,6 +41,15 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
   private static GenericEntry intakeMode = matchTab.add("Intake Mode", "Cone Mode").getEntry();
+
+  private DebugLog coneDist = new DebugLog<Integer>(0, "Cone Distance", this);
+  private DebugLog cubeDist = new DebugLog<Integer>(0, "Cube Distance", this);
+  private DebugLog hasCone = new DebugLog<Boolean>(false, "Has Cone", this);
+  private DebugLog hasCube = new DebugLog<Boolean>(false, "Has Cube", this);
+  private DebugLog isConeSensor = new DebugLog<Boolean>(true, "Cone Sensor Working", this);
+  private DebugLog isCubeSensor = new DebugLog<Boolean>(true, "Cube Sensor Working", this);
+
+
   private boolean isConeMode;
 
   /** Creates a new IntakeSubsystem. */
@@ -66,6 +76,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void setMode(boolean isConeMode) {
+    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
     this.isConeMode = isConeMode;
   }
 
@@ -104,24 +115,22 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     boolean coneSensorUp = coneDistance != -1;
     boolean cubeSensorUp = cubeDistance != -1;
 
-    SmartDashboard.putNumber("Cone Distance", coneDistance);
-    SmartDashboard.putNumber("Cube Distance", cubeDistance);
-    SmartDashboard.putBoolean("Has Cone", coneDistance <= coneActivationThreshold);
-    SmartDashboard.putBoolean("Has Cube", cubeDistance <= cubeActivationThreshold);
-    SmartDashboard.putBoolean("Cone Sensor Working", coneSensorUp);
-    SmartDashboard.putBoolean("Cube Sensor Working", cubeSensorUp);
+    coneDist.log(coneDistance);
+    cubeDist.log(cubeDistance);
+    hasCone.log(coneDistance <= coneActivationThreshold);
+    hasCube.log(cubeDistance <= cubeActivationThreshold);
+    isConeSensor.log(coneSensorUp);
+    isCubeSensor.log(cubeSensorUp);
 
-    if (coneSensorUp && cubeSensorUp) {
-      // Only change state if both sensors are up, otherwise stay in last state
-      if (coneDistance <= coneActivationThreshold) {
-        tofState = FlightStates.CONE;
-      } 
-      else if (cubeDistance <= cubeActivationThreshold) {
-        tofState = FlightStates.CUBE;
-      } 
-      else {
-        tofState = FlightStates.IDLE;
-      }
+    // Only change state if both sensors are up, otherwise stay in last state
+    if (coneDistance <= coneActivationThreshold && coneSensorUp) {
+      tofState = FlightStates.CONE;
+    } 
+    else if (cubeDistance <= cubeActivationThreshold && cubeSensorUp) {
+      tofState = FlightStates.CUBE;
+    } 
+    else {
+      tofState = FlightStates.IDLE;
     }
   }
 
@@ -132,10 +141,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
-  }
+  public void periodic() {}
 
   @Override
   public void simulationPeriodic() {
