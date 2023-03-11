@@ -49,6 +49,7 @@ public class ArmSubsystem extends SubsystemBase {
     MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
+    HIGHTRANSITIONAUTON(0, 0), //High transition state used in auton to avoid getting stuck FIXME
     HIGHDROP(1.4433, 0.9266), //High scoring motion
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 

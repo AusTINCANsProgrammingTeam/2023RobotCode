@@ -83,7 +83,7 @@ public class Auton{
             modeChooser.addOption(mode.toString(), mode);
         }
         modeChooser.setDefaultOption(kDefaultAutonMode.toString(), kDefaultAutonMode);
-        configTab.add("Auton mode", modeChooser);
+        configTab.add("Auton mode", modeChooser).withSize(2, 1);
 
         pathConstraints = new PathConstraints(kMaxSpeed, kMaxAcceleration);
     }
@@ -123,7 +123,7 @@ public class Auton{
         return new SequentialCommandGroup(
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
-            armSubsystem.goToState(ArmState.HIGHTRANSITION),
+            armSubsystem.goToState(ArmState.HIGHTRANSITIONAUTON),
             armSubsystem.goToState(ArmState.HIGHSCORE)
             ), 
             new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem)
