@@ -31,8 +31,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kCubeOuttakeSpeed = -0.55;
   private TimeOfFlightSensor timeOfFlightSensor;
 
-  private final double coneActivationThreshold = 25.0; // placeholder value for how small values have to be for cone to be there
-  private final double cubeActivationThreshold = 25.0; // placeholder value for how small values have to be for cube to be there
+  private final double coneActivationThreshold = 550.0; // placeholder value for how small values have to be for cone to be there
+  private final double cubeActivationThreshold = 550.0; // placeholder value for how small values have to be for cube to be there
   private FlightStates tofState = FlightStates.IDLE;
 
   private CANSparkMax motor;

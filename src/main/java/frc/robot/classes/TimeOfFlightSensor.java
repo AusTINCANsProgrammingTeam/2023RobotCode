@@ -8,6 +8,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SerialPortJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.SerialPort;
 
 public class TimeOfFlightSensor implements AutoCloseable {
   public static class RawDistance {
@@ -79,6 +80,7 @@ public class TimeOfFlightSensor implements AutoCloseable {
   private final Thread readThread;
   private final AtomicBoolean threadRunning = new AtomicBoolean(true);
 
+
   private void threadMain() {
     // Using JNI for a non allocating read
     int port = SerialPortJNI.serialInitializePort((byte)1);
@@ -89,7 +91,8 @@ public class TimeOfFlightSensor implements AutoCloseable {
 
     SerialPortJNI.serialSetTimeout(port, 1);
     SerialPortJNI.serialEnableTermination(port, '\n');
-
+    
+    //int port = SerialPortJNI.serialInitializePort((byte)3);
     HAL.report(tResourceType.kResourceType_SerialPort, 2);
 
     byte[] buffer = new byte[257];
@@ -127,10 +130,12 @@ public class TimeOfFlightSensor implements AutoCloseable {
 
       lastComma.value = -1;
 
-      boolean hasDistance0 = parseIntFromIndex(charSeq, read, lastComma) != 0;
-      boolean hasDistance1 = parseIntFromIndex(charSeq, read, lastComma) != 0;
+      //boolean hasDistance0 = parseIntFromIndex(charSeq, read, lastComma) != 0;
+      //boolean hasDistance1 = parseIntFromIndex(charSeq, read, lastComma) != 0;
       distance0.classDistance = parseIntFromIndex(charSeq, read, lastComma);
       distance1.classDistance = parseIntFromIndex(charSeq, read, lastComma);
+      boolean hasDistance0 = distance0.classDistance != -1;
+      boolean hasDistance1 = distance1.classDistance != -1;
 
       double ts = Timer.getFPGATimestamp();
 
