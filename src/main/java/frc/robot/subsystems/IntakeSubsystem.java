@@ -100,17 +100,17 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     motor2.close();
   }
 
-  public double getConeDist() {
-    return timeOfFlightSensor.getRawDistance0().classDistance;
+  public int getConeDist() {
+    return timeOfFlightSensor.getDistance0();
   }
 
-  public double getCubeDist() {
-    return timeOfFlightSensor.getRawDistance1().classDistance;
+  public int getCubeDist() {
+    return timeOfFlightSensor.getDistance1();
   }
 
   public void changeFlightState() {
-    double coneDistance = getConeDist();
-    double cubeDistance = getCubeDist();
+    int coneDistance = getConeDist();
+    int cubeDistance = getCubeDist();
 
     boolean coneSensorUp = coneDistance != -1;
     boolean cubeSensorUp = cubeDistance != -1;

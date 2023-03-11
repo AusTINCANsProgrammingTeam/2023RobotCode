@@ -11,16 +11,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.SerialPort;
 
 public class TimeOfFlightSensor implements AutoCloseable {
-  public static class RawDistance {
-    public RawDistance(int distance) {
-        classDistance = distance;
-    }
-    public RawDistance() {
-    }
-
-    public int classDistance;
-  }
-
   private static class SingleCharSequence implements CharSequence {
     public byte[] data;
 
@@ -73,8 +63,8 @@ public class TimeOfFlightSensor implements AutoCloseable {
   private final AtomicBoolean debugPrints = new AtomicBoolean();
   private boolean hasDistance0;
   private boolean hasDistance1;
-  private final RawDistance distance0 = new RawDistance();
-  private final RawDistance distance1 = new RawDistance();
+  private int distance0;
+  private int distance1;
   private double lastReadTime;
   private final ReentrantLock threadLock = new ReentrantLock();
   private final Thread readThread;
@@ -100,8 +90,8 @@ public class TimeOfFlightSensor implements AutoCloseable {
     charSeq.data = buffer;
     IntRef lastComma = new IntRef();
 
-    RawDistance distance0 = new RawDistance();
-    RawDistance distance1 = new RawDistance();
+    int distance0;
+    int distance1;
 
     while (threadRunning.get()) {
       int read = SerialPortJNI.serialRead(port, buffer, buffer.length - 1);
@@ -145,10 +135,10 @@ public class TimeOfFlightSensor implements AutoCloseable {
         this.hasDistance0 = hasDistance0;
         this.hasDistance1 = hasDistance1;
         if (hasDistance0) {
-          this.distance0.classDistance = distance0.classDistance;
+          this.distance0 = distance0;
         }
         if (hasDistance1) {
-          this.distance1.classDistance = distance1.classDistance;
+          this.distance1 = distance1;
         }
       } finally {
         threadLock.unlock();
@@ -182,37 +172,37 @@ public class TimeOfFlightSensor implements AutoCloseable {
     }
   }
 
-  public RawDistance getRawDistance0() {
+  public int getDistance0() {
     try {
       threadLock.lock();
-      return new RawDistance(distance0.classDistance);
+      return distance0;
     } finally {
       threadLock.unlock();
     }
   }
 
-  public void getRawDistance0(RawDistance rawDistance) {
+  public void getDistance0(int rawDistance) {
     try {
       threadLock.lock();
-      rawDistance.classDistance = distance0.classDistance;
+      rawDistance = distance0;
     } finally {
       threadLock.unlock();
     }
   }
 
-  public RawDistance getRawDistance1() {
+  public int getDistance1() {
     try {
       threadLock.lock();
-      return new RawDistance(distance1.classDistance);
+      return distance1;
     } finally {
       threadLock.unlock();
     }
   }
 
-  public void getRawDistance1(RawDistance rawDistance) {
+  public void getDistance1(int rawDistance) {
     try {
       threadLock.lock();
-      rawDistance.classDistance = distance1.classDistance;
+      rawDistance = distance1;
     } finally {
       threadLock.unlock();
     }
