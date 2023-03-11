@@ -73,6 +73,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     return new StartEndCommand(this::pull, this::stop, this).withTimeout(seconds);
   }
 
+  public Command pushTimed(double seconds, boolean isConeMode){
+    setMode(isConeMode);
+    return new StartEndCommand(this::push, this::stop, this).withTimeout(seconds);
+  }
+
   @Override
   public void close() throws Exception {
     // This method will close all device handles used by this object and release any other dynamic memory.
