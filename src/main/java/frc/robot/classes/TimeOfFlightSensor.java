@@ -122,10 +122,10 @@ public class TimeOfFlightSensor implements AutoCloseable {
 
       //boolean hasDistance0 = parseIntFromIndex(charSeq, read, lastComma) != 0;
       //boolean hasDistance1 = parseIntFromIndex(charSeq, read, lastComma) != 0;
-      distance0.classDistance = parseIntFromIndex(charSeq, read, lastComma);
-      distance1.classDistance = parseIntFromIndex(charSeq, read, lastComma);
-      boolean hasDistance0 = distance0.classDistance != -1;
-      boolean hasDistance1 = distance1.classDistance != -1;
+      distance0 = parseIntFromIndex(charSeq, read, lastComma);
+      distance1 = parseIntFromIndex(charSeq, read, lastComma);
+      boolean hasDistance0 = distance0 != -1;
+      boolean hasDistance1 = distance1 != -1;
 
       double ts = Timer.getFPGATimestamp();
 
