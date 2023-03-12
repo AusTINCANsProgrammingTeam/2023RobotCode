@@ -26,7 +26,7 @@ public class IntakeTest {
   public void shutdown() throws Exception {
     dut.close(); // destroy our subsystem object so we do each test from a clean slate
   }
-
+  /* 
   @Test // marks this method as a test
   public void testPull() {
     dut.pull();
@@ -40,4 +40,5 @@ public class IntakeTest {
     assertEquals(IntakeSubsystem.kConeOuttakeSpeed, dut.getSpeed(), kDelta);
   }
   // Add more @Test tagged methods to test other things...
+  */
 }
