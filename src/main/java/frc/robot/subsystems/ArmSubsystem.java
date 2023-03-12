@@ -45,7 +45,7 @@ public class ArmSubsystem extends SubsystemBase {
   public static enum ArmState{
     STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
     CONEINTAKE(1.0136, -0.0876), //Arm is in position to intake cones
-    CUBEINTAKE(0.7984, -0.2416), //Arm is in position to intake cubes
+    CUBEINTAKE(0.7691, -0.2365), //Arm is in position to intake cubes
     MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
@@ -77,9 +77,9 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseI = 0.35;
   private double kBaseD = 0;
   //Elbow arm PID values
-  private double kElbowP = 1.3;
-  private double kElbowI = 0.25;
-  private double kElbowD = 0.015;
+  private double kElbowP = 0.95;
+  private double kElbowI = 0.15;
+  private double kElbowD = 0.05;
   //Sim PID values
   private double kSimBaseP = 0.1;
   private double kSimElbowP = 0.1;
@@ -262,7 +262,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void updateMotors() {
     double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? -1 : 1) * basePIDController.calculate(getBaseAngle()),-1,1);
-    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
+    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),-.4,1);
     baseMotor.set(baseOutput);
     elbowMotor.set(elbowOutput);
   }
