@@ -17,9 +17,9 @@ public class AbsoluteEncoder {
         BackLeftModule(3, false, -2.789, -3.911),
         BackRightModule(4, false, -3.995, -4.686),
         //Arm Encoders (REV)
-        ArmBase(1, true, Units.degreesToRadians(43.384)),
+        ArmBase(1, true, Units.degreesToRadians(43.384), Units.degreesToRadians(49.056)),
         ArmChooChoo(2),
-        ArmElbow(0, true, Units.degreesToRadians(233.6));
+        ArmElbow(0, true, Units.degreesToRadians(233.6), Units.degreesToRadians(-56.425));
         
         private int ID;
         private boolean reversed;
