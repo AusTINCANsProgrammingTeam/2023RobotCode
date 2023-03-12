@@ -8,7 +8,6 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ArmSubsystem.ArmState;
 import frc.robot.subsystems.IntakeSubsystem.FlightStates;
-import frc.robot.subsystems.IntakeSubsystem.FlightStates;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ToFIntakeCommand extends CommandBase {
@@ -28,7 +27,7 @@ public class ToFIntakeCommand extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {} 
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

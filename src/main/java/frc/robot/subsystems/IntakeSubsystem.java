@@ -16,7 +16,6 @@ import frc.robot.subsystems.ArmSubsystem.ArmState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public enum FlightStates{
@@ -32,8 +31,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kCubeOuttakeSpeed = -0.55;
   private TimeOfFlightSensor timeOfFlightSensor;
 
-  private final double coneActivationThreshold = 550.0; 
-  private final double cubeActivationThreshold = 550.0; 
+  private final double mmConeActivationThreshold = 550.0; 
+  private final double mmCubeActivationThreshold = 550.0; 
   private FlightStates tofState = FlightStates.IDLE;
 
   private CANSparkMax motor;
@@ -42,12 +41,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
   private static GenericEntry intakeMode = matchTab.add("Intake Mode", "Cone Mode").getEntry();
 
-  private DebugLog coneDist = new DebugLog<Integer>(0, "Cone Distance", this);
-  private DebugLog cubeDist = new DebugLog<Integer>(0, "Cube Distance", this);
-  private DebugLog hasCone = new DebugLog<Boolean>(false, "Has Cone", this);
-  private DebugLog hasCube = new DebugLog<Boolean>(false, "Has Cube", this);
-  private DebugLog isConeSensor = new DebugLog<Boolean>(true, "Cone Sensor Working", this);
-  private DebugLog isCubeSensor = new DebugLog<Boolean>(true, "Cube Sensor Working", this);
+  private DebugLog<Integer> coneDist = new DebugLog<Integer>(0, "Cone Distance", this);
+  private DebugLog<Integer> cubeDist = new DebugLog<Integer>(0, "Cube Distance", this);
+  private DebugLog<Boolean> hasCone = new DebugLog<Boolean>(false, "Has Cone", this);
+  private DebugLog<Boolean> hasCube = new DebugLog<Boolean>(false, "Has Cube", this);
+  private DebugLog<Boolean> isConeSensor = new DebugLog<Boolean>(true, "Cone Sensor Working", this);
+  private DebugLog<Boolean> isCubeSensor = new DebugLog<Boolean>(true, "Cube Sensor Working", this);
 
 
   private boolean isConeMode;
@@ -100,36 +99,47 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     motor2.close();
   }
 
-  public int getConeDist() {
-    return timeOfFlightSensor.getDistance0();
-  }
-
-  public int getCubeDist() {
-    return timeOfFlightSensor.getDistance1();
-  }
-
   public void changeFlightState() {
-    int coneDistance = getConeDist();
-    int cubeDistance = getCubeDist();
+    // Check if sensors are online
+    boolean coneSensorUp = timeOfFlightSensor.isSensor0Connected();
+    boolean cubeSensorUp = timeOfFlightSensor.isSensor1Connected();
 
-    boolean coneSensorUp = coneDistance != -1;
-    boolean cubeSensorUp = cubeDistance != -1;
-
-    coneDist.log(coneDistance);
-    cubeDist.log(cubeDistance);
-    hasCone.log(coneDistance <= coneActivationThreshold);
-    hasCube.log(cubeDistance <= cubeActivationThreshold);
+    // Log whether sensors are online
     isConeSensor.log(coneSensorUp);
     isCubeSensor.log(cubeSensorUp);
 
-    // Only change state if both sensors are up, otherwise stay in last state
-    if (coneDistance <= coneActivationThreshold && coneSensorUp) {
+    // Initialize both values to -1 and only change if sensors are up
+    int coneDistance = -1; 
+    int cubeDistance = -1;
+
+    // Check if cone sensor is up
+    if (coneSensorUp) {
+      coneDistance = timeOfFlightSensor.getDistance0();
+      hasCone.log(coneDistance <= mmConeActivationThreshold);
+    } else {
+      hasCone.log(false);
+    }
+
+    // Check if cube sensor is up
+    if (cubeSensorUp) {
+      cubeDistance = timeOfFlightSensor.getDistance1();
+      hasCube.log(false);
+    } else {
+      hasCube.log(false);
+    }
+
+    // Log distance values
+    coneDist.log(coneDistance);
+    cubeDist.log(cubeDistance);
+
+    // Change state (only if sensors are online)
+    if (coneDistance <= mmConeActivationThreshold && coneSensorUp) {
       tofState = FlightStates.CONE;
     } 
-    else if (cubeDistance <= cubeActivationThreshold && cubeSensorUp) {
+    else if (cubeDistance <= mmCubeActivationThreshold && cubeSensorUp) {
       tofState = FlightStates.CUBE;
     } 
-    else {
+    else if (coneSensorUp || cubeSensorUp) {
       tofState = FlightStates.IDLE;
     }
   }
