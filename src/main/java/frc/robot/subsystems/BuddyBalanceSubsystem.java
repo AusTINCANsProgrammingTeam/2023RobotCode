@@ -31,8 +31,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 public class BuddyBalanceSubsystem extends SubsystemBase {
-  private static final double kRetrievedAngle = 180; // Buddy balance PID reference point when lifting a robot and engaging charge station
-  private static final double kDeployedAngle = 0; // Buddy balance PID reference point when setting down a robot/initial position when deployed
+  private static final double kRetrievedAngle = 270; // Buddy balance PID reference point when lifting a robot and engaging charge station
+  private static final double kDeployedAngle = 95; // Buddy balance PID reference point when setting down a robot/initial position when deployed
   private static final double kDefaultMotorP = 0.175;
   private static final double kDefaultMotorI = 0;
   private static final double kDefaultMotorD = 0;
@@ -63,6 +63,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   private CANSparkMax leftMotor1;
   private CANSparkMax leftMotor2;
   private ProfiledPIDController unifiedPIDController; // Never forget
+  private double unifiedPIDControllerCalculation;
   private DutyCycleEncoder encoder;
   private boolean isDeployed = false;
   private DataLog datalog = DataLogManager.getLog();
@@ -78,11 +79,11 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
 
   private static double encoderCalculatedAngle; 
   private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
-  public static final Constraints kBalanceConstraints = new Constraints(Units.degreesToRadians(360), Units.degreesToRadians(360));
+  public static final Constraints kBalanceConstraints = new Constraints(Units.degreesToRadians(1), Units.degreesToRadians(1));
 
   public BuddyBalanceSubsystem() {
     //Add coast mode command to shuffleboard
-    configTab.add(new StartEndCommand(this::coastMotors, this::brakeMotors, this).ignoringDisable(true).withName("Coast Arm"));
+    configTab.add(new StartEndCommand(this::coastMotors, this::brakeMotors, this).ignoringDisable(true).withName("Coast BB"));
     rightMotor1 = MotorController.constructMotor(MotorConfig.BuddyBalanceRight1);
     rightMotor2 = MotorController.constructMotor(MotorConfig.BuddyBalanceRight2);
     leftMotor1 = MotorController.constructMotor(MotorConfig.BuddyBalanceLeft1);
@@ -92,6 +93,8 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     
     encoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.BuddyBalance);
     unifiedPIDController = new ProfiledPIDController(kDefaultMotorP, kDefaultMotorI, kDefaultMotorD, kConstraints);
+    unifiedPIDController.reset(getAngle());
+    unifiedPIDController.setGoal(getAngle());
 
     tunerNumP = new TunableNumber("Buddy Balance Motor P", kDefaultMotorP, unifiedPIDController::setP);
     tunerNumI = new TunableNumber("Buddy Balance Motor I", kDefaultMotorI, unifiedPIDController::setI);
@@ -101,7 +104,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     returnServos();
   }
 
-  public double getDesiredAngle() {
+  public double getAngle() {
     return Math.round(AbsoluteEncoder.getPositionRadians(encoder)*100)/100.0;
   }
 
@@ -140,10 +143,11 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
 
   public void updateMotors() {
     SmartDashboard.putBoolean("here", true);
-    rightMotor1.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
-    rightMotor2.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
-    leftMotor1.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
-    leftMotor2.set(MathUtil.clamp(unifiedPIDController.calculate(getDesiredAngle()), -1, 1));
+    unifiedPIDControllerCalculation = unifiedPIDController.calculate(getAngle());
+    rightMotor1.set(MathUtil.clamp(unifiedPIDControllerCalculation, -1, 1));
+    rightMotor2.set(MathUtil.clamp(unifiedPIDControllerCalculation, -1, 1));
+    leftMotor1.set(MathUtil.clamp(unifiedPIDControllerCalculation, -1, 1));
+    leftMotor2.set(MathUtil.clamp(unifiedPIDControllerCalculation, -1, 1));
     rightMotorOutputEntry.setDouble(rightMotor1.get());
     leftMotorOutputEntry.setDouble(leftMotor1.get());
     setpointEntry.setDouble(unifiedPIDController.getGoal().position);
@@ -211,11 +215,11 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run 
     buddyBalancePos.append(AbsoluteEncoder.getPositionRadians(encoder)); // Logging the position of the buddy balance lift
     positionEntry.setDouble(AbsoluteEncoder.getPositionRadians(encoder));
-    encoderCalculatedAngle = unifiedPIDController.calculate(getDesiredAngle());
+    encoderCalculatedAngle = unifiedPIDController.calculate(getAngle());
     SmartDashboard.putNumber("Buddy Balance Angle", Units.radiansToDegrees(AbsoluteEncoder.getPositionRadians(encoder)));
     // to prevent the world from ending (cam breaking swerve modules)
     SmartDashboard.putData(this);
-    if ((AbsoluteEncoder.getPositionRadians(encoder) > 3.2) || (AbsoluteEncoder.getPositionRadians(encoder) < 0)) {
+    if ((AbsoluteEncoder.getPositionRadians(encoder) > 4.8) || (AbsoluteEncoder.getPositionRadians(encoder) < 1.55)) {
       stopMotors();
     } else {
       updateMotors();

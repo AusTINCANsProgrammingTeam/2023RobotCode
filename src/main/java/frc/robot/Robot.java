@@ -48,7 +48,7 @@ public class Robot extends LoggedRobot {
 
   public static final boolean cameraEnabled = false;
   public static final boolean intakeEnabled = false;
-  public static final boolean swerveEnabled = false;
+  public static final boolean swerveEnabled = true;
   public static final boolean armEnabled = false;
   public static final boolean buddyBalanceEnabled = true;
   
