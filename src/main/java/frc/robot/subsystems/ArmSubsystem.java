@@ -454,6 +454,7 @@ public class ArmSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
+    SmartDashboard.putData(this);
     // This method will be called once per scheduler run
     calculateCurrentPositions();
     if(DriverStation.isDisabled()){

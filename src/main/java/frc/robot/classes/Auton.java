@@ -128,7 +128,7 @@ public class Auton{
             new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem)
         ),
         armSubsystem.goToState(ArmState.HIGHDROP)
-        );
+        )
     }
 
     private Command delay(double seconds){
