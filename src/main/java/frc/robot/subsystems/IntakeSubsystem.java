@@ -29,6 +29,10 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kConeOuttakeSpeed = 0.75;
   public static final double kCubeIntakeSpeed = 0.55;
   public static final double kCubeOuttakeSpeed = -0.55;
+
+  private final double kConeHoldSpeed = 0.35; // change after testing
+  private final double kCubeHoldSpeed = 0.25; // change after testing
+
   private TimeOfFlightSensor timeOfFlightSensor;
 
   private final double mmConeActivationThreshold = 550.0; 
@@ -60,7 +64,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
   }
   
-  public void spinWheels(double velocity) {
+  private void spinWheels(double velocity) {
     motor.set(velocity);
     motor2.set(-velocity);
     intakeEntry.setDouble(velocity);
@@ -72,6 +76,10 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   public void pull() {
     spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
+  }
+
+  public void hold() {
+    spinWheels(isConeMode ? kConeHoldSpeed : kCubeHoldSpeed);
   }
 
   public void setMode(boolean isConeMode) {

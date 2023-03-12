@@ -14,9 +14,6 @@ public class ToFIntakeCommand extends CommandBase {
   /** Creates a new ToFIntakeCommand. */
   private final IntakeSubsystem intakeSubsystem;
   private final ArmSubsystem armSubsystem;
-  private final double coneKeepSpeed = 0.35; // change after testing
-  private final double cubeKeepSpeed = 0.25; // change after testing
-
 
   public ToFIntakeCommand(IntakeSubsystem intakeSubsystem, ArmSubsystem armSubsystem) {
     this.intakeSubsystem = intakeSubsystem;
@@ -47,13 +44,13 @@ public class ToFIntakeCommand extends CommandBase {
           tofState = FlightStates.CONE_SCORE;
         } else {
           intakeSubsystem.setMode(true);
-          intakeSubsystem.spinWheels(coneKeepSpeed);
+          intakeSubsystem.hold();
           break;
         }
 
       case CUBE:
         intakeSubsystem.setMode(false);
-        intakeSubsystem.spinWheels(cubeKeepSpeed);
+        intakeSubsystem.hold();
         break;
 
       case CONE_SCORE:
