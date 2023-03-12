@@ -76,7 +76,7 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseP = 1;
   private double kBaseI = 0.35;
   private double kBaseD = 0;
-  //Elbow arm PID values
+  //Elbow arm PID values FIXME
   private double kElbowP = 1.3;
   private double kElbowI = 0.25;
   private double kElbowD = 0.015;
@@ -90,6 +90,7 @@ public class ArmSubsystem extends SubsystemBase {
   private CANSparkMax baseMotor;
   private CANSparkMax baseMotor2;
   private CANSparkMax elbowMotor;
+  private CANSparkMax elbowMotor2;
 
   private final DutyCycleEncoder baseAbsoluteEncoder;
   private final DutyCycleEncoder choochooAbsoluteEncoder;
@@ -111,6 +112,7 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kMaxBaseAngle = Units.degreesToRadians(90);
   public static final double kMaxElbowAngle = Units.degreesToRadians(162);
 
+  //FIXME
   public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(80), Units.degreesToRadians(80));
   public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(180), Units.degreesToRadians(180));
 
@@ -172,9 +174,11 @@ public class ArmSubsystem extends SubsystemBase {
 
     baseMotor = MotorController.constructMotor(MotorConfig.ArmBase1);
     baseMotor2 = MotorController.constructMotor(MotorConfig.ArmBase2);
-    elbowMotor = MotorController.constructMotor(MotorConfig.ArmElbow);
+    elbowMotor = MotorController.constructMotor(MotorConfig.ArmElbow1);
+    elbowMotor2 = MotorController.constructMotor(MotorConfig.ArmElbow2);
 
     baseMotor2.follow(baseMotor);
+    elbowMotor2.follow(elbowMotor);
 
     baseMotor.enableVoltageCompensation(11);
     elbowMotor.enableVoltageCompensation(11);
@@ -262,7 +266,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void updateMotors() {
     double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? -1 : 1) * basePIDController.calculate(getBaseAngle()),-1,1);
-    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
+    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),-1,1);
     baseMotor.set(baseOutput);
     elbowMotor.set(elbowOutput);
     
