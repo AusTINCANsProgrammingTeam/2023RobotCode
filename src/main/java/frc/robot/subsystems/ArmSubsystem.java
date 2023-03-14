@@ -100,8 +100,8 @@ public class ArmSubsystem extends SubsystemBase {
   private final ProfiledPIDController basePIDController;
   private final ProfiledPIDController elbowPIDController;
 
-  public static final double kMinChooChooAngle = Units.degreesToRadians(208);
-  public static final double kMaxChooChooAngle = Units.degreesToRadians(326);
+  public static final double kMinChooChooAngle = Robot.isCompetitionRobot ? Units.degreesToRadians(208) : Units.degreesToRadians(39);
+  public static final double kMaxChooChooAngle = Robot.isCompetitionRobot ? Units.degreesToRadians(326) : Units.degreesToRadians(250);
 
   public static final double kBaseLength = Units.inchesToMeters(41);
   public static final double kElbowLength = Units.inchesToMeters(43);
@@ -261,7 +261,7 @@ public class ArmSubsystem extends SubsystemBase {
   
 
   public void updateMotors() {
-    double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? -1 : 1) * basePIDController.calculate(getBaseAngle()),-1,1);
+    double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? 1 : -1) * basePIDController.calculate(getBaseAngle()),-1,1);
     double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),0,1);
     baseMotor.set(baseOutput);
     elbowMotor.set(elbowOutput);
@@ -460,7 +460,7 @@ public class ArmSubsystem extends SubsystemBase {
       holdCurrentPosition();
     }
 
-    rolloverLog.log(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
+    rolloverLog.log(!(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle));
 
     actualBaseAngleLog.log(Units.radiansToDegrees(getBaseAngle()));
     actualChooChooAngleLog.log(Units.radiansToDegrees(getChooChooAngle()));

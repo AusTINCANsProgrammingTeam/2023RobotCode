@@ -19,7 +19,7 @@ public class AbsoluteEncoder {
         //Arm Encoders (REV)
         ArmBase(1, true, Units.degreesToRadians(43.384), Units.degreesToRadians(49.056)),
         ArmChooChoo(2),
-        ArmElbow(0, true, Units.degreesToRadians(233.6), Units.degreesToRadians(-56.425));
+        ArmElbow(0, true, Units.degreesToRadians(233.6), Units.degreesToRadians(0));
         
         private int ID;
         private boolean reversed;
