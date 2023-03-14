@@ -32,16 +32,25 @@ public class Robot extends LoggedRobot {
   public static final boolean isReplayMode = false;
   public static final double kDefaultPeriod = 0.02;
 
+  public static final int ledPort = 2;
+
   //RoboRIO serial numbers
   public static final String competitionRobotSerial = "03161743";;
   public static final String practiceRobotSerial = "03064df0";
   public static final boolean isCompetitionRobot = !HALUtil.getSerialNumber().equals(practiceRobotSerial);
 
+  public static enum LedEnum {
+    BLINKIN, STRIP, MATRIX, NONE;
+  }
+
   //Subsystem toggle
+  public static final LedEnum ledSubSelect = LedEnum.NONE;
+
   public static final boolean cameraEnabled = false;
-  public static final boolean everybotIntakeEnabled = false;
-  public static final boolean intakeEnabled = false;
+  public static final boolean intakeEnabled = true;
   public static final boolean swerveEnabled = true;
+  public static final boolean armEnabled = true;
+  public static final boolean buddyBalanceEnabled = false;
   
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();

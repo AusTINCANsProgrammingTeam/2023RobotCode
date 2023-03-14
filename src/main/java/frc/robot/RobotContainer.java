@@ -10,13 +10,27 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
+import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
 import frc.robot.subsystems.SimulationSubsystem;
+import frc.robot.commands.ArmAnglesCommand;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.ArmSubsystem.ArmState;
+import frc.robot.subsystems.BuddyBalanceSubsystem;
+import frc.robot.subsystems.led.BlinkinLedSubsystem;
+import frc.robot.subsystems.led.LedMatrixSubsystem;
+import frc.robot.subsystems.led.LedStripSubsystem;
+import frc.robot.subsystems.led.BlinkinLedSubsystem.BlinkinMode;
+import frc.robot.subsystems.led.LedMatrixSubsystem.MatrixMode;
+import frc.robot.subsystems.led.LedStripSubsystem.StripMode;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.CameraSubsystem;
-import frc.robot.subsystems.EverybotIntakeSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,29 +42,52 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem swerveSubsystem;
   private final SimulationSubsystem simulationSubsystem;
-  private final EverybotIntakeSubsystem everybotIntakeSubsystem;
+  private final IntakeSubsystem intakeSubsystem;
   private final CameraSubsystem cameraSubsystem;
+  private final BuddyBalanceSubsystem buddyBalanceSubsystem;
+  private final ArmSubsystem armSubsystem;
+  private final ArmAnglesCommand armAnglesCommand;
+
+  private LedStripSubsystem ledSubsystem;
+  private LedMatrixSubsystem ledMatrixSubsystem;
+  private BlinkinLedSubsystem blinkinLedSubsystem;
 
   private Auton auton;
 
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
-  private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/");
-
+  private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    armSubsystem = Robot.armEnabled ? new ArmSubsystem() : null;
+    subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
+
+    ledSubsystem = Robot.ledSubSelect == LedEnum.STRIP ? new LedStripSubsystem() : null;
+    subsystemEnabledLog.append(ledSubsystem == null ? "Led: Disabled" : "Led: Enabled");
+
+    ledMatrixSubsystem = Robot.ledSubSelect == LedEnum.MATRIX ? new LedMatrixSubsystem() : null; //PWM port 2
+    subsystemEnabledLog.append(ledSubsystem == null ? "Led Matrix: Disabled" : "Led Matrix: Enabled");
+
+    blinkinLedSubsystem = Robot.ledSubSelect == LedEnum.BLINKIN ? new BlinkinLedSubsystem() : null;
+    subsystemEnabledLog.append(ledSubsystem == null ? "Led Blinkin: Disabled" : "Led Blinkin: Enabled");
+
     swerveSubsystem = Robot.swerveEnabled ? new SwerveSubsystem() : null;
     subsystemEnabledLog.append(swerveSubsystem == null ? "Swerve: Disabled" : "Swerve: Enabled");
 
     simulationSubsystem = Robot.isSimulation() && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
     subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
 
-    everybotIntakeSubsystem = Robot.intakeEnabled ? new EverybotIntakeSubsystem() : null;
-    subsystemEnabledLog.append(everybotIntakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
+    intakeSubsystem = Robot.intakeEnabled ? new IntakeSubsystem() : null;
+    subsystemEnabledLog.append(intakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
 
     cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
     subsystemEnabledLog.append(cameraSubsystem == null ? "Camera: Disabled" : "Camera: Enabled");
 
-    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem) : null;
+    buddyBalanceSubsystem = Robot.buddyBalanceEnabled ? new BuddyBalanceSubsystem() : null;
+    subsystemEnabledLog.append(buddyBalanceSubsystem == null ? "Buddy Balance: Disabled" : "Buddy Balance Enabled");
+
+    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem, armSubsystem, intakeSubsystem) : null;
+
+    armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getArmBaseSupplier(), OI.Operator.getArmElbowSupplier()) : null;
 
     if (Robot.swerveEnabled) {
       swerveSubsystem.setDefaultCommand(new SwerveTeleopCommand(
@@ -60,6 +97,9 @@ public class RobotContainer {
       OI.Driver.getRotationSupplier()));
     }
 
+    if (Robot.armEnabled) {
+      armSubsystem.setDefaultCommand(armAnglesCommand);
+    }
     // Configure the button bindings    
     configureButtonBindings();
   }
@@ -71,6 +111,19 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    if (Robot.ledSubSelect == LedEnum.MATRIX){
+     // OI.Operator.getYellowCargoButton().onTrue(ledMatrixSubsystem.goCans());
+     OI.Operator.getConeSignalButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(MatrixMode.CONE), ledMatrixSubsystem::offLed, ledMatrixSubsystem));
+     OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(MatrixMode.CUBE), ledMatrixSubsystem::offLed, ledMatrixSubsystem));
+    }
+    if (Robot.ledSubSelect == LedEnum.BLINKIN){
+      OI.Operator.getConeSignalButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_YELLOW), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
+      OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_PURPLE), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
+    }
+    if (Robot.ledSubSelect == LedEnum.STRIP){
+      OI.Operator.getConeSignalButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(StripMode.CUBE), ledSubsystem::offLed, ledSubsystem));
+      OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(StripMode.CONE), ledSubsystem::offLed, ledSubsystem));
+    }
     if (Robot.swerveEnabled) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
       OI.Driver.getZeroButton().onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
@@ -79,13 +132,29 @@ public class RobotContainer {
     }
 
     if (Robot.intakeEnabled) {
-      OI.Driver.getIntakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::pull, everybotIntakeSubsystem));
-      OI.Driver.getOuttakeButton().onTrue(new InstantCommand(everybotIntakeSubsystem::push, everybotIntakeSubsystem));
+      OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem));
+      OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem));
+      OI.Operator.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::toggleConeMode));
     }
 
-    if (!Robot.isCompetition) {
-      OI.putControllerButtons();
+    if (Robot.armEnabled) {
+      OI.Driver.getArmHighButton().onTrue(new ProxyCommand(() -> armSubsystem.handleHighButton()));
+      OI.Driver.getArmMidButton().onTrue(new ProxyCommand(() -> armSubsystem.handleMidButton()));
+      if (Robot.intakeEnabled){
+        OI.Driver.getArmConeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleConeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setMode(true))));
+        OI.Driver.getArmCubeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleCubeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setMode(false))));
+      }
+      OI.Operator.getHighScoreButton().onTrue(armSubsystem.goToState(ArmState.HIGHSCORE));
     }
+
+    if (Robot.buddyBalanceEnabled) {
+      OI.Operator.getDownBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::deployBuddyBalance, buddyBalanceSubsystem).unless(() -> buddyBalanceSubsystem.getIsDeployed()));
+      OI.Operator.getDownBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::releaseBuddy, buddyBalanceSubsystem).unless(() -> !buddyBalanceSubsystem.getIsDeployed()));
+      OI.Operator.getUpBuddyBalanceButton().and(OI.Operator.getActivateBuddyBalanceButton()).onTrue(new InstantCommand(buddyBalanceSubsystem::retrieveBuddy, buddyBalanceSubsystem).unless(() -> !buddyBalanceSubsystem.getIsDeployed()));
+    }
+
+    OI.putControllerButtons();
+    
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

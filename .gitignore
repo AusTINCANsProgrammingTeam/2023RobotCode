@@ -166,3 +166,6 @@ simgui-ds.json
 *.wpilog
 BuildConstants.java
 networktables.json
+glass.json
+.pathplanner/*
+!.pathplanner/settings.json

@@ -5,16 +5,21 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.Robot;
 
 public class AbsoluteEncoder {
     public enum EncoderConfig {
-        //Swerve Modules
+        //Swerve Modules (CAN)
         //Offsets determined by manually turning all modules to 0 (forward) and recording their positions
         FrontLeftModule(1, false, -4.916, -1.12),
         FrontRightModule(2, false, -4.944, -1.078),
         BackLeftModule(3, false, -2.789, -3.911),
-        BackRightModule(4, false, -3.995, -4.686);
+        BackRightModule(4, false, -3.995, -4.686),
+        //Arm Encoders (REV)
+        ArmBase(1, true, Units.degreesToRadians(43.384)),
+        ArmChooChoo(2),
+        ArmElbow(0, true, Units.degreesToRadians(233.6));
         
         private int ID;
         private boolean reversed;
@@ -57,7 +62,7 @@ public class AbsoluteEncoder {
         }
     }
 
-    public static WPI_CANCoder constructEncoder(EncoderConfig config){
+    public static WPI_CANCoder constructCANCoder(EncoderConfig config){
         WPI_CANCoder encoder = new WPI_CANCoder(config.getID());
         encoder.configFactoryDefault();
         encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
@@ -65,5 +70,31 @@ public class AbsoluteEncoder {
         encoder.configSensorDirection(config.getReversed());
         encoder.configMagnetOffset(Units.radiansToDegrees(Robot.isCompetitionRobot ? config.getCompetitionOffset() : config.getPracticeOffset()));
         return encoder;
+    }
+
+    public static DutyCycleEncoder constructREVEncoder(EncoderConfig config){
+        DutyCycleEncoder encoder = new DutyCycleEncoder(config.getID());
+        double offset = Units.radiansToRotations(Robot.isCompetitionRobot ? config.getCompetitionOffset() : config.getPracticeOffset());
+        if (offset < 0){
+            offset++;
+        }
+        encoder.setPositionOffset(offset);
+        encoder.setDistancePerRotation(config.getReversed() ? -1 : 1);
+        return encoder;
+    }
+
+    public static double getPositionRadians(DutyCycleEncoder encoder){
+        //Get position of a REV encoder in radians
+        double position = encoder.getAbsolutePosition() + encoder.getPositionOffset();
+        position = encoder.getDistancePerRotation() < 0 ? 1 - position : position;
+        if(position < 0){
+            position++;
+        }
+        return Units.rotationsToRadians(position);
+    }
+
+    public static double getPositionRadians(DutyCycleEncoder encoder, int places){
+        //Truncates measure to places decimal points
+        return Math.round(getPositionRadians(encoder) * Math.pow(10, places)) / Math.pow(10, places);
     }
 }

@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.ControlType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.MotorController;
@@ -16,40 +15,56 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
-  public static final double kOuttakeSpeed = -1;
-  public static final double kIntakeSpeed = 0.5;
-  public static final double kRetractPosition = -.5; //TODO measure and find position 
-  public static final double kExtendPosition = .5;
+  public static final double kConeIntakeSpeed = -0.75;
+  public static final double kConeOuttakeSpeed = 0.75;
+  public static final double kCubeIntakeSpeed = 0.55;
+  public static final double kCubeOuttakeSpeed = -0.65;
+
   private CANSparkMax motor;
   private CANSparkMax motor2;
-  private CANSparkMax motor3;
-  private boolean inOutArm = false;
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
+  private static GenericEntry intakeMode = matchTab.add("Intake Mode", "Cone Mode").getEntry();
+
+  private boolean isConeMode;
+
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
+    isConeMode = true;
+
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
     motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
-    motor.follow(motor2);
   }
   
   private void spinWheels(double velocity) {
     motor.set(velocity);
-
+    motor2.set(-velocity);
+    intakeEntry.setDouble(velocity);
   }
 
   public void push() {
-    spinWheels(kOuttakeSpeed);
+    spinWheels(isConeMode ? kConeOuttakeSpeed : kCubeOuttakeSpeed);
   }
 
   public void pull() {
-    spinWheels(kIntakeSpeed);
+    spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
+  }
+
+  public void setMode(boolean isConeMode) {
+    this.isConeMode = isConeMode;
+  }
+
+  public void toggleConeMode() {
+    isConeMode = !isConeMode;
   }
   
   public double getSpeed(){
     return motor.get();
   }
 
+  public void stop() {
+    spinWheels(0);
+  }
 
   @Override
   public void close() throws Exception {
@@ -62,7 +77,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    intakeEntry.setDouble(getSpeed());
+    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
     // This method will be called once per scheduler run
   }
 
@@ -70,13 +85,4 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
-
-public void inOutArm() {
-  inOutArm = !inOutArm; //Toggle boolean
-    if (inOutArm) {
-    motor3.getPIDController().setReference(kExtendPosition,ControlType.kPosition);
-  } else {
-    motor3.getPIDController().setReference(kRetractPosition,ControlType.kPosition);
-  }
-}
 }

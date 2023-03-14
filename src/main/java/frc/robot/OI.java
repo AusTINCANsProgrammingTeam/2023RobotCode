@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 public class OI {
     //Operator Interface (OI) class containing all control information
@@ -52,15 +53,18 @@ public class OI {
         };
 
         private static final Joystick kJoystick = new Joystick(OI.kDriverJoystickPort);
-        
-        private static final Button kOrientationButton = Button.B1; //Toggle swerve orientation
-        private static final Button kZeroButton = Button.B3; //Zero the gyroscope
+
+        private static final Button kOrientationButton = Button.Start; //Toggle swerve orientation
+        private static final Button kZeroButton = Button.Back; //Zero the gyroscope
+        private static final Button kOuttakeButton = Button.LT; //Run outtake
+        private static final Button kIntakeButton = Button.LB; //Run intake
         private static final Button kAlignForwardButton = Button.B4; //Align forwards
         private static final Button kAlignBackwardButton = Button.B2; //Align backwards
-        private static final Button kIntakeButton = Button.RT; //Run intake
-        private static final Button kOuttakeButton = Button.RB; //Run outtake
-        private static final Button kParkButton = Button.RB; //Park modules
-
+        private static final Button kArmHighButton = Button.RB; //Arm to high scoring position
+        private static final Button kArmMidButton = Button.RT; //Arm to mid scoring position
+        private static final Button kArmConeIntakeButton = Button.B3; //Arm to cone intake position
+        private static final Button kArmCubeIntakeButton = Button.B1; //Arm to cube intake position
+        
         private static final int kXTranslationAxis = 0;
         private static final int kYTranslationAxis = 1;
         private static final int kRotationAxis = 2;
@@ -68,7 +72,7 @@ public class OI {
         //TODO: Tune curves to driver preference
         private static final ControlCurve kXTranslationCurve = new ControlCurve(0.85,0.05,0.85,0.1);
         private static final ControlCurve kYTranslationCurve = new ControlCurve(0.85,0.05,0.85,0.1);
-        private static final ControlCurve kRotationCurve = new ControlCurve(1,0,1,0.1);
+        private static final ControlCurve kRotationCurve = new ControlCurve(0.8,0,1,0.1);
 
         public static Supplier<Double> getXTranslationSupplier(){
             //This axis is inverted
@@ -84,7 +88,7 @@ public class OI {
             //This axis is inverted
             return () -> kRotationCurve.calculate(-kJoystick.getRawAxis(kRotationAxis));
         }
-
+        
         public static JoystickButton getOrientationButton(){
             kOrientationButton.setButtonAction("Toggle swerve orientation");
             return new JoystickButton(kJoystick, kOrientationButton.getButtonID());
@@ -115,9 +119,24 @@ public class OI {
             return new JoystickButton(kJoystick, kOuttakeButton.getButtonID());
         }
         
-        public static JoystickButton getParkButton(){
-            kParkButton.setButtonAction("Park modules");
-            return new JoystickButton(kJoystick, kParkButton.getButtonID());
+        public static JoystickButton getArmHighButton(){
+            kArmHighButton.setButtonAction("Arm High");
+            return new JoystickButton(kJoystick, kArmHighButton.getButtonID());
+        }
+
+        public static JoystickButton getArmMidButton(){
+            kArmMidButton.setButtonAction("Arm Mid");
+            return new JoystickButton(kJoystick, kArmMidButton.getButtonID());
+        }
+
+        public static JoystickButton getArmConeIntakeButton(){
+            kArmConeIntakeButton.setButtonAction("Cone Intake");
+            return new JoystickButton(kJoystick, kArmConeIntakeButton.getButtonID());
+        }
+
+        public static JoystickButton getArmCubeIntakeButton(){
+            kArmCubeIntakeButton.setButtonAction("Cube Intake");
+            return new JoystickButton(kJoystick, kArmCubeIntakeButton.getButtonID());
         }
     }
 
@@ -134,7 +153,11 @@ public class OI {
             Back (9),
             Start (10),
             LJ (11), // Left Joystick Button
-            RJ (12); // Right Joystick Button
+            RJ (12),  // Right Joystick Button
+            POVUP (0),
+            POVDOWN (180),
+            POVLEFT (270),
+            POVRIGHT (90);
             
             private final int buttonID; 
             private String buttonAction;
@@ -159,11 +182,64 @@ public class OI {
 
         private static final Joystick kJoystick = new Joystick(OI.kOperatorJoystickPort);
 
-        private static final Button kAssistedBalanceButton = Button.Y; //Toggle assisted balance
+        private static final Button kBuddyBalanceActivateButton = Button.B; //Activates buddy balance
+        private static final Button kDownBuddyBalanceButton = Button.POVDOWN; // Lowers buddy balance lift
+        private static final Button kUpBuddyBalanceButton = Button.POVUP; // Raises buddy balance lift
+        private static final Button kConeSignalButton = Button.Y;
+        private static final Button kCubeSignalButton = Button.X;
+        private static final Button kHighScoreButton = Button.RB; // Sets arm state to highscore
+        private static final Button kIntakeButton = Button.LB; // Toggles intake mode between cone and cube
 
-        public static JoystickButton getBalanceButton(){
-            kAssistedBalanceButton.setButtonAction("Toggle assisted balance");
-            return new JoystickButton(kJoystick, kAssistedBalanceButton.getButtonID());
+        private static final int kArmElbowAxis = 3;
+        private static final int kArmBaseAxis = 1;
+
+        //TODO: Tune curves to driver preference
+        private static final ControlCurve kArmElbowCurve = new ControlCurve(0.65,0.05,1,0.1);
+        private static final ControlCurve kArmBaseCurve = new ControlCurve(0.65,0.05,1,0.1);
+ 
+        public static Supplier<Double> getArmElbowSupplier(){
+            //This axis is inverted
+            return () -> kArmElbowCurve.calculate(-kJoystick.getRawAxis(kArmElbowAxis));
+        }
+
+        public static Supplier<Double> getArmBaseSupplier(){
+            //This axis is inverted
+            return () -> kArmBaseCurve.calculate(-kJoystick.getRawAxis(kArmBaseAxis));
+        }
+
+        public static JoystickButton getActivateBuddyBalanceButton() {
+            kBuddyBalanceActivateButton.setButtonAction("Activate buddy balance");
+            return new JoystickButton(kJoystick, kBuddyBalanceActivateButton.getButtonID()); // This button must be held in order for the buddy balance to function
+        }
+
+        public static POVButton getDownBuddyBalanceButton() {
+            kDownBuddyBalanceButton.setButtonAction("Lower buddy balance");
+            return new POVButton(kJoystick, kDownBuddyBalanceButton.getButtonID()); // This button will deploy the buddy balance if the confirm button is also held, and also move the lift to the deployed position if it was in the balanced position
+        }
+
+        public static POVButton getUpBuddyBalanceButton() {
+            kUpBuddyBalanceButton.setButtonAction("Raise buddy balance");
+            return new POVButton(kJoystick, kUpBuddyBalanceButton.getButtonID()); // This button will move the lift to the balanced position if it was in the deployed position
+        }
+
+        public static JoystickButton getConeSignalButton() {
+            kConeSignalButton.setButtonAction("Signal Cone");
+            return new JoystickButton(kJoystick, kConeSignalButton.getButtonID());
+        }
+
+        public static JoystickButton getCubeSignalButton() {
+            kCubeSignalButton.setButtonAction("Signal Cube");
+            return new JoystickButton(kJoystick, kCubeSignalButton.getButtonID());
+        }
+
+        public static JoystickButton getHighScoreButton() {
+            kHighScoreButton.setButtonAction("High Score");
+            return new JoystickButton(kJoystick, kHighScoreButton.getButtonID());
+        }
+
+        public static JoystickButton getIntakeButton(){
+            kIntakeButton.setButtonAction("Toggle Intake Mode");
+            return new JoystickButton(kJoystick, kIntakeButton.getButtonID());
         }
     }
 
