@@ -23,8 +23,8 @@ public class MotorController {
         BackRightModuleDrive(10, 50, IdleMode.kBrake),
         BackRightModuleTurn(9, 40, IdleMode.kBrake, true),
         //Arm motors
-        ArmBase1(14, 50, IdleMode.kBrake),
-        ArmBase2(13, 50, IdleMode.kBrake),
+        ArmBase1(7, 50, IdleMode.kBrake),
+        ArmBase2(8, 50, IdleMode.kBrake),
         ArmElbow1(15, 50, true),
         ArmElbow2(18, 50, true),
         //Intake motors
