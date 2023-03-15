@@ -266,10 +266,9 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void updateMotors() {
     double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? -1 : 1) * basePIDController.calculate(getBaseAngle()),-1,1);
-    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),-1,1);
+    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()), getElbowAngle() < kMinElbowAngle ? 0 : -1, getElbowAngle() > kMaxElbowAngle ? 0 : 1);
     baseMotor.set(baseOutput);
-    elbowMotor.set(elbowOutput);
-    
+    elbowMotor.set(0.1);
   }
 
   //Cancels commmand, but profPIDcontroller keeps going to next setpoint, before dropping back to where the button was pressed.
