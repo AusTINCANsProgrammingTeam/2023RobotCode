@@ -108,13 +108,13 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kElbowLength = Units.inchesToMeters(43);
 
   public static final double kMinBaseAngle = Units.degreesToRadians(46);
-  public static final double kMinElbowAngle = Units.degreesToRadians(15);
+  public static final double kMinElbowAngle = Units.degreesToRadians(22);
   public static final double kMaxBaseAngle = Units.degreesToRadians(90);
   public static final double kMaxElbowAngle = Units.degreesToRadians(162);
 
   //FIXME
   public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(80), Units.degreesToRadians(80));
-  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(180), Units.degreesToRadians(180));
+  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(30), Units.degreesToRadians(30));
 
   public static final double kBaseGearing = 40.8333333;
   public static final double kElbowGearing = 4.28571429;
@@ -268,7 +268,7 @@ public class ArmSubsystem extends SubsystemBase {
     double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? -1 : 1) * basePIDController.calculate(getBaseAngle()),-1,1);
     double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()), getElbowAngle() < kMinElbowAngle ? 0 : -1, getElbowAngle() > kMaxElbowAngle ? 0 : 1);
     baseMotor.set(baseOutput);
-    elbowMotor.set(0.1);
+    elbowMotor.set(elbowOutput);
   }
 
   //Cancels commmand, but profPIDcontroller keeps going to next setpoint, before dropping back to where the button was pressed.
