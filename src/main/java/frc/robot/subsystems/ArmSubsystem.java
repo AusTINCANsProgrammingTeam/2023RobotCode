@@ -294,7 +294,7 @@ public class ArmSubsystem extends SubsystemBase {
     //PID output
     double elbowOutput = elbowPIDController.calculate(getElbowAngle());
     //Feedforward output
-    elbowOutput += elbowFeedForward.calculate(elbowPIDController.getGoal().position + basePIDController.getGoal().position - Math.PI, 0);
+    elbowOutput += elbowFeedForward.calculate(getElbowAngle() + getBaseAngle() - Math.PI, 0);
     //Clamp output
     elbowOutput = MathUtil.clamp(elbowOutput, getElbowAngle() < kMinElbowAngle ? 0 : -12, getElbowAngle() > kMaxElbowAngle ? 0 : 12);
 
