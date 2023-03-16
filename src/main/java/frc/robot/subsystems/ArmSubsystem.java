@@ -148,6 +148,8 @@ public class ArmSubsystem extends SubsystemBase {
   private DebugLog<Double> desiredElbowGoalLog = new DebugLog<Double>(0.0, "Desired Elbow Goal", this);
   private DebugLog<Double> desiredElbowSetpointLog = new DebugLog<Double>(0.0, "Desired Elbow Setpoint", this);
   private DebugLog<Double> elbowOutputLog = new DebugLog<Double>(0.0, "Elbow Output", this);
+  private DebugLog<Double> elbowPIDOutputLog = new DebugLog<Double>(0.0, "Elbow PID Output", this);
+  private DebugLog<Double> elbowFFOutputLog = new DebugLog<Double>(0.0, "Elbow FF Output", this);
   private DebugLog<String> elbowUpDownLog = new DebugLog<String>("", "Elbow Up/Down", this);
 
   private DebugLog<Double> actualXPositionLog = new DebugLog<Double>(0.0, "Actual X Position", this);
@@ -292,11 +294,14 @@ public class ArmSubsystem extends SubsystemBase {
     double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? -1 : 1) * basePIDController.calculate(getBaseAngle()),-1,1);
     
     //PID output
-    double elbowOutput = elbowPIDController.calculate(getElbowAngle());
+    double elbowPIDOutput = elbowPIDController.calculate(getElbowAngle());
+    elbowPIDOutputLog.log(elbowPIDOutput);
     //Feedforward output
-    elbowOutput += elbowFeedForward.calculate(getElbowAngle() + getBaseAngle() - Math.PI, 0);
+    double elbowFFOutput = elbowFeedForward.calculate(getElbowAngle() + getBaseAngle() - Math.PI, 0);
+    elbowFFOutputLog.log(elbowFFOutput);
     //Clamp output
-    elbowOutput = MathUtil.clamp(elbowOutput, getElbowAngle() < kMinElbowAngle ? 0 : -12, getElbowAngle() > kMaxElbowAngle ? 0 : 12);
+    double elbowOutput = MathUtil.clamp(elbowPIDOutput + elbowFFOutput, getElbowAngle() < kMinElbowAngle ? 0 : -12, getElbowAngle() > kMaxElbowAngle ? 0 : 12);
+    elbowOutputLog.log(elbowOutput);
 
     baseMotor.set(baseOutput);
     elbowMotor.setVoltage(elbowOutput);
