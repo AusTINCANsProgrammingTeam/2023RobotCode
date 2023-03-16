@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -77,9 +78,13 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseI = 0.35;
   private double kBaseD = 0;
   //Elbow arm PID values FIXME
-  private double kElbowP = 1.3;
-  private double kElbowI = 0.25;
-  private double kElbowD = 0.015;
+  private double kElbowP = 0;
+  private double kElbowI = 0;
+  private double kElbowD = 0;
+  private double kElbowS = 0;
+  private double kElbowG = 1.43;
+  private double kElbowV = 1.40;
+  private double kElbowA = 0.11;
   //Sim PID values
   private double kSimBaseP = 0.1;
   private double kSimElbowP = 0.1;
@@ -100,6 +105,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   private final ProfiledPIDController basePIDController;
   private final ProfiledPIDController elbowPIDController;
+  private final ArmFeedforward elbowFeedForward;
 
   public static final double kMinChooChooAngle = Units.degreesToRadians(208);
   public static final double kMaxChooChooAngle = Units.degreesToRadians(326);
@@ -190,6 +196,7 @@ public class ArmSubsystem extends SubsystemBase {
     if(Robot.isReal()) {
       basePIDController = new ProfiledPIDController(kBaseP, kBaseI, kBaseD, kBaseConstraints);
       elbowPIDController = new ProfiledPIDController(kElbowP, kElbowI, kElbowD, kElbowConstraints);
+      elbowFeedForward = new ArmFeedforward(kElbowS, kElbowG, kElbowV, kElbowA);
       
       basePTuner = new TunableNumber("baseP", kBaseP, basePIDController::setP);
       baseITuner = new TunableNumber("baseI", kBaseI, basePIDController::setI);
@@ -200,6 +207,7 @@ public class ArmSubsystem extends SubsystemBase {
       elbowDTuner = new TunableNumber("elbowD", kElbowD, elbowPIDController::setD);
     } else {
       SmartDashboard.putData("Arm Sim", simArmCanvas);
+      elbowFeedForward = new ArmFeedforward(0, 0, 0, 0);
       basePIDController = new ProfiledPIDController(kSimBaseP, 0, 0, kBaseConstraints);
       elbowPIDController = new ProfiledPIDController(kSimElbowP, 0, 0, kElbowConstraints);
     }
@@ -263,12 +271,18 @@ public class ArmSubsystem extends SubsystemBase {
     armYPosition = getArmY();
   }
   
-
   public void updateMotors() {
     double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? -1 : 1) * basePIDController.calculate(getBaseAngle()),-1,1);
-    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()), getElbowAngle() < kMinElbowAngle ? 0 : -1, getElbowAngle() > kMaxElbowAngle ? 0 : 1);
+    
+    //PID output
+    double elbowOutput = elbowPIDController.calculate(getElbowAngle());
+    //Feedforward output
+    elbowOutput += elbowFeedForward.calculate(elbowPIDController.getGoal().position + basePIDController.getGoal().position - Math.PI, 0);
+    //Clamp output
+    elbowOutput = MathUtil.clamp(elbowOutput, getElbowAngle() < kMinElbowAngle ? 0 : -12, getElbowAngle() > kMaxElbowAngle ? 0 : 12);
+
     baseMotor.set(baseOutput);
-    elbowMotor.set(elbowOutput);
+    elbowMotor.setVoltage(elbowOutput);
   }
 
   //Cancels commmand, but profPIDcontroller keeps going to next setpoint, before dropping back to where the button was pressed.
