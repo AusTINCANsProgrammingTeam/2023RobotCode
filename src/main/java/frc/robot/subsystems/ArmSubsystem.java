@@ -78,9 +78,14 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseI = 0.35;
   private double kBaseD = 0;
   //Elbow arm PID values FIXME
-  private double kElbowP = 0;
-  private double kElbowI = 0;
-  private double kElbowD = 0;
+  private double kElbowUpP = 2.5;
+  private double kElbowUpI = 0.1;
+  private double kElbowUpD = 0;
+
+  private double kElbowDownP = 0;
+  private double kElbowDownI = 0;
+  private double kElbowDownD = 0;
+
   private double kElbowS = 0;
   private double kElbowG = 1.43;
   private double kElbowV = 1.40;
@@ -195,16 +200,16 @@ public class ArmSubsystem extends SubsystemBase {
 
     if(Robot.isReal()) {
       basePIDController = new ProfiledPIDController(kBaseP, kBaseI, kBaseD, kBaseConstraints);
-      elbowPIDController = new ProfiledPIDController(kElbowP, kElbowI, kElbowD, kElbowConstraints);
+      elbowPIDController = new ProfiledPIDController(kElbowUpP, kElbowUpI, kElbowUpD, kElbowConstraints);
       elbowFeedForward = new ArmFeedforward(kElbowS, kElbowG, kElbowV, kElbowA);
       
       basePTuner = new TunableNumber("baseP", kBaseP, basePIDController::setP);
       baseITuner = new TunableNumber("baseI", kBaseI, basePIDController::setI);
       baseDTuner = new TunableNumber("baseD", kBaseD, basePIDController::setD);
   
-      elbowPTuner = new TunableNumber("elbowP", kElbowP, elbowPIDController::setP);
-      elbowITuner = new TunableNumber("elbowI", kElbowI, elbowPIDController::setI);
-      elbowDTuner = new TunableNumber("elbowD", kElbowD, elbowPIDController::setD);
+      elbowPTuner = new TunableNumber("elbowP", kElbowUpP, elbowPIDController::setP);
+      elbowITuner = new TunableNumber("elbowI", kElbowUpI, elbowPIDController::setI);
+      elbowDTuner = new TunableNumber("elbowD", kElbowUpD, elbowPIDController::setD);
     } else {
       SmartDashboard.putData("Arm Sim", simArmCanvas);
       elbowFeedForward = new ArmFeedforward(0, 0, 0, 0);
@@ -243,6 +248,15 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void setElbowReference(double setpoint) {
+    if(elbowPIDController.getGoal().position > setpoint){
+      elbowPIDController.setP(kElbowDownP);
+      elbowPIDController.setI(kElbowDownI);
+      elbowPIDController.setD(kElbowDownD);
+    } else{
+      elbowPIDController.setP(kElbowUpP);
+      elbowPIDController.setI(kElbowUpI);
+      elbowPIDController.setD(kElbowUpD);
+    }
     elbowPIDController.setGoal(setpoint);
   }
 
