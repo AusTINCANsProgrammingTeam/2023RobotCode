@@ -148,6 +148,7 @@ public class ArmSubsystem extends SubsystemBase {
   private DebugLog<Double> desiredElbowGoalLog = new DebugLog<Double>(0.0, "Desired Elbow Goal", this);
   private DebugLog<Double> desiredElbowSetpointLog = new DebugLog<Double>(0.0, "Desired Elbow Setpoint", this);
   private DebugLog<Double> elbowOutputLog = new DebugLog<Double>(0.0, "Elbow Output", this);
+  private DebugLog<String> elbowUpDownLog = new DebugLog<String>("", "Elbow Up/Down", this);
 
   private DebugLog<Double> actualXPositionLog = new DebugLog<Double>(0.0, "Actual X Position", this);
   private DebugLog<Double> actualYPositionLog = new DebugLog<Double>(0.0, "Actual Y Position", this);
@@ -248,14 +249,16 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void setElbowReference(double setpoint) {
-    if(elbowPIDController.getGoal().position > setpoint){
+    if(getElbowAngle() > setpoint){
       elbowPIDController.setP(kElbowDownP);
       elbowPIDController.setI(kElbowDownI);
       elbowPIDController.setD(kElbowDownD);
+      elbowUpDownLog.log("Down");
     } else{
       elbowPIDController.setP(kElbowUpP);
       elbowPIDController.setI(kElbowUpI);
       elbowPIDController.setD(kElbowUpD);
+      elbowUpDownLog.log("Up");
     }
     elbowPIDController.setGoal(setpoint);
   }
