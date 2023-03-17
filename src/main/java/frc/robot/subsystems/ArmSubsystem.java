@@ -82,8 +82,8 @@ public class ArmSubsystem extends SubsystemBase {
   private double kElbowUpI = 0.1;
   private double kElbowUpD = 0;
 
-  private double kElbowDownP = 0;
-  private double kElbowDownI = 0;
+  private double kElbowDownP = 0.5;
+  private double kElbowDownI = 0.25;
   private double kElbowDownD = 0;
 
   private double kElbowS = 0;
@@ -150,7 +150,7 @@ public class ArmSubsystem extends SubsystemBase {
   private DebugLog<Double> elbowOutputLog = new DebugLog<Double>(0.0, "Elbow Output", this);
   private DebugLog<Double> elbowPIDOutputLog = new DebugLog<Double>(0.0, "Elbow PID Output", this);
   private DebugLog<Double> elbowFFOutputLog = new DebugLog<Double>(0.0, "Elbow FF Output", this);
-  private DebugLog<String> elbowUpDownLog = new DebugLog<String>("", "Elbow Up/Down", this);
+  private DebugLog<String> elbowUpDownLog = new DebugLog<String>("", "Elbow Up-Down", this);
 
   private DebugLog<Double> actualXPositionLog = new DebugLog<Double>(0.0, "Actual X Position", this);
   private DebugLog<Double> actualYPositionLog = new DebugLog<Double>(0.0, "Actual Y Position", this);
@@ -166,9 +166,13 @@ public class ArmSubsystem extends SubsystemBase {
   private TunableNumber baseITuner;
   private TunableNumber baseDTuner;
 
-  private TunableNumber elbowPTuner;
-  private TunableNumber elbowITuner;
-  private TunableNumber elbowDTuner;
+  private TunableNumber elbowUpPTuner;
+  private TunableNumber elbowUpITuner;
+  private TunableNumber elbowUpDTuner;
+
+  private TunableNumber elbowDownPTuner;
+  private TunableNumber elbowDownITuner;
+  private TunableNumber elbowDownDTuner;
 
   private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), kBaseGearing, kBaseInertia, kBaseLength, kMinBaseAngle, kMaxBaseAngle, false);
   private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, kElbowInertia, kElbowLength, kMinElbowAngle, kMaxElbowAngle, false);
@@ -210,9 +214,13 @@ public class ArmSubsystem extends SubsystemBase {
       baseITuner = new TunableNumber("baseI", kBaseI, basePIDController::setI);
       baseDTuner = new TunableNumber("baseD", kBaseD, basePIDController::setD);
   
-      elbowPTuner = new TunableNumber("elbowP", kElbowUpP, elbowPIDController::setP);
-      elbowITuner = new TunableNumber("elbowI", kElbowUpI, elbowPIDController::setI);
-      elbowDTuner = new TunableNumber("elbowD", kElbowUpD, elbowPIDController::setD);
+      elbowUpPTuner = new TunableNumber("elbowUpP", kElbowUpP, (a) -> kElbowUpP = a);
+      elbowUpITuner = new TunableNumber("elbowUpI", kElbowUpI, (a) -> kElbowUpI = a);
+      elbowUpDTuner = new TunableNumber("elbowUpD", kElbowUpD, (a) -> kElbowUpD = a);
+
+      elbowDownPTuner = new TunableNumber("elbowDownP", kElbowDownP, (a) -> kElbowDownP = a);
+      elbowDownITuner = new TunableNumber("elbowDownI", kElbowDownI, (a) -> kElbowDownI = a);
+      elbowDownDTuner = new TunableNumber("elbowDownD", kElbowDownD, (a) -> kElbowDownD = a);
     } else {
       SmartDashboard.putData("Arm Sim", simArmCanvas);
       elbowFeedForward = new ArmFeedforward(0, 0, 0, 0);
@@ -297,7 +305,7 @@ public class ArmSubsystem extends SubsystemBase {
     double elbowPIDOutput = elbowPIDController.calculate(getElbowAngle());
     elbowPIDOutputLog.log(elbowPIDOutput);
     //Feedforward output
-    double elbowFFOutput = elbowFeedForward.calculate(getElbowAngle() + getBaseAngle() - Math.PI, 0);
+    double elbowFFOutput = elbowFeedForward.calculate(elbowPIDController.getSetpoint().position + basePIDController.getSetpoint().position - Math.PI, 0);
     elbowFFOutputLog.log(elbowFFOutput);
     //Clamp output
     double elbowOutput = MathUtil.clamp(elbowPIDOutput + elbowFFOutput, getElbowAngle() < kMinElbowAngle ? 0 : -12, getElbowAngle() > kMaxElbowAngle ? 0 : 12);
