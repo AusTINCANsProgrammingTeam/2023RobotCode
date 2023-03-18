@@ -13,9 +13,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.classes.DebugLog;
 
 public class CubeapultSubsystem extends SubsystemBase {
-  private static final double kStartPos = 0;
-  private static final double kStoredPos = 0.5;
-  private static final double kLaunchPos = 1;
+  private static final double kStartPosition = 0;
+  private static final double kStoredPosition = 0.5;
+  private static final double kLaunchPosition = 1;
   private static final int servoID = 0;
   private Servo servo;
 
@@ -28,18 +28,18 @@ public class CubeapultSubsystem extends SubsystemBase {
   }
 
   private void start() {
-    servo.set(kStartPos);
-    desiredServoPositionLog.log(kStartPos);
+    servo.set(kStartPosition);
+    desiredServoPositionLog.log(kStartPosition);
   }
 
   private void store() {
-    servo.set(kStoredPos);
-    desiredServoPositionLog.log(kStoredPos);
+    servo.set(kStoredPosition);
+    desiredServoPositionLog.log(kStoredPosition);
   }
 
   private void launch() {
-    servo.set(kLaunchPos);
-    desiredServoPositionLog.log(kLaunchPos);
+    servo.set(kLaunchPosition);
+    desiredServoPositionLog.log(kLaunchPosition);
   }
 
   public Command launchCube() {
