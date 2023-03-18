@@ -18,13 +18,14 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kConeIntakeSpeed = -0.75;
   public static final double kConeOuttakeSpeed = 0.75;
   public static final double kCubeIntakeSpeed = 0.55;
-  public static final double kCubeOuttakeSpeed = -0.55;
+  public static final double kCubeOuttakeSpeed = -0.65;
 
   private CANSparkMax motor;
   private CANSparkMax motor2;
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
   private static GenericEntry intakeMode = matchTab.add("Intake Mode", "Cone Mode").getEntry();
+
   private boolean isConeMode;
 
   /** Creates a new IntakeSubsystem. */

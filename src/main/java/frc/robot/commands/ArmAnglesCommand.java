@@ -4,13 +4,9 @@
 
 package frc.robot.commands;
 
-import frc.robot.Robot;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.ArmSubsystem.ArmState;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import java.util.function.Supplier;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.util.Units;
 
 public class ArmAnglesCommand extends CommandBase {
   private final ArmSubsystem armSubsystem;
