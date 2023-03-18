@@ -179,28 +179,10 @@ public class TimeOfFlightSensor implements AutoCloseable {
     }
   }
 
-  public void getDistance0(int rawDistance) {
-    try {
-      threadLock.lock();
-      rawDistance = distance0;
-    } finally {
-      threadLock.unlock();
-    }
-  }
-
   public int getDistance1() {
     try {
       threadLock.lock();
       return distance1;
-    } finally {
-      threadLock.unlock();
-    }
-  }
-
-  public void getDistance1(int rawDistance) {
-    try {
-      threadLock.lock();
-      rawDistance = distance1;
     } finally {
       threadLock.unlock();
     }

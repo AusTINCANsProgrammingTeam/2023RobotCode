@@ -139,14 +139,25 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     cubeDist.log((double)cubeDistance);
 
     // Change state (only if sensors are online)
-    if (coneDistance <= mmConeActivationThreshold && coneSensorUp) {
-      tofState = FlightStates.CONE;
-    } 
-    else if (cubeDistance <= mmCubeActivationThreshold && cubeSensorUp) {
-      tofState = FlightStates.CUBE;
-    } 
-    else if (coneSensorUp || cubeSensorUp) {
-      tofState = FlightStates.IDLE;
+    switch(tofState) {
+      case IDLE:
+        if (coneSensorUp && coneDistance <= mmConeActivationThreshold) {
+          tofState = FlightStates.CONE;
+        } else if (cubeSensorUp && cubeDistance <= mmCubeActivationThreshold) {
+          tofState = FlightStates.CUBE;
+        }
+      case CONE:
+        if (coneSensorUp && coneDistance > mmConeActivationThreshold) {
+          tofState = FlightStates.IDLE;
+        }
+      case CUBE:
+        if (cubeSensorUp && cubeDistance > mmCubeActivationThreshold) {
+          tofState = FlightStates.IDLE;
+        }
+      case CONE_SCORE:
+        if (coneSensorUp && coneDistance > mmConeActivationThreshold) {
+          tofState = FlightStates.IDLE;
+        }
     }
   }
 
