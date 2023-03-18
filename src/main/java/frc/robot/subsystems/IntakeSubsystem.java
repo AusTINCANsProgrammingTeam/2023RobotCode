@@ -15,6 +15,9 @@ import frc.robot.hardware.MotorController.MotorConfig;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import java.util.Map;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public enum FlightStates{
@@ -40,16 +43,18 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   private CANSparkMax motor;
   private CANSparkMax motor2;
+
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
-  private static GenericEntry intakeMode = matchTab.add("Intake Mode", "Cone Mode").getEntry();
+  private SimpleWidget intakeMode = matchTab.add("Intake Mode", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow"));
+  private static GenericEntry currentState = matchTab.add("ToF State", FlightStates.IDLE.toString()).getEntry();
+  private static GenericEntry sensor0Up = matchTab.add("Cone ToF sensor up: ", true).getEntry();
+  private static GenericEntry sensor1Up = matchTab.add("Cube ToF sensor up: ", true).getEntry(); 
 
-  private DebugLog<Double> coneDist = new DebugLog<Double>(0.0, "Cone Distance", this);
-  private DebugLog<Double> cubeDist = new DebugLog<Double>(0.0, "Cube Distance", this);
-  private DebugLog<Boolean> hasCone = new DebugLog<Boolean>(false, "Has Cone", this);
-  private DebugLog<Boolean> hasCube = new DebugLog<Boolean>(false, "Has Cube", this);
-  private DebugLog<Boolean> isConeSensor = new DebugLog<Boolean>(true, "Cone Sensor Working", this);
-  private DebugLog<Boolean> isCubeSensor = new DebugLog<Boolean>(true, "Cube Sensor Working", this);
+  private DebugLog<Double> coneDistLog = new DebugLog<Double>(0.0, "Cone Distance", this);
+  private DebugLog<Double> cubeDistLog = new DebugLog<Double>(0.0, "Cube Distance", this);
+  private DebugLog<Boolean> hasConeLog = new DebugLog<Boolean>(false, "Has Cone", this);
+  private DebugLog<Boolean> hasCubeLog = new DebugLog<Boolean>(false, "Has Cube", this);
 
   private boolean isConeMode;
 
@@ -81,7 +86,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void setMode(boolean isConeMode) {
-    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
+    intakeMode.getEntry().setBoolean(isConeMode);
     this.isConeMode = isConeMode;
   }
 
@@ -111,8 +116,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     boolean cubeSensorUp = timeOfFlightSensor.isSensor1Connected();
 
     // Log whether sensors are online
-    isConeSensor.log(coneSensorUp);
-    isCubeSensor.log(cubeSensorUp);
+    sensor0Up.setBoolean(coneSensorUp);
+    sensor1Up.setBoolean(cubeSensorUp);
 
     // Initialize both values to -1 and only change if sensors are up
     int coneDistance = -1; 
@@ -121,42 +126,43 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     // Check if cone sensor is up
     if (coneSensorUp) {
       coneDistance = timeOfFlightSensor.getDistance0();
-      hasCone.log(coneDistance <= mmConeActivationThreshold);
-    } else {
-      hasCone.log(false);
+      hasConeLog.log(coneDistance <= mmConeActivationThreshold);
     }
 
     // Check if cube sensor is up
     if (cubeSensorUp) {
       cubeDistance = timeOfFlightSensor.getDistance1();
-      hasCube.log(cubeDistance <= mmCubeActivationThreshold);
-    } else {
-      hasCube.log(false);
+      hasCubeLog.log(cubeDistance <= mmCubeActivationThreshold);
     }
 
     // Log distance values
-    coneDist.log((double)coneDistance);
-    cubeDist.log((double)cubeDistance);
+    coneDistLog.log((double)coneDistance);
+    cubeDistLog.log((double)cubeDistance);
 
     // Change state (only if sensors are online)
     switch(tofState) {
       case IDLE:
         if (coneSensorUp && coneDistance <= mmConeActivationThreshold) {
           tofState = FlightStates.CONE;
+          break;
         } else if (cubeSensorUp && cubeDistance <= mmCubeActivationThreshold) {
           tofState = FlightStates.CUBE;
+          break;
         }
       case CONE:
         if (coneSensorUp && coneDistance > mmConeActivationThreshold) {
           tofState = FlightStates.IDLE;
+          break;
         }
       case CUBE:
         if (cubeSensorUp && cubeDistance > mmCubeActivationThreshold) {
           tofState = FlightStates.IDLE;
+          break;
         }
       case CONE_SCORE:
         if (coneSensorUp && coneDistance > mmConeActivationThreshold) {
           tofState = FlightStates.IDLE;
+          break;
         }
     }
   }
@@ -164,6 +170,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public FlightStates getFlightState() {
     // Check if state has changed before returning it
     changeFlightState();
+    currentState.setString(tofState.toString());
     return tofState;
   }
 
