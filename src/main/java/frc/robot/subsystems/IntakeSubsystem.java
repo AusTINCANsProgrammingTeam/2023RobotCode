@@ -12,7 +12,6 @@ import frc.robot.classes.DebugLog;
 import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
-import frc.robot.subsystems.ArmSubsystem.ArmState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -45,13 +44,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
   private static GenericEntry intakeMode = matchTab.add("Intake Mode", "Cone Mode").getEntry();
 
-  private DebugLog<Integer> coneDist = new DebugLog<Integer>(0, "Cone Distance", this);
-  private DebugLog<Integer> cubeDist = new DebugLog<Integer>(0, "Cube Distance", this);
+  private DebugLog<Double> coneDist = new DebugLog<Double>(0.0, "Cone Distance", this);
+  private DebugLog<Double> cubeDist = new DebugLog<Double>(0.0, "Cube Distance", this);
   private DebugLog<Boolean> hasCone = new DebugLog<Boolean>(false, "Has Cone", this);
   private DebugLog<Boolean> hasCube = new DebugLog<Boolean>(false, "Has Cube", this);
   private DebugLog<Boolean> isConeSensor = new DebugLog<Boolean>(true, "Cone Sensor Working", this);
   private DebugLog<Boolean> isCubeSensor = new DebugLog<Boolean>(true, "Cube Sensor Working", this);
-
 
   private boolean isConeMode;
 
@@ -131,14 +129,14 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     // Check if cube sensor is up
     if (cubeSensorUp) {
       cubeDistance = timeOfFlightSensor.getDistance1();
-      hasCube.log(false);
+      hasCube.log(cubeDistance <= mmCubeActivationThreshold);
     } else {
       hasCube.log(false);
     }
 
     // Log distance values
-    coneDist.log(coneDistance);
-    cubeDist.log(cubeDistance);
+    coneDist.log((double)coneDistance);
+    cubeDist.log((double)cubeDistance);
 
     // Change state (only if sensors are online)
     if (coneDistance <= mmConeActivationThreshold && coneSensorUp) {

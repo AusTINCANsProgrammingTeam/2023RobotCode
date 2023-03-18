@@ -19,7 +19,6 @@ public class ToFIntakeCommand extends CommandBase {
     this.intakeSubsystem = intakeSubsystem;
     this.armSubsystem = armSubsystem;
     addRequirements(intakeSubsystem);
-    addRequirements(armSubsystem);
   }
 
   // Called when the command is initially scheduled.
