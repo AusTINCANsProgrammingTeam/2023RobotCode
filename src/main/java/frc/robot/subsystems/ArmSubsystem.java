@@ -77,7 +77,7 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseP = 1;
   private double kBaseI = 0.35;
   private double kBaseD = 0;
-  //Elbow arm PID values FIXME
+  //Elbow arm PID values
   private double kElbowUpP = 5;
   private double kElbowUpI = 0.5;
   private double kElbowUpD = 0;
