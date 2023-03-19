@@ -78,12 +78,12 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseI = 0.35;
   private double kBaseD = 0;
   //Elbow arm PID values FIXME
-  private double kElbowUpP = 2.5;
-  private double kElbowUpI = 0.1;
+  private double kElbowUpP = 5;
+  private double kElbowUpI = 0.5;
   private double kElbowUpD = 0;
 
-  private double kElbowDownP = 0.5;
-  private double kElbowDownI = 0.25;
+  private double kElbowDownP = 5;
+  private double kElbowDownI = 0.5;
   private double kElbowDownD = 0;
 
   private double kElbowS = 0;
@@ -121,11 +121,11 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kMinBaseAngle = Units.degreesToRadians(46);
   public static final double kMinElbowAngle = Units.degreesToRadians(22);
   public static final double kMaxBaseAngle = Units.degreesToRadians(90);
-  public static final double kMaxElbowAngle = Units.degreesToRadians(162);
+  public static final double kMaxElbowAngle = Units.degreesToRadians(170);
 
   //FIXME
-  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(80), Units.degreesToRadians(80));
-  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(30), Units.degreesToRadians(30));
+  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(210), Units.degreesToRadians(210));
+  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(300), Units.degreesToRadians(300));
 
   public static final double kBaseGearing = 40.8333333;
   public static final double kElbowGearing = 4.28571429;
@@ -250,8 +250,8 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void updateReferences(double bJoystickValue, double eJoystickValue) {
-    setBaseReference(MathUtil.clamp(basePIDController.getGoal().position+Units.degreesToRadians(bJoystickValue),ArmSubsystem.kMinBaseAngle,ArmSubsystem.kMaxBaseAngle));
-    setElbowReference(MathUtil.clamp(elbowPIDController.getGoal().position+Units.degreesToRadians(eJoystickValue),ArmSubsystem.kMinElbowAngle,ArmSubsystem.kMaxElbowAngle));
+    basePIDController.setGoal(MathUtil.clamp(basePIDController.getGoal().position+Units.degreesToRadians(bJoystickValue),ArmSubsystem.kMinBaseAngle,ArmSubsystem.kMaxBaseAngle));
+    elbowPIDController.setGoal(MathUtil.clamp(elbowPIDController.getGoal().position+Units.degreesToRadians(eJoystickValue),ArmSubsystem.kMinElbowAngle,ArmSubsystem.kMaxElbowAngle));
   }
 
   public void setBaseReference(double setpoint) {
@@ -305,7 +305,7 @@ public class ArmSubsystem extends SubsystemBase {
     double elbowPIDOutput = elbowPIDController.calculate(getElbowAngle());
     elbowPIDOutputLog.log(elbowPIDOutput);
     //Feedforward output
-    double elbowFFOutput = elbowFeedForward.calculate(elbowPIDController.getSetpoint().position + basePIDController.getSetpoint().position - Math.PI, 0);
+    double elbowFFOutput = elbowFeedForward.calculate(elbowPIDController.getGoal().position + basePIDController.getGoal().position - Math.PI, 0);
     elbowFFOutputLog.log(elbowFFOutput);
     //Clamp output
     double elbowOutput = MathUtil.clamp(elbowPIDOutput + elbowFFOutput, getElbowAngle() < kMinElbowAngle ? 0 : -12, getElbowAngle() > kMaxElbowAngle ? 0 : 12);
