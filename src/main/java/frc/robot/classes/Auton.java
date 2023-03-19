@@ -30,8 +30,8 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class Auton{
-    public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed * 0.1; //Maximum speed allowed in auton, in meters per second
-    public static final double kMaxAcceleration = 3; //Maximum accelaration allowed in auton, in meters per seconds squared
+    public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed * 0.75; //Maximum speed allowed in auton, in meters per second
+    public static final double kMaxAcceleration = 5; //Maximum accelaration allowed in auton, in meters per seconds squared
 
     private enum AutonModes{
         //Number after a path name corresponds to its starting position
