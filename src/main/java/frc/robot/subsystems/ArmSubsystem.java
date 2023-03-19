@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -47,7 +48,7 @@ public class ArmSubsystem extends SubsystemBase {
     CONEINTAKE(1.0136, -0.0876), //Arm is in position to intake cones
     CUBEINTAKE(0.7691, -0.2365), //Arm is in position to intake cubes
     MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
-    HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
+    HIGHSCORE(1.6773, 1.2778), //Arm is in position to score on the high pole
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
     HIGHTRANSITIONAUTON(1.0321, 1.0992), //High transition state used in auton to avoid getting stuck FIXME
     HIGHDROP(1.4433, 0.9266), //High scoring motion
@@ -78,9 +79,18 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseI = 0.35;
   private double kBaseD = 0;
   //Elbow arm PID values
-  private double kElbowP = 0.95;
-  private double kElbowI = 0.15;
-  private double kElbowD = 0.05;
+  private double kElbowUpP = 5;
+  private double kElbowUpI = 0.5;
+  private double kElbowUpD = 0;
+
+  private double kElbowDownP = 5;
+  private double kElbowDownI = 0.5;
+  private double kElbowDownD = 0;
+
+  private double kElbowS = 0;
+  private double kElbowG = 1.43;
+  private double kElbowV = 1.40;
+  private double kElbowA = 0.11;
   //Sim PID values
   private double kSimBaseP = 0.1;
   private double kSimElbowP = 0.1;
@@ -91,6 +101,7 @@ public class ArmSubsystem extends SubsystemBase {
   private CANSparkMax baseMotor;
   private CANSparkMax baseMotor2;
   private CANSparkMax elbowMotor;
+  private CANSparkMax elbowMotor2;
 
   private final DutyCycleEncoder baseAbsoluteEncoder;
   private final DutyCycleEncoder choochooAbsoluteEncoder;
@@ -100,6 +111,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   private final ProfiledPIDController basePIDController;
   private final ProfiledPIDController elbowPIDController;
+  private final ArmFeedforward elbowFeedForward;
 
   public static final double kMinChooChooAngle = Units.degreesToRadians(208);
   public static final double kMaxChooChooAngle = Units.degreesToRadians(326);
@@ -108,12 +120,14 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kElbowLength = Units.inchesToMeters(43);
 
   public static final double kMinBaseAngle = Units.degreesToRadians(46);
-  public static final double kMinElbowAngle = Units.degreesToRadians(15);
+  public static final double kMinElbowAngle = Units.degreesToRadians(22);
   public static final double kMaxBaseAngle = Units.degreesToRadians(90);
-  public static final double kMaxElbowAngle = Units.degreesToRadians(162);
+  public static final double kMaxElbowAngle = Units.degreesToRadians(170);
 
-  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(80), Units.degreesToRadians(80));
-  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(180), Units.degreesToRadians(180));
+  public static final double kMaxElbowVoltage = 12;
+
+  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(133), Units.degreesToRadians(133));
+  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(300), Units.degreesToRadians(300));
 
   public static final double kBaseGearing = 40.8333333;
   public static final double kElbowGearing = 4.28571429;
@@ -136,6 +150,9 @@ public class ArmSubsystem extends SubsystemBase {
   private DebugLog<Double> desiredElbowGoalLog = new DebugLog<Double>(0.0, "Desired Elbow Goal", this);
   private DebugLog<Double> desiredElbowSetpointLog = new DebugLog<Double>(0.0, "Desired Elbow Setpoint", this);
   private DebugLog<Double> elbowOutputLog = new DebugLog<Double>(0.0, "Elbow Output", this);
+  private DebugLog<Double> elbowPIDOutputLog = new DebugLog<Double>(0.0, "Elbow PID Output", this);
+  private DebugLog<Double> elbowFFOutputLog = new DebugLog<Double>(0.0, "Elbow FF Output", this);
+  private DebugLog<String> elbowUpDownLog = new DebugLog<String>("", "Elbow Up-Down", this);
 
   private DebugLog<Double> actualXPositionLog = new DebugLog<Double>(0.0, "Actual X Position", this);
   private DebugLog<Double> actualYPositionLog = new DebugLog<Double>(0.0, "Actual Y Position", this);
@@ -151,9 +168,13 @@ public class ArmSubsystem extends SubsystemBase {
   private TunableNumber baseITuner;
   private TunableNumber baseDTuner;
 
-  private TunableNumber elbowPTuner;
-  private TunableNumber elbowITuner;
-  private TunableNumber elbowDTuner;
+  private TunableNumber elbowUpPTuner;
+  private TunableNumber elbowUpITuner;
+  private TunableNumber elbowUpDTuner;
+
+  private TunableNumber elbowDownPTuner;
+  private TunableNumber elbowDownITuner;
+  private TunableNumber elbowDownDTuner;
 
   private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), kBaseGearing, kBaseInertia, kBaseLength, kMinBaseAngle, kMaxBaseAngle, false);
   private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, kElbowInertia, kElbowLength, kMinElbowAngle, kMaxElbowAngle, false);
@@ -173,9 +194,11 @@ public class ArmSubsystem extends SubsystemBase {
 
     baseMotor = MotorController.constructMotor(MotorConfig.ArmBase1);
     baseMotor2 = MotorController.constructMotor(MotorConfig.ArmBase2);
-    elbowMotor = MotorController.constructMotor(MotorConfig.ArmElbow);
+    elbowMotor = MotorController.constructMotor(MotorConfig.ArmElbow1);
+    elbowMotor2 = MotorController.constructMotor(MotorConfig.ArmElbow2);
 
     baseMotor2.follow(baseMotor);
+    elbowMotor2.follow(elbowMotor);
 
     baseMotor.enableVoltageCompensation(11);
     elbowMotor.enableVoltageCompensation(11);
@@ -186,17 +209,23 @@ public class ArmSubsystem extends SubsystemBase {
 
     if(Robot.isReal()) {
       basePIDController = new ProfiledPIDController(kBaseP, kBaseI, kBaseD, kBaseConstraints);
-      elbowPIDController = new ProfiledPIDController(kElbowP, kElbowI, kElbowD, kElbowConstraints);
+      elbowPIDController = new ProfiledPIDController(kElbowUpP, kElbowUpI, kElbowUpD, kElbowConstraints);
+      elbowFeedForward = new ArmFeedforward(kElbowS, kElbowG, kElbowV, kElbowA);
       
       basePTuner = new TunableNumber("baseP", kBaseP, basePIDController::setP);
       baseITuner = new TunableNumber("baseI", kBaseI, basePIDController::setI);
       baseDTuner = new TunableNumber("baseD", kBaseD, basePIDController::setD);
   
-      elbowPTuner = new TunableNumber("elbowP", kElbowP, elbowPIDController::setP);
-      elbowITuner = new TunableNumber("elbowI", kElbowI, elbowPIDController::setI);
-      elbowDTuner = new TunableNumber("elbowD", kElbowD, elbowPIDController::setD);
+      elbowUpPTuner = new TunableNumber("elbowUpP", kElbowUpP, (a) -> kElbowUpP = a);
+      elbowUpITuner = new TunableNumber("elbowUpI", kElbowUpI, (a) -> kElbowUpI = a);
+      elbowUpDTuner = new TunableNumber("elbowUpD", kElbowUpD, (a) -> kElbowUpD = a);
+
+      elbowDownPTuner = new TunableNumber("elbowDownP", kElbowDownP, (a) -> kElbowDownP = a);
+      elbowDownITuner = new TunableNumber("elbowDownI", kElbowDownI, (a) -> kElbowDownI = a);
+      elbowDownDTuner = new TunableNumber("elbowDownD", kElbowDownD, (a) -> kElbowDownD = a);
     } else {
       SmartDashboard.putData("Arm Sim", simArmCanvas);
+      elbowFeedForward = new ArmFeedforward(0, 0, 0, 0);
       basePIDController = new ProfiledPIDController(kSimBaseP, 0, 0, kBaseConstraints);
       elbowPIDController = new ProfiledPIDController(kSimElbowP, 0, 0, kElbowConstraints);
     }
@@ -223,8 +252,8 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void updateReferences(double bJoystickValue, double eJoystickValue) {
-    setBaseReference(MathUtil.clamp(basePIDController.getGoal().position+Units.degreesToRadians(bJoystickValue),ArmSubsystem.kMinBaseAngle,ArmSubsystem.kMaxBaseAngle));
-    setElbowReference(MathUtil.clamp(elbowPIDController.getGoal().position+Units.degreesToRadians(eJoystickValue),ArmSubsystem.kMinElbowAngle,ArmSubsystem.kMaxElbowAngle));
+    basePIDController.setGoal(MathUtil.clamp(basePIDController.getGoal().position+Units.degreesToRadians(bJoystickValue),ArmSubsystem.kMinBaseAngle,ArmSubsystem.kMaxBaseAngle));
+    elbowPIDController.setGoal(MathUtil.clamp(elbowPIDController.getGoal().position+Units.degreesToRadians(eJoystickValue),ArmSubsystem.kMinElbowAngle,ArmSubsystem.kMaxElbowAngle));
   }
 
   public void setBaseReference(double setpoint) {
@@ -232,6 +261,17 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void setElbowReference(double setpoint) {
+    if(getElbowAngle() > setpoint){
+      elbowPIDController.setP(kElbowDownP);
+      elbowPIDController.setI(kElbowDownI);
+      elbowPIDController.setD(kElbowDownD);
+      elbowUpDownLog.log("Down");
+    } else{
+      elbowPIDController.setP(kElbowUpP);
+      elbowPIDController.setI(kElbowUpI);
+      elbowPIDController.setD(kElbowUpD);
+      elbowUpDownLog.log("Up");
+    }
     elbowPIDController.setGoal(setpoint);
   }
 
@@ -260,12 +300,26 @@ public class ArmSubsystem extends SubsystemBase {
     armYPosition = getArmY();
   }
   
-
   public void updateMotors() {
     double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? -1 : 1) * basePIDController.calculate(getBaseAngle()),-1,1);
-    double elbowOutput = MathUtil.clamp(elbowPIDController.calculate(getElbowAngle()),-.4,1);
+    
+    //PID output
+    double elbowPIDOutput = elbowPIDController.calculate(getElbowAngle());
+    elbowPIDOutputLog.log(elbowPIDOutput);
+    //Feedforward output
+    double elbowFFOutput = elbowFeedForward.calculate(elbowPIDController.getGoal().position + basePIDController.getGoal().position - Math.PI, 0);
+    elbowFFOutputLog.log(elbowFFOutput);
+    //Clamp output
+    double elbowOutput = MathUtil.clamp(elbowPIDOutput + elbowFFOutput, getElbowAngle() < kMinElbowAngle ? 0 : -kMaxElbowVoltage, getElbowAngle() > kMaxElbowAngle ? 0 : kMaxElbowVoltage);
+    elbowOutputLog.log(elbowOutput);
+
     baseMotor.set(baseOutput);
-    elbowMotor.set(elbowOutput);
+    elbowMotor.setVoltage(elbowOutput);
+  }
+
+  //Cancels commmand, but profPIDcontroller keeps going to next setpoint, before dropping back to where the button was pressed.
+  public void cancelCommands() {
+    getCurrentCommand().cancel();
   }
 
 
@@ -336,7 +390,7 @@ public class ArmSubsystem extends SubsystemBase {
                 (b)->{}, //End 
                 this::atSetpoint, //isFinished
                 this
-            );
+            ).withName("goToState " + state);
   }
 
   public Command goToStateDelay(ArmState state) {
@@ -412,13 +466,13 @@ public class ArmSubsystem extends SubsystemBase {
       case STOWED:
         return transitionToState(ArmState.CUBEINTAKE);
       case HIGHTRANSITION:
+      case MIDSCORE:
       case CUBEINTAKE:
         return transitionToState(ArmState.STOWED);
       case HIGHSCORE:
         return goToState(ArmState.HIGHDROP);
       case TRANSITION:
       case CONEINTAKE:
-      case MIDSCORE:
       case HIGHDROP:
         return goToState(ArmState.CUBEINTAKE);
       default:
@@ -449,6 +503,7 @@ public class ArmSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
+    SmartDashboard.putData(this);
     // This method will be called once per scheduler run
     calculateCurrentPositions();
     if(DriverStation.isDisabled()){
