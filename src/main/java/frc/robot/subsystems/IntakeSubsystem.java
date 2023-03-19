@@ -37,8 +37,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   private TimeOfFlightSensor timeOfFlightSensor;
 
-  private final double mmConeActivationThreshold = 550.0; 
-  private final double mmCubeActivationThreshold = 550.0; 
+  private final double mmConeActivationThreshold = 450.0; 
+  private final double mmCubeActivationThreshold = 450.0; 
   private FlightStates tofState = FlightStates.IDLE;
 
   private CANSparkMax motor;
