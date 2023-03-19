@@ -173,7 +173,7 @@ public class TimeOfFlightSensor implements AutoCloseable {
   public int getDistance0() {
     try {
       threadLock.lock();
-      return distance0;
+      return (hasDistance0) ? distance0 : -1;
     } finally {
       threadLock.unlock();
     }
@@ -182,7 +182,7 @@ public class TimeOfFlightSensor implements AutoCloseable {
   public int getDistance1() {
     try {
       threadLock.lock();
-      return distance1;
+      return (hasDistance1) ? distance1 : -1;
     } finally {
       threadLock.unlock();
     }
