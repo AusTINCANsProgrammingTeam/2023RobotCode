@@ -123,7 +123,8 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kMaxBaseAngle = Units.degreesToRadians(90);
   public static final double kMaxElbowAngle = Units.degreesToRadians(170);
 
-  //FIXME
+  public static final double kMaxElbowVoltage = 12;
+
   public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(133), Units.degreesToRadians(133));
   public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(300), Units.degreesToRadians(300));
 
@@ -308,7 +309,7 @@ public class ArmSubsystem extends SubsystemBase {
     double elbowFFOutput = elbowFeedForward.calculate(elbowPIDController.getGoal().position + basePIDController.getGoal().position - Math.PI, 0);
     elbowFFOutputLog.log(elbowFFOutput);
     //Clamp output
-    double elbowOutput = MathUtil.clamp(elbowPIDOutput + elbowFFOutput, getElbowAngle() < kMinElbowAngle ? 0 : -12, getElbowAngle() > kMaxElbowAngle ? 0 : 12);
+    double elbowOutput = MathUtil.clamp(elbowPIDOutput + elbowFFOutput, getElbowAngle() < kMinElbowAngle ? 0 : -kMaxElbowVoltage, getElbowAngle() > kMaxElbowAngle ? 0 : kMaxElbowVoltage);
     elbowOutputLog.log(elbowOutput);
 
     baseMotor.set(baseOutput);
