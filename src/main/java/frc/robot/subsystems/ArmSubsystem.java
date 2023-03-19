@@ -45,8 +45,8 @@ import frc.robot.hardware.MotorController.MotorConfig;
 public class ArmSubsystem extends SubsystemBase {
   public static enum ArmState{
     STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
-    CONEINTAKE(1.0136, -0.0749), //Arm is in position to intake cones
-    CUBEINTAKE(0.7984, -0.2416), //Arm is in position to intake cubes
+    CONEINTAKE(1.0136, -0.0876), //Arm is in position to intake cones
+    CUBEINTAKE(0.7691, -0.2365), //Arm is in position to intake cubes
     MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6773, 1.2778), //Arm is in position to score on the high pole
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
@@ -459,13 +459,13 @@ public class ArmSubsystem extends SubsystemBase {
       case STOWED:
         return transitionToState(ArmState.CUBEINTAKE);
       case HIGHTRANSITION:
+      case MIDSCORE:
       case CUBEINTAKE:
         return transitionToState(ArmState.STOWED);
       case HIGHSCORE:
         return goToState(ArmState.HIGHDROP);
       case TRANSITION:
       case CONEINTAKE:
-      case MIDSCORE:
       case HIGHDROP:
         return goToState(ArmState.CUBEINTAKE);
       default:
@@ -501,10 +501,13 @@ public class ArmSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
+    SmartDashboard.putData(this);
     // This method will be called once per scheduler run
     calculateCurrentPositions();
     if(DriverStation.isDisabled()){
       holdCurrentPosition();
+      basePIDController.reset(getBaseAngle());
+      elbowPIDController.reset(getElbowAngle());
     }
 
     rolloverLog.log(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);

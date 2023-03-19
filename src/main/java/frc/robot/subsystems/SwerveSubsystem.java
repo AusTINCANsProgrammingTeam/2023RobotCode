@@ -308,8 +308,8 @@ public class SwerveSubsystem extends SubsystemBase{
     
     @Override
     public void periodic() {
+        SmartDashboard.putData(this);
         odometer.update(getRotation2d(), getModulePositions());
-
         pitchEntry.setDouble(getPitch());
         headingEntry.setDouble(getHeading());
         positionEntry.setString(getPose().getTranslation().toString());
