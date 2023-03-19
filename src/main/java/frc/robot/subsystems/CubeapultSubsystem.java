@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,28 +21,29 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.classes.DebugLog;
 
 public class CubeapultSubsystem extends SubsystemBase {
-  private static final int solenoidID = 0; //TODO: Update ids when plugged in to the robot
-  private static final int pneumaticsID = 0;
-  private Solenoid solenoid;
+  private static final int solenoidForwardID = 0; //TODO: Update ids when plugged in to the robot
+  private static final int solenoidReverseID = 1; //TODO: Update ids when plugged in to the robot
+  private static final int pneumaticsID = 59;
+  private DoubleSolenoid solenoid;
   private PneumaticHub pneumatics;
   private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
   private DebugLog<Boolean> solenoidStateLog = new DebugLog<Boolean>(false, "Solenoid State", this);
   
   public CubeapultSubsystem() {
     configTab.add(new StartEndCommand(this::activate, this::deactivate, this).withName("Enable Compressor"));
-    solenoid = new Solenoid(PneumaticsModuleType.REVPH, solenoidID);
+    solenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, solenoidForwardID, solenoidReverseID);
     pneumatics = new PneumaticHub(pneumaticsID);
     retract();
     deactivate();
   }
 
   private void extend() {
-    solenoid.set(true);
+    solenoid.set(Value.kForward);;
     solenoidStateLog.log(true);
   }
 
   private void retract() {
-    solenoid.set(false);
+    solenoid.set(Value.kReverse);
     solenoidStateLog.log(false);
   }
 
