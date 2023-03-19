@@ -48,7 +48,7 @@ public class ArmSubsystem extends SubsystemBase {
     CONEINTAKE(1.0136, -0.0749), //Arm is in position to intake cones
     CUBEINTAKE(0.7984, -0.2416), //Arm is in position to intake cubes
     MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
-    HIGHSCORE(1.6324, 1.3305), //Arm is in position to score on the high pole
+    HIGHSCORE(1.6773, 1.2778), //Arm is in position to score on the high pole
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
     HIGHDROP(1.4433, 0.9266), //High scoring motion
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
@@ -124,7 +124,7 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kMaxElbowAngle = Units.degreesToRadians(170);
 
   //FIXME
-  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(210), Units.degreesToRadians(210));
+  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(133), Units.degreesToRadians(133));
   public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(300), Units.degreesToRadians(300));
 
   public static final double kBaseGearing = 40.8333333;
