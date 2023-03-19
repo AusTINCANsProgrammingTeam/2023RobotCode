@@ -68,11 +68,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public IntakeSubsystem(TimeOfFlightSensor timeOfFlightSensor) {
-    isConeMode = true;
+    this();
     this.timeOfFlightSensor = timeOfFlightSensor;
-
-    motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
-    motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
   }
   
   private void spinWheels(double velocity) {
