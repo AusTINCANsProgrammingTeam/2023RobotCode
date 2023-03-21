@@ -244,7 +244,7 @@ public class Auton{
                     swerveSubsystem.followTrajectory("1ScoreLoad1-1", getTrajectory("1ScoreLoad1-1"))
                     .alongWith(armSubsystem.goToStateDelay(ArmState.CUBEINTAKE)),
                     swerveSubsystem.followTrajectory("1ScoreLoad2-1", getTrajectory("1ScoreLoad2-1"))
-                    .alongWith(intakeSubsystem.pullTimed(1, false)
+                    .alongWith(intakeSubsystem.pullTimed(3, false)
                         .andThen(armSubsystem.goToStateDelay(ArmState.STOWED))
                     ),
                     swerveSubsystem.assistedBalance()
