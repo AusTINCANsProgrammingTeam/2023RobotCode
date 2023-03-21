@@ -50,7 +50,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private static GenericEntry currentState = matchTab.add("ToF State", FlightStates.IDLE.toString()).getEntry();
   private static GenericEntry sensor0Up = matchTab.add("Cone ToF sensor up: ", true).getEntry();
   private static GenericEntry sensor1Up = matchTab.add("Cube ToF sensor up: ", true).getEntry(); 
-  private static GenericEntry tofToggle = matchTab.add("ToF Enabled", true).withWidget(BuiltInWidgets.kToggleButton).getEntry();
 
   private DebugLog<Double> coneDistLog = new DebugLog<Double>(0.0, "Cone Distance", this);
   private DebugLog<Double> cubeDistLog = new DebugLog<Double>(0.0, "Cube Distance", this);
@@ -105,10 +104,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   public void stop() {
     spinWheels(0);
-  }
-
-  public boolean getTofEnabled() {
-    return tofToggle.getBoolean(false);
   }
 
   @Override

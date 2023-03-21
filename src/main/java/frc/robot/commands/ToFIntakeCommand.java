@@ -28,36 +28,34 @@ public class ToFIntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (intakeSubsystem.getTofEnabled()) {
-      FlightStates tofState = intakeSubsystem.getFlightState();
+    FlightStates tofState = intakeSubsystem.getFlightState();
 
-      switch (tofState) {
-        case IDLE:
-          if (intakeSubsystem.getSpeed() != 0) {
-            intakeSubsystem.stop();
-          }
-          break;
+    switch (tofState) {
+      case IDLE:
+        if (intakeSubsystem.getSpeed() != 0) {
+          intakeSubsystem.stop();
+        }
+        break;
 
-        case CONE:
-          // If we're about to shoot, make sure not to stay running intake normally
-          if (armSubsystem.getArmState().equals(ArmState.HIGHDROP)) {
-            tofState = FlightStates.CONE_SCORE;
-          } else {
-            intakeSubsystem.setMode(true);
-            intakeSubsystem.hold();
-            break;
-          }
-
-        case CUBE:
-          intakeSubsystem.setMode(false);
+      case CONE:
+        // If we're about to shoot, make sure not to stay running intake normally
+        if (armSubsystem.getArmState().equals(ArmState.HIGHDROP)) {
+          tofState = FlightStates.CONE_SCORE;
+        } else {
+          intakeSubsystem.setMode(true);
           intakeSubsystem.hold();
           break;
+        }
 
-        case CONE_SCORE:
-          // Turn off intake when about to score
-          intakeSubsystem.stop();
-          break;
-      }
+      case CUBE:
+        intakeSubsystem.setMode(false);
+        intakeSubsystem.hold();
+        break;
+
+      case CONE_SCORE:
+        // Turn off intake when about to score
+        intakeSubsystem.stop();
+        break;
     }
   }
 
