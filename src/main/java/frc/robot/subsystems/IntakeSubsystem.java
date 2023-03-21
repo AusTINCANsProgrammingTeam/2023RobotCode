@@ -7,13 +7,13 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.hardware.MotorController;
-import frc.robot.hardware.MotorController.MotorConfig;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.hardware.MotorController;
+import frc.robot.hardware.MotorController.MotorConfig;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kConeIntakeSpeed = -0.75;
@@ -51,8 +51,14 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
   }
 
-  public void setMode(boolean isConeMode) {
+  /*public void setMode(boolean isConeMode) {
     this.isConeMode = isConeMode;
+  }
+*/
+    public void setConeMode() {
+  }
+
+    public void setCubeMode() {
   }
 
   public void toggleConeMode() {
