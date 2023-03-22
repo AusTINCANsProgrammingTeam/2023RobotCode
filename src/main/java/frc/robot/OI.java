@@ -189,6 +189,7 @@ public class OI {
         private static final Button kCubeSignalButton = Button.X;
         private static final Button kHighScoreButton = Button.RB; // Sets arm state to highscore
         private static final Button kIntakeButton = Button.LB; // Toggles intake mode between cone and cube
+        private static final Button kArmStopButton = Button.A; // Cancels current arm command
 
         private static final int kArmElbowAxis = 3;
         private static final int kArmBaseAxis = 1;
@@ -240,6 +241,11 @@ public class OI {
         public static JoystickButton getIntakeButton(){
             kIntakeButton.setButtonAction("Toggle Intake Mode");
             return new JoystickButton(kJoystick, kIntakeButton.getButtonID());
+        }
+
+        public static JoystickButton getArmStopButton() {
+            kArmStopButton.setButtonAction("Stop Arm");
+            return new JoystickButton(kJoystick, kArmStopButton.getButtonID());
         }
     }
 

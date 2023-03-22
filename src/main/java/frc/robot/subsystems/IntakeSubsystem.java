@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import java.util.Map;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public enum FlightStates{
@@ -30,7 +31,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kConeIntakeSpeed = -0.75;
   public static final double kConeOuttakeSpeed = 0.75;
   public static final double kCubeIntakeSpeed = 0.55;
-  public static final double kCubeOuttakeSpeed = -0.55;
+  public static final double kCubeOuttakeSpeed = -0.65;
 
   private final double kConeHoldSpeed = 0.35; // change after testing
   private final double kCubeHoldSpeed = 0.25; // change after testing
@@ -85,13 +86,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
   }
 
-  public void hold() {
-    spinWheels(isConeMode ? kConeHoldSpeed : kCubeHoldSpeed);
+    public void setConeMode() {
+      this.isConeMode = true;
   }
 
-  public void setMode(boolean isConeMode) {
-    intakeMode.setBoolean(isConeMode);
-    this.isConeMode = isConeMode;
+    public void setCubeMode() {
+      this.isConeMode = false;
   }
 
   public void toggleConeMode() {
@@ -106,6 +106,10 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     spinWheels(0);
   }
 
+  public void hold() {
+    spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
+  }
+
   @Override
   public void close() throws Exception {
     // This method will close all device handles used by this object and release any other dynamic memory.
@@ -115,33 +119,25 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void changeFlightState() {
+    // Check distances
+    int coneDistance = timeOfFlightSensor.getDistance0();
+    int cubeDistance = timeOfFlightSensor.getDistance1();
+
+    // Log distance values
+    coneDistLog.log((double)coneDistance);
+    cubeDistLog.log((double)cubeDistance);
+
     // Check if sensors are online
-    boolean coneSensorUp = timeOfFlightSensor.isSensor0Connected();
-    boolean cubeSensorUp = timeOfFlightSensor.isSensor1Connected();
+    boolean coneSensorUp = coneDistance != -1;
+    boolean cubeSensorUp = cubeDistance != -1;
 
     // Log whether sensors are online
     sensor0Up.setBoolean(coneSensorUp);
     sensor1Up.setBoolean(cubeSensorUp);
 
-    // Initialize both values to -1 and only change if sensors are up
-    int coneDistance = -1; 
-    int cubeDistance = -1;
-
-    // Check if cone sensor is up
-    if (coneSensorUp) {
-      coneDistance = timeOfFlightSensor.getDistance0();
-      hasConeLog.log(coneDistance <= mmConeActivationThreshold);
-    }
-
-    // Check if cube sensor is up
-    if (cubeSensorUp) {
-      cubeDistance = timeOfFlightSensor.getDistance1();
-      hasCubeLog.log(cubeDistance <= mmCubeActivationThreshold);
-    }
-
-    // Log distance values
-    coneDistLog.log((double)coneDistance);
-    cubeDistLog.log((double)cubeDistance);
+    // Log if sensors are activated
+    hasConeLog.log(coneDistance <= mmConeActivationThreshold && coneSensorUp);
+    hasCubeLog.log(cubeDistance <= mmCubeActivationThreshold && cubeSensorUp);
 
     // Change state (only if sensors are online)
     switch(tofState) {
@@ -179,7 +175,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    // This method will be called once per scheduler run
+    SmartDashboard.putData(this);
+    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
+  }
 
   @Override
   public void simulationPeriodic() {

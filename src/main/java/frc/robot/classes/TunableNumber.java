@@ -25,6 +25,7 @@ public class TunableNumber extends SubsystemBase{
             numberEntry = tuningTab.add(name, defaultValue).getEntry();
         }
         numberLog = new DoubleLogEntry(datalog, "/tunables/" + name); 
+        numberLog.append(defaultValue);
     }
 
     public void periodic(){

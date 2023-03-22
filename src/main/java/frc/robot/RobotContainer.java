@@ -120,16 +120,16 @@ public class RobotContainer {
   private void configureButtonBindings() {
     if (Robot.ledSubSelect == LedEnum.MATRIX){
      // OI.Operator.getYellowCargoButton().onTrue(ledMatrixSubsystem.goCans());
-     OI.Operator.getConeSignalButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(MatrixMode.CONE), ledMatrixSubsystem::offLed, ledMatrixSubsystem));
-     OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(MatrixMode.CUBE), ledMatrixSubsystem::offLed, ledMatrixSubsystem));
+     OI.Operator.getConeSignalButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(MatrixMode.CONE), ledMatrixSubsystem::offLed, ledMatrixSubsystem).withName("Cone Signal"));
+     OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> ledMatrixSubsystem.cargoLed(MatrixMode.CUBE), ledMatrixSubsystem::offLed, ledMatrixSubsystem).withName("Cube Signal"));
     }
     if (Robot.ledSubSelect == LedEnum.BLINKIN){
-      OI.Operator.getConeSignalButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_YELLOW), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
-      OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_PURPLE), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem));
+      OI.Operator.getConeSignalButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_YELLOW), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem).withName("Cone Signal"));
+      OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> blinkinLedSubsystem.cargoLed(BlinkinMode.BLINKIN_PURPLE), blinkinLedSubsystem::blinkinStopLed, blinkinLedSubsystem).withName("Cube Signal"));
     }
     if (Robot.ledSubSelect == LedEnum.STRIP){
-      OI.Operator.getConeSignalButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(StripMode.CUBE), ledSubsystem::offLed, ledSubsystem));
-      OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(StripMode.CONE), ledSubsystem::offLed, ledSubsystem));
+      OI.Operator.getConeSignalButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(StripMode.CUBE), ledSubsystem::offLed, ledSubsystem).withName("Cone Signal"));
+      OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> ledSubsystem.cargoLed(StripMode.CONE), ledSubsystem::offLed, ledSubsystem).withName("Cube Signal"));
     }
     if (Robot.swerveEnabled) {
       OI.Driver.getOrientationButton().onTrue(new InstantCommand(swerveSubsystem::toggleOrientation));
@@ -139,17 +139,18 @@ public class RobotContainer {
     }
 
     if (Robot.intakeEnabled) {
-      OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem));
-      OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem));
+      OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem).withName("Intake"));
+      OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem).withName("Outtake"));
       OI.Operator.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::toggleConeMode));
     }
 
     if (Robot.armEnabled) {
-      OI.Driver.getArmHighButton().onTrue(new ProxyCommand(() -> armSubsystem.handleHighButton()));
-      OI.Driver.getArmMidButton().onTrue(new ProxyCommand(() -> armSubsystem.handleMidButton()));
+      OI.Driver.getArmHighButton().onTrue(new ProxyCommand(armSubsystem::handleHighButton));
+      OI.Driver.getArmMidButton().onTrue(new ProxyCommand(armSubsystem::handleMidButton));
+      OI.Operator.getArmStopButton().onTrue(new InstantCommand(armSubsystem::cancelCommands));
       if (Robot.intakeEnabled){
-        OI.Driver.getArmConeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleConeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setMode(true))));
-        OI.Driver.getArmCubeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleCubeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setMode(false))));
+        OI.Driver.getArmConeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleConeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setConeMode())));
+        OI.Driver.getArmCubeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleCubeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setCubeMode())));
         if (Robot.tofEnabled) {
           intakeSubsystem.setDefaultCommand(new ToFIntakeCommand(intakeSubsystem, armSubsystem));
         }
