@@ -87,9 +87,12 @@ public class SwerveModule extends SubsystemBase {
 
         int errorCode = driveEncoder.setPositionConversionFactor(kDriveEncoderRotFactor).value;
         errorCode += driveEncoder.setVelocityConversionFactor(kDriveEncoderRPMFactor).value;
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule driveEncoder", null);}
+        errorCode = 0;
         errorCode += turningEncoder.setPositionConversionFactor(kTurningEncoderRotFactor).value;
         errorCode += turningEncoder.setVelocityConversionFactor(kTurningEncoderRPMFactor).value;
-
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule turningEncoder", null);}
+        errorCode = 0;
         simDriveMotor = new FlywheelSim(
             LinearSystemId.identifyVelocitySystem(2, 1.24), //TODO: Update with real SysID
             DCMotor.getNEO(1),
@@ -106,6 +109,7 @@ public class SwerveModule extends SubsystemBase {
         
         turningPIDController = turningMotor.getPIDController();
         errorCode += turningPIDController.setP(kPTurning).value;
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule turningPIDController", null);}
         simTurningPIDController = new PIDController(turningPIDController.getP(), turningPIDController.getI(), turningPIDController.getD());
         simTurningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -115,8 +119,6 @@ public class SwerveModule extends SubsystemBase {
         actualSpeedLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setSpeed"); //Logs actual speed in meters per second
         desiredAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setAngle"); //Logs desired angle in radians
         actualAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualAngle"); //Logs actual relative angle in radians
-
-        if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule", null);}
     }
 
     public SwerveModulePosition getPosition() {
