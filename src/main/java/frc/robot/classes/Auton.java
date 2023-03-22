@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.CubeapultSubsystem;
 import frc.robot.subsystems.ArmSubsystem.ArmState;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -36,8 +37,8 @@ public class Auton{
 
     private enum AutonModes{
         //Number after a path name corresponds to its starting position
-        //Path that allows us to test auton scoring at the competition's practice field
-        ONESCORETEST,
+        //Test routines
+        PLACETEST, LAUNCHTEST,
         //Skip scoring and balance
         CHARGE1, CHARGE6,
         //Score preload and drive out of the community
@@ -67,15 +68,17 @@ public class Auton{
     private SwerveSubsystem swerveSubsystem;
     private ArmSubsystem armSubsystem;
     private IntakeSubsystem intakeSubsystem;
+    private CubeapultSubsystem cubeapultSubsystem;
 
     private PathConstraints pathConstraints;
 
     private AutonModes autonMode;
 
-    public Auton(SwerveSubsystem swerveSubsystem, ArmSubsystem armSubsystem, IntakeSubsystem intakeSubsystem){
+    public Auton(SwerveSubsystem swerveSubsystem, ArmSubsystem armSubsystem, IntakeSubsystem intakeSubsystem, CubeapultSubsystem cubeapultSubsystem){
         this.swerveSubsystem = swerveSubsystem;
         this.armSubsystem = armSubsystem;
         this.intakeSubsystem = intakeSubsystem;
+        this.cubeapultSubsystem = cubeapultSubsystem;
 
         //Add auton modes to chooser
         for(AutonModes mode : AutonModes.values()){
@@ -140,12 +143,16 @@ public class Auton{
         //Sequence of actions to be performed during the autonomous period
         try{
         switch(autonMode){
-            case ONESCORETEST:
+            case PLACETEST:
                 return 
                     new SequentialCommandGroup(
                         resetOdometry("1Score"),
                         highScoreSequence(),
                         new InstantCommand(() -> SmartDashboard.putBoolean("next", true))
+                    );
+            case LAUNCHTEST:
+                    new SequentialCommandGroup(
+                        cubeapultSubsystem.launch()
                     );
             case ONESCORE:
                 return

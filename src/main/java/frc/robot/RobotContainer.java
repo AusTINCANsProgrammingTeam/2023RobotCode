@@ -90,7 +90,7 @@ public class RobotContainer {
     cubeapultSubsystem = Robot.cubeapultEnabled ? new CubeapultSubsystem() : null;
     subsystemEnabledLog.append(cubeapultSubsystem == null ? "Cubeapult: Disabled" : "Cubeapult: Enabled");
 
-    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem, armSubsystem, intakeSubsystem) : null;
+    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem, armSubsystem, intakeSubsystem, cubeapultSubsystem) : null;
 
     armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getArmBaseSupplier(), OI.Operator.getArmElbowSupplier()) : null;
 

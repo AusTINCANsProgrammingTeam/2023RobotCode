@@ -31,7 +31,7 @@ public class CubeapultSubsystem extends SubsystemBase {
   public CubeapultSubsystem() {
     configTab.add(new StartEndCommand(this::activate, this::deactivate, this).withName("Enable Compressor"));
     solenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, solenoidForwardID, solenoidReverseID);
-    pneumatics = new PneumaticHub(pneumaticsID);
+    pneumatics = new PneumaticHub();
     retract();
     deactivate();
   }
