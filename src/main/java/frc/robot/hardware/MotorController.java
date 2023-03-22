@@ -105,16 +105,14 @@ public class MotorController {
         errorCode += motor.setIdleMode(config.getIdleMode()).value;
         errorCode +=  motor.setOpenLoopRampRate(config.getOpenLoopRampRate()).value;
         motor.setInverted(config.getReversed());
-        if (errorCode != 0){
-            if(errorCode != 0){DriverStation.reportError("An Error has occured in constructMotor(MotorConfig config)", null);}
-        }
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in constructMotor(MotorConfig config)", null);}
         return motor;
     }
 
     public static CANSparkMax constructMotor(MotorConfig config, double[] PIDArray){
         CANSparkMax motor = constructMotor(config);
         SparkMaxPIDController motorPIDcontroller = motor.getPIDController();
-        int errorCode = motorPIDcontroller.setP(PIDArray[0]).value;
+        int errorCode = motorPIDcontroller.setP(PIDArray[0]).value; //Gets REVLibError code value (Is 0 if no error occured)
         errorCode += motorPIDcontroller.setI(PIDArray[1]).value;
         errorCode += motorPIDcontroller.setD(PIDArray[2]).value;
         if(errorCode != 0){DriverStation.reportError("An Error has occured in constructMotor(MotorConfig config, double[] PIDArray)", null);}
