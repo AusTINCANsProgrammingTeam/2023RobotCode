@@ -19,7 +19,7 @@ public class AbsoluteEncoder {
         //Arm Encoders (REV)
         ArmBase(1, true, Units.degreesToRadians(-75.45)),
         ArmChooChoo(2),
-        ArmElbow(0, true, Units.degreesToRadians(-65.134)); //FIXME
+        ArmElbow(0, true, Units.degreesToRadians(-85.5));
         
         private int ID;
         private boolean reversed;
