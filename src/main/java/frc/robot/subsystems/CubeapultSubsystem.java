@@ -23,6 +23,7 @@ public class CubeapultSubsystem extends SubsystemBase {
   private static final int solenoidForwardID = 0; //TODO: Update ids when plugged in to the robot
   private static final int solenoidReverseID = 1; //TODO: Update ids when plugged in to the robot
   private static final int pneumaticsID = 59;
+  private static final int activationPressure = 120;
   private DoubleSolenoid solenoid;
   private PneumaticHub pneumatics;
   private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
@@ -47,7 +48,7 @@ public class CubeapultSubsystem extends SubsystemBase {
   }
 
   private void activate() {
-    pneumatics.enableCompressorDigital();
+    pneumatics.enableCompressorAnalog(activationPressure, activationPressure);
   }
 
   private void deactivate() {
