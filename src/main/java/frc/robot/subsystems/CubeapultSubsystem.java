@@ -20,8 +20,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.classes.DebugLog;
 
 public class CubeapultSubsystem extends SubsystemBase {
-  private static final int solenoidForwardID = 0; //TODO: Update ids when plugged in to the robot
-  private static final int solenoidReverseID = 1; //TODO: Update ids when plugged in to the robot
+  private static final int solenoidForwardID = 1; //TODO: Update ids when plugged in to the robot
+  private static final int solenoidReverseID = 0; //TODO: Update ids when plugged in to the robot
   private static final int pneumaticsID = 59;
   private static final int activationMaxPressure = 120;
   private static final int activationMinPressure = 100;
@@ -40,12 +40,12 @@ public class CubeapultSubsystem extends SubsystemBase {
 
   private void extend() {
     solenoid.set(Value.kForward);;
-    solenoidStateLog.log(true);
+    solenoidStateLog.log(false);
   }
 
   private void retract() {
     solenoid.set(Value.kReverse);
-    solenoidStateLog.log(false);
+    solenoidStateLog.log(true);
   }
 
   private void activate() {

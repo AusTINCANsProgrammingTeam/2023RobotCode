@@ -150,6 +150,7 @@ public class Auton{
                         new InstantCommand(() -> SmartDashboard.putBoolean("next", true))
                     );
             case LAUNCHTEST:
+                return
                     new SequentialCommandGroup(
                         cubeapultSubsystem.launch()
                     );
