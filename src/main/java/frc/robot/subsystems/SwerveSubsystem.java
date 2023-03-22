@@ -302,14 +302,14 @@ public class SwerveSubsystem extends SubsystemBase{
         ).alongWith(new InstantCommand(() -> Logger.getInstance().recordOutput("trajectory " + name, trajectory)));
     }
 
-    public Command assistedBalance(boolean reversed){
-        return new AssistedBalanceCommand(this, reversed);
+    public Command assistedBalance(){
+        return new AssistedBalanceCommand(this);
     }
     
     @Override
     public void periodic() {
-        SmartDashboard.putData(this);
         odometer.update(getRotation2d(), getModulePositions());
+
         pitchEntry.setDouble(getPitch());
         headingEntry.setDouble(getHeading());
         positionEntry.setString(getPose().getTranslation().toString());

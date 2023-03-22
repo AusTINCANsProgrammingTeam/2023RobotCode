@@ -18,7 +18,6 @@ public class AssistedBalanceCommand extends CommandBase {
   private final double kDBalancing = 0;
   private final double balancingDeadzoneNumber = 2.5;
   private double pidControllerMaxSpeed = 0.15;
-  private boolean reversed = false;
   PIDController pidController = new PIDController(kPBalancing, kIBalancing, kDBalancing);
   
   /**
@@ -26,13 +25,12 @@ public class AssistedBalanceCommand extends CommandBase {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public AssistedBalanceCommand(SwerveSubsystem swerveSubsystem, boolean reverse) {
+  public AssistedBalanceCommand(SwerveSubsystem swerveSubsystem) {
     swerve_subsystem = swerveSubsystem;
     pidController.setTolerance(balancingDeadzoneNumber);
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveSubsystem); 
-    reversed = reverse;
   }
 
   // Called when the command is initially scheduled.
@@ -44,7 +42,7 @@ public class AssistedBalanceCommand extends CommandBase {
   public void execute() {
     swerve_subsystem.setModuleStates(
       swerve_subsystem.convertToModuleStates(
-        0.0, MathUtil.clamp((reversed?-1:1)*pidController.calculate(swerve_subsystem.getPitch(), 0.0), -pidControllerMaxSpeed, pidControllerMaxSpeed), 0.0));  
+        0.0, MathUtil.clamp(-pidController.calculate(swerve_subsystem.getPitch(), 0.0), -pidControllerMaxSpeed, pidControllerMaxSpeed), 0.0));  
   }
 
   // Called once the command ends or is interrupted.
