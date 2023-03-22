@@ -18,6 +18,7 @@ import frc.robot.hardware.MotorController.MotorConfig;
 import frc.robot.classes.TunableNumber;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
@@ -96,7 +97,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     int errorCode = rightPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition).value;
     errorCode += leftPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition).value;
     if (errorCode != 0){
-      if(errorCode != 0){DriverStation.reportError("An Error has occured in retrieveBuddy() for SparkMaxPIDController.setReference() Code:" + errorCode, null);}
+      if(errorCode != 0){DriverStation.reportError("An Error has occured in retrieveBuddy() for SparkMaxPIDController.setReference() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
     }
   }
 
@@ -104,7 +105,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
     int errorCode = rightPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition).value;
     errorCode += leftPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition).value;
     if (errorCode != 0){
-      if(errorCode != 0){DriverStation.reportError("An Error has occured in releaseBuddy() for SparkMaxPIDController.setReference() Code:" + errorCode, null);}
+      if(errorCode != 0){DriverStation.reportError("An Error has occured in releaseBuddy() for SparkMaxPIDController.setReference() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
     }
   }
 

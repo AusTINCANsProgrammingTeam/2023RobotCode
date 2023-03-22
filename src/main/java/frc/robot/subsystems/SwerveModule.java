@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -152,7 +153,7 @@ public class SwerveModule extends SubsystemBase {
             absoluteEncoder.close();
         }
         if(errorCode != 0){
-            if(errorCode != 0){DriverStation.reportError("An Error has occurred in SwerveModule.resetEncoders() Code:" + errorCode, null);}
+            if(errorCode != 0){DriverStation.reportError("An Error has occurred in SwerveModule.resetEncoders() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
         }
     }
 
@@ -174,7 +175,7 @@ public class SwerveModule extends SubsystemBase {
         driveMotor.set(desiredState.speedMetersPerSecond / SwerveSubsystem.kPhysicalMaxSpeed);
         turningSetpoint = calculateSetpoint(desiredState.angle.getRadians());
         int errorCode = turningPIDController.setReference(turningSetpoint, ControlType.kPosition).value;
-        if(errorCode != 0){DriverStation.reportError("An Error has occured in setDesiredState() for SparkMaxPIDController.setReference() Code:" + errorCode, null);}
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in setDesiredState() for SparkMaxPIDController.setReference() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
 
 
         SmartDashboard.putString("Swerve[" + ID + "] state", desiredState.toString());
@@ -187,10 +188,10 @@ public class SwerveModule extends SubsystemBase {
         if(reversed){
             //not using calculateSetpoint because these are less than one full rotation
             int errorCode = turningPIDController.setReference(Math.PI/4, ControlType.kPosition).value;  
-            if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule.park() for SparkMaxPIDController.setReference() Code:" + errorCode, null);}
+            if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule.park() for SparkMaxPIDController.setReference() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
         } else{
             int errorCode = turningPIDController.setReference(-Math.PI/4, ControlType.kPosition).value;
-            if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule.park() for SparkMaxPIDController.setReference() Code:" + errorCode, null);}
+            if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule.park() for SparkMaxPIDController.setReference() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
         }
     }
 
@@ -202,13 +203,13 @@ public class SwerveModule extends SubsystemBase {
     public void coast() {
         int errorCode = driveMotor.setIdleMode(IdleMode.kCoast).value;
         errorCode += turningMotor.setIdleMode(IdleMode.kCoast).value;
-        if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule.coast() Code:" + errorCode, null);}
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule.coast() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
     }
 
     public void brake() {
         int errorCode = driveMotor.setIdleMode(IdleMode.kBrake).value;
         errorCode += turningMotor.setIdleMode(IdleMode.kBrake).value;
-        if(errorCode != 0){DriverStation.reportError("An Error has occured inn SwerveModule.brake() during .setIdleMode() Code:" + errorCode, null);}
+        if(errorCode != 0){DriverStation.reportError("An Error has occured inn SwerveModule.brake() during .setIdleMode() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
     }
 
     @Override
