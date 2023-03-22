@@ -115,6 +115,18 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void changeFlightState() {
+    // Initialize both values to -1 and only change if sensors are up
+    int coneDistance = -1; 
+    int cubeDistance = -1;
+
+    // Check if cone sensor is up
+    coneDistance = timeOfFlightSensor.getDistance0();
+    hasConeLog.log(coneDistance <= mmConeActivationThreshold);
+
+    // Check if cube sensor is up
+    cubeDistance = timeOfFlightSensor.getDistance1();
+    hasCubeLog.log(cubeDistance <= mmCubeActivationThreshold);
+    
     // Check if sensors are online
     boolean coneSensorUp = coneDistance != -1;
     boolean cubeSensorUp = cubeDistance != -1;
@@ -122,22 +134,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     // Log whether sensors are online
     sensor0Up.setBoolean(coneSensorUp);
     sensor1Up.setBoolean(cubeSensorUp);
-
-    // Initialize both values to -1 and only change if sensors are up
-    int coneDistance = -1; 
-    int cubeDistance = -1;
-
-    // Check if cone sensor is up
-    if (coneSensorUp) {
-      coneDistance = timeOfFlightSensor.getDistance0();
-      hasConeLog.log(coneDistance <= mmConeActivationThreshold);
-    }
-
-    // Check if cube sensor is up
-    if (cubeSensorUp) {
-      cubeDistance = timeOfFlightSensor.getDistance1();
-      hasCubeLog.log(cubeDistance <= mmCubeActivationThreshold);
-    }
 
     // Log distance values
     coneDistLog.log((double)coneDistance);
