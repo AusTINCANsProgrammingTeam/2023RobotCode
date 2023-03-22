@@ -42,13 +42,13 @@ public class ToFIntakeCommand extends CommandBase {
         if (armSubsystem.getArmState().equals(ArmState.HIGHDROP)) {
           tofState = FlightStates.CONE_SCORE;
         } else {
-          intakeSubsystem.setMode(true);
+          intakeSubsystem.setConeMode();
           intakeSubsystem.hold();
           break;
         }
 
       case CUBE:
-        intakeSubsystem.setMode(false);
+        intakeSubsystem.setCubeMode();
         intakeSubsystem.hold();
         break;
 

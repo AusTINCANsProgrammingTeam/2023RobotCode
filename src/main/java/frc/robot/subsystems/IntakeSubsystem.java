@@ -7,7 +7,6 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 
-<<<<<<< HEAD
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.classes.DebugLog;
 import frc.robot.classes.TimeOfFlightSensor;
@@ -19,15 +18,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import java.util.Map;
-=======
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.hardware.MotorController;
-import frc.robot.hardware.MotorController.MotorConfig;
->>>>>>> 1bd4746c71749fa096e385b24440188f275d7f50
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public enum FlightStates{
@@ -56,7 +47,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
-<<<<<<< HEAD
   private GenericEntry intakeMode = matchTab.add("Intake Mode", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow")).getEntry();
   private static GenericEntry currentState = matchTab.add("ToF State", FlightStates.IDLE.toString()).getEntry();
   private static GenericEntry sensor0Up = matchTab.add("Cone ToF sensor up: ", true).getEntry();
@@ -66,9 +56,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private DebugLog<Double> cubeDistLog = new DebugLog<Double>(0.0, "Cube Distance", this);
   private DebugLog<Boolean> hasConeLog = new DebugLog<Boolean>(false, "Has Cone", this);
   private DebugLog<Boolean> hasCubeLog = new DebugLog<Boolean>(false, "Has Cube", this);
-=======
-  private static GenericEntry intakeMode = matchTab.add("Intake Mode", "Cone Mode").getEntry();
->>>>>>> 1bd4746c71749fa096e385b24440188f275d7f50
 
   private boolean isConeMode;
 
@@ -99,22 +86,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
   }
 
-<<<<<<< HEAD
-  public void hold() {
-    spinWheels(isConeMode ? kConeHoldSpeed : kCubeHoldSpeed);
-  }
-
-  public void setMode(boolean isConeMode) {
-    intakeMode.setBoolean(isConeMode);
-    this.isConeMode = isConeMode;
-=======
     public void setConeMode() {
       this.isConeMode = true;
   }
 
     public void setCubeMode() {
       this.isConeMode = false;
->>>>>>> 1bd4746c71749fa096e385b24440188f275d7f50
   }
 
   public void toggleConeMode() {
@@ -127,6 +104,10 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   public void stop() {
     spinWheels(0);
+  }
+
+  public void hold() {
+    spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
   }
 
   @Override
@@ -198,15 +179,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   @Override
-<<<<<<< HEAD
-  public void periodic() {}
-=======
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putData(this);
     intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
   }
->>>>>>> 1bd4746c71749fa096e385b24440188f275d7f50
 
   @Override
   public void simulationPeriodic() {
