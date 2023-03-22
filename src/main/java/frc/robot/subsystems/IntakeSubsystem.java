@@ -51,14 +51,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
   }
 
-  /*public void setMode(boolean isConeMode) {
-    this.isConeMode = isConeMode;
-  }
-*/
     public void setConeMode() {
+      this.isConeMode = true;
   }
 
     public void setCubeMode() {
+      this.isConeMode = false;
   }
 
   public void toggleConeMode() {
