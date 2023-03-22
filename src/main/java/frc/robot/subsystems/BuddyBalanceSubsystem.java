@@ -96,17 +96,13 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   public void retrieveBuddy() { // Used to pick up the buddy robot while the lift is already underneath it
     int errorCode = rightPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition).value;
     errorCode += leftPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition).value;
-    if (errorCode != 0){
-      if(errorCode != 0){DriverStation.reportError("An Error has occured in retrieveBuddy() for SparkMaxPIDController.setReference() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
-    }
+    if(errorCode != 0){DriverStation.reportError("An Error has occured in retrieveBuddy() for SparkMaxPIDController.setReference() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
   }
 
   public void releaseBuddy() { // Used to set down the robot
     int errorCode = rightPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition).value;
     errorCode += leftPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition).value;
-    if (errorCode != 0){
-      if(errorCode != 0){DriverStation.reportError("An Error has occured in releaseBuddy() for SparkMaxPIDController.setReference() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
-    }
+    if(errorCode != 0){DriverStation.reportError("An Error has occured in releaseBuddy() for SparkMaxPIDController.setReference() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
   }
 
   @Override
