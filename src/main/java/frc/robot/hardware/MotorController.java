@@ -5,6 +5,8 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 public class MotorController {
     public static final class MotorDefaults{
         //Constants to use as default values for Motor Controllers
@@ -98,20 +100,24 @@ public class MotorController {
 
     public static CANSparkMax constructMotor(MotorConfig config){
         CANSparkMax motor = new CANSparkMax(config.getID(), MotorType.kBrushless);
-        motor.restoreFactoryDefaults();
-        motor.setSmartCurrentLimit(config.getCurrentLimit());
-        motor.setIdleMode(config.getIdleMode());
-        motor.setOpenLoopRampRate(config.getOpenLoopRampRate());
+        int errorCode = motor.restoreFactoryDefaults().value;
+        errorCode += motor.setSmartCurrentLimit(config.getCurrentLimit()).value;
+        errorCode += motor.setIdleMode(config.getIdleMode()).value;
+        errorCode +=  motor.setOpenLoopRampRate(config.getOpenLoopRampRate()).value;
         motor.setInverted(config.getReversed());
+        if (errorCode != 0){
+            if(errorCode != 0){DriverStation.reportError("An Error has occured in constructMotor(MotorConfig config)", null);}
+        }
         return motor;
     }
 
     public static CANSparkMax constructMotor(MotorConfig config, double[] PIDArray){
         CANSparkMax motor = constructMotor(config);
         SparkMaxPIDController motorPIDcontroller = motor.getPIDController();
-        motorPIDcontroller.setP(PIDArray[0]);
-        motorPIDcontroller.setI(PIDArray[1]);
-        motorPIDcontroller.setD(PIDArray[2]);
+        int errorCode = motorPIDcontroller.setP(PIDArray[0]).value;
+        errorCode += motorPIDcontroller.setI(PIDArray[1]).value;
+        errorCode += motorPIDcontroller.setD(PIDArray[2]).value;
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in constructMotor(MotorConfig config, double[] PIDArray)", null);}
         return motor;
     }
 }

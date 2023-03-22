@@ -21,6 +21,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -83,10 +84,10 @@ public class SwerveModule extends SubsystemBase {
         driveEncoder = this.driveMotor.getEncoder();
         turningEncoder = this.turningMotor.getEncoder();
 
-        driveEncoder.setPositionConversionFactor(kDriveEncoderRotFactor);
-        driveEncoder.setVelocityConversionFactor(kDriveEncoderRPMFactor);
-        turningEncoder.setPositionConversionFactor(kTurningEncoderRotFactor);
-        turningEncoder.setVelocityConversionFactor(kTurningEncoderRPMFactor);
+        int errorCode = driveEncoder.setPositionConversionFactor(kDriveEncoderRotFactor).value;
+        errorCode += driveEncoder.setVelocityConversionFactor(kDriveEncoderRPMFactor).value;
+        errorCode += turningEncoder.setPositionConversionFactor(kTurningEncoderRotFactor).value;
+        errorCode += turningEncoder.setVelocityConversionFactor(kTurningEncoderRPMFactor).value;
 
         simDriveMotor = new FlywheelSim(
             LinearSystemId.identifyVelocitySystem(2, 1.24), //TODO: Update with real SysID
@@ -103,7 +104,7 @@ public class SwerveModule extends SubsystemBase {
         simTurningEncoder = new RelativeEncoderSim(turningMotor);
         
         turningPIDController = turningMotor.getPIDController();
-        turningPIDController.setP(kPTurning);
+        errorCode += turningPIDController.setP(kPTurning).value;
         simTurningPIDController = new PIDController(turningPIDController.getP(), turningPIDController.getI(), turningPIDController.getD());
         simTurningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -113,6 +114,8 @@ public class SwerveModule extends SubsystemBase {
         actualSpeedLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setSpeed"); //Logs actual speed in meters per second
         desiredAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/setAngle"); //Logs desired angle in radians
         actualAngleLog = new DoubleLogEntry(datalog, "/swerve/" + ID +"/actualAngle"); //Logs actual relative angle in radians
+
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule", null);}
     }
 
     public SwerveModulePosition getPosition() {
@@ -143,10 +146,13 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public void resetEncoders() {
-        driveEncoder.setPosition(0);
-        turningEncoder.setPosition(getAbsoluteTurningPosition());
+        int errorCode = driveEncoder.setPosition(0).value;
+        errorCode += turningEncoder.setPosition(getAbsoluteTurningPosition()).value;
         if(Robot.isReal()){
             absoluteEncoder.close();
+        }
+        if(errorCode != 0){
+            if(errorCode != 0){DriverStation.reportError("An Error has occurred in SwerveModule.resetEncoders() Code:" + errorCode, null);}
         }
     }
 
@@ -167,7 +173,9 @@ public class SwerveModule extends SubsystemBase {
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
         driveMotor.set(desiredState.speedMetersPerSecond / SwerveSubsystem.kPhysicalMaxSpeed);
         turningSetpoint = calculateSetpoint(desiredState.angle.getRadians());
-        turningPIDController.setReference(turningSetpoint, ControlType.kPosition);
+        int errorCode = turningPIDController.setReference(turningSetpoint, ControlType.kPosition).value;
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in setDesiredState() for SparkMaxPIDController.setReference() Code:" + errorCode, null);}
+
 
         SmartDashboard.putString("Swerve[" + ID + "] state", desiredState.toString());
         desiredAngleLog.append(desiredState.angle.getRadians());
@@ -178,9 +186,11 @@ public class SwerveModule extends SubsystemBase {
         stop();
         if(reversed){
             //not using calculateSetpoint because these are less than one full rotation
-            turningPIDController.setReference(Math.PI/4, ControlType.kPosition);  
+            int errorCode = turningPIDController.setReference(Math.PI/4, ControlType.kPosition).value;  
+            if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule.park() for SparkMaxPIDController.setReference() Code:" + errorCode, null);}
         } else{
-            turningPIDController.setReference(-Math.PI/4, ControlType.kPosition);
+            int errorCode = turningPIDController.setReference(-Math.PI/4, ControlType.kPosition).value;
+            if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule.park() for SparkMaxPIDController.setReference() Code:" + errorCode, null);}
         }
     }
 
@@ -190,13 +200,15 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public void coast() {
-        driveMotor.setIdleMode(IdleMode.kCoast);
-        turningMotor.setIdleMode(IdleMode.kCoast);
+        int errorCode = driveMotor.setIdleMode(IdleMode.kCoast).value;
+        errorCode += turningMotor.setIdleMode(IdleMode.kCoast).value;
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule.coast() Code:" + errorCode, null);}
     }
 
     public void brake() {
-        driveMotor.setIdleMode(IdleMode.kBrake);
-        turningMotor.setIdleMode(IdleMode.kBrake);
+        int errorCode = driveMotor.setIdleMode(IdleMode.kBrake).value;
+        errorCode += turningMotor.setIdleMode(IdleMode.kBrake).value;
+        if(errorCode != 0){DriverStation.reportError("An Error has occured inn SwerveModule.brake() during .setIdleMode() Code:" + errorCode, null);}
     }
 
     @Override
@@ -207,13 +219,14 @@ public class SwerveModule extends SubsystemBase {
         simDriveMotor.update(Robot.kDefaultPeriod);
         simTurningMotor.update(Robot.kDefaultPeriod);
 
-        simDriveEncoder.setPosition(simDriveEncoder.getPosition() + simDriveMotor.getAngularVelocityRadPerSec() * Robot.kDefaultPeriod);
-        simDriveEncoder.setSimVelocity(simDriveMotor.getAngularVelocityRadPerSec());
+        int errorCode = simDriveEncoder.setPosition(simDriveEncoder.getPosition() + simDriveMotor.getAngularVelocityRadPerSec() * Robot.kDefaultPeriod).value;
+        errorCode += simDriveEncoder.setSimVelocity(simDriveMotor.getAngularVelocityRadPerSec()).value;
 
-        simTurningEncoder.setPosition(simTurningEncoder.getPosition() + simTurningMotor.getAngularVelocityRadPerSec() * Robot.kDefaultPeriod);
-        simTurningEncoder.setSimVelocity(simTurningMotor.getAngularVelocityRadPerSec());
+        errorCode += simTurningEncoder.setPosition(simTurningEncoder.getPosition() + simTurningMotor.getAngularVelocityRadPerSec() * Robot.kDefaultPeriod).value;
+        errorCode += simTurningEncoder.setSimVelocity(simTurningMotor.getAngularVelocityRadPerSec()).value;
 
         turningMotor.set(simTurningPIDController.calculate(getTurningPosition(), turningSetpoint));
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in SwerveModule simulationPeriodic", null);}
   }
 
     @Override

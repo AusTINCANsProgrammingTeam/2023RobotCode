@@ -174,10 +174,13 @@ public class ArmSubsystem extends SubsystemBase {
     baseMotor2 = MotorController.constructMotor(MotorConfig.ArmBase2);
     elbowMotor = MotorController.constructMotor(MotorConfig.ArmElbow);
 
-    baseMotor2.follow(baseMotor);
+    int errorCode = baseMotor2.follow(baseMotor).value;
 
-    baseMotor.enableVoltageCompensation(11);
-    elbowMotor.enableVoltageCompensation(11);
+    errorCode += baseMotor.enableVoltageCompensation(11).value;
+    errorCode += elbowMotor.enableVoltageCompensation(11).value;
+
+    if(errorCode != 0){DriverStation.reportError("An Error has occured in ArmSubsystem()", null);}
+
 
     baseAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmBase);
     elbowAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);
@@ -432,13 +435,15 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void coastBase() {
-    baseMotor.setIdleMode(IdleMode.kCoast);
-    baseMotor2.setIdleMode(IdleMode.kCoast);
+    int errorCode = baseMotor.setIdleMode(IdleMode.kCoast).value;
+    errorCode += baseMotor2.setIdleMode(IdleMode.kCoast).value;
+    if(errorCode != 0){DriverStation.reportError("An Error has occured in coastBase()", null);}
   }
 
   public void brakeBase() {
-    baseMotor.setIdleMode(IdleMode.kBrake);
-    baseMotor2.setIdleMode(IdleMode.kBrake);
+    int errorCode = baseMotor.setIdleMode(IdleMode.kBrake).value;
+    errorCode += baseMotor2.setIdleMode(IdleMode.kBrake).value;
+    if(errorCode != 0){DriverStation.reportError("An Error has occured in brakeBase()", null);}
   }
   
   public void stop() {
