@@ -116,8 +116,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   public void changeFlightState() {
     // Check if sensors are online
-    boolean coneSensorUp = timeOfFlightSensor.isSensor0Connected();
-    boolean cubeSensorUp = timeOfFlightSensor.isSensor1Connected();
+    boolean coneSensorUp = coneDistance != -1;
+    boolean cubeSensorUp = cubeDistance != -1;
 
     // Log whether sensors are online
     sensor0Up.setBoolean(coneSensorUp);
