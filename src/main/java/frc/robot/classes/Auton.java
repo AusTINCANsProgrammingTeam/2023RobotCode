@@ -261,15 +261,16 @@ public class Auton{
             case ONESCORELOADCHARGE1:
             return
                 new SequentialCommandGroup(
-                    resetOdometry("1ScoreLoad1-1"),
-                    highScoreSequenceCone(),
-                    swerveSubsystem.followTrajectory("1ScoreLoad1-1", getTrajectory("1ScoreLoad1-1"))
-                    .alongWith(armSubsystem.goToStateDelay(ArmState.CUBEINTAKE)),
-                    swerveSubsystem.followTrajectory("1ScoreLoad2-1", getTrajectory("1ScoreLoad2-1"))
-                    .alongWith(intakeSubsystem.pullTimed(3, false)
-                        .andThen(armSubsystem.goToStateDelay(ArmState.STOWED))
-                    ),
-                    swerveSubsystem.assistedBalance(true)
+                    resetOdometry("1ScoreCubeLoad1-1"),
+                    cubeapultSubsystem.launch(),
+                    armSubsystem.transitionToState(ArmState.CUBEINTAKE),
+                    swerveSubsystem.followTrajectory("1ScoreCubeLoad1-1", getTrajectory("1ScoreCubeLoad1-1")),
+                    new ParallelDeadlineGroup(
+                        swerveSubsystem.followTrajectory("1ScoreCubeLoad2-1", getTrajectory("1ScoreCubeLoad2-1")),
+                        intakeSubsystem.pullTimed(3, false),
+                        new RepeatCommand(new InstantCommand(armSubsystem::updateMotors))
+                    ).andThen(armSubsystem.goToStateDelay(ArmState.STOWED)),
+                    swerveSubsystem.assistedBalance(false)
                 );
             case TWOSCORE1:
                 return
