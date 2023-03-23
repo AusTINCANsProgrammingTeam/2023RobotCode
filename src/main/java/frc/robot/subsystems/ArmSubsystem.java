@@ -190,7 +190,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem() {
     //Add coast mode command to shuffleboard
-    configTab.add(new StartEndCommand(this::coastBase, this::brakeBase, this).ignoringDisable(true).withName("Coast Arm"));
+    configTab.add(new StartEndCommand(this::coast, this::brake, this).ignoringDisable(true).withName("Coast Arm"));
 
     baseMotor = MotorController.constructMotor(MotorConfig.ArmBase1);
     baseMotor2 = MotorController.constructMotor(MotorConfig.ArmBase2);
@@ -480,14 +480,18 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
-  public void coastBase() {
+  public void coast() {
     baseMotor.setIdleMode(IdleMode.kCoast);
     baseMotor2.setIdleMode(IdleMode.kCoast);
+    elbowMotor.setIdleMode(IdleMode.kCoast);
+    elbowMotor2.setIdleMode(IdleMode.kCoast);
   }
 
-  public void brakeBase() {
+  public void brake() {
     baseMotor.setIdleMode(IdleMode.kBrake);
     baseMotor2.setIdleMode(IdleMode.kBrake);
+    elbowMotor.setIdleMode(IdleMode.kBrake);
+    elbowMotor2.setIdleMode(IdleMode.kBrake);
   }
   
   public void stop() {
