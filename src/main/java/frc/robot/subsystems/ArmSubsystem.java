@@ -49,8 +49,8 @@ public class ArmSubsystem extends SubsystemBase {
     CUBEINTAKE(0.7691, -0.2365), //Arm is in position to intake cubes
     MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6773, 1.2778), //Arm is in position to score on the high pole
-    HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
-    HIGHTRANSITIONAUTON(1.0751, 1.2201), //High transition state used in auton to avoid getting stuck FIXME
+    HIGHTRANSITION(1.0743,0.9349), //Used as an intermediate step when in transition to high score
+    HIGHTRANSITIONAUTON(1.0751, 1.2201), //High transition state used in auton to avoid getting stuck
     HIGHDROP(1.4433, 0.9266), //High scoring motion
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
@@ -79,11 +79,11 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseI = 0.35;
   private double kBaseD = 0;
   //Elbow arm PID values
-  private double kElbowUpP = 5;
+  private double kElbowUpP = 4.5;
   private double kElbowUpI = 0.5;
   private double kElbowUpD = 0;
 
-  private double kElbowDownP = 5;
+  private double kElbowDownP = 4.5;
   private double kElbowDownI = 0.5;
   private double kElbowDownD = 0;
 
@@ -121,7 +121,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public static final double kMinBaseAngle = Units.degreesToRadians(46);
   public static final double kMinElbowAngle = Units.degreesToRadians(22);
-  public static final double kMaxBaseAngle = Units.degreesToRadians(90);
+  public static final double kMaxBaseAngle = Units.degreesToRadians(91.5);
   public static final double kMaxElbowAngle = Units.degreesToRadians(170);
 
   public static final double kMaxElbowVoltage = 12;
@@ -527,7 +527,6 @@ public class ArmSubsystem extends SubsystemBase {
     actualElbowAngleLog.log(Units.radiansToDegrees(getElbowAngle()));
     desiredElbowGoalLog.log(Units.radiansToDegrees(elbowPIDController.getGoal().position));
     desiredElbowSetpointLog.log(Units.radiansToDegrees(elbowPIDController.getSetpoint().position));
-    elbowOutputLog.log(elbowMotor.get());
 
     actualXPositionLog.log(armXPosition);
     actualYPositionLog.log(armYPosition);

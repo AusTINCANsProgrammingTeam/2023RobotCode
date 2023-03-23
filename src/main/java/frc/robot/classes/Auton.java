@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -126,13 +127,21 @@ public class Auton{
         return new SequentialCommandGroup(
         new InstantCommand(intakeSubsystem::setConeMode),
         new ParallelDeadlineGroup(
-            new SequentialCommandGroup(
-            armSubsystem.goToState(ArmState.HIGHTRANSITIONAUTON),
-            armSubsystem.goToState(ArmState.HIGHSCORE)
-            ), 
+            armSubsystem.goToState(ArmState.HIGHSCORE),
             new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem)
         ),
+        new WaitCommand(1).deadlineWith(new RepeatCommand(new InstantCommand(armSubsystem::updateMotors))),
         armSubsystem.goToState(ArmState.HIGHDROP)
+        );
+    }
+
+    private Command highTransitionSequenceCone() {
+        return new SequentialCommandGroup(
+        new InstantCommand(intakeSubsystem::setConeMode),
+        new ParallelDeadlineGroup(
+            armSubsystem.goToState(ArmState.HIGHTRANSITION),
+            new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem)
+        )
         );
     }
 
@@ -179,9 +188,8 @@ public class Auton{
             case CHARGE1:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("1ScoreCharge-1"),
-                        swerveSubsystem.followTrajectory("1ScoreCharge-1", getTrajectory("1ScoreCharge-1")),
-                        swerveSubsystem.assistedBalance(true)
+                        resetOdometry("1ScoreCharge1-1"),
+                        swerveSubsystem.followTrajectory("1ScoreCharge1-1", getTrajectory("1ScoreCharge1-1"))
                     );
             case CHARGE6:
                 return
@@ -193,9 +201,12 @@ public class Auton{
             case ONESCORECHARGE1:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("1ScoreCharge-1"),
+                        resetOdometry("1ScoreCharge2-1"),
+                        highTransitionSequenceCone(),
+                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
+                        resetOdometry("1ScoreCharge2-1"),
                         highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("1ScoreCharge-1", getTrajectory("1ScoreCharge-1"))
+                        swerveSubsystem.followTrajectory("1ScoreCharge2-1", getTrajectory("1ScoreCharge2-1"))
                         .deadlineWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
                         swerveSubsystem.assistedBalance(true)
                     );
@@ -238,10 +249,13 @@ public class Auton{
             case ONESCORECHARGE6:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("1ScoreCharge-6"),
+                        resetOdometry("1ScoreCharge2-6"),
+                        highTransitionSequenceCone(),
+                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
+                        resetOdometry("1ScoreCharge2-6"),
                         highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("1ScoreCharge-6", getTrajectory("1ScoreCharge-6"))
-                        .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
+                        swerveSubsystem.followTrajectory("1ScoreCharge2-6", getTrajectory("1ScoreCharge2-6"))
+                        .deadlineWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
                         swerveSubsystem.assistedBalance(true)
                     );
             case ONESCORELOADCHARGE1:
