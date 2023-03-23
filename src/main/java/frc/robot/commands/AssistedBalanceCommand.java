@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -19,6 +20,7 @@ public class AssistedBalanceCommand extends CommandBase {
   private final double balancingDeadzoneNumber = 2.5;
   private double pidControllerMaxSpeed = 0.15;
   PIDController pidController = new PIDController(kPBalancing, kIBalancing, kDBalancing);
+  Debouncer balanceDebouncer = new Debouncer(3, Debouncer.DebounceType.kBoth);
   
   /**
    * Creates a new AssistedBalanceCommand
@@ -54,6 +56,6 @@ public class AssistedBalanceCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return balanceDebouncer.calculate(-balancingDeadzoneNumber < swerve_subsystem.getPitch() && balancingDeadzoneNumber > swerve_subsystem.getPitch());
   }
 }
