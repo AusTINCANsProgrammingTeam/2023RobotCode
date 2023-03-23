@@ -7,12 +7,13 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.hardware.MotorController;
-import frc.robot.hardware.MotorController.MotorConfig;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.hardware.MotorController;
+import frc.robot.hardware.MotorController.MotorConfig;
 
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kConeIntakeSpeed = -0.75;
@@ -50,8 +51,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
   }
 
-  public void setMode(boolean isConeMode) {
-    this.isConeMode = isConeMode;
+    public void setConeMode() {
+      this.isConeMode = true;
+  }
+
+    public void setCubeMode() {
+      this.isConeMode = false;
   }
 
   public void toggleConeMode() {
@@ -77,8 +82,9 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
     // This method will be called once per scheduler run
+    SmartDashboard.putData(this);
+    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
   }
 
   @Override
