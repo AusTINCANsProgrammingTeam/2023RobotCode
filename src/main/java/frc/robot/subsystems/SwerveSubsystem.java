@@ -302,8 +302,8 @@ public class SwerveSubsystem extends SubsystemBase{
         ).alongWith(new InstantCommand(() -> Logger.getInstance().recordOutput("trajectory " + name, trajectory)));
     }
 
-    public Command assistedBalance(){
-        return new AssistedBalanceCommand(this);
+    public Command assistedBalance(boolean reversed){
+        return new AssistedBalanceCommand(this, reversed);
     }
     
     @Override

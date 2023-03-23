@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.CubeapultSubsystem;
 import frc.robot.subsystems.ArmSubsystem.ArmState;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -35,8 +36,8 @@ public class Auton{
 
     private enum AutonModes{
         //Number after a path name corresponds to its starting position
-        //Path that allows us to test auton scoring at the competition's practice field
-        ONESCORETEST,
+        //Test routines
+        PLACETEST, LAUNCHTEST,
         //Skip scoring and balance
         CHARGE1, CHARGE6,
         //Score preload and drive out of the community
@@ -68,15 +69,17 @@ public class Auton{
     private SwerveSubsystem swerveSubsystem;
     private ArmSubsystem armSubsystem;
     private IntakeSubsystem intakeSubsystem;
+    private CubeapultSubsystem cubeapultSubsystem;
 
     private PathConstraints pathConstraints;
 
     private AutonModes autonMode;
 
-    public Auton(SwerveSubsystem swerveSubsystem, ArmSubsystem armSubsystem, IntakeSubsystem intakeSubsystem){
+    public Auton(SwerveSubsystem swerveSubsystem, ArmSubsystem armSubsystem, IntakeSubsystem intakeSubsystem, CubeapultSubsystem cubeapultSubsystem){
         this.swerveSubsystem = swerveSubsystem;
         this.armSubsystem = armSubsystem;
         this.intakeSubsystem = intakeSubsystem;
+        this.cubeapultSubsystem = cubeapultSubsystem;
 
         //Add auton modes to chooser
         for(AutonModes mode : AutonModes.values()){
@@ -121,7 +124,7 @@ public class Auton{
 
     private Command highScoreSequenceCone() {
         return new SequentialCommandGroup(
-        new InstantCommand(() -> intakeSubsystem.setMode(true)),
+        new InstantCommand(intakeSubsystem::setConeMode),
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
             armSubsystem.goToState(ArmState.HIGHTRANSITIONAUTON),
@@ -135,7 +138,7 @@ public class Auton{
 
     private Command highScoreSequenceCube() {
         return new SequentialCommandGroup(
-        new InstantCommand(() -> intakeSubsystem.setMode(false)),
+        new InstantCommand(intakeSubsystem::setCubeMode),
         new ParallelDeadlineGroup(
             armSubsystem.goToState(ArmState.HIGHTRANSITION),
             new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem)
@@ -153,12 +156,17 @@ public class Auton{
         //Sequence of actions to be performed during the autonomous period
         try{
         switch(autonMode){
-            case ONESCORETEST:
+            case PLACETEST:
                 return 
                     new SequentialCommandGroup(
                         resetOdometry("1Score"),
                         highScoreSequenceCone(),
                         new InstantCommand(() -> SmartDashboard.putBoolean("next", true))
+                    );
+            case LAUNCHTEST:
+                return
+                    new SequentialCommandGroup(
+                        cubeapultSubsystem.launch()
                     );
             case ONESCORE:
                 return
@@ -173,14 +181,14 @@ public class Auton{
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-1"),
                         swerveSubsystem.followTrajectory("1ScoreCharge-1", getTrajectory("1ScoreCharge-1")),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case CHARGE6:
                 return
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-6"),
                         swerveSubsystem.followTrajectory("1ScoreCharge-6", getTrajectory("1ScoreCharge-6")),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case ONESCORECHARGE1:
                 return
@@ -189,7 +197,7 @@ public class Auton{
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge-1", getTrajectory("1ScoreCharge-1"))
                         .deadlineWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case ONESCORECHARGE2:
                 return
@@ -198,7 +206,7 @@ public class Auton{
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge-2", getTrajectory("1ScoreCharge-2"))
                         .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case ONESCORECHARGE3:
                 return
@@ -207,7 +215,7 @@ public class Auton{
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge-3", getTrajectory("1ScoreCharge-3"))
                         .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case ONESCORECHARGE4:
                 return
@@ -216,7 +224,7 @@ public class Auton{
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge-4", getTrajectory("1ScoreCharge-4"))
                         .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case ONESCORECHARGE5:
                 return
@@ -225,7 +233,7 @@ public class Auton{
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge-5", getTrajectory("1ScoreCharge-5"))
                         .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case ONESCORECHARGE6:
                 return
@@ -234,7 +242,7 @@ public class Auton{
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge-6", getTrajectory("1ScoreCharge-6"))
                         .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case ONESCORELOADCHARGE1:
             return
@@ -247,7 +255,7 @@ public class Auton{
                     .alongWith(intakeSubsystem.pullTimed(1, false)
                         .andThen(armSubsystem.goToStateDelay(ArmState.STOWED))
                     ),
-                    swerveSubsystem.assistedBalance()
+                    swerveSubsystem.assistedBalance(true)
                 );
             case TWOSCORE1:
                 return
@@ -280,7 +288,7 @@ public class Auton{
                         .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
                         swerveSubsystem.followTrajectory("2ScoreCharge2-1", getTrajectory("2ScoreCharge2-1")),
                         swerveSubsystem.followTrajectory("2ScoreCharge3-1", getTrajectory("2ScoreCharge3-1")),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case TWOSCORECHARGE6:
                 return
@@ -291,7 +299,7 @@ public class Auton{
                         .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
                         swerveSubsystem.followTrajectory("2ScoreCharge2-6", getTrajectory("2ScoreCharge2-6")),
                         swerveSubsystem.followTrajectory("2ScoreCharge3-6", getTrajectory("2ScoreCharge3-6")),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case THREESCORE1:
                 return
@@ -325,7 +333,7 @@ public class Auton{
                         swerveSubsystem.followTrajectory("2ScoreLoadCharge2-1", getTrajectory("2ScoreLoadCharge2-1")),
                         swerveSubsystem.followTrajectory("2ScoreLoadCharge3-1", getTrajectory("2ScoreLoadCharge3-1")),
                         swerveSubsystem.followTrajectory("2ScoreLoadCharge4-1", getTrajectory("2ScoreLoadCharge4-1")),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case TWOSCORELOADCHARGE6:
                 return
@@ -337,7 +345,7 @@ public class Auton{
                         swerveSubsystem.followTrajectory("2ScoreLoadCharge2-6", getTrajectory("2ScoreLoadCharge2-6")),
                         swerveSubsystem.followTrajectory("2ScoreLoadCharge3-6", getTrajectory("2ScoreLoadCharge3-6")),
                         swerveSubsystem.followTrajectory("2ScoreLoadCharge4-6", getTrajectory("2ScoreLoadCharge4-6")),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case THREESCORECHARGE1:
                 return
@@ -350,7 +358,7 @@ public class Auton{
                         swerveSubsystem.followTrajectory("3ScoreCharge3-1", getTrajectory("3ScoreCharge3-1")),
                         swerveSubsystem.followTrajectory("3ScoreCharge4-1", getTrajectory("3ScoreCharge4-1")),
                         swerveSubsystem.followTrajectory("3ScoreCharge5-1", getTrajectory("3ScoreCharge5-1")),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             case THREESCORECHARGE6:
                 return
@@ -363,7 +371,7 @@ public class Auton{
                         swerveSubsystem.followTrajectory("3ScoreCharge3-6", getTrajectory("3ScoreCharge3-6")),
                         swerveSubsystem.followTrajectory("3ScoreCharge4-6", getTrajectory("3ScoreCharge4-6")),
                         swerveSubsystem.followTrajectory("3ScoreCharge5-6", getTrajectory("3ScoreCharge5-6")),
-                        swerveSubsystem.assistedBalance()
+                        swerveSubsystem.assistedBalance(true)
                     );
             default:
                 return null;

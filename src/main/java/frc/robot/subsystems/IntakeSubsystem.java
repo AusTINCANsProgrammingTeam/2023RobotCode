@@ -53,8 +53,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
   }
 
-  public void setMode(boolean isConeMode) {
-    this.isConeMode = isConeMode;
+    public void setConeMode() {
+      this.isConeMode = true;
+  }
+
+    public void setCubeMode() {
+      this.isConeMode = false;
   }
 
   public void toggleConeMode() {
@@ -70,13 +74,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public Command pullTimed(double seconds, boolean isConeMode){
-    setMode(isConeMode);
-    return new StartEndCommand(this::pull, this::stop, this).withTimeout(seconds);
+    return new StartEndCommand(this::pull, this::stop, this).withTimeout(seconds).beforeStarting(isConeMode ? this::setConeMode : this::setCubeMode);
   }
 
   public Command pushTimed(double seconds, boolean isConeMode){
-    setMode(isConeMode);
-    return new StartEndCommand(this::push, this::stop, this).withTimeout(seconds);
+    return new StartEndCommand(this::push, this::stop, this).withTimeout(seconds).beforeStarting(isConeMode ? this::setConeMode : this::setCubeMode);
   }
 
   @Override
