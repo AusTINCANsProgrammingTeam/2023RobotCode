@@ -2,38 +2,13 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.855,
-        "y": 4.98
+        "x": 6.3,
+        "y": 4.6
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8550000000000013,
-        "y": 4.98
-      },
-      "holonomicAngle": 180.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 5.9,
-        "y": 4.98
-      },
-      "prevControl": {
-        "x": 5.9,
-        "y": 4.95446596379809
-      },
-      "nextControl": {
-        "x": 5.9,
-        "y": 4.991895444279704
+        "x": 6.3677036290977265,
+        "y": 4.6
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -49,15 +24,40 @@
     },
     {
       "anchorPoint": {
-        "x": 5.9,
+        "x": 6.8,
+        "y": 4.60270759690825
+      },
+      "prevControl": {
+        "x": 6.74086363638274,
+        "y": 4.60270759690825
+      },
+      "nextControl": {
+        "x": 6.857312123774359,
+        "y": 4.60270759690825
+      },
+      "holonomicAngle": 0.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.8,
         "y": 4.6
       },
       "prevControl": {
-        "x": 5.9,
-        "y": 4.7854664012860555
+        "x": 6.736681224634033,
+        "y": 4.6
       },
       "nextControl": null,
-      "holonomicAngle": 0.0,
+      "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -70,5 +70,8 @@
       }
     }
   ],
+  "maxVelocity": 2.0,
+  "maxAcceleration": 0.5,
+  "isReversed": null,
   "markers": []
 }
