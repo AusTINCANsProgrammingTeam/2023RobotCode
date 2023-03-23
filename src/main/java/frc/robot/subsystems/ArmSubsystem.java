@@ -50,7 +50,7 @@ public class ArmSubsystem extends SubsystemBase {
     MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6773, 1.2778), //Arm is in position to score on the high pole
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
-    HIGHTRANSITIONAUTON(1.0321, 1.0992), //High transition state used in auton to avoid getting stuck FIXME
+    HIGHTRANSITIONAUTON(1.0751, 1.2201), //High transition state used in auton to avoid getting stuck FIXME
     HIGHDROP(1.4433, 0.9266), //High scoring motion
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
@@ -116,8 +116,8 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kMinChooChooAngle = Units.degreesToRadians(208);
   public static final double kMaxChooChooAngle = Units.degreesToRadians(326);
 
-  public static final double kBaseLength = Units.inchesToMeters(41.5);
-  public static final double kElbowLength = Units.inchesToMeters(43.5);
+  public static final double kBaseLength = Units.inchesToMeters(41);
+  public static final double kElbowLength = Units.inchesToMeters(43);
 
   public static final double kMinBaseAngle = Units.degreesToRadians(46);
   public static final double kMinElbowAngle = Units.degreesToRadians(22);
