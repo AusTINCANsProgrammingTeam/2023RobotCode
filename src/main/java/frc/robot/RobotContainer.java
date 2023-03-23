@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.CameraSubsystem;
+import frc.robot.subsystems.CubeapultSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 /**
@@ -47,6 +48,7 @@ public class RobotContainer {
   private final BuddyBalanceSubsystem buddyBalanceSubsystem;
   private final ArmSubsystem armSubsystem;
   private final ArmAnglesCommand armAnglesCommand;
+  private final CubeapultSubsystem cubeapultSubsystem;
 
   private LedStripSubsystem ledSubsystem;
   private LedMatrixSubsystem ledMatrixSubsystem;
@@ -83,9 +85,12 @@ public class RobotContainer {
     subsystemEnabledLog.append(cameraSubsystem == null ? "Camera: Disabled" : "Camera: Enabled");
 
     buddyBalanceSubsystem = Robot.buddyBalanceEnabled ? new BuddyBalanceSubsystem() : null;
-    subsystemEnabledLog.append(buddyBalanceSubsystem == null ? "Buddy Balance: Disabled" : "Buddy Balance Enabled");
+    subsystemEnabledLog.append(buddyBalanceSubsystem == null ? "Buddy Balance: Disabled" : "Buddy Balance: Enabled");
 
-    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem, armSubsystem, intakeSubsystem) : null;
+    cubeapultSubsystem = Robot.cubeapultEnabled ? new CubeapultSubsystem() : null;
+    subsystemEnabledLog.append(cubeapultSubsystem == null ? "Cubeapult: Disabled" : "Cubeapult: Enabled");
+
+    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem, armSubsystem, intakeSubsystem, cubeapultSubsystem) : null;
 
     armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getArmBaseSupplier(), OI.Operator.getArmElbowSupplier()) : null;
 
