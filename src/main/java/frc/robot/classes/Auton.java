@@ -185,9 +185,7 @@ public class Auton{
                         new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
                         resetOdometry("1Score"),
                         highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("1Score", getTrajectory("1Score"))
-                        .deadlineWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.assistedBalance(true)
+                        swerveSubsystem.followTrajectory("1Score", getTrajectory("1Score")).deadlineWith(new RepeatCommand(new InstantCommand(() -> armSubsystem.updateMotors())))
                     );
             case CHARGE1:
                 return
