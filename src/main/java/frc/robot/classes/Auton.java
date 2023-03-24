@@ -181,9 +181,13 @@ public class Auton{
                 return
                     new SequentialCommandGroup(
                         resetOdometry("1Score"),
+                        highTransitionSequenceCone(),
+                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
+                        resetOdometry("1Score"),
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1Score", getTrajectory("1Score"))
-                        .deadlineWith(armSubsystem.goToStateDelay(ArmState.STOWED))
+                        .deadlineWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
+                        swerveSubsystem.assistedBalance(true)
                     );
             case CHARGE1:
                 return
