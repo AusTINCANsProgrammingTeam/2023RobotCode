@@ -113,7 +113,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final ProfiledPIDController elbowPIDController;
   private final ArmFeedforward elbowFeedForward;
 
-  public static final double kMinChooChooAngle = Units.degreesToRadians(208);
+  public static final double kMinChooChooAngle = Units.degreesToRadians(187);
   public static final double kMaxChooChooAngle = Units.degreesToRadians(326);
 
   public static final double kBaseLength = Units.inchesToMeters(41);
