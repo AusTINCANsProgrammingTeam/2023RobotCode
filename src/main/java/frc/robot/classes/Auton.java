@@ -139,7 +139,7 @@ public class Auton{
         return new SequentialCommandGroup(
         new InstantCommand(intakeSubsystem::setConeMode),
         new ParallelDeadlineGroup(
-            armSubsystem.goToState(ArmState.HIGHTRANSITION),
+            armSubsystem.goToState(ArmState.HIGHTRANSITIONAUTON),
             new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem)
         )
         );

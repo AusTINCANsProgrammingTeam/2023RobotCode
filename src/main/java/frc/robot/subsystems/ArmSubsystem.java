@@ -49,8 +49,8 @@ public class ArmSubsystem extends SubsystemBase {
     CUBEINTAKE(0.7691, -0.2365), //Arm is in position to intake cubes
     MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
     HIGHSCORE(1.6773, 1.2778), //Arm is in position to score on the high pole
-    HIGHTRANSITION(1.0743,0.9349), //Used as an intermediate step when in transition to high score
-    HIGHTRANSITIONAUTON(1.0751, 1.2201), //High transition state used in auton to avoid getting stuck
+    HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
+    HIGHTRANSITIONAUTON(1.0743,0.9349), //High transition state used in auton to avoid getting stuck
     HIGHDROP(1.4433, 0.9266), //High scoring motion
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
