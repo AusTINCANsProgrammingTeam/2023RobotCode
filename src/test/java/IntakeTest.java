@@ -1,8 +1,6 @@
 import static org.junit.jupiter.api.Assertions.*; 
 import edu.wpi.first.hal.HAL;
 import org.junit.jupiter.api.*;
-
-import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.subsystems.IntakeSubsystem;
 
 
@@ -25,8 +23,7 @@ public class IntakeTest {
   public void shutdown() throws Exception {
     dut.close(); // destroy our subsystem object so we do each test from a clean slate
   }
-   
-  
+
   @Test // marks this method as a test
   public void testPull() {
     dut.pull();
