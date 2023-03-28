@@ -51,7 +51,8 @@ public class ArmSubsystem extends SubsystemBase {
     HIGHSCORE(1.704, 1.241), //Arm is in position to score on the high pole
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
     HIGHTRANSITIONAUTON(1.0743,0.9349), //High transition state used in auton to avoid getting stuck
-    HIGHDROP(1.4433, 0.9266), //High scoring motion
+    HIGHDROPB(1.7783, 1.0252),
+    HIGHDROPC(1.4433, 0.9266), //High scoring motion
     TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
 
     private double x; //Position relative to the base of the arm, in meters
@@ -373,7 +374,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     basePIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 0.25);
     elbowPIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 0.25);
-    
+
     setDesiredPositions(state.getX(), state.getY());
   }
 
@@ -405,6 +406,10 @@ public class ArmSubsystem extends SubsystemBase {
     ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
 
+  public Command highDrop(){
+    return goToState(ArmState.HIGHDROPB).andThen(goToState(ArmState.HIGHDROPC));
+  }
+
   public Command handleHighButton(){
     switch(currentState){
       case STOWED:
@@ -414,10 +419,11 @@ public class ArmSubsystem extends SubsystemBase {
       case MIDSCORE:
         return goToState(ArmState.HIGHTRANSITION);
       case HIGHSCORE:
-        return goToState(ArmState.HIGHDROP);
+        return highDrop();
       case HIGHTRANSITION:
         return goToState(ArmState.HIGHSCORE);
-      case HIGHDROP:
+      case HIGHDROPB:
+      case HIGHDROPC:
         return transitionToState(ArmState.STOWED);
       default:
         return null;
@@ -430,13 +436,14 @@ public class ArmSubsystem extends SubsystemBase {
       case TRANSITION:
       case CONEINTAKE:
       case CUBEINTAKE:
-      case HIGHDROP:
+      case HIGHDROPB:
+      case HIGHDROPC:
       case HIGHTRANSITION:
         return goToState(ArmState.MIDSCORE);
       case MIDSCORE:
         return goToState(ArmState.STOWED);
       case HIGHSCORE:
-        return goToState(ArmState.HIGHDROP);
+        return goToState(ArmState.HIGHDROPB);
       default:
         return null;
     }
@@ -449,12 +456,13 @@ public class ArmSubsystem extends SubsystemBase {
       case CONEINTAKE:
         return transitionToState(ArmState.STOWED);
       case HIGHSCORE:
-        return goToState(ArmState.HIGHDROP);
+        return highDrop();
       case TRANSITION:
       case CUBEINTAKE:
       case MIDSCORE:
       case HIGHTRANSITION:
-      case HIGHDROP:
+      case HIGHDROPB:
+      case HIGHDROPC:
         return goToState(ArmState.CONEINTAKE);
       default:
         return null;
@@ -470,10 +478,11 @@ public class ArmSubsystem extends SubsystemBase {
       case CUBEINTAKE:
         return transitionToState(ArmState.STOWED);
       case HIGHSCORE:
-        return goToState(ArmState.HIGHDROP);
+        return highDrop();
       case TRANSITION:
       case CONEINTAKE:
-      case HIGHDROP:
+      case HIGHDROPB:
+      case HIGHDROPC:
         return goToState(ArmState.CUBEINTAKE);
       default:
         return null;
@@ -530,6 +539,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     actualXPositionLog.log(armXPosition);
     actualYPositionLog.log(armYPosition);
+    SmartDashboard.putNumber("Inverse Elbow", Units.radiansToDegrees(convertToElbowAngle(armXPosition, armYPosition)));
+    SmartDashboard.putNumber("Inverse Base", Units.radiansToDegrees(convertToBaseAngle(armXPosition, armYPosition)));
   }
 
   @Override
