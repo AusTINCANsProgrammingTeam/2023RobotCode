@@ -323,7 +323,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 
   public void updateSimMotors() {
-    updateMotors();
+    //updateMotors(); Moved to periodic
     baseArmSim.setInputVoltage(baseMotor.get() * RobotController.getBatteryVoltage());
     elbowArmSim.setInputVoltage(elbowMotor.get() * RobotController.getBatteryVoltage());
   }
@@ -385,7 +385,8 @@ public class ArmSubsystem extends SubsystemBase {
     //Command for autonomous, obstructs routine until arm is at setpoint
     return new FunctionalCommand(
                 () -> setState(state), //Init
-                this::updateMotors, //Execute
+                //this::updateMotors, //Moved to periodic
+                null, //Execute
                 (b)->{}, //End 
                 this::atSetpoint, //isFinished
                 this
@@ -510,7 +511,7 @@ public class ArmSubsystem extends SubsystemBase {
       basePIDController.reset(getBaseAngle());
       elbowPIDController.reset(getElbowAngle());
     }
-
+    updateMotors();
     rolloverLog.log(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
 
     actualBaseAngleLog.log(Units.radiansToDegrees(getBaseAngle()));
