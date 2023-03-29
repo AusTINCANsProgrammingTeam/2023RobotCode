@@ -14,7 +14,10 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -108,6 +111,7 @@ public class SwerveSubsystem extends SubsystemBase{
     public boolean controlOrientationIsFOD;
 
     public Double rotationHold;
+    Quaternion quaternion = new Quaternion();
 
     private PIDController xController;
     private PIDController yController;
@@ -167,6 +171,10 @@ public class SwerveSubsystem extends SubsystemBase{
 
     public Pose2d getPose() {
         return odometer.getPoseMeters();
+    }
+
+    public Pose3d getPose3d() {
+        return new Pose3d(getPose().getX(), getPose().getY(), quaternion.getZ(), new Rotation3d(quaternion));
     }
 
     public void resetOdometry(Pose2d pose) {
@@ -315,5 +323,8 @@ public class SwerveSubsystem extends SubsystemBase{
         positionEntry.setString(getPose().getTranslation().toString());
         Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
         Logger.getInstance().recordOutput("Pose 2D", getPose());
+        //SmartDashboard.putData("Pose 3D", getPose3d());
+        Logger.getInstance().recordOutput("Pose 3D", getPose3d());
+        quaternion = new Quaternion(gyro.getQuaternionW(), gyro.getQuaternionX(), gyro.getQuaternionY(), gyro.getQuaternionZ());
     }
 }
