@@ -122,7 +122,7 @@ public class Auton{
         new ParallelDeadlineGroup(
             new SequentialCommandGroup(
             armSubsystem.goToState(ArmState.HIGHTRANSITION),
-            armSubsystem.goToState(ArmState.HIGHSCORE)
+            armSubsystem.goToState(ArmState.HIGHSCORECONE)
             ), 
             new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem)
         ),
