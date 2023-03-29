@@ -48,9 +48,11 @@ public class Robot extends LoggedRobot {
 
   public static final boolean cameraEnabled = false;
   public static final boolean intakeEnabled = true;
+  public static final boolean tofEnabled = false;
   public static final boolean swerveEnabled = true;
-  public static final boolean armEnabled = true;
+  public static final boolean armEnabled = false;
   public static final boolean buddyBalanceEnabled = false;
+  public static final boolean cubeapultEnabled = true;
   
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();

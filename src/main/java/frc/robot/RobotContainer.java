@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SwerveTeleopCommand;
 import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
+import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.commands.ArmAnglesCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -24,12 +25,14 @@ import frc.robot.subsystems.led.LedStripSubsystem;
 import frc.robot.subsystems.led.BlinkinLedSubsystem.BlinkinMode;
 import frc.robot.subsystems.led.LedMatrixSubsystem.MatrixMode;
 import frc.robot.subsystems.led.LedStripSubsystem.StripMode;
+import frc.robot.commands.ToFIntakeCommand;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.CameraSubsystem;
+import frc.robot.subsystems.CubeapultSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 /**
@@ -47,12 +50,14 @@ public class RobotContainer {
   private final BuddyBalanceSubsystem buddyBalanceSubsystem;
   private final ArmSubsystem armSubsystem;
   private final ArmAnglesCommand armAnglesCommand;
+  private final CubeapultSubsystem cubeapultSubsystem;
 
   private LedStripSubsystem ledSubsystem;
   private LedMatrixSubsystem ledMatrixSubsystem;
   private BlinkinLedSubsystem blinkinLedSubsystem;
-
+  
   private Auton auton;
+  private TimeOfFlightSensor timeOfFlightSensor;
 
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
@@ -76,16 +81,29 @@ public class RobotContainer {
     simulationSubsystem = Robot.isSimulation() && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
     subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
 
-    intakeSubsystem = Robot.intakeEnabled ? new IntakeSubsystem() : null;
+    if (Robot.intakeEnabled) {
+      if (Robot.tofEnabled) {
+        timeOfFlightSensor = new TimeOfFlightSensor();
+        intakeSubsystem = new IntakeSubsystem(timeOfFlightSensor);
+      } else {
+        intakeSubsystem = new IntakeSubsystem();
+      }
+    } else {
+      intakeSubsystem = null;
+    }
+
     subsystemEnabledLog.append(intakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
 
     cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
     subsystemEnabledLog.append(cameraSubsystem == null ? "Camera: Disabled" : "Camera: Enabled");
 
     buddyBalanceSubsystem = Robot.buddyBalanceEnabled ? new BuddyBalanceSubsystem() : null;
-    subsystemEnabledLog.append(buddyBalanceSubsystem == null ? "Buddy Balance: Disabled" : "Buddy Balance Enabled");
+    subsystemEnabledLog.append(buddyBalanceSubsystem == null ? "Buddy Balance: Disabled" : "Buddy Balance: Enabled");
 
-    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem, armSubsystem, intakeSubsystem) : null;
+    cubeapultSubsystem = Robot.cubeapultEnabled ? new CubeapultSubsystem() : null;
+    subsystemEnabledLog.append(cubeapultSubsystem == null ? "Cubeapult: Disabled" : "Cubeapult: Enabled");
+
+    auton = Robot.swerveEnabled ? new Auton(swerveSubsystem, armSubsystem, intakeSubsystem, cubeapultSubsystem) : null;
 
     armAnglesCommand = Robot.armEnabled ? new ArmAnglesCommand(armSubsystem, OI.Operator.getArmBaseSupplier(), OI.Operator.getArmElbowSupplier()) : null;
 
@@ -142,8 +160,11 @@ public class RobotContainer {
       OI.Driver.getArmMidButton().onTrue(new ProxyCommand(armSubsystem::handleMidButton));
       OI.Operator.getArmStopButton().onTrue(new InstantCommand(armSubsystem::cancelCommands));
       if (Robot.intakeEnabled){
-        OI.Driver.getArmConeIntakeButton().onTrue(new ProxyCommand(armSubsystem::handleConeIntakeButton).alongWith(new InstantCommand(() -> intakeSubsystem.setConeMode())));
-        OI.Driver.getArmCubeIntakeButton().onTrue(new ProxyCommand(armSubsystem::handleCubeIntakeButton).alongWith(new InstantCommand(() -> intakeSubsystem.setCubeMode())));
+        OI.Driver.getArmConeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleConeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setConeMode())));
+        OI.Driver.getArmCubeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleCubeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setCubeMode())));
+        if (Robot.tofEnabled) {
+          intakeSubsystem.setDefaultCommand(new ToFIntakeCommand(intakeSubsystem, armSubsystem));
+        }
       }
       OI.Operator.getHighScoreButton().onTrue(armSubsystem.goToState(ArmState.HIGHSCORE));
     }

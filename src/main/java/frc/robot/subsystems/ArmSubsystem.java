@@ -474,6 +474,10 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  public ArmState getArmState() {
+    return currentState;
+  }
+
   public Command stowArmParallel() {
     //Run along with a trajectory to stow arm after scoring
     return new WaitCommand(0.5).andThen(goToState(ArmState.STOWED));
