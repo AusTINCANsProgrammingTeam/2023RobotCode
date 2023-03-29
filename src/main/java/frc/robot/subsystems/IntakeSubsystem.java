@@ -97,6 +97,10 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public void toggleConeMode() {
     isConeMode = !isConeMode;
   }
+
+  public boolean isConeMode() {
+    return isConeMode;
+  }
   
   public double getSpeed(){
     return motor.get();
