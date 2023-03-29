@@ -155,7 +155,8 @@ public class RobotContainer {
           intakeSubsystem.setDefaultCommand(new ToFIntakeCommand(intakeSubsystem, armSubsystem));
         }
       }
-      OI.Operator.getHighScoreButton().onTrue(armSubsystem.goToState(ArmState.HIGHSCORE));
+      OI.Operator.getHighScoreCubeButton().onTrue(armSubsystem.goToState(ArmState.HIGHSCORECUBE));
+      OI.Operator.getHighScoreConeButton().onTrue(armSubsystem.goToState(ArmState.HIGHSCORECONE));
     }
 
     if (Robot.buddyBalanceEnabled) {

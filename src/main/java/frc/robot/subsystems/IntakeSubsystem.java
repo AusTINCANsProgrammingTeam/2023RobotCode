@@ -57,7 +57,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private DebugLog<Boolean> hasConeLog = new DebugLog<Boolean>(false, "Has Cone", this);
   private DebugLog<Boolean> hasCubeLog = new DebugLog<Boolean>(false, "Has Cube", this);
 
-  private boolean isConeMode;
+  private static boolean isConeMode;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
@@ -98,7 +98,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     isConeMode = !isConeMode;
   }
 
-  public boolean isConeMode() {
+  public static boolean isConeMode() {
     return isConeMode;
   }
   
