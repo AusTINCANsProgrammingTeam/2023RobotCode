@@ -10,12 +10,13 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.classes.DebugLog;
 import frc.robot.classes.TimeOfFlightSensor;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import java.util.Map;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -112,6 +113,14 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   public void hold() {
     spinWheels(hasCone ? kConeIntakeSpeed : kCubeIntakeSpeed);
+  }
+  
+  public Command pullTimed(double seconds, boolean isConeMode){
+    return new StartEndCommand(this::pull, this::stop, this).withTimeout(seconds).beforeStarting(isConeMode ? this::setConeMode : this::setCubeMode);
+  }
+
+  public Command pushTimed(double seconds, boolean isConeMode){
+    return new StartEndCommand(this::push, this::stop, this).withTimeout(seconds).beforeStarting(isConeMode ? this::setConeMode : this::setCubeMode);
   }
 
   @Override

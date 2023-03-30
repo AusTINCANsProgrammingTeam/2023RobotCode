@@ -25,8 +25,8 @@ public class MotorController {
         //Arm motors
         ArmBase1(7, 50, IdleMode.kBrake),
         ArmBase2(8, 50, IdleMode.kBrake),
-        ArmElbow1(15, 50),
-        ArmElbow2(18, 50),
+        ArmElbow1(15, 50, IdleMode.kBrake),
+        ArmElbow2(18, 50, IdleMode.kBrake),
         //Intake motors
         IntakeMotor1(4, 20, IdleMode.kBrake),
         IntakeMotor2(5, 20, IdleMode.kBrake),

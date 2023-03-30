@@ -53,7 +53,9 @@ public class ArmSubsystem extends SubsystemBase {
     HIGHSCORECONE(1.6773, 1.2778), //Arm is in position to score on the high node with a cone
     HIGHSCORECUBE(0, 0), //Arm is in position to score on the high node with a cube
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
-    HIGHDROP(1.4433, 0.9266), //High scoring motion
+    HIGHTRANSITIONAUTON(1.0743,0.9349), //High transition state used in auton to avoid getting stuck
+    HIGHDROPB(1.7783, 1.0252),
+    HIGHDROPC(1.4433, 0.9266), //High scoring motion
     TRANSITION(0.7124, 0.1644);//Used to transition to any state from stowed position
 
     private double x; //Position relative to the base of the arm, in meters
@@ -81,11 +83,11 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseI = 0.35;
   private double kBaseD = 0;
   //Elbow arm PID values
-  private double kElbowUpP = 5;
+  private double kElbowUpP = 4.5;
   private double kElbowUpI = 0.5;
   private double kElbowUpD = 0;
 
-  private double kElbowDownP = 5;
+  private double kElbowDownP = 4.5;
   private double kElbowDownI = 0.5;
   private double kElbowDownD = 0;
 
@@ -115,7 +117,7 @@ public class ArmSubsystem extends SubsystemBase {
   private final ProfiledPIDController elbowPIDController;
   private final ArmFeedforward elbowFeedForward;
 
-  public static final double kMinChooChooAngle = Units.degreesToRadians(208);
+  public static final double kMinChooChooAngle = Units.degreesToRadians(187);
   public static final double kMaxChooChooAngle = Units.degreesToRadians(326);
 
   public static final double kBaseLength = Units.inchesToMeters(41);
@@ -123,7 +125,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public static final double kMinBaseAngle = Units.degreesToRadians(46);
   public static final double kMinElbowAngle = Units.degreesToRadians(22);
-  public static final double kMaxBaseAngle = Units.degreesToRadians(90);
+  public static final double kMaxBaseAngle = Units.degreesToRadians(91.5);
   public static final double kMaxElbowAngle = Units.degreesToRadians(170);
 
   public static final double kMaxElbowVoltage = 12;
@@ -194,7 +196,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem(IntakeSubsystem intakeSubsystem) {
     //Add coast mode command to shuffleboard
-    configTab.add(new StartEndCommand(this::coastBase, this::brakeBase, this).ignoringDisable(true).withName("Coast Arm"));
+    configTab.add(new StartEndCommand(this::coast, this::brake, this).ignoringDisable(true).withName("Coast Arm"));
 
     baseMotor = MotorController.constructMotor(MotorConfig.ArmBase1);
     baseMotor2 = MotorController.constructMotor(MotorConfig.ArmBase2);
@@ -398,11 +400,20 @@ public class ArmSubsystem extends SubsystemBase {
             ).withName("goToState " + state);
   }
 
+  public Command goToStateDelay(ArmState state) {
+    //Intended for use after scoring
+    return new WaitCommand(0.5).andThen(goToState(state));
+  }
+
   public Command transitionToState(ArmState state){
     return new SequentialCommandGroup(
       goToState(ArmState.TRANSITION),
       goToState(state)
     ).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+  }
+
+  public Command highDrop(){
+    return goToState(ArmState.HIGHDROPB).andThen(goToState(ArmState.HIGHDROPC));
   }
 
   public Command handleHighButton(){
@@ -416,10 +427,11 @@ public class ArmSubsystem extends SubsystemBase {
         return goToState(ArmState.HIGHTRANSITION);
       case HIGHSCORECUBE:
       case HIGHSCORECONE:
-        return goToState(ArmState.HIGHDROP);
+        return highDrop();
       case HIGHTRANSITION:
         return intakeSubsystem.hasCube() ? goToState(ArmState.HIGHSCORECONE) : goToState(ArmState.HIGHSCORECUBE);
-      case HIGHDROP:
+      case HIGHDROPB:
+      case HIGHDROPC:
         return transitionToState(ArmState.STOWED);
       default:
         return null;
@@ -432,7 +444,8 @@ public class ArmSubsystem extends SubsystemBase {
       case TRANSITION:
       case CONEINTAKE:
       case CUBEINTAKE:
-      case HIGHDROP:
+      case HIGHDROPB:
+      case HIGHDROPC:
       case HIGHTRANSITION:
       return intakeSubsystem.hasCube() ? goToState(ArmState.MIDSCORECONE) : goToState(ArmState.MIDSCORECUBE);
       case MIDSCORECONE:
@@ -440,7 +453,7 @@ public class ArmSubsystem extends SubsystemBase {
         return goToState(ArmState.STOWED);
       case HIGHSCORECONE:
       case HIGHSCORECUBE:
-        return goToState(ArmState.HIGHDROP);
+        return highDrop();
       default:
         return null;
     }
@@ -454,13 +467,14 @@ public class ArmSubsystem extends SubsystemBase {
         return transitionToState(ArmState.STOWED);
       case HIGHSCORECONE:
       case HIGHSCORECUBE:
-        return goToState(ArmState.HIGHDROP);
+        return highDrop();
       case TRANSITION:
       case CUBEINTAKE:
       case MIDSCORECONE:
       case MIDSCORECUBE:
       case HIGHTRANSITION:
-      case HIGHDROP:
+      case HIGHDROPB:
+      case HIGHDROPC:
         return goToState(ArmState.CONEINTAKE);
       default:
         return null;
@@ -478,10 +492,11 @@ public class ArmSubsystem extends SubsystemBase {
         return transitionToState(ArmState.STOWED);
       case HIGHSCORECONE:
       case HIGHSCORECUBE:
-        return goToState(ArmState.HIGHDROP);
+        return highDrop();
       case TRANSITION:
       case CONEINTAKE:
-      case HIGHDROP:
+      case HIGHDROPB:
+      case HIGHDROPC:
         return goToState(ArmState.CUBEINTAKE);
       default:
         return null;
@@ -492,19 +507,18 @@ public class ArmSubsystem extends SubsystemBase {
     return currentState;
   }
 
-  public Command stowArmParallel() {
-    //Run along with a trajectory to stow arm after scoring
-    return new WaitCommand(0.5).andThen(goToState(ArmState.STOWED));
-  }
-
-  public void coastBase() {
+  public void coast() {
     baseMotor.setIdleMode(IdleMode.kCoast);
     baseMotor2.setIdleMode(IdleMode.kCoast);
+    elbowMotor.setIdleMode(IdleMode.kCoast);
+    elbowMotor2.setIdleMode(IdleMode.kCoast);
   }
 
-  public void brakeBase() {
+  public void brake() {
     baseMotor.setIdleMode(IdleMode.kBrake);
     baseMotor2.setIdleMode(IdleMode.kBrake);
+    elbowMotor.setIdleMode(IdleMode.kBrake);
+    elbowMotor2.setIdleMode(IdleMode.kBrake);
   }
   
   public void stop() {
@@ -540,10 +554,11 @@ public class ArmSubsystem extends SubsystemBase {
     actualElbowAngleLog.log(Units.radiansToDegrees(getElbowAngle()));
     desiredElbowGoalLog.log(Units.radiansToDegrees(elbowPIDController.getGoal().position));
     desiredElbowSetpointLog.log(Units.radiansToDegrees(elbowPIDController.getSetpoint().position));
-    elbowOutputLog.log(elbowMotor.get());
 
     actualXPositionLog.log(armXPosition);
     actualYPositionLog.log(armYPosition);
+    SmartDashboard.putNumber("Inverse Elbow", Units.radiansToDegrees(convertToElbowAngle(armXPosition, armYPosition)));
+    SmartDashboard.putNumber("Inverse Base", Units.radiansToDegrees(convertToBaseAngle(armXPosition, armYPosition)));
   }
 
   @Override
