@@ -25,6 +25,7 @@ public class SimulationSubsystem extends SubsystemBase {
   private double swerveX;
   private SimDouble pitch = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Pitch"));
   private SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(navXSim, "Yaw"));
+
   /** Creates a new SimulationSubsystem. */
   public SimulationSubsystem(SwerveSubsystem swerveSubsystem) {
     this.swerveSubsystem = swerveSubsystem;
@@ -33,7 +34,6 @@ public class SimulationSubsystem extends SubsystemBase {
     
     //This puts the field into SmartDashboard
     SmartDashboard.putData("Field", m_field); 
-
   }
 
   @Override
