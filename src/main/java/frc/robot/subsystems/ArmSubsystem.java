@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
+import frc.robot.OI.Driver;
 import frc.robot.classes.DebugLog;
 import frc.robot.classes.TunableNumber;
 import frc.robot.hardware.AbsoluteEncoder;
@@ -382,6 +383,18 @@ public class ArmSubsystem extends SubsystemBase {
     setBaseReference(getBaseAngle());
     setElbowReference(getElbowAngle());
   }
+
+  public void checkAngles() throws Exception {
+    if(getBaseAngle() > kMaxBaseAngle || 
+    getBaseAngle() < kMinBaseAngle || 
+    getChooChooAngle() > kMaxChooChooAngle ||
+    getChooChooAngle() < kMinChooChooAngle ||
+    getElbowAngle() > kMaxElbowAngle ||
+    getElbowAngle() < kMinElbowAngle) {
+      DriverStation.reportError("Angles Outside of expected ranges, check your offsets!", false);
+      throw new Exception("Angles Outside of expected ranges, check your offsets!");
+    }
+  }
   
   public Command goToState(ArmState state){
     //Command for autonomous, obstructs routine until arm is at setpoint
@@ -523,6 +536,11 @@ public class ArmSubsystem extends SubsystemBase {
       holdCurrentPosition();
       basePIDController.reset(getBaseAngle());
       elbowPIDController.reset(getElbowAngle());
+      try {
+        checkAngles();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
 
     rolloverLog.log(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
