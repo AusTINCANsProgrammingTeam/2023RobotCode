@@ -83,6 +83,7 @@ public class RobotContainer {
       subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
     } else {
       intakeSubsystem = Robot.intakeEnabled ? new IntakeSubsystem() : null;
+      armSubsystem = Robot.armEnabled ? new ArmSubsystem() : null;
     }
     subsystemEnabledLog.append(intakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
 

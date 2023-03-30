@@ -242,6 +242,56 @@ public class ArmSubsystem extends SubsystemBase {
     setState(kDefaultState);
   }
 
+  public ArmSubsystem() {
+    //Add coast mode command to shuffleboard
+    configTab.add(new StartEndCommand(this::coastBase, this::brakeBase, this).ignoringDisable(true).withName("Coast Arm"));
+
+    baseMotor = MotorController.constructMotor(MotorConfig.ArmBase1);
+    baseMotor2 = MotorController.constructMotor(MotorConfig.ArmBase2);
+    elbowMotor = MotorController.constructMotor(MotorConfig.ArmElbow1);
+    elbowMotor2 = MotorController.constructMotor(MotorConfig.ArmElbow2);
+
+    baseMotor2.follow(baseMotor);
+    elbowMotor2.follow(elbowMotor);
+
+    baseMotor.enableVoltageCompensation(11);
+    elbowMotor.enableVoltageCompensation(11);
+
+    baseAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmBase);
+    elbowAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);
+    choochooAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmChooChoo);
+
+    if(Robot.isReal()) {
+      basePIDController = new ProfiledPIDController(kBaseP, kBaseI, kBaseD, kBaseConstraints);
+      elbowPIDController = new ProfiledPIDController(kElbowUpP, kElbowUpI, kElbowUpD, kElbowConstraints);
+      elbowFeedForward = new ArmFeedforward(kElbowS, kElbowG, kElbowV, kElbowA);
+      
+      basePTuner = new TunableNumber("baseP", kBaseP, basePIDController::setP);
+      baseITuner = new TunableNumber("baseI", kBaseI, basePIDController::setI);
+      baseDTuner = new TunableNumber("baseD", kBaseD, basePIDController::setD);
+  
+      elbowUpPTuner = new TunableNumber("elbowUpP", kElbowUpP, (a) -> kElbowUpP = a);
+      elbowUpITuner = new TunableNumber("elbowUpI", kElbowUpI, (a) -> kElbowUpI = a);
+      elbowUpDTuner = new TunableNumber("elbowUpD", kElbowUpD, (a) -> kElbowUpD = a);
+
+      elbowDownPTuner = new TunableNumber("elbowDownP", kElbowDownP, (a) -> kElbowDownP = a);
+      elbowDownITuner = new TunableNumber("elbowDownI", kElbowDownI, (a) -> kElbowDownI = a);
+      elbowDownDTuner = new TunableNumber("elbowDownD", kElbowDownD, (a) -> kElbowDownD = a);
+    } else {
+      SmartDashboard.putData("Arm Sim", simArmCanvas);
+      elbowFeedForward = new ArmFeedforward(0, 0, 0, 0);
+      basePIDController = new ProfiledPIDController(kSimBaseP, 0, 0, kBaseConstraints);
+      elbowPIDController = new ProfiledPIDController(kSimElbowP, 0, 0, kElbowConstraints);
+    }
+
+    basePIDController.reset(getBaseAngle());
+    elbowPIDController.reset(getElbowAngle());
+
+    holdCurrentPosition();
+    
+    setState(kDefaultState);
+  }
+
   //Returns sim encoder position (No offset) if in simulation, the actual position otherwise
   public double getBaseAngle() {
     return Robot.isSimulation() ? simBaseEncoderPosition : AbsoluteEncoder.getPositionRadians(baseAbsoluteEncoder,3);
@@ -416,7 +466,7 @@ public class ArmSubsystem extends SubsystemBase {
       case HIGHSCORECONE:
         return goToState(ArmState.HIGHDROP);
       case HIGHTRANSITION:
-        return intakeSubsystem.hasCube() ? goToState(ArmState.HIGHSCORECONE) : goToState(ArmState.HIGHSCORECUBE);
+        return intakeSubsystem.hasCube() ? goToState(ArmState.HIGHSCORECUBE) : goToState(ArmState.HIGHSCORECONE);
       case HIGHDROP:
         return transitionToState(ArmState.STOWED);
       default:
