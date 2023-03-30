@@ -525,6 +525,8 @@ public class ArmSubsystem extends SubsystemBase {
       elbowPIDController.reset(getElbowAngle());
     }
 
+    updateMotors();
+
     rolloverLog.log(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
 
     actualBaseAngleLog.log(Units.radiansToDegrees(getBaseAngle()));
