@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.ArmSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -58,6 +59,7 @@ public class Robot extends LoggedRobot {
   private IntegerLogEntry loopCountEntry = new IntegerLogEntry(loopCountlog, "/robot/loopCount");
 
   private RobotContainer m_robotContainer;
+  private ArmSubsystem armSubsystem = new ArmSubsystem();
 
   private int loopCount = 0;
 
@@ -67,6 +69,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
+    armSubsystem.checkAngles();
     Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
     if (isReal()) {
