@@ -391,7 +391,9 @@ public class ArmSubsystem extends SubsystemBase {
     getChooChooAngle() < kMinChooChooAngle ||
     getElbowAngle() > kMaxElbowAngle ||
     getElbowAngle() < kMinElbowAngle) {
-      DriverStation.reportError("Angles Outside of expected ranges, check your offsets!", false);
+      stop();
+      String badString = null;
+      badString.toString();
       throw new Exception("Angles Outside of expected ranges, check your offsets!");
     }
   }
@@ -564,7 +566,6 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     updateSimMotors();
-
     simBaseEncoderPosition = baseArmSim.getAngleRads();
     simElbowEncoderPosition = elbowArmSim.getAngleRads();
 
