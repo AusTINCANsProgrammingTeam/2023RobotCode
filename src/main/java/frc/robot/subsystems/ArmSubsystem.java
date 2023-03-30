@@ -35,9 +35,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.classes.DebugLog;
+import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.classes.TunableNumber;
 import frc.robot.hardware.AbsoluteEncoder;
-import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
+import frc.robot.hardware.AbsoluteEncoder.EncoderConfig; 
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
 
@@ -52,7 +53,7 @@ public class ArmSubsystem extends SubsystemBase {
     HIGHSCORECUBE(1.6773, 1.2778), //Arm is in position to score on the high node with a cube
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
     HIGHDROP(1.4433, 0.9266), //High scoring motion
-    TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
+    TRANSITION(0.7124, 0.1644);//Used to transition to any state from stowed position
 
     private double x; //Position relative to the base of the arm, in meters
     private double y; //Position above the carpet, in meters
@@ -176,6 +177,8 @@ public class ArmSubsystem extends SubsystemBase {
   private TunableNumber elbowDownITuner;
   private TunableNumber elbowDownDTuner;
 
+  private IntakeSubsystem intakeSubsystem;
+
   private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), kBaseGearing, kBaseInertia, kBaseLength, kMinBaseAngle, kMaxBaseAngle, false);
   private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, kElbowInertia, kElbowLength, kMinElbowAngle, kMaxElbowAngle, false);
 
@@ -188,7 +191,7 @@ public class ArmSubsystem extends SubsystemBase {
   MechanismLigament2d elbowLigament = baseLigament.append(new MechanismLigament2d("Elbow Arm", kElbowLength*3, elbowArmSim.getAngleRads()));
   
 
-  public ArmSubsystem() {
+  public ArmSubsystem(IntakeSubsystem intakeSubsystem) {
     //Add coast mode command to shuffleboard
     configTab.add(new StartEndCommand(this::coastBase, this::brakeBase, this).ignoringDisable(true).withName("Coast Arm"));
 
@@ -206,6 +209,7 @@ public class ArmSubsystem extends SubsystemBase {
     baseAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmBase);
     elbowAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);
     choochooAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmChooChoo);
+    this.intakeSubsystem = intakeSubsystem;
 
     if(Robot.isReal()) {
       basePIDController = new ProfiledPIDController(kBaseP, kBaseI, kBaseD, kBaseConstraints);
@@ -412,7 +416,7 @@ public class ArmSubsystem extends SubsystemBase {
       case HIGHSCORECONE:
         return goToState(ArmState.HIGHDROP);
       case HIGHTRANSITION:
-        return (IntakeSubsystem.isConeMode() ? goToState(ArmState.HIGHSCORECONE) : goToState(ArmState.HIGHSCORECUBE));
+        return intakeSubsystem.hasCube() ? goToState(ArmState.HIGHSCORECONE) : goToState(ArmState.HIGHSCORECUBE);
       case HIGHDROP:
         return transitionToState(ArmState.STOWED);
       default:

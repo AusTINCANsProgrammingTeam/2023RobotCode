@@ -57,11 +57,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private DebugLog<Boolean> hasConeLog = new DebugLog<Boolean>(false, "Has Cone", this);
   private DebugLog<Boolean> hasCubeLog = new DebugLog<Boolean>(false, "Has Cube", this);
 
-  private static boolean isConeMode;
+  private boolean hasCone;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
-    isConeMode = true;
+    hasCone = true;
 
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
     motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
@@ -79,27 +79,27 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void push() {
-    spinWheels(isConeMode ? kConeOuttakeSpeed : kCubeOuttakeSpeed);
+    spinWheels(hasCone ? kConeOuttakeSpeed : kCubeOuttakeSpeed);
   }
 
   public void pull() {
-    spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
+    spinWheels(hasCone ? kConeIntakeSpeed : kCubeIntakeSpeed);
   }
 
     public void setConeMode() {
-      this.isConeMode = true;
+      this.hasCone = false;
   }
 
     public void setCubeMode() {
-      this.isConeMode = false;
+      this.hasCone = true;
   }
 
   public void toggleConeMode() {
-    isConeMode = !isConeMode;
+    hasCone = !hasCone;
   }
 
-  public static boolean isConeMode() {
-    return isConeMode;
+  public boolean hasCube() {
+    return hasCone;
   }
   
   public double getSpeed(){
@@ -111,7 +111,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void hold() {
-    spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
+    spinWheels(hasCone ? kConeIntakeSpeed : kCubeIntakeSpeed);
   }
 
   @Override
@@ -182,7 +182,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putData(this);
-    intakeMode.setString((isConeMode) ? "Cone Mode" : "Cube Mode");
+    intakeMode.setString((hasCone) ? "Cone Mode" : "Cube Mode");
   }
 
   @Override

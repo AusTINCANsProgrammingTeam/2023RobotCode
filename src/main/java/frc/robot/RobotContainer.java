@@ -61,8 +61,6 @@ public class RobotContainer {
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    armSubsystem = Robot.armEnabled ? new ArmSubsystem() : null;
-    subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
 
     ledSubsystem = Robot.ledSubSelect == LedEnum.STRIP ? new LedStripSubsystem() : null;
     subsystemEnabledLog.append(ledSubsystem == null ? "Led: Disabled" : "Led: Enabled");
@@ -81,6 +79,8 @@ public class RobotContainer {
 
     if (Robot.intakeEnabled && Robot.tofEnabled) {
       intakeSubsystem = new IntakeSubsystem(timeOfFlightSensor);
+      armSubsystem = Robot.armEnabled ? new ArmSubsystem(intakeSubsystem) : null;
+      subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
     } else {
       intakeSubsystem = Robot.intakeEnabled ? new IntakeSubsystem() : null;
     }
