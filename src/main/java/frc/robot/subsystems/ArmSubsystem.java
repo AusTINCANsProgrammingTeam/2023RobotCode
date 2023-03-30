@@ -480,7 +480,12 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  public ArmState getArmState() {
+    return currentState;
+  }
+  
   public void coast() {
+    
     baseMotor.setIdleMode(IdleMode.kCoast);
     baseMotor2.setIdleMode(IdleMode.kCoast);
     elbowMotor.setIdleMode(IdleMode.kCoast);
