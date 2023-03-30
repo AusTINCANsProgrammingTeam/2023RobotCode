@@ -384,14 +384,19 @@ public class ArmSubsystem extends SubsystemBase {
     setElbowReference(getElbowAngle());
   }
 
-  public void checkAngles() {
+  public void checkAngles() throws Exception {
     if(getBaseAngle() > kMaxBaseAngle || 
     getBaseAngle() < kMinBaseAngle || 
     getChooChooAngle() > kMaxChooChooAngle ||
     getChooChooAngle() < kMinChooChooAngle ||
     getElbowAngle() > kMaxElbowAngle ||
     getElbowAngle() < kMinElbowAngle) {
-      DriverStation.reportError("Encoders read outside of possible positions, check your offsets!", true);
+      if(DriverStation.isDisabled()) {
+        DriverStation.reportError("Encoders read outside of possible positions, check your offsets!", true);
+      } else {
+        throw new Exception("Angles Outside of expected ranges, check your offsets!");
+      }
+      
     }
   }
   
@@ -535,6 +540,13 @@ public class ArmSubsystem extends SubsystemBase {
       holdCurrentPosition();
       basePIDController.reset(getBaseAngle());
       elbowPIDController.reset(getElbowAngle());
+    }
+    if(Robot.offsetsFixed) {
+      try {
+        checkAngles();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
 
     rolloverLog.log(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);

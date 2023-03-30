@@ -51,6 +51,7 @@ public class Robot extends LoggedRobot {
   public static final boolean intakeEnabled = true;
   public static final boolean swerveEnabled = true;
   public static final boolean armEnabled = true;
+  public static final boolean offsetsFixed = true;
   public static final boolean buddyBalanceEnabled = false;
   public static final boolean cubeapultEnabled = true;
   
@@ -59,7 +60,6 @@ public class Robot extends LoggedRobot {
   private IntegerLogEntry loopCountEntry = new IntegerLogEntry(loopCountlog, "/robot/loopCount");
 
   private RobotContainer m_robotContainer;
-  private ArmSubsystem armSubsystem = new ArmSubsystem();
 
   private int loopCount = 0;
 
@@ -69,7 +69,6 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
-    armSubsystem.checkAngles();
     Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
     if (isReal()) {
