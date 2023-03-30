@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
@@ -103,6 +104,7 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putData(this);
     // This method will be called once per scheduler run
     buddyBalancePosition.append(rightEncoder.getPosition()); // Logging the position of the buddy balance lift
     buddyBalancePosition.append(leftEncoder.getPosition());
