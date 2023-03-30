@@ -159,6 +159,10 @@ public class Auton{
     private Command delay(double seconds){
         return new WaitCommand(seconds).beforeStarting(() -> commandLog.append("Wait " + seconds + " seconds"));
     }
+
+    private Command timeCommand(double speed, double timeout) {
+        return new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, speed, 0)), () -> swerveSubsystem.stopModules()).withTimeout(timeout);
+    }
     
     private Command getAutonSequence(){
         autonMode = modeChooser.getSelected();
@@ -203,7 +207,7 @@ public class Auton{
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge2-1"),
                         highTransitionSequenceCone(),
-                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
+                        timeCommand(-0.1, 0.5),
                         resetOdometry("1ScoreCharge2-1"),
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge2-1", getTrajectory("1ScoreCharge2-1"))
@@ -251,7 +255,7 @@ public class Auton{
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge2-6"),
                         highTransitionSequenceCone(),
-                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
+                        timeCommand(-0.1, 0.5),
                         resetOdometry("1ScoreCharge2-6"),
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge2-6", getTrajectory("1ScoreCharge2-6"))
