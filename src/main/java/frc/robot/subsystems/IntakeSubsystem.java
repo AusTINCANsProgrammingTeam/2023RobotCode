@@ -32,7 +32,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kConeIntakeSpeed = -0.75;
   public static final double kConeOuttakeSpeed = 0.75;
   public static final double kCubeIntakeSpeed = 0.55;
-  public static final double kCubeOuttakeSpeed = -0.65;
+  public static final double kCubeOuttakeSpeed = -0.3;
 
   private final double kConeHoldSpeed = 0.35; // change after testing
   private final double kCubeHoldSpeed = 0.25; // change after testing
@@ -58,11 +58,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private DebugLog<Boolean> hasConeLog = new DebugLog<Boolean>(false, "Has Cone", this);
   private DebugLog<Boolean> hasCubeLog = new DebugLog<Boolean>(false, "Has Cube", this);
 
-  private boolean hasCone;
+  private boolean isConeMode;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
-    hasCone = true;
+    isConeMode = true;
 
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
     motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
@@ -80,27 +80,29 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void push() {
-    spinWheels(hasCone ? kConeOuttakeSpeed : kCubeOuttakeSpeed);
+    spinWheels(isConeMode ? kConeOuttakeSpeed : kCubeOuttakeSpeed);
   }
 
   public void pull() {
-    spinWheels(hasCone ? kConeIntakeSpeed : kCubeIntakeSpeed);
+    spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
   }
 
     public void setConeMode() {
-      this.hasCone = false;
+      isConeMode = true;
   }
 
-    public void setCubeMode() {
-      this.hasCone = true;
+  public void setCubeMode() {
+      isConeMode = false;
   }
 
   public void toggleConeMode() {
-    hasCone = !hasCone;
+    isConeMode = !isConeMode;
   }
 
   public boolean hasCube() {
-    return hasCone;
+    int cubeDistance = timeOfFlightSensor.getDistance1();
+    boolean cubeSensorUp = cubeDistance != -1;
+    return cubeDistance <= mmCubeActivationThreshold && cubeSensorUp;
   }
   
   public double getSpeed(){
@@ -112,7 +114,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public void hold() {
-    spinWheels(hasCone ? kConeIntakeSpeed : kCubeIntakeSpeed);
+    spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
   }
   
   public Command pullTimed(double seconds, boolean isConeMode){
@@ -191,7 +193,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putData(this);
-    intakeMode.setString((hasCone) ? "Cone Mode" : "Cube Mode");
+    intakeMode.setBoolean(isConeMode);
   }
 
   @Override

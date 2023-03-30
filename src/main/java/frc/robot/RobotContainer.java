@@ -158,7 +158,7 @@ public class RobotContainer {
         OI.Driver.getArmConeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleConeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setConeMode())));
         OI.Driver.getArmCubeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleCubeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setCubeMode())));
         if (Robot.tofEnabled) {
-          intakeSubsystem.setDefaultCommand(new ToFIntakeCommand(intakeSubsystem, armSubsystem));
+          //intakeSubsystem.setDefaultCommand(new ToFIntakeCommand(intakeSubsystem, armSubsystem));
         }
       }
       OI.Operator.getHighScoreCubeButton().onTrue(armSubsystem.goToState(ArmState.HIGHSCORECUBE));
