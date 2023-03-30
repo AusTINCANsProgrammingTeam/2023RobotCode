@@ -174,13 +174,9 @@ public class ArmSubsystem extends SubsystemBase {
     baseMotor2 = MotorController.constructMotor(MotorConfig.ArmBase2);
     elbowMotor = MotorController.constructMotor(MotorConfig.ArmElbow);
 
-    int errorCode = baseMotor2.follow(baseMotor).value;
-
-    errorCode += baseMotor.enableVoltageCompensation(11).value;
-    errorCode += elbowMotor.enableVoltageCompensation(11).value;
-
-    if(errorCode != 0){DriverStation.reportError("An Error has occured in ArmSubsystem()", null);}
-
+    if(baseMotor2.follow(baseMotor).value != 0){DriverStation.reportError("An Error has occured with baseMotor2.follow(baseMotor)", null);};
+    if(baseMotor.enableVoltageCompensation(11).value != 0){DriverStation.reportError("An Error has occured with baseMotor.enableVoltageCompensation", null);};
+    if(elbowMotor.enableVoltageCompensation(11).value != 0){DriverStation.reportError("An Error has occured with elbowMotor.enableVoltageCompensation", null);};
 
     baseAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmBase);
     elbowAbsoluteEncoder = AbsoluteEncoder.constructREVEncoder(EncoderConfig.ArmElbow);

@@ -105,7 +105,7 @@ public class MotorController {
         errorCode += motor.setIdleMode(config.getIdleMode()).value;
         errorCode +=  motor.setOpenLoopRampRate(config.getOpenLoopRampRate()).value;
         motor.setInverted(config.getReversed());
-        if(errorCode != 0){DriverStation.reportError("An Error has occured in constructMotor(MotorConfig config)", null);}
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in constructMotor(MotorConfig config) with config " + config.getID(), null);}
         return motor;
     }
 
@@ -115,7 +115,7 @@ public class MotorController {
         int errorCode = motorPIDcontroller.setP(PIDArray[0]).value; //Gets REVLibError code value (Is 0 if no error occured)
         errorCode += motorPIDcontroller.setI(PIDArray[1]).value;
         errorCode += motorPIDcontroller.setD(PIDArray[2]).value;
-        if(errorCode != 0){DriverStation.reportError("An Error has occured in constructMotor(MotorConfig config, double[] PIDArray)", null);}
+        if(errorCode != 0){DriverStation.reportError("An Error has occured in constructMotor(MotorConfig config, double[] PIDArray) with motor " + motor.getDeviceId() + " whilst setting PID", null);}
         return motor;
     }
 }
