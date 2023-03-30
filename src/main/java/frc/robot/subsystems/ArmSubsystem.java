@@ -48,9 +48,10 @@ public class ArmSubsystem extends SubsystemBase {
     STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
     CONEINTAKE(1.0136, -0.0876), //Arm is in position to intake cones
     CUBEINTAKE(0.7691, -0.2365), //Arm is in position to intake cubes
-    MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
+    MIDSCORECONE(1.4536, 0.9486), //Arm is in position to score on the mid node with a cone
+    MIDSCORECUBE(0, 0), //Arm is in position to score on the mid node with a cube
     HIGHSCORECONE(1.6773, 1.2778), //Arm is in position to score on the high node with a cone
-    HIGHSCORECUBE(1.6773, 1.2778), //Arm is in position to score on the high node with a cube
+    HIGHSCORECUBE(0, 0), //Arm is in position to score on the high node with a cube
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
     HIGHDROP(1.4433, 0.9266), //High scoring motion
     TRANSITION(0.7124, 0.1644);//Used to transition to any state from stowed position
@@ -410,7 +411,8 @@ public class ArmSubsystem extends SubsystemBase {
       case TRANSITION:
       case CONEINTAKE:
       case CUBEINTAKE:
-      case MIDSCORE:
+      case MIDSCORECONE:
+      case MIDSCORECUBE:
         return goToState(ArmState.HIGHTRANSITION);
       case HIGHSCORECUBE:
       case HIGHSCORECONE:
@@ -432,8 +434,9 @@ public class ArmSubsystem extends SubsystemBase {
       case CUBEINTAKE:
       case HIGHDROP:
       case HIGHTRANSITION:
-        return goToState(ArmState.MIDSCORE);
-      case MIDSCORE:
+      return intakeSubsystem.hasCube() ? goToState(ArmState.MIDSCORECONE) : goToState(ArmState.MIDSCORECUBE);
+      case MIDSCORECONE:
+      case MIDSCORECUBE:
         return goToState(ArmState.STOWED);
       case HIGHSCORECONE:
       case HIGHSCORECUBE:
@@ -454,7 +457,8 @@ public class ArmSubsystem extends SubsystemBase {
         return goToState(ArmState.HIGHDROP);
       case TRANSITION:
       case CUBEINTAKE:
-      case MIDSCORE:
+      case MIDSCORECONE:
+      case MIDSCORECUBE:
       case HIGHTRANSITION:
       case HIGHDROP:
         return goToState(ArmState.CONEINTAKE);
@@ -468,7 +472,8 @@ public class ArmSubsystem extends SubsystemBase {
       case STOWED:
         return transitionToState(ArmState.CUBEINTAKE);
       case HIGHTRANSITION:
-      case MIDSCORE:
+      case MIDSCORECONE:
+      case MIDSCORECUBE:
       case CUBEINTAKE:
         return transitionToState(ArmState.STOWED);
       case HIGHSCORECONE:
