@@ -301,6 +301,9 @@ public class ArmSubsystem extends SubsystemBase {
     armYPosition = getArmY();
   }
   
+  public void nothing() {
+    //Does nothing, placeholder for certain commands that use the update motors method.
+  }
   public void updateMotors() {
     double baseOutput = MathUtil.clamp(((getChooChooAngle() < kMaxChooChooAngle && getChooChooAngle() > kMinChooChooAngle) ? -1 : 1) * basePIDController.calculate(getBaseAngle()),-1,1);
     
@@ -325,7 +328,6 @@ public class ArmSubsystem extends SubsystemBase {
 
 
   public void updateSimMotors() {
-    updateMotors();
     baseArmSim.setInputVoltage(baseMotor.get() * RobotController.getBatteryVoltage());
     elbowArmSim.setInputVoltage(elbowMotor.get() * RobotController.getBatteryVoltage());
   }
@@ -387,7 +389,7 @@ public class ArmSubsystem extends SubsystemBase {
     //Command for autonomous, obstructs routine until arm is at setpoint
     return new FunctionalCommand(
                 () -> setState(state), //Init
-                this::updateMotors, //Execute
+                this::nothing, //Execute
                 (b)->{}, //End 
                 this::atSetpoint, //isFinished
                 this
@@ -516,6 +518,7 @@ public class ArmSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
+    
     SmartDashboard.putData(this);
     // This method will be called once per scheduler run
     calculateCurrentPositions();
@@ -524,7 +527,7 @@ public class ArmSubsystem extends SubsystemBase {
       basePIDController.reset(getBaseAngle());
       elbowPIDController.reset(getElbowAngle());
     }
-
+    updateMotors();
     rolloverLog.log(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
 
     actualBaseAngleLog.log(Units.radiansToDegrees(getBaseAngle()));
