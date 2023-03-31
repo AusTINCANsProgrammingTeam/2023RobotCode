@@ -443,7 +443,7 @@ public class ArmSubsystem extends SubsystemBase {
     //Command for autonomous, obstructs routine until arm is at setpoint
     return new FunctionalCommand(
                 () -> setState(state), //Init
-                this::updateMotors, //Execute
+                () -> {}, //Execute
                 (b)->{}, //End 
                 this::atSetpoint, //isFinished
                 this

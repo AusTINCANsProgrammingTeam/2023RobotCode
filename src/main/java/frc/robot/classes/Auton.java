@@ -33,7 +33,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 
 public class Auton{
     public static final double kMaxSpeed = SwerveSubsystem.kPhysicalMaxSpeed * 0.75; //Maximum speed allowed in auton, in meters per second
-    public static final double kMaxAcceleration = 10; //Maximum accelaration allowed in auton, in meters per seconds squared
+    public static final double kMaxAcceleration = 5; //Maximum accelaration allowed in auton, in meters per seconds squared
 
     private enum AutonModes{
         //Number after a path name corresponds to its starting position
@@ -278,7 +278,7 @@ public class Auton{
                     new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
                     resetOdometry("1ScoreLoad1-1"),
                     highScoreSequenceCone(),
-                    swerveSubsystem.followTrajectory("1ScoreLoad1-1", getTrajectory("1ScoreLoad1-1")).deadlineWith(armSubsystem.goToStateDelay(ArmState.CONEINTAKE)),
+                    swerveSubsystem.followTrajectory("1ScoreLoad1-1", getTrajectory("1ScoreLoad1-1")).deadlineWith(armSubsystem.transitionToState(ArmState.CONEINTAKE)),
                     new ParallelDeadlineGroup(
                         swerveSubsystem.followTrajectory("1ScoreLoad2-1", getTrajectory("1ScoreLoad2-1")),
                         intakeSubsystem.pullTimed(3, true)
@@ -305,11 +305,11 @@ public class Auton{
                 new SequentialCommandGroup(
                     resetOdometry("1ScoreCubeLoad1-1"),
                     cubeapultSubsystem.launch(),
-                    swerveSubsystem.followTrajectory("1ScoreCubeLoad1-1", getTrajectory("1ScoreCubeLoad1-1")).deadlineWith(armSubsystem.goToStateDelay(ArmState.CONEINTAKE)),
+                    swerveSubsystem.followTrajectory("1ScoreCubeLoad1-1", getTrajectory("1ScoreCubeLoad1-1")).deadlineWith(armSubsystem.transitionToState(ArmState.CONEINTAKE)),
                     new ParallelDeadlineGroup(
                         swerveSubsystem.followTrajectory("1ScoreLoad2-1", getTrajectory("1ScoreLoad2-1")),
-                        intakeSubsystem.pullTimed(3, true)
-                    ).andThen(armSubsystem.goToStateDelay(ArmState.STOWED)),
+                        intakeSubsystem.pullTimed(3, true).andThen(armSubsystem.goToStateDelay(ArmState.STOWED)
+                    )),
                     swerveSubsystem.assistedBalance(false)
                     );
             case ONECUBELOAD6:
