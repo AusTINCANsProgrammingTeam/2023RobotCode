@@ -73,7 +73,13 @@ dependencies {
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
 
-    implementation 'com.github.azvanderpas:java-packager-exp:v0.2.0'
+    // Pulls in github release or commit using jitpack.io
+    // main-SNAPSHOT take latest commit to main branch (any branch can be used)
+    // Note that this might cause a build timeout because jitpack.io has to build the dependency on the fly
+    implementation 'com.github.azvanderpas:java-packager-exp:main-SNAPSHOT'
+
+    // Can also lock down to a specific tag/release, for example:
+    // implementation 'com.github.azvanderpas:java-packager-exp:v0.2.0'
 }
 
 test {
