@@ -1,5 +1,7 @@
 package frc.robot.classes;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
 
 import edu.wpi.first.networktables.GenericEntry;
@@ -13,6 +15,7 @@ import frc.robot.Robot;
 
 public class DebugLog<T> {
     private static DataLog datalog = DataLogManager.getLog();
+    private static HashMap<Integer,String> entrys = new HashMap<Integer,String>();
 
     private ShuffleboardTab networkTab;
     private GenericEntry networkEntry;
@@ -37,7 +40,11 @@ public class DebugLog<T> {
         if (localEntry != null) {
             if(!Robot.isCompetition){
                 networkTab = Shuffleboard.getTab(subsystem.getName());
-                networkEntry = networkTab.add(name, defaultValue).getEntry();
+
+                if (!entrys.containsValue(name)) {
+                    networkEntry = networkTab.add(name, defaultValue).getEntry();
+                    entrys.put(entrys.size(), name);
+                }
             }
             localConsumer.accept(defaultValue);
         }
@@ -46,7 +53,9 @@ public class DebugLog<T> {
     public void log(T newValue){
         try{
             if(!Robot.isCompetition){
-                networkEntry.setValue(newValue);
+                if (networkEntry != null) {
+                    networkEntry.setValue(newValue);
+                }
             }
             localConsumer.accept(newValue);
         } catch(NullPointerException e){
