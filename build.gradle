@@ -72,6 +72,8 @@ dependencies {
 
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
+
+    implementation 'com.github.azvanderpas:java-packager-exp:v0.2.0'
 }
 
 test {
@@ -103,6 +105,7 @@ tasks.withType(JavaCompile) {
 }
 
 repositories {
+    maven { url 'https://jitpack.io' }
     maven {
         url = uri("https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit")
         credentials {
