@@ -149,6 +149,9 @@ java {
 publishing {
     publications {
         maven(MavenPublication) {
+         groupId = 'com.github.AusTINCANsProgrammingTeam.2023RobotCode'
+         artifactId = 'library'
+         version = "${version}"
 		from components.java
         }
     }
