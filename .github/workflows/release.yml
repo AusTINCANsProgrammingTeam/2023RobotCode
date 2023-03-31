@@ -1,0 +1,43 @@
+# This is a basic workflow to build robot code.
+
+name: release
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events for main and develop branches
+on:
+  workflow_dispatch:
+  push:
+    branches: 
+      - main 
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  deploy:
+    name: Prepare Jar & JitPack
+    
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+    
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Build - Gradle ${{ env.GRADLE_VERSION }}
+        uses: gradle/gradle-build-action@v2.3.0-beta.1
+        with:
+          arguments: build -Pversion=${{ github.event.release.tag_name }}
+
+      - name: Upload Assets to Release
+        uses: AButler/upload-release-assets@v2.0
+        with:
+          files: ./build/libs/*.jar
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update JitPack
+        uses: badasintended/autojitpack@v1
+        with:
+          version: ${{ github.event.release.tag_name }}
+
