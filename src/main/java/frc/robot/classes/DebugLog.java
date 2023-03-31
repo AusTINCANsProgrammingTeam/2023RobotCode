@@ -1,7 +1,6 @@
 package frc.robot.classes;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.function.Consumer;
 
 import edu.wpi.first.networktables.GenericEntry;
