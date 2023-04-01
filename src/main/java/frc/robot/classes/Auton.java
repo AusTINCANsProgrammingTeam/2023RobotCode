@@ -156,8 +156,13 @@ public class Auton{
         );
     }
 
+
     private Command delay(double seconds){
         return new WaitCommand(seconds).beforeStarting(() -> commandLog.append("Wait " + seconds + " seconds"));
+    }
+
+    private Command translateY(double speed, double timeout) {
+        return new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, speed, 0)), () -> swerveSubsystem.stopModules()).withTimeout(timeout);
     }
     
     private Command getAutonSequence(){
@@ -182,7 +187,7 @@ public class Auton{
                     new SequentialCommandGroup(
                         resetOdometry("1Score"),
                         highTransitionSequenceCone(),
-                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
+                        translateY(-0.1, 0.5),
                         resetOdometry("1Score"),
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1Score", getTrajectory("1Score"))
@@ -206,7 +211,7 @@ public class Auton{
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge2-1"),
                         highTransitionSequenceCone(),
-                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
+                        translateY(-0.1, 0.5),
                         resetOdometry("1ScoreCharge2-1"),
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge2-1", getTrajectory("1ScoreCharge2-1"))
@@ -227,7 +232,7 @@ public class Auton{
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-3"),
                         highTransitionSequenceCone(),
-                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
+                        translateY(-0.1, 0.5),
                         resetOdometry("1ScoreCharge-3"),
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge-3", getTrajectory("1ScoreCharge-3"))
@@ -239,7 +244,7 @@ public class Auton{
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-4"),
                         highTransitionSequenceCone(),
-                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
+                        translateY(-0.1, 0.5),
                         resetOdometry("1ScoreCharge-4"),
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge-4", getTrajectory("1ScoreCharge-4"))
@@ -251,7 +256,7 @@ public class Auton{
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-5"),
                         highTransitionSequenceCone(),
-                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
+                        translateY(-0.1, 0.5),
                         resetOdometry("1ScoreCharge-5"),
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge-5", getTrajectory("1ScoreCharge-5"))
@@ -263,7 +268,7 @@ public class Auton{
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge2-6"),
                         highTransitionSequenceCone(),
-                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.5),
+                        translateY(-0.1, 0.5),
                         resetOdometry("1ScoreCharge2-6"),
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge2-6", getTrajectory("1ScoreCharge2-6"))
