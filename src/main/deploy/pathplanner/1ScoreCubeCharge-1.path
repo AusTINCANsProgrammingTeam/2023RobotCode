@@ -2,15 +2,15 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.8502623528142021,
-        "y": 2.2
+        "x": 1.9,
+        "y": 4.4
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.5001848089587275,
-        "y": 2.2
+        "x": 2.311739557362483,
+        "y": 4.8117395573624835
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -24,18 +24,43 @@
     },
     {
       "anchorPoint": {
-        "x": 2.9,
-        "y": 2.2
+        "x": 5.7,
+        "y": 4.0
       },
       "prevControl": {
-        "x": 2.7794754458591076,
-        "y": 2.2
+        "x": 5.7,
+        "y": 5.229917548405949
       },
       "nextControl": {
-        "x": 3.0442139331626086,
-        "y": 2.2
+        "x": 5.7,
+        "y": 3.28807450974596
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.85,
+        "y": 3.25
+      },
+      "prevControl": {
+        "x": 4.918726097138878,
+        "y": 3.25
+      },
+      "nextControl": {
+        "x": 4.713677487262222,
+        "y": 3.25
+      },
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": 0.5,
       "isLocked": false,
@@ -49,15 +74,15 @@
     },
     {
       "anchorPoint": {
-        "x": 3.9,
-        "y": 2.2
+        "x": 3.6,
+        "y": 3.25
       },
       "prevControl": {
-        "x": 3.594851832748854,
-        "y": 2.2
+        "x": 4.005938895246027,
+        "y": 3.25
       },
       "nextControl": null,
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -70,8 +95,8 @@
       }
     }
   ],
-  "maxVelocity": 2.0,
-  "maxAcceleration": 2.0,
+  "maxVelocity": 4.0,
+  "maxAcceleration": null,
   "isReversed": null,
   "markers": []
 }
