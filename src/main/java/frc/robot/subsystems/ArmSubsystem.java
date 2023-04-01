@@ -543,8 +543,6 @@ public class ArmSubsystem extends SubsystemBase {
 
     actualXPositionLog.log(armXPosition);
     actualYPositionLog.log(armYPosition);
-    SmartDashboard.putNumber("Inverse Elbow", Units.radiansToDegrees(convertToElbowAngle(armXPosition, armYPosition)));
-    SmartDashboard.putNumber("Inverse Base", Units.radiansToDegrees(convertToBaseAngle(armXPosition, armYPosition)));
   }
 
   @Override
