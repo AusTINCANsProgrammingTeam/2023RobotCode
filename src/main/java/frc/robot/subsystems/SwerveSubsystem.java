@@ -55,7 +55,9 @@ public class SwerveSubsystem extends SubsystemBase{
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
         
     public static final double kXTranslationP = 1.75;
+    public static final double kXTranslationI = 0.1;
     public static final double kYTranslationP = 1.75;
+    public static final double kYTranslationI = 0.1;
     public static final double kRotationP = 1.75;
     public static final double kRotationI = 1e-6;
 

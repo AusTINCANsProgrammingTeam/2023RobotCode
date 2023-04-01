@@ -51,7 +51,7 @@ public class Auton{
         //Score preload, intake another game piece, then balance
         ONESCORELOADCHARGE1, ONESCORELOADCHARGE6, ONECUBELOAD1, ONECUBELOAD6,
         //Score preload then score another game piece
-        TWOSCORE1, TWOSCORE6,
+        TWOSCORE1, TWOSCORECUBE1, TWOSCORE6,
         //Score preload, score another game piece, then balance
         TWOSCORECHARGE1, TWOSCORECHARGE6,
         //Score preload, score another game piece, intake another game piece, then balance
@@ -97,6 +97,8 @@ public class Auton{
 
         actions = new HashMap<>();
         actions.put("armConeIntake", armSubsystem.transitionToState(ArmState.CONEINTAKE));
+        actions.put("armCubeIntake", armSubsystem.transitionToState(ArmState.CUBEINTAKE));
+        actions.put("cubePullTransition", intakeSubsystem.pullTimed(1.5, false).andThen(highTransitionSequenceCube()));
         actions.put("conePull", intakeSubsystem.pullTimed(1.5, true).andThen(armSubsystem.goToState(ArmState.STOWED)));
         actions.put("conePullTransition", intakeSubsystem.pullTimed(1.5, true).andThen(highTransitionSequenceCone()));
     }
@@ -144,6 +146,16 @@ public class Auton{
         );
     }
 
+    private Command highTransitionSequenceCube() {
+        return new SequentialCommandGroup(
+        new InstantCommand(intakeSubsystem::setCubeMode),
+        new ParallelDeadlineGroup(
+            armSubsystem.goToState(ArmState.MIDSCORECUBE),
+            new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem)
+        )
+        );
+    }
+
     private Command highTransitionSequenceCone() {
         return new SequentialCommandGroup(
         new InstantCommand(intakeSubsystem::setConeMode),
@@ -154,13 +166,9 @@ public class Auton{
         );
     }
 
-    private Command highScoreSequenceCube() {
+    private Command midScoreSequenceCube() {
         return new SequentialCommandGroup(
         new InstantCommand(intakeSubsystem::setCubeMode),
-        new ParallelDeadlineGroup(
-            armSubsystem.goToState(ArmState.HIGHTRANSITION),
-            new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem)
-        ),
         intakeSubsystem.pushTimed(1, false)
         );
     }
@@ -349,7 +357,21 @@ public class Auton{
                             getTrajectory("2Score-1").getMarkers(),
                             actions
                         ),
+                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.3),
                         highScoreSequenceCone()
+                    );
+            case TWOSCORECUBE1:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("2ScoreCube-1"),
+                        cubeapultSubsystem.launch(),
+                        new FollowPathWithEvents(
+                            swerveSubsystem.followTrajectory("2ScoreCube-1", getTrajectory("2ScoreCube-1")), 
+                            getTrajectory("2ScoreCube-1").getMarkers(),
+                            actions
+                        ),
+                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.3),
+                        midScoreSequenceCube()
                     );
             case TWOSCORE6:
                 return

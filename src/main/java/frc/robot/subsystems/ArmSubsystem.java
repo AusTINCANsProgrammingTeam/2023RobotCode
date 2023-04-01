@@ -4,12 +4,16 @@
 
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
@@ -582,6 +586,22 @@ public class ArmSubsystem extends SubsystemBase {
     elbowArmSim.setInputVoltage(0);
   }
   
+  public Rotation3d getBaseRotation3d() {
+    return new Rotation3d(getBaseAngle(), 0, 0);
+  }
+
+  public Rotation3d getElbowRotation3d() {
+    return new Rotation3d(getElbowAngle(), 0, 0);
+  }
+
+  public Pose3d getBasePose3D() {
+    return new Pose3d(0.008083, -0.173961, 0.20541, getBaseRotation3d());
+  }
+
+  public Pose3d getElbowPose3d() {
+    return new Pose3d(getArmX(), getArmY(), -0.042619, getElbowRotation3d());
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putData(this);
@@ -611,6 +631,9 @@ public class ArmSubsystem extends SubsystemBase {
     actualYPositionLog.log(armYPosition);
     SmartDashboard.putNumber("Inverse Elbow", Units.radiansToDegrees(convertToElbowAngle(armXPosition, armYPosition)));
     SmartDashboard.putNumber("Inverse Base", Units.radiansToDegrees(convertToBaseAngle(armXPosition, armYPosition)));
+
+    Logger.getInstance().recordOutput("Base Arm Pose3D", getBasePose3D());
+    Logger.getInstance().recordOutput("Elbow Arm Pose3D", getElbowPose3d());
   }
 
   @Override
