@@ -23,7 +23,7 @@ public class CubeapultSubsystem extends SubsystemBase {
   private static final int solenoidForwardID = 1; //TODO: Update ids when plugged in to the robot
   private static final int solenoidReverseID = 0; //TODO: Update ids when plugged in to the robot
   private static final int pneumaticsID = 59;
-  private static final int activationMaxPressure = 120;
+  private static final int activationMaxPressure = 110;
   private static final int activationMinPressure = 100;
   private DoubleSolenoid solenoid;
   private PneumaticHub pneumatics;
