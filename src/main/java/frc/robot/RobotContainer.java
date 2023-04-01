@@ -83,12 +83,12 @@ public class RobotContainer {
     if (Robot.intakeEnabled && Robot.tofEnabled) {
       intakeSubsystem = new IntakeSubsystem(timeOfFlightSensor);
       armSubsystem = Robot.armEnabled ? new ArmSubsystem(intakeSubsystem) : null;
-      subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
     } else {
       intakeSubsystem = Robot.intakeEnabled ? new IntakeSubsystem() : null;
       armSubsystem = Robot.armEnabled ? new ArmSubsystem() : null;
     }
-
+    
+    subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
     subsystemEnabledLog.append(intakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
 
     cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
