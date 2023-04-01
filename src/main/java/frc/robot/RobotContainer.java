@@ -57,7 +57,7 @@ public class RobotContainer {
   private BlinkinLedSubsystem blinkinLedSubsystem;
   
   private Auton auton;
-  private TimeOfFlightSensor timeOfFlightSensor = new TimeOfFlightSensor();
+  private TimeOfFlightSensor timeOfFlightSensor = Robot.tofEnabled ? new TimeOfFlightSensor() : null;
 
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
@@ -79,14 +79,10 @@ public class RobotContainer {
     simulationSubsystem = Robot.isSimulation() && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
     subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
 
-    if (Robot.intakeEnabled && Robot.tofEnabled) {
-      intakeSubsystem = new IntakeSubsystem(timeOfFlightSensor);
-      armSubsystem = Robot.armEnabled ? new ArmSubsystem(intakeSubsystem) : null;
-      subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
-    } else {
-      intakeSubsystem = Robot.intakeEnabled ? new IntakeSubsystem() : null;
-      armSubsystem = Robot.armEnabled ? new ArmSubsystem() : null;
-    }
+    intakeSubsystem = Robot.intakeEnabled ? new IntakeSubsystem(timeOfFlightSensor) : null;
+    armSubsystem = Robot.armEnabled ? new ArmSubsystem(intakeSubsystem) : null;
+    subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
+
     subsystemEnabledLog.append(intakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
 
     cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;

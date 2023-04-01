@@ -117,12 +117,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
   }
   
-  public Command pullTimed(double seconds, boolean isConeMode){
-    return new StartEndCommand(this::pull, this::stop, this).withTimeout(seconds).beforeStarting(isConeMode ? this::setConeMode : this::setCubeMode);
+  public Command pullTimed(double seconds, boolean hasCube){
+    return new StartEndCommand(this::pull, this::stop, this).withTimeout(seconds).beforeStarting(hasCube ? this::setConeMode : this::setCubeMode);
   }
 
-  public Command pushTimed(double seconds, boolean isConeMode){
-    return new StartEndCommand(this::push, this::stop, this).withTimeout(seconds).beforeStarting(isConeMode ? this::setConeMode : this::setCubeMode);
+  public Command pushTimed(double seconds, boolean hasCube){
+    return new StartEndCommand(this::push, this::stop, this).withTimeout(seconds).beforeStarting(hasCube ? this::setConeMode : this::setCubeMode);
   }
 
   @Override
@@ -159,26 +159,25 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
       case IDLE:
         if (coneSensorUp && coneDistance <= mmConeActivationThreshold) {
           tofState = FlightStates.CONE;
-          break;
         } else if (cubeSensorUp && cubeDistance <= mmCubeActivationThreshold) {
           tofState = FlightStates.CUBE;
-          break;
         }
+        break;
       case CONE:
         if (coneSensorUp && coneDistance > mmConeActivationThreshold) {
           tofState = FlightStates.IDLE;
-          break;
         }
+        break;
       case CUBE:
         if (cubeSensorUp && cubeDistance > mmCubeActivationThreshold) {
           tofState = FlightStates.IDLE;
-          break;
         }
+        break;
       case CONE_SCORE:
         if (coneSensorUp && coneDistance > mmConeActivationThreshold) {
           tofState = FlightStates.IDLE;
-          break;
         }
+        break;
     }
   }
 
