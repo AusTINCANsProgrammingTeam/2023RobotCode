@@ -156,26 +156,6 @@ public class Auton{
         );
     }
 
-    private Command highTransitionSequenceCone() {
-        return new SequentialCommandGroup(
-        new InstantCommand(intakeSubsystem::setConeMode),
-        new ParallelDeadlineGroup(
-            armSubsystem.goToState(ArmState.HIGHTRANSITION),
-            new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem)
-        )
-        );
-    }
-
-    private Command highScoreSequenceCube() {
-        return new SequentialCommandGroup(
-        new InstantCommand(intakeSubsystem::setCubeMode),
-        new ParallelDeadlineGroup(
-            armSubsystem.goToState(ArmState.HIGHTRANSITION),
-            new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem)
-        ),
-        intakeSubsystem.pushTimed(1, false)
-        );
-    }
 
     private Command delay(double seconds){
         return new WaitCommand(seconds).beforeStarting(() -> commandLog.append("Wait " + seconds + " seconds"));
