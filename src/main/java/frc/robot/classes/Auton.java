@@ -160,7 +160,7 @@ public class Auton{
         return new WaitCommand(seconds).beforeStarting(() -> commandLog.append("Wait " + seconds + " seconds"));
     }
 
-    private Command timeToMoveCommand(double speed, double timeout) {
+    private Command translateY(double speed, double timeout) {
         return new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, speed, 0)), () -> swerveSubsystem.stopModules()).withTimeout(timeout);
     }
     
@@ -207,7 +207,7 @@ public class Auton{
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge2-1"),
                         highTransitionSequenceCone(),
-                        timeToMoveCommand(-0.1, 0.5),
+                        translateY(-0.1, 0.5),
                         resetOdometry("1ScoreCharge2-1"),
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge2-1", getTrajectory("1ScoreCharge2-1"))
@@ -255,7 +255,7 @@ public class Auton{
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge2-6"),
                         highTransitionSequenceCone(),
-                        timeToMoveCommand(-0.1, 0.5),
+                        translateY(-0.1, 0.5),
                         resetOdometry("1ScoreCharge2-6"),
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge2-6", getTrajectory("1ScoreCharge2-6"))

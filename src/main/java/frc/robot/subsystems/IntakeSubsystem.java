@@ -107,12 +107,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     spinWheels(0);
   }
 
-  public Command pullTimed(double seconds, boolean isConeMode){
-    return new StartEndCommand(this::pull, this::stop, this).withTimeout(seconds).beforeStarting(isConeMode ? this::setConeMode : this::setCubeMode);
+  public Command pullTimed(double seconds, boolean coneMode){
+    return new StartEndCommand(this::pull, this::stop, this).withTimeout(seconds).beforeStarting(coneMode ? this::setConeMode : this::setCubeMode);
   }
 
-  public Command pushTimed(double seconds, boolean isConeMode){
-    return new StartEndCommand(this::push, this::stop, this).withTimeout(seconds).beforeStarting(isConeMode ? this::setConeMode : this::setCubeMode);
+  public Command pushTimed(double seconds, boolean coneMode){
+    return new StartEndCommand(this::push, this::stop, this).withTimeout(seconds).beforeStarting(coneMode ? this::setConeMode : this::setCubeMode);
   }
 
   public void hold() {
