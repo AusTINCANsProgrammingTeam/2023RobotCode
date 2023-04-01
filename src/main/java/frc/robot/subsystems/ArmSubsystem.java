@@ -10,6 +10,10 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
@@ -476,6 +480,22 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmState getArmState() {
     return currentState;
+  }
+
+  public Rotation3d getBaseRotation3d() {
+    return new Rotation3d(0, getBaseAngle(), 0);
+  }
+
+  public Rotation3d getElbowRotation3d() {
+    return new Rotation3d(0, getElbowAngle(), 0);
+  }
+
+  public Pose3d getBasePose3D() {
+    return new Pose3d(0.008083, -0.173961, 0.20541, getBaseRotation3d());
+  }
+
+  public Pose3d getElbowPose3d() {
+    return new Pose3d(-0.307975, -0.94113, -0.042619, getElbowRotation3d());
   }
 
   public Command stowArmParallel() {

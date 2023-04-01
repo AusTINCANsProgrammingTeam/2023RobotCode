@@ -167,20 +167,8 @@ public class SwerveSubsystem extends SubsystemBase{
         return Rotation2d.fromDegrees(getHeading());
     }
 
-    public Rotation3d getRotation3d() {
-        return new Rotation3d(gyro.getRoll(), gyro.getPitch(), gyro.getYaw());
-    }
-
     public Pose2d getPose() {
         return odometer.getPoseMeters();
-    }
-
-    public Pose3d getBasePose() {
-         return new Pose3d(-0.023546, -0.172784, -0.215371, getRotation3d());
-    }
-
-    public Pose3d getElbowPose() {
-         return new Pose3d(-0.018974, -0.946945, 0.4807, getRotation3d());
     }
 
     public void resetOdometry(Pose2d pose) {
@@ -329,7 +317,5 @@ public class SwerveSubsystem extends SubsystemBase{
         positionEntry.setString(getPose().getTranslation().toString());
         Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
         Logger.getInstance().recordOutput("Pose 2D", getPose());
-        Logger.getInstance().recordOutput("Base Arm Pose3d", getBasePose());
-        Logger.getInstance().recordOutput("Elbow Arm Pose3D", getElbowPose());
     }
 }
