@@ -116,9 +116,9 @@ public class ArmSubsystem extends SubsystemBase {
   public static final double kMaxChooChooAngle = Units.degreesToRadians(326);
 
   public static final double kBaseLength = Units.inchesToMeters(41);
-  public static final double kElbowLength = Units.inchesToMeters(43);
+  public static final double kElbowLength = Units.inchesToMeters(43); //might not be the exact value, but we should leave it where it is because it is what we have already tuned to.
 
-  public static final double kMinBaseAngle = Units.degreesToRadians(46);
+  public static final double kMinBaseAngle = Units.degreesToRadians(48);
   public static final double kMinElbowAngle = Units.degreesToRadians(22);
   public static final double kMaxBaseAngle = Units.degreesToRadians(90);
   public static final double kMaxElbowAngle = Units.degreesToRadians(170);
