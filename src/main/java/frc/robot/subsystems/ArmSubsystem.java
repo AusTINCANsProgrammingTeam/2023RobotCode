@@ -493,11 +493,11 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public Pose3d getBasePose3D() {
-    return new Pose3d(0, 0, 0, getBaseRotation3d());
+    return new Pose3d(-0.3175, -156197, 0.582218, getBaseRotation3d());
   }
 
   public Pose3d getElbowPose3d() {
-    return new Pose3d(getArmX(), getArmY(), 0, getElbowRotation3d());
+    return new Pose3d(-0.307975, getArmY()-0.94113, getArmX()-0.0426184, getElbowRotation3d());
   }
 
   public Command stowArmParallel() {
@@ -555,6 +555,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     Logger.getInstance().recordOutput("Base Arm Pose3D", getBasePose3D());
     Logger.getInstance().recordOutput("Elbow Arm Pose3D", getElbowPose3d());
+    Logger.getInstance().recordOutput("Base Arm Pose3D (NEW)", getBasePose3D());
+    Logger.getInstance().recordOutput("Elbow Arm Pose3D (NEW)", getElbowPose3d());
   }
 
   @Override
