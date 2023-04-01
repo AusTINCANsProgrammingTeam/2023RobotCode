@@ -117,6 +117,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
   public void hold() {
     spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
+
   }
 
   @Override

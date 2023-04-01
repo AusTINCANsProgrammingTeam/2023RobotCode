@@ -39,7 +39,7 @@ public class ToFIntakeCommand extends CommandBase {
 
       case CONE:
         // If we're about to shoot, make sure not to stay running intake normally
-        if (armSubsystem.getArmState().equals(ArmState.HIGHDROP)) {
+        if (armSubsystem.getArmState().equals(ArmState.HIGHDROPB) || armSubsystem.getArmState().equals(ArmState.HIGHDROPC)) {
           tofState = FlightStates.CONE_SCORE;
         } else {
           intakeSubsystem.setConeMode();
