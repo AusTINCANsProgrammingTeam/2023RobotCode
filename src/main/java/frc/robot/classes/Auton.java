@@ -99,6 +99,8 @@ public class Auton{
         actions.put("armConeIntake", armSubsystem.transitionToState(ArmState.CONEINTAKE));
         actions.put("armCubeIntake", armSubsystem.transitionToState(ArmState.CUBEINTAKE));
         actions.put("cubePullTransition", intakeSubsystem.pullTimed(1.5, false).andThen(highTransitionSequenceCube()));
+        actions.put("cubePullIntake", intakeSubsystem.pullTimed(1.5, false).andThen(armSubsystem.transitionToState(ArmState.CUBEINTAKE)));
+        actions.put("cubeScore", scoreSequenceCube());
         actions.put("conePull", intakeSubsystem.pullTimed(1.5, true).andThen(armSubsystem.goToState(ArmState.STOWED)));
         actions.put("conePullTransition", intakeSubsystem.pullTimed(1.5, true).andThen(highTransitionSequenceCone()));
     }
@@ -166,7 +168,7 @@ public class Auton{
         );
     }
 
-    private Command midScoreSequenceCube() {
+    private Command scoreSequenceCube() {
         return new SequentialCommandGroup(
         new InstantCommand(intakeSubsystem::setCubeMode),
         intakeSubsystem.pushTimed(1, false)
@@ -370,8 +372,7 @@ public class Auton{
                             getTrajectory("2ScoreCube-1").getMarkers(),
                             actions
                         ),
-                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.3),
-                        midScoreSequenceCube()
+                        scoreSequenceCube()
                     );
             case TWOSCORE6:
                 return
@@ -407,13 +408,20 @@ public class Auton{
             case THREESCORE1:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("3Score1-1"),
-                        highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("3Score1-1", getTrajectory("3Score1-1"))
-                        .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.followTrajectory("3Score2-1", getTrajectory("3Score2-1")),
-                        swerveSubsystem.followTrajectory("3Score3-1", getTrajectory("3Score3-1")),
-                        swerveSubsystem.followTrajectory("3Score4-1", getTrajectory("3Score4-1"))
+                        resetOdometry("3ScoreCube1-1"),
+                        cubeapultSubsystem.launch(),
+                        new FollowPathWithEvents(
+                            swerveSubsystem.followTrajectory("3ScoreCube1-1", getTrajectory("3ScoreCube1-1")), 
+                            getTrajectory("3ScoreCube1-1").getMarkers(),
+                            actions
+                        ),
+                        scoreSequenceCube(),
+                        new FollowPathWithEvents(
+                            swerveSubsystem.followTrajectory("3ScoreCube2-1", getTrajectory("3ScoreCube2-1")), 
+                            getTrajectory("3ScoreCube2-1").getMarkers(),
+                            actions
+                        ),
+                        scoreSequenceCube()
                     );
             case THREESCORE6:
                 return
