@@ -98,6 +98,7 @@ public class Auton{
         actions = new HashMap<>();
         actions.put("armConeIntake", armSubsystem.transitionToState(ArmState.CONEINTAKE));
         actions.put("conePull", intakeSubsystem.pullTimed(1.5, true).andThen(armSubsystem.goToState(ArmState.STOWED)));
+        actions.put("conePullTransition", intakeSubsystem.pullTimed(1.5, true).andThen(highTransitionSequenceCone()));
     }
 
     private PathPlannerTrajectory getTrajectory(String name) throws NullPointerException{
@@ -341,15 +342,14 @@ public class Auton{
             case TWOSCORE1:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("2Score1-1"),
-                        highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("2Score1-1", getTrajectory("2Score1-1"))
-                        .alongWith(armSubsystem.goToStateDelay(ArmState.CUBEINTAKE)),
-                        swerveSubsystem.followTrajectory("2Score2-1", getTrajectory("2Score2-1"))
-                        .alongWith(intakeSubsystem.pullTimed(1, false)
-                            .andThen(armSubsystem.goToStateDelay(ArmState.STOWED))
+                        resetOdometry("2Score-1"),
+                        cubeapultSubsystem.launch(),
+                        new FollowPathWithEvents(
+                            swerveSubsystem.followTrajectory("2Score-1", getTrajectory("2Score-1")), 
+                            getTrajectory("2Score-1").getMarkers(),
+                            actions
                         ),
-                        highScoreSequenceCube()
+                        highScoreSequenceCone()
                     );
             case TWOSCORE6:
                 return
