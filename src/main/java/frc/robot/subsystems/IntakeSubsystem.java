@@ -34,23 +34,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kCubeIntakeSpeed = 0.55;
   public static final double kCubeOuttakeSpeed = -0.3;
 
-  private final double kConeHoldSpeed = 0.35; // change after testing
-  private final double kCubeHoldSpeed = 0.25; // change after testing
-
-  private TimeOfFlightSensor timeOfFlightSensor;
-
   private final double mmConeActivationThreshold = 450.0; 
   private final double mmCubeActivationThreshold = 450.0; 
   private FlightStates tofState = FlightStates.IDLE;
 
-  private final double kConeHoldSpeed = 0.35; // change after testing
-  private final double kCubeHoldSpeed = 0.25; // change after testing
-
   private TimeOfFlightSensor timeOfFlightSensor;
-
-  private final double mmConeActivationThreshold = 450.0; 
-  private final double mmCubeActivationThreshold = 450.0; 
-  private FlightStates tofState = FlightStates.IDLE;
 
   private CANSparkMax motor;
   private CANSparkMax motor2;
