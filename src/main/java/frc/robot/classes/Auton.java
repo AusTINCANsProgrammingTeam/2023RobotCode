@@ -80,7 +80,7 @@ public class Auton{
 
     private AutonModes autonMode;
     private Command autonCommand;
-    private Trigger modeTrigger = new Trigger(() -> (modeChooser.getSelected() != autonMode)).onTrue(new InstantCommand(() -> {autonCommand = getAutonSequence();}));
+    private Trigger modeTrigger;
 
     private HashMap<String, Command> actions;
 
@@ -107,6 +107,9 @@ public class Auton{
         actions.put("cubeScore", scoreSequenceCube());
         actions.put("conePull", intakeSubsystem.pullTimed(1.5, true).andThen(armSubsystem.goToState(ArmState.STOWED)));
         actions.put("conePullTransition", intakeSubsystem.pullTimed(1.5, true).andThen(highTransitionSequenceCone()));
+
+        autonCommand = getAutonSequence();
+        configTab.add(new InstantCommand(() -> {autonCommand = getAutonSequence();}).beforeStarting(new WaitCommand(1)).withName("Load Auton").ignoringDisable(true));
     }
 
     private PathPlannerTrajectory getTrajectory(String name) throws NullPointerException{
@@ -512,6 +515,7 @@ public class Auton{
     }
 
     public Command getAutonCommand(){
+        SmartDashboard.putString("auton", autonMode.toString());
         return autonCommand.beforeStarting(delay(delayEntry.getDouble(0.0))).andThen(getAutonEnd());
     }
 }
