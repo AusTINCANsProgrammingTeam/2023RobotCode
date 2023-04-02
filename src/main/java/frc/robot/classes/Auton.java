@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CubeapultSubsystem;
 import frc.robot.subsystems.ArmSubsystem.ArmState;
@@ -78,6 +79,9 @@ public class Auton{
     private PathConstraints pathConstraints;
 
     private AutonModes autonMode;
+    private Command autonCommand;
+    private Trigger modeTrigger = new Trigger(() -> (modeChooser.getSelected() != autonMode)).onTrue(new InstantCommand(() -> {autonCommand = getAutonSequence();}));
+
     private HashMap<String, Command> actions;
 
     public Auton(SwerveSubsystem swerveSubsystem, ArmSubsystem armSubsystem, IntakeSubsystem intakeSubsystem, CubeapultSubsystem cubeapultSubsystem){
@@ -500,6 +504,6 @@ public class Auton{
     }
 
     public Command getAutonCommand(){
-        return getAutonSequence().beforeStarting(delay(delayEntry.getDouble(0.0))).andThen(getAutonEnd());
+        return autonCommand.beforeStarting(delay(delayEntry.getDouble(0.0))).andThen(getAutonEnd());
     }
 }
