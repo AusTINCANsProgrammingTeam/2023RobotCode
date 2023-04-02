@@ -35,7 +35,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.classes.DebugLog;
-import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.classes.TunableNumber;
 import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig; 
@@ -130,7 +129,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public static final double kMaxElbowVoltage = 12;
 
-  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(300), Units.degreesToRadians(300));
+  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(133), Units.degreesToRadians(133));
   public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(300), Units.degreesToRadians(300));
 
   public static final double kBaseGearing = 40.8333333;
@@ -561,8 +560,6 @@ public class ArmSubsystem extends SubsystemBase {
 
     actualXPositionLog.log(armXPosition);
     actualYPositionLog.log(armYPosition);
-    SmartDashboard.putNumber("Inverse Elbow", Units.radiansToDegrees(convertToElbowAngle(armXPosition, armYPosition)));
-    SmartDashboard.putNumber("Inverse Base", Units.radiansToDegrees(convertToBaseAngle(armXPosition, armYPosition)));
   }
 
   @Override
