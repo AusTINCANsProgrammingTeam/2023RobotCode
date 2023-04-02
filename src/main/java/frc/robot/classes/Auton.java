@@ -127,7 +127,7 @@ public class Auton{
         return new SequentialCommandGroup(
         new InstantCommand(intakeSubsystem::setConeMode),
         new ParallelDeadlineGroup(
-            armSubsystem.goToState(ArmState.HIGHSCORE),
+            armSubsystem.goToState(ArmState.HIGHSCORECONE),
             new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem)
         ),
         new WaitCommand(1).deadlineWith(new RepeatCommand(new InstantCommand(armSubsystem::updateMotors))),

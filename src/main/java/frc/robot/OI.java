@@ -70,8 +70,8 @@ public class OI {
         private static final int kRotationAxis = 2;
 
         //TODO: Tune curves to driver preference
-        private static final ControlCurve kXTranslationCurve = new ControlCurve(0.85,0.05,0.85,0.1);
-        private static final ControlCurve kYTranslationCurve = new ControlCurve(0.85,0.05,0.85,0.1);
+        private static final ControlCurve kXTranslationCurve = new ControlCurve(1,0.05,0.85,0.1);
+        private static final ControlCurve kYTranslationCurve = new ControlCurve(1,0.05,0.85,0.1);
         private static final ControlCurve kRotationCurve = new ControlCurve(0.8,0,1,0.1);
 
         public static Supplier<Double> getXTranslationSupplier(){
@@ -187,7 +187,8 @@ public class OI {
         private static final Button kUpBuddyBalanceButton = Button.POVUP; // Raises buddy balance lift
         private static final Button kConeSignalButton = Button.Y;
         private static final Button kCubeSignalButton = Button.X;
-        private static final Button kHighScoreButton = Button.RB; // Sets arm state to highscore
+        private static final Button kHighScoreButtonCube = Button.RB; // Sets arm state to highscore with cubes
+        private static final Button kHighScoreButtonCone = Button.RT; // Sets arm state to highscore with cones
         private static final Button kIntakeButton = Button.LB; // Toggles intake mode between cone and cube
         private static final Button kArmStopButton = Button.A; // Cancels current arm command
 
@@ -233,9 +234,14 @@ public class OI {
             return new JoystickButton(kJoystick, kCubeSignalButton.getButtonID());
         }
 
-        public static JoystickButton getHighScoreButton() {
-            kHighScoreButton.setButtonAction("High Score");
-            return new JoystickButton(kJoystick, kHighScoreButton.getButtonID());
+        public static JoystickButton getHighScoreCubeButton() {
+            kHighScoreButtonCube.setButtonAction("High Score (Cube)");
+            return new JoystickButton(kJoystick, kHighScoreButtonCube.getButtonID());
+        }
+
+        public static JoystickButton getHighScoreConeButton() {
+            kHighScoreButtonCone.setButtonAction("High Score (Cone)");
+            return new JoystickButton(kJoystick, kHighScoreButtonCone.getButtonID());
         }
 
         public static JoystickButton getIntakeButton(){

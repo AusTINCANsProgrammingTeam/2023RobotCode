@@ -57,14 +57,13 @@ public class RobotContainer {
   private BlinkinLedSubsystem blinkinLedSubsystem;
   
   private Auton auton;
-  private TimeOfFlightSensor timeOfFlightSensor;
+  private TimeOfFlightSensor timeOfFlightSensor = Robot.tofEnabled ? new TimeOfFlightSensor() : null;
+
 
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    armSubsystem = Robot.armEnabled ? new ArmSubsystem() : null;
-    subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
 
     ledSubsystem = Robot.ledSubSelect == LedEnum.STRIP ? new LedStripSubsystem() : null;
     subsystemEnabledLog.append(ledSubsystem == null ? "Led: Disabled" : "Led: Enabled");
@@ -80,18 +79,16 @@ public class RobotContainer {
 
     simulationSubsystem = Robot.isSimulation() && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
     subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
-
-    if (Robot.intakeEnabled) {
-      if (Robot.tofEnabled) {
-        timeOfFlightSensor = new TimeOfFlightSensor();
-        intakeSubsystem = new IntakeSubsystem(timeOfFlightSensor);
-      } else {
-        intakeSubsystem = new IntakeSubsystem();
-      }
+    
+    if (Robot.intakeEnabled && Robot.tofEnabled) {
+      intakeSubsystem = new IntakeSubsystem(timeOfFlightSensor);
+      armSubsystem = Robot.armEnabled ? new ArmSubsystem(intakeSubsystem) : null;
     } else {
-      intakeSubsystem = null;
+      intakeSubsystem = Robot.intakeEnabled ? new IntakeSubsystem() : null;
+      armSubsystem = Robot.armEnabled ? new ArmSubsystem() : null;
     }
-
+    
+    subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
     subsystemEnabledLog.append(intakeSubsystem == null ? "Intake: Disabled" : "Intake: Enabled");
 
     cameraSubsystem = Robot.cameraEnabled ? new CameraSubsystem() : null;
@@ -162,11 +159,10 @@ public class RobotContainer {
       if (Robot.intakeEnabled){
         OI.Driver.getArmConeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleConeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setConeMode())));
         OI.Driver.getArmCubeIntakeButton().onTrue(new ProxyCommand(() -> armSubsystem.handleCubeIntakeButton()).alongWith(new InstantCommand(() -> intakeSubsystem.setCubeMode())));
-        if (Robot.tofEnabled) {
-          intakeSubsystem.setDefaultCommand(new ToFIntakeCommand(intakeSubsystem, armSubsystem));
-        }
+
       }
-      OI.Operator.getHighScoreButton().onTrue(armSubsystem.goToState(ArmState.HIGHSCORE));
+      OI.Operator.getHighScoreCubeButton().onTrue(armSubsystem.goToState(ArmState.HIGHSCORECUBE));
+      OI.Operator.getHighScoreConeButton().onTrue(armSubsystem.goToState(ArmState.HIGHSCORECONE));
     }
 
     if (Robot.buddyBalanceEnabled) {
