@@ -322,9 +322,9 @@ public class SwerveSubsystem extends SubsystemBase{
         headingEntry.setDouble(getHeading());
         positionEntry.setString(getPose().getTranslation().toString());
         Logger.getInstance().recordOutput("Actual Module States", getModuleStates());
-        Logger.getInstance().recordOutput("Pose 2D", getPose());
-        //SmartDashboard.putData("Pose 3D", getPose3d());
+        //Logger.getInstance().recordOutput("Pose 2D", getPose());
+        //SmartDashboard.putData(getPose3d());
         Logger.getInstance().recordOutput("Pose 3D", getPose3d());
-        quaternion = new Quaternion(gyro.getQuaternionW(), gyro.getQuaternionX(), gyro.getQuaternionY(), gyro.getQuaternionZ());
+        quaternion = new Quaternion(gyro.getQuaternionW(), getPose().getX(), getPose().getY(), gyro.getQuaternionZ());
     }
 }
