@@ -99,7 +99,7 @@ public class Auton{
         actions.put("armConeIntake", armSubsystem.transitionToState(ArmState.CONEINTAKE));
         actions.put("armCubeIntake", armSubsystem.transitionToState(ArmState.CUBEINTAKE));
         actions.put("cubePullTransition", intakeSubsystem.pullTimed(1.5, false).andThen(highTransitionSequenceCube()));
-        actions.put("cubePullIntake", intakeSubsystem.pullTimed(1.5, false).andThen(armSubsystem.transitionToState(ArmState.CUBEINTAKE)));
+        actions.put("cubePullIntake", intakeSubsystem.pullTimed(1.5, false).andThen(armSubsystem.transitionToState(ArmState.STOWED)));
         actions.put("cubeScore", scoreSequenceCube());
         actions.put("conePull", intakeSubsystem.pullTimed(1.5, true).andThen(armSubsystem.goToState(ArmState.STOWED)));
         actions.put("conePullTransition", intakeSubsystem.pullTimed(1.5, true).andThen(highTransitionSequenceCone()));
@@ -171,7 +171,7 @@ public class Auton{
     private Command scoreSequenceCube() {
         return new SequentialCommandGroup(
         new InstantCommand(intakeSubsystem::setCubeMode),
-        intakeSubsystem.pushTimed(1, false)
+        intakeSubsystem.pushTimed(0.25, false)
         );
     }
 
@@ -416,6 +416,7 @@ public class Auton{
                             actions
                         ),
                         scoreSequenceCube(),
+                        resetOdometry("3ScoreCube2-1"),
                         new FollowPathWithEvents(
                             swerveSubsystem.followTrajectory("3ScoreCube2-1", getTrajectory("3ScoreCube2-1")), 
                             getTrajectory("3ScoreCube2-1").getMarkers(),

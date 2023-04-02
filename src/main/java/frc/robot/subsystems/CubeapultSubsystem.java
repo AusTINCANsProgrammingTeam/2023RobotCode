@@ -59,7 +59,7 @@ public class CubeapultSubsystem extends SubsystemBase {
   public Command launch() {
     return new SequentialCommandGroup(
       new InstantCommand(this::extend, this),
-      new WaitCommand(0.5),
+      new WaitCommand(0.1),
       new InstantCommand(this::retract, this)
     ).withName("Launch");
   }
