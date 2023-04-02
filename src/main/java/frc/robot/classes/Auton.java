@@ -171,7 +171,7 @@ public class Auton{
     private Command scoreSequenceCube() {
         return new SequentialCommandGroup(
         new InstantCommand(intakeSubsystem::setCubeMode),
-        intakeSubsystem.pushTimed(0.25, false)
+        intakeSubsystem.pushTimed(0.5, false)
         );
     }
 
@@ -421,8 +421,7 @@ public class Auton{
                             swerveSubsystem.followTrajectory("3ScoreCube2-1", getTrajectory("3ScoreCube2-1")), 
                             getTrajectory("3ScoreCube2-1").getMarkers(),
                             actions
-                        ),
-                        scoreSequenceCube()
+                        )
                     );
             case THREESCORE6:
                 return

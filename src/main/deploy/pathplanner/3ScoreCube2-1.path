@@ -25,15 +25,15 @@
     {
       "anchorPoint": {
         "x": 4.0,
-        "y": 4.85
+        "y": 4.75
       },
       "prevControl": {
         "x": 3.022527177121546,
-        "y": 4.85
+        "y": 4.75
       },
       "nextControl": {
         "x": 5.747020840089503,
-        "y": 4.85
+        "y": 4.75
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -181,6 +181,12 @@
       "position": 1.85,
       "names": [
         "cubePullIntake"
+      ]
+    },
+    {
+      "position": 5.0,
+      "names": [
+        "cubeScore"
       ]
     }
   ]
