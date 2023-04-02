@@ -34,14 +34,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public static final double kCubeIntakeSpeed = 0.55;
   public static final double kCubeOuttakeSpeed = -0.3;
 
-  private final double kConeHoldSpeed = 0.35; // change after testing
-  private final double kCubeHoldSpeed = 0.25; // change after testing
-
-  private TimeOfFlightSensor timeOfFlightSensor;
-
   private final double mmConeActivationThreshold = 450.0; 
   private final double mmCubeActivationThreshold = 450.0; 
   private FlightStates tofState = FlightStates.IDLE;
+
+  private TimeOfFlightSensor timeOfFlightSensor;
 
   private CANSparkMax motor;
   private CANSparkMax motor2;
@@ -113,16 +110,17 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     spinWheels(0);
   }
 
-  public void hold() {
-    spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
+  public Command pullTimed(double seconds, boolean coneMode){
+    return new StartEndCommand(this::pull, this::stop, this).withTimeout(seconds).beforeStarting(coneMode ? this::setConeMode : this::setCubeMode);
   }
   
-  public Command pullTimed(double seconds, boolean isConeMode){
-    return new StartEndCommand(this::pull, this::stop, this).withTimeout(seconds).beforeStarting(isConeMode ? this::setConeMode : this::setCubeMode);
+  public Command pushTimed(double seconds, boolean coneMode){
+    return new StartEndCommand(this::push, this::stop, this).withTimeout(seconds).beforeStarting(coneMode ? this::setConeMode : this::setCubeMode);
   }
 
-  public Command pushTimed(double seconds, boolean isConeMode){
-    return new StartEndCommand(this::push, this::stop, this).withTimeout(seconds).beforeStarting(isConeMode ? this::setConeMode : this::setCubeMode);
+  public void hold() {
+    spinWheels(isConeMode ? kConeIntakeSpeed : kCubeIntakeSpeed);
+
   }
 
   @Override
@@ -159,26 +157,25 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
       case IDLE:
         if (coneSensorUp && coneDistance <= mmConeActivationThreshold) {
           tofState = FlightStates.CONE;
-          break;
         } else if (cubeSensorUp && cubeDistance <= mmCubeActivationThreshold) {
           tofState = FlightStates.CUBE;
-          break;
         }
+        break;
       case CONE:
         if (coneSensorUp && coneDistance > mmConeActivationThreshold) {
           tofState = FlightStates.IDLE;
-          break;
         }
+        break;
       case CUBE:
         if (cubeSensorUp && cubeDistance > mmCubeActivationThreshold) {
           tofState = FlightStates.IDLE;
-          break;
         }
+        break;
       case CONE_SCORE:
         if (coneSensorUp && coneDistance > mmConeActivationThreshold) {
           tofState = FlightStates.IDLE;
-          break;
         }
+        break;
     }
   }
 

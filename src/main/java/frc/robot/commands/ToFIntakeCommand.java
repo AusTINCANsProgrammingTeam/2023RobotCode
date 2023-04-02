@@ -44,8 +44,8 @@ public class ToFIntakeCommand extends CommandBase {
         } else {
           intakeSubsystem.setConeMode();
           intakeSubsystem.hold();
-          break;
         }
+        break;
 
       case CUBE:
         intakeSubsystem.setCubeMode();
