@@ -59,10 +59,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private DebugLog<Boolean> hasCubeLog = new DebugLog<Boolean>(false, "Has Cube", this);
 
   private boolean isConeMode;
+  private boolean cubeOverride;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     isConeMode = true;
+    cubeOverride = false;
 
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
     motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
@@ -99,10 +101,14 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     isConeMode = !isConeMode;
   }
 
+  public void setCubeOverride(boolean cubeOverride){
+    this.cubeOverride = cubeOverride;
+  }
+
   public boolean hasCube() {
     int cubeDistance = timeOfFlightSensor.getDistance1();
     boolean cubeSensorUp = cubeDistance != -1;
-    return cubeDistance <= mmCubeActivationThreshold && cubeSensorUp;
+    return cubeOverride || (cubeDistance <= mmCubeActivationThreshold && cubeSensorUp);
   }
   
   public double getSpeed(){
