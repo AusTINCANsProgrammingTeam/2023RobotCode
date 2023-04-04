@@ -2,40 +2,15 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.9,
-        "y": 4.552
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 2.53996256559825,
-        "y": 5.19196256559825
-      },
-      "holonomicAngle": 0.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
         "x": 5.9,
         "y": 4.6
       },
-      "prevControl": {
-        "x": 5.342463300362177,
-        "y": 4.6
-      },
+      "prevControl": null,
       "nextControl": {
-        "x": 6.457536699637823,
+        "x": 6.0858260927408745,
         "y": 4.6
       },
-      "holonomicAngle": 0.0,
+      "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -50,17 +25,17 @@
     {
       "anchorPoint": {
         "x": 6.5,
-        "y": 4.6
+        "y": 4.601924759405074
       },
       "prevControl": {
-        "x": 6.376989416334121,
-        "y": 4.6
+        "x": 6.385238780521644,
+        "y": 4.601924759405074
       },
       "nextControl": {
-        "x": 6.623010583665879,
-        "y": 4.6
+        "x": 6.56946008807385,
+        "y": 4.601924759405074
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -78,14 +53,14 @@
         "y": 3.25
       },
       "prevControl": {
-        "x": 6.612921026944999,
+        "x": 6.666388448072246,
         "y": 3.25
       },
       "nextControl": {
-        "x": 4.587078973055,
+        "x": 4.533611551927752,
         "y": 3.25
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -103,11 +78,11 @@
         "y": 3.25
       },
       "prevControl": {
-        "x": 4.458500280701822,
+        "x": 4.513488298264547,
         "y": 3.25
       },
       "nextControl": null,
-      "holonomicAngle": 0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -120,18 +95,5 @@
       }
     }
   ],
-  "markers": [
-    {
-      "position": 1.0,
-      "names": [
-        "conePull"
-      ]
-    },
-    {
-      "position": 0.0,
-      "names": [
-        "armConeIntake"
-      ]
-    }
-  ]
+  "markers": []
 }

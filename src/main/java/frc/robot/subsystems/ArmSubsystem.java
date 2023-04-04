@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.classes.DebugLog;
+import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.classes.TunableNumber;
 import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig; 
@@ -55,7 +56,7 @@ public class ArmSubsystem extends SubsystemBase {
     HIGHTRANSITIONAUTON(1.0743,0.9349), //High transition state used in auton to avoid getting stuck
     HIGHDROPB(1.7783, 1.0252),
     HIGHDROPC(1.4433, 0.9266), //High scoring motion
-    TRANSITION(0.7124, 0.1644); //Used to transition to any state from stowed position
+    TRANSITION(0.7124, 0.1644);//Used to transition to any state from stowed position
 
     private double x; //Position relative to the base of the arm, in meters
     private double y; //Position above the carpet, in meters
@@ -82,12 +83,12 @@ public class ArmSubsystem extends SubsystemBase {
   private double kBaseI = 0.35;
   private double kBaseD = 0;
   //Elbow arm PID values
-  private double kElbowUpP = 4.5;
-  private double kElbowUpI = 0.5;
+  private double kElbowUpP = 4;
+  private double kElbowUpI = 1;
   private double kElbowUpD = 0;
 
-  private double kElbowDownP = 4.5;
-  private double kElbowDownI = 0.5;
+  private double kElbowDownP = 4;
+  private double kElbowDownI = 1;
   private double kElbowDownD = 0;
 
   private double kElbowS = 0;
@@ -129,8 +130,8 @@ public class ArmSubsystem extends SubsystemBase {
 
   public static final double kMaxElbowVoltage = 12;
 
-  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(133), Units.degreesToRadians(133));
-  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(300), Units.degreesToRadians(300));
+  public static final Constraints kBaseConstraints = new Constraints(Units.degreesToRadians(150), Units.degreesToRadians(150));
+  public static final Constraints kElbowConstraints = new Constraints(Units.degreesToRadians(337.5), Units.degreesToRadians(337.5));
 
   public static final double kBaseGearing = 40.8333333;
   public static final double kElbowGearing = 4.28571429;
@@ -396,7 +397,7 @@ public class ArmSubsystem extends SubsystemBase {
     //Command for autonomous, obstructs routine until arm is at setpoint
     return new FunctionalCommand(
                 () -> setState(state), //Init
-                this::updateMotors, //Execute
+                () -> {}, //Execute
                 (b)->{}, //End 
                 this::atSetpoint, //isFinished
                 this
@@ -545,6 +546,8 @@ public class ArmSubsystem extends SubsystemBase {
       basePIDController.reset(getBaseAngle());
       elbowPIDController.reset(getElbowAngle());
     }
+
+    updateMotors();
 
     rolloverLog.log(getChooChooAngle() > kMinChooChooAngle && getChooChooAngle() < kMaxChooChooAngle);
 

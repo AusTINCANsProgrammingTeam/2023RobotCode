@@ -149,8 +149,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     sensor1Up.setBoolean(cubeSensorUp);
 
     // Log if sensors are activated
-    hasConeLog.log(coneDistance > 0 && coneDistance <=mmConeActivationThreshold);
-    hasCubeLog.log(cubeDistance > 0 && cubeDistance <=mmCubeActivationThreshold);
+    hasConeLog.log(coneDistance <= mmConeActivationThreshold && coneSensorUp);
+    hasCubeLog.log(cubeDistance <= mmCubeActivationThreshold && cubeSensorUp);
 
     // Change state (only if sensors are online)
     switch(tofState) {

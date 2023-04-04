@@ -160,7 +160,7 @@ public class TimeOfFlightSensor implements AutoCloseable {
       threadLock.unlock();
     }
   }
-
+  
   public boolean isSensor1Connected() {
     try {
       threadLock.lock();
