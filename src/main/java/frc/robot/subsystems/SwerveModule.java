@@ -206,15 +206,18 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public void coast() {
-        int errorCode = driveMotor.setIdleMode(IdleMode.kCoast).value;
-        errorCode += turningMotor.setIdleMode(IdleMode.kCoast).value;
-
+        errorCode = driveMotor.setIdleMode(IdleMode.kCoast).value;
+        if(errorCode != 0){DriverStation.reportError("An Error has occurred in SwerveModule.coast() at module" + ID + "  Code:" + REVLibError.fromInt(errorCode).toString(), null);}
+        
+        errorCode = turningMotor.setIdleMode(IdleMode.kCoast).value;
         if(errorCode != 0){DriverStation.reportError("An Error has occurred in SwerveModule.coast() at module" + ID + "  Code:" + REVLibError.fromInt(errorCode).toString(), null);}
     }
 
     public void brake() {
-        int errorCode = driveMotor.setIdleMode(IdleMode.kBrake).value;
-        errorCode += turningMotor.setIdleMode(IdleMode.kBrake).value;
+        errorCode = driveMotor.setIdleMode(IdleMode.kBrake).value;
+        if(errorCode != 0){DriverStation.reportError("An Error has occurred inn SwerveModule.brake() at module" + ID + "  with .setIdleMode()", null);}
+        
+        errorCode = turningMotor.setIdleMode(IdleMode.kBrake).value;
         if(errorCode != 0){DriverStation.reportError("An Error has occurred inn SwerveModule.brake() at module" + ID + "  with .setIdleMode()", null);}
     }
 
