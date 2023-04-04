@@ -76,6 +76,8 @@ public class ArmSubsystem extends SubsystemBase {
   private final ArmState kDefaultState = ArmState.STOWED;
   private ArmState currentState;
 
+  //Offset checker boolean
+  private boolean anglesChecked = false;
   //Base arm PID values
   private double kBaseP = 1;
   private double kBaseI = 0.35;
@@ -384,7 +386,8 @@ public class ArmSubsystem extends SubsystemBase {
     setElbowReference(getElbowAngle());
   }
 
-  public void checkAngles() {
+  //This checks the offsets of the arms' encoders to see if they are within expected values
+  private void checkAngles() {
     if(getBaseAngle() > kMaxBaseAngle || 
     getBaseAngle() < kMinBaseAngle || 
     getChooChooAngle() > kMaxChooChooAngle ||
@@ -392,13 +395,20 @@ public class ArmSubsystem extends SubsystemBase {
     getElbowAngle() > kMaxElbowAngle ||
     getElbowAngle() < kMinElbowAngle) {
       if(DriverStation.isDisabled()) {
+        //If the robot is determined to have incorrect offsets and is disabled, a warning message is sent
         DriverStation.reportError("Encoders read outside of possible positions, check your offsets!", true);
       } else {
+        //If the robot has incorrect offsets and is enabled, we crash the robot, as that is preferrable to it breaking the arm
+        //There are two crash attempts to be safe: one is a null pointer exception, the other just closes the whole system
         String evilString = null;
         evilString.toString();
         System.exit(0);
       }
-      
+    }
+    else {
+      if(DriverStation.isEnabled()) {
+        anglesChecked = true;
+      }
     }
   }
   
@@ -543,7 +553,7 @@ public class ArmSubsystem extends SubsystemBase {
       basePIDController.reset(getBaseAngle());
       elbowPIDController.reset(getElbowAngle());
     }
-    if(Robot.offsetsFixed && !Robot.isCompetition) {
+    if(Robot.offsetsFixed && !Robot.isCompetition && !anglesChecked) {
       checkAngles();
     }
 
