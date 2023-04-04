@@ -14,7 +14,7 @@ import frc.robot.Robot;
 
 public class DebugLog<T> {
     private static DataLog datalog = DataLogManager.getLog();
-    private static HashMap<Integer,String> entrys = new HashMap<Integer,String>();
+    private static HashMap<String,GenericEntry> entries = new HashMap<String,GenericEntry>();
 
     private ShuffleboardTab networkTab;
     private GenericEntry networkEntry;
@@ -40,9 +40,12 @@ public class DebugLog<T> {
             if(!Robot.isCompetition){
                 networkTab = Shuffleboard.getTab(subsystem.getName());
 
-                if (!entrys.containsValue(name)) {
+                if (!entries.containsKey(name)) {
                     networkEntry = networkTab.add(name, defaultValue).getEntry();
-                    entrys.put(entrys.size(), name);
+                    entries.put(name, networkEntry);
+                } else {
+                    networkEntry = entries.get(name);
+                    DriverStation.reportWarning("Duplicate ShuffleboardEntry on " + networkTab.getTitle() + " tab: " + name, false);
                 }
             }
             localConsumer.accept(defaultValue);
@@ -52,9 +55,7 @@ public class DebugLog<T> {
     public void log(T newValue){
         try{
             if(!Robot.isCompetition){
-                if (networkEntry != null) {
-                    networkEntry.setValue(newValue);
-                }
+                networkEntry.setValue(newValue);
             }
             localConsumer.accept(newValue);
         } catch(NullPointerException e){
