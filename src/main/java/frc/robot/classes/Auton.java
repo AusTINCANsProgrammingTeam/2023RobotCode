@@ -28,7 +28,6 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CubeapultSubsystem;
 import frc.robot.subsystems.ArmSubsystem.ArmState;
@@ -79,8 +78,6 @@ public class Auton{
     private PathConstraints pathConstraints;
 
     private AutonModes autonMode;
-    private Command autonCommand;
-    private Trigger modeTrigger;
 
     private HashMap<String, Command> actions;
 
@@ -109,7 +106,7 @@ public class Auton{
         actions.put("conePullTransition", intakeSubsystem.pullTimed(1.5, true).andThen(highTransitionSequenceCone()));
 
         autonCommand = getAutonSequence();
-        configTab.add(new InstantCommand(() -> {autonCommand = getAutonSequence();}).beforeStarting(new WaitCommand(1)).withName("Load Auton").ignoringDisable(true));
+        configTab.add(new InstantCommand(() -> {autonCommand = getAutonSequence();}).beforeStarting(new WaitCommand(1)).withName("Load Auton").ignoringDisable(true)); //wait command is to show if the load auton command ran
     }
 
     private PathPlannerTrajectory getTrajectory(String name) throws NullPointerException{
