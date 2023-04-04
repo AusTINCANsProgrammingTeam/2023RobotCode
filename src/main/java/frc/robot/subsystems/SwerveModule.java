@@ -220,7 +220,6 @@ public class SwerveModule extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        int errorCode;
         simDriveMotor.setInputVoltage(driveMotor.get() * RobotController.getBatteryVoltage());
         simTurningMotor.setInputVoltage(turningMotor.get()  * RobotController.getBatteryVoltage());
 
