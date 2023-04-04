@@ -25,7 +25,6 @@ import frc.robot.subsystems.led.LedStripSubsystem;
 import frc.robot.subsystems.led.BlinkinLedSubsystem.BlinkinMode;
 import frc.robot.subsystems.led.LedMatrixSubsystem.MatrixMode;
 import frc.robot.subsystems.led.LedStripSubsystem.StripMode;
-import frc.robot.commands.ToFIntakeCommand;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -150,6 +149,7 @@ public class RobotContainer {
       OI.Driver.getIntakeButton().whileTrue(new StartEndCommand(intakeSubsystem::pull, intakeSubsystem::stop, intakeSubsystem).withName("Intake"));
       OI.Driver.getOuttakeButton().whileTrue(new StartEndCommand(intakeSubsystem::push, intakeSubsystem::stop, intakeSubsystem).withName("Outtake"));
       OI.Operator.getIntakeButton().onTrue(new InstantCommand(intakeSubsystem::toggleConeMode));
+      OI.Operator.getCubeSignalButton().whileTrue(new StartEndCommand(() -> intakeSubsystem.setCubeOverride(true), () -> intakeSubsystem.setCubeOverride(false), intakeSubsystem));
     }
 
     if (Robot.armEnabled) {
