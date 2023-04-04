@@ -144,17 +144,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     int coneDistance = timeOfFlightSensor.getDistance0();
     int cubeDistance = timeOfFlightSensor.getDistance1();
 
-    // Log distance values
-    coneDistLog.log((double)coneDistance);
-    cubeDistLog.log((double)cubeDistance);
-
-    // Check if sensors are online
     boolean coneSensorUp = coneDistance != -1;
     boolean cubeSensorUp = cubeDistance != -1;
 
-    // Log whether sensors are online
-    sensor0Up.setBoolean(coneSensorUp);
-    sensor1Up.setBoolean(cubeSensorUp);
+    
+
 
     // Log if sensors are activated
     hasConeLog.log(coneDistance <= mmConeActivationThreshold && coneSensorUp);
@@ -200,6 +194,21 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     // This method will be called once per scheduler run
     SmartDashboard.putData(this);
     intakeMode.setBoolean(isConeMode);
+
+    int coneDistance = timeOfFlightSensor.getDistance0();
+    int cubeDistance = timeOfFlightSensor.getDistance1();
+
+    // Log distance values
+    coneDistLog.log((double)coneDistance);
+    cubeDistLog.log((double)cubeDistance);
+
+    // Check if sensors are online
+    boolean coneSensorUp = coneDistance != -1;
+    boolean cubeSensorUp = cubeDistance != -1;
+
+    // Log whether sensors are online
+    sensor0Up.setBoolean(coneSensorUp);
+    sensor1Up.setBoolean(cubeSensorUp);
   }
 
   @Override
