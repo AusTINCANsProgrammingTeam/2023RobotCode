@@ -360,7 +360,7 @@ public class Auton{
                             getTrajectory("2Score-1").getMarkers(),
                             actions
                         ),
-                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.3),
+                        translateY(-0.1,0.3),
                         highScoreSequenceCone()
                     );
             case TWOSCORECUBE1:
@@ -373,7 +373,7 @@ public class Auton{
                             getTrajectory("2ScoreCube-1").getMarkers(),
                             actions
                         ),
-                        new StartEndCommand(() -> swerveSubsystem.setModuleStates(swerveSubsystem.convertToModuleStates(0, -0.1, 0)), () -> swerveSubsystem.stopModules()).withTimeout(0.3),
+                        translateY(-0.1,0.3),
                         midScoreSequenceCube()
                     );
             case TWOSCORE6:

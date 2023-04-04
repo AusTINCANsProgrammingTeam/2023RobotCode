@@ -547,11 +547,11 @@ public class ArmSubsystem extends SubsystemBase {
   public Rotation3d getElbowRotation3d() {
     return new Rotation3d(getElbowAngle(), 0, 0);
   }
-
+  // Ofsets from the cad model for the 3Dpose of the base
   public Pose3d getBasePose3D() {
     return new Pose3d(0.008083, -0.173961, 0.20541, getBaseRotation3d());
   }
-
+  // Ofsets from the cad model for the 3Dpose of the elbow
   public Pose3d getElbowPose3d() {
     return new Pose3d(getArmX(), getArmY(), -0.042619, getElbowRotation3d());
   }
