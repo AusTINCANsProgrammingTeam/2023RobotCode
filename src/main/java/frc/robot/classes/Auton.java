@@ -54,7 +54,7 @@ public class Auton{
         //Score preload then score another game piece
         TWOSCORE1, TWOSCORECUBE1, TWOSCORE6,
         //Score preload, score another game piece, then balance
-        TWOSCORECHARGE1, TWOSCORECHARGE6,
+        TWOSCORECUBECHARGE1, TWOSCORECHARGE1, TWOSCORECHARGE6,
         //Score preload, score another game piece, intake another game piece, then balance
         TWOSCORELOADCHARGE1, TWOSCORELOADCHARGE6,
         //Score preload, then score two other game pieces
@@ -389,6 +389,21 @@ public class Auton{
                         swerveSubsystem.followTrajectory("2Score1-6", getTrajectory("2Score1-6"))
                         .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
                         swerveSubsystem.followTrajectory("2Score2-6", getTrajectory("2Score2-6"))
+                    );
+            case TWOSCORECUBECHARGE1:
+                return
+                    new SequentialCommandGroup(
+                        resetOdometry("2ScoreCube-1"),
+                        cubeapultSubsystem.launch(),
+                        new FollowPathWithEvents(
+                            swerveSubsystem.followTrajectory("2ScoreCube-1", getTrajectory("2ScoreCube-1")), 
+                            getTrajectory("2ScoreCube-1").getMarkers(),
+                            actions
+                        ),
+                        scoreSequenceCube(),
+                        swerveSubsystem.followTrajectory("2ScoreCubeCharge-1", getTrajectory("2ScoreCubeCharge-1"))
+                        .alongWith(armSubsystem.goToState(ArmState.STOWED)),
+                        swerveSubsystem.assistedBalance(true)
                     );
             case TWOSCORECHARGE1:
                 return
