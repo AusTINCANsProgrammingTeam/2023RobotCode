@@ -38,7 +38,7 @@ import frc.robot.OI.Driver;
 import frc.robot.classes.DebugLog;
 import frc.robot.classes.TunableNumber;
 import frc.robot.hardware.AbsoluteEncoder;
-import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
+import frc.robot.hardware.AbsoluteEncoder.EncoderConfig; 
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
 
@@ -48,8 +48,10 @@ public class ArmSubsystem extends SubsystemBase {
     STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
     CONEINTAKE(1.0136, -0.0876), //Arm is in position to intake cones
     CUBEINTAKE(0.7691, -0.2365), //Arm is in position to intake cubes
-    MIDSCORE(1.4536, 0.9486), //Arm is in position to score on the mid pole
-    HIGHSCORE(1.704, 1.241), //Arm is in position to score on the high pole
+    MIDSCORECONE(1.4536, 0.9486), //Arm is in position to score on the mid node with a cone
+    MIDSCORECUBE(1.0657, 0.4111), //Arm is in position to score on the mid node with a cube
+    HIGHSCORECONE(1.6773, 1.2778), //Arm is in position to score on the high node with a cone
+    HIGHSCORECUBE(1.5330, 0.7575), //Arm is in position to score on the high node with a cube
     HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
     HIGHTRANSITIONAUTON(1.0743,0.9349), //High transition state used in auton to avoid getting stuck
     HIGHDROPB(1.7783, 1.0252),
@@ -180,6 +182,8 @@ public class ArmSubsystem extends SubsystemBase {
   private TunableNumber elbowDownITuner;
   private TunableNumber elbowDownDTuner;
 
+  private IntakeSubsystem intakeSubsystem;
+
   private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), kBaseGearing, kBaseInertia, kBaseLength, kMinBaseAngle, kMaxBaseAngle, false);
   private final SingleJointedArmSim elbowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), kElbowGearing, kElbowInertia, kElbowLength, kMinElbowAngle, kMaxElbowAngle, false);
 
@@ -191,6 +195,11 @@ public class ArmSubsystem extends SubsystemBase {
   MechanismLigament2d baseLigament = baseRoot.append(new MechanismLigament2d("Base Arm", kBaseLength*3, baseArmSim.getAngleRads()));
   MechanismLigament2d elbowLigament = baseLigament.append(new MechanismLigament2d("Elbow Arm", kElbowLength*3, elbowArmSim.getAngleRads()));
   
+
+  public ArmSubsystem(IntakeSubsystem intakeSubsystem) {
+    this();
+    this.intakeSubsystem = intakeSubsystem;
+  }
 
   public ArmSubsystem() {
     //Add coast mode command to shuffleboard
@@ -445,14 +454,16 @@ public class ArmSubsystem extends SubsystemBase {
       case TRANSITION:
       case CONEINTAKE:
       case CUBEINTAKE:
-      case MIDSCORE:
+      case MIDSCORECONE:
+      case MIDSCORECUBE:
         return goToState(ArmState.HIGHTRANSITION);
-      case HIGHSCORE:
+      case HIGHSCORECONE:
         return highDrop();
       case HIGHTRANSITION:
-        return goToState(ArmState.HIGHSCORE);
+        return intakeSubsystem.hasCube() ? goToState(ArmState.HIGHSCORECUBE) : goToState(ArmState.HIGHSCORECONE);
       case HIGHDROPB:
       case HIGHDROPC:
+      case HIGHSCORECUBE:
         return transitionToState(ArmState.STOWED);
       default:
         return null;
@@ -468,11 +479,13 @@ public class ArmSubsystem extends SubsystemBase {
       case HIGHDROPB:
       case HIGHDROPC:
       case HIGHTRANSITION:
-        return goToState(ArmState.MIDSCORE);
-      case MIDSCORE:
+      return intakeSubsystem.hasCube() ? goToState(ArmState.MIDSCORECUBE) : goToState(ArmState.MIDSCORECONE);
+      case MIDSCORECONE:
+      case MIDSCORECUBE:
+      case HIGHSCORECUBE:
         return goToState(ArmState.STOWED);
-      case HIGHSCORE:
-        return goToState(ArmState.HIGHDROPB);
+      case HIGHSCORECONE:
+        return highDrop();
       default:
         return null;
     }
@@ -484,12 +497,14 @@ public class ArmSubsystem extends SubsystemBase {
         return transitionToState(ArmState.CONEINTAKE);
       case CONEINTAKE:
         return transitionToState(ArmState.STOWED);
-      case HIGHSCORE:
+      case HIGHSCORECONE:
         return highDrop();
       case TRANSITION:
       case CUBEINTAKE:
-      case MIDSCORE:
+      case MIDSCORECONE:
+      case MIDSCORECUBE:
       case HIGHTRANSITION:
+      case HIGHSCORECUBE:
       case HIGHDROPB:
       case HIGHDROPC:
         return goToState(ArmState.CONEINTAKE);
@@ -503,10 +518,12 @@ public class ArmSubsystem extends SubsystemBase {
       case STOWED:
         return transitionToState(ArmState.CUBEINTAKE);
       case HIGHTRANSITION:
-      case MIDSCORE:
+      case MIDSCORECONE:
+      case MIDSCORECUBE:
+      case HIGHSCORECUBE:
       case CUBEINTAKE:
         return transitionToState(ArmState.STOWED);
-      case HIGHSCORE:
+        case HIGHSCORECONE:
         return highDrop();
       case TRANSITION:
       case CONEINTAKE:
@@ -516,6 +533,10 @@ public class ArmSubsystem extends SubsystemBase {
       default:
         return null;
     }
+  }
+
+  public ArmState getArmState() {
+    return currentState;
   }
 
   public void coast() {
