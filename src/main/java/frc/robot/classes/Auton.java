@@ -517,7 +517,6 @@ public class Auton{
     }
 
     public Command getAutonCommand(){
-        SmartDashboard.putString("auton", autonMode.toString());
         return autonCommand.beforeStarting(delay(delayEntry.getDouble(0.0))).andThen(getAutonEnd());
     }
 }
