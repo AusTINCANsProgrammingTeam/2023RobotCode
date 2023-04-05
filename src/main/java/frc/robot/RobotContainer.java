@@ -59,7 +59,6 @@ public class RobotContainer {
   private Auton auton;
   private TimeOfFlightSensor timeOfFlightSensor = Robot.tofEnabled ? new TimeOfFlightSensor() : null;
 
-
   private DataLog robotSubsystemsLog = DataLogManager.getLog();
   private StringLogEntry subsystemEnabledLog = new StringLogEntry(robotSubsystemsLog, "/Subsystems Enabled/"); 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -79,6 +78,7 @@ public class RobotContainer {
 
     simulationSubsystem = Robot.isSimulation() && swerveSubsystem != null ? new SimulationSubsystem(swerveSubsystem) : null;
     subsystemEnabledLog.append(simulationSubsystem == null ? "Simulation: Disabled" : "Simulation: Enabled");
+
     
     if (Robot.intakeEnabled && Robot.tofEnabled) {
       intakeSubsystem = new IntakeSubsystem(timeOfFlightSensor);

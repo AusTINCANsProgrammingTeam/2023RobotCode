@@ -1,0 +1,193 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.9,
+        "y": 4.42
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.7075118336673634,
+        "y": 4.42
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.0,
+        "y": 4.75
+      },
+      "prevControl": {
+        "x": 3.022527177121546,
+        "y": 4.75
+      },
+      "nextControl": {
+        "x": 5.747020840089503,
+        "y": 4.75
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.45,
+        "y": 4.05
+      },
+      "prevControl": {
+        "x": 6.45,
+        "y": 4.138049050680592
+      },
+      "nextControl": {
+        "x": 6.45,
+        "y": 3.929415410922969
+      },
+      "holonomicAngle": 270.0,
+      "isReversal": false,
+      "velOverride": 2.0,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.45,
+        "y": 3.55
+      },
+      "prevControl": {
+        "x": 6.45,
+        "y": 3.7353149125819445
+      },
+      "nextControl": {
+        "x": 6.45,
+        "y": 3.50679795360952
+      },
+      "holonomicAngle": 270.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.6,
+        "y": 4.35
+      },
+      "prevControl": {
+        "x": 6.317580463781593,
+        "y": 4.35
+      },
+      "nextControl": {
+        "x": 2.845617789448219,
+        "y": 4.35
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 2.15,
+        "y": 4.32
+      },
+      "prevControl": {
+        "x": 2.403418073485094,
+        "y": 4.32
+      },
+      "nextControl": {
+        "x": 1.8588671941899224,
+        "y": 4.32
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": 0.5,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 1.95,
+        "y": 4.32
+      },
+      "prevControl": {
+        "x": 2.0913049964466452,
+        "y": 4.32
+      },
+      "nextControl": null,
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "markers": [
+    {
+      "position": 0.0,
+      "names": [
+        "armCubeIntake"
+      ]
+    },
+    {
+      "position": 1.85,
+      "names": [
+        "cubePullIntake"
+      ]
+    },
+    {
+      "position": 5.0,
+      "names": [
+        "cubeScore"
+      ]
+    }
+  ]
+}
