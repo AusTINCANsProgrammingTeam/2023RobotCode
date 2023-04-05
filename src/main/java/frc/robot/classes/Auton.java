@@ -106,12 +106,10 @@ public class Auton{
         actions.put("conePull", intakeSubsystem.pullTimed(1.5, true).andThen(armSubsystem.goToState(ArmState.STOWED)));
         actions.put("conePullTransition", intakeSubsystem.pullTimed(1.5, true).andThen(highTransitionSequenceCone()));
 
+        autonCommand = getAutonSequence();
         autonSelectionTrig = new Trigger(() -> {return autonMode != modeChooser.getSelected();});
-        autonSelectionTrig.whileTrue(new InstantCommand(() -> {
-            autonCommand = getAutonSequence();
-            loadEntry.setString(autonMode.toString());
-        }).ignoringDisable(true));
-    }
+        autonSelectionTrig.whileTrue(new InstantCommand(() -> { autonCommand = getAutonSequence(); }).ignoringDisable(true)); }
+    
 
     private PathPlannerTrajectory getTrajectory(String name) throws NullPointerException{
         return PathPlanner.loadPath(name, pathConstraints);
@@ -192,6 +190,7 @@ public class Auton{
     
     private Command getAutonSequence(){
         autonMode = modeChooser.getSelected();
+        loadEntry.setString(autonMode.toString());
         //Sequence of actions to be performed during the autonomous period
         try{
         switch(autonMode){
