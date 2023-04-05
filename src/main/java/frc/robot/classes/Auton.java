@@ -78,7 +78,7 @@ public class Auton{
     private PathConstraints pathConstraints;
 
     private AutonModes autonMode;
-    private HashMap<String, Command> actions;
+    private Command autonCommand;
 
     private HashMap<String, Command> actions;
 
