@@ -46,9 +46,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
   private static GenericEntry intakeMode = matchTab.add("Intake Mode", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow")).getEntry();
+  private static GenericEntry scoreMode = matchTab.add("Has Cube", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Red", "colorWhenTrue", "Green")).getEntry();
   private static GenericEntry currentState = matchTab.add("ToF State", FlightStates.IDLE.toString()).getEntry();
   private static GenericEntry sensor0Up = matchTab.add("Cone ToF sensor up: ", true).getEntry();
   private static GenericEntry sensor1Up = matchTab.add("Cube ToF sensor up: ", true).getEntry(); 
+  private static GenericEntry cubeDistanceEntry = matchTab.add("Cube distance mm ", true).getEntry(); 
 
   private DebugLog<Double> coneDistLog = new DebugLog<Double>(0.0, "Cone Distance", this);
   private DebugLog<Double> cubeDistLog = new DebugLog<Double>(0.0, "Cube Distance", this);
@@ -56,10 +58,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private DebugLog<Boolean> hasCubeLog = new DebugLog<Boolean>(false, "Has Cube", this);
 
   private boolean isConeMode;
+  private boolean cubeOverride;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     isConeMode = true;
+    cubeOverride = false;
 
     motor = MotorController.constructMotor(MotorConfig.IntakeMotor1);
     motor2 = MotorController.constructMotor(MotorConfig.IntakeMotor2);
@@ -96,10 +100,14 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     isConeMode = !isConeMode;
   }
 
+  public void setCubeOverride(boolean cubeOverride){
+    this.cubeOverride = cubeOverride;
+  }
+
   public boolean hasCube() {
     int cubeDistance = timeOfFlightSensor.getDistance1();
     boolean cubeSensorUp = cubeDistance != -1;
-    return cubeDistance <= mmCubeActivationThreshold && cubeSensorUp;
+    return cubeOverride || (cubeDistance <= mmCubeActivationThreshold && cubeSensorUp);
   }
   
   public double getSpeed(){
@@ -136,17 +144,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     int coneDistance = timeOfFlightSensor.getDistance0();
     int cubeDistance = timeOfFlightSensor.getDistance1();
 
-    // Log distance values
-    coneDistLog.log((double)coneDistance);
-    cubeDistLog.log((double)cubeDistance);
-
-    // Check if sensors are online
     boolean coneSensorUp = coneDistance != -1;
     boolean cubeSensorUp = cubeDistance != -1;
 
-    // Log whether sensors are online
-    sensor0Up.setBoolean(coneSensorUp);
-    sensor1Up.setBoolean(cubeSensorUp);
+    
+
 
     // Log if sensors are activated
     hasConeLog.log(coneDistance <= mmConeActivationThreshold && coneSensorUp);
@@ -191,6 +193,23 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     // This method will be called once per scheduler run
     SmartDashboard.putData(this);
     intakeMode.setBoolean(isConeMode);
+    scoreMode.setBoolean(hasCube());
+
+    int coneDistance = timeOfFlightSensor.getDistance0();
+    int cubeDistance = timeOfFlightSensor.getDistance1();
+    cubeDistanceEntry.setInteger(cubeDistance);
+
+    // Log distance values
+    coneDistLog.log((double)coneDistance);
+    cubeDistLog.log((double)cubeDistance);
+
+    // Check if sensors are online
+    boolean coneSensorUp = coneDistance != -1;
+    boolean cubeSensorUp = cubeDistance != -1;
+
+    // Log whether sensors are online
+    sensor0Up.setBoolean(coneSensorUp);
+    sensor1Up.setBoolean(cubeSensorUp);
   }
 
   @Override
