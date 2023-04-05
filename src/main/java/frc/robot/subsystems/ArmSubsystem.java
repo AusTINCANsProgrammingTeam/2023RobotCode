@@ -51,7 +51,7 @@ public class ArmSubsystem extends SubsystemBase {
   public static enum ArmState{
     STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
     CONEINTAKE(1.0136, -0.0876), //Arm is in position to intake cones
-    CUBEINTAKE(0.7691, -0.2365), //Arm is in position to intake cubes
+    CUBEINTAKE(0.78, -0.2365), //Arm is in position to intake cubes
     MIDSCORECONE(1.4536, 0.9486), //Arm is in position to score on the mid node with a cone
     MIDSCORECUBE(1.0657, 0.4111), //Arm is in position to score on the mid node with a cube
     HIGHSCORECONE(1.6773, 1.2778), //Arm is in position to score on the high node with a cone
@@ -60,7 +60,7 @@ public class ArmSubsystem extends SubsystemBase {
     HIGHTRANSITIONAUTON(1.0743,0.9349), //High transition state used in auton to avoid getting stuck
     HIGHDROPB(1.7783, 1.0252),
     HIGHDROPC(1.4433, 0.9266), //High scoring motion
-    TRANSITION(0.7124, 0.1644);//Used to transition to any state from stowed position
+    TRANSITION(0.9256, 0.1487);//Used to transition to any state from stowed position
 
 
     private double x; //Position relative to the base of the arm, in meters
@@ -382,6 +382,8 @@ public class ArmSubsystem extends SubsystemBase {
   //Cancels commmand, but profPIDcontroller keeps going to next setpoint, before dropping back to where the button was pressed.
   public void cancelCommands() {
     getCurrentCommand().cancel();
+    basePIDController.reset(getBaseAngle());
+    elbowPIDController.reset(getElbowAngle());
   }
 
 
@@ -433,8 +435,8 @@ public class ArmSubsystem extends SubsystemBase {
     currentStateEntry.setString(state.toString());
     currentState = state;
 
-    basePIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 0.25);
-    elbowPIDController.setTolerance(state == ArmState.TRANSITION ? 10 : 0.25);
+    basePIDController.setTolerance(state == ArmState.TRANSITION ? Units.degreesToRadians(10) : 0.25);
+    elbowPIDController.setTolerance(state == ArmState.TRANSITION ? Units.degreesToRadians(10) : 0.25);
 
     setDesiredPositions(state.getX(), state.getY());
   }
