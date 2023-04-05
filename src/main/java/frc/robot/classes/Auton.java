@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CubeapultSubsystem;
 import frc.robot.subsystems.ArmSubsystem.ArmState;
@@ -75,6 +76,7 @@ public class Auton{
 
     private AutonModes autonMode;
     private Command autonCommand;
+    private Trigger autonSelectionTrig;
 
     private HashMap<String, Command> actions;
 
@@ -89,6 +91,8 @@ public class Auton{
             modeChooser.addOption(mode.toString(), mode);
         }
         modeChooser.setDefaultOption(kDefaultAutonMode.toString(), kDefaultAutonMode);
+        autonMode = kDefaultAutonMode;
+
         configTab.add("Auton mode", modeChooser).withSize(2, 1);
 
         pathConstraints = new PathConstraints(kMaxSpeed, kMaxAcceleration);
@@ -102,8 +106,11 @@ public class Auton{
         actions.put("conePull", intakeSubsystem.pullTimed(1.5, true).andThen(armSubsystem.goToState(ArmState.STOWED)));
         actions.put("conePullTransition", intakeSubsystem.pullTimed(1.5, true).andThen(highTransitionSequenceCone()));
 
-        autonCommand = getAutonSequence();
-        configTab.add(new InstantCommand(() -> {autonCommand = getAutonSequence(); loadEntry.setString(autonMode.toString());}).beforeStarting(new WaitCommand(1)).withName("Load Auton").ignoringDisable(true)); //wait command is to show if the load auton command ran
+        autonSelectionTrig = new Trigger(() -> {return autonMode != modeChooser.getSelected();});
+        autonSelectionTrig.whileTrue(new InstantCommand(() -> {
+            autonCommand = getAutonSequence();
+            loadEntry.setString(autonMode.toString());
+        }).ignoringDisable(true));
     }
 
     private PathPlannerTrajectory getTrajectory(String name) throws NullPointerException{
