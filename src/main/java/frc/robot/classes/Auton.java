@@ -65,6 +65,7 @@ public class Auton{
 
     private ShuffleboardTab configTab = Shuffleboard.getTab("Config");
     private GenericEntry delayEntry = configTab.add("Auton Delay", 0.0).getEntry();
+    private GenericEntry loadEntry = configTab.add("Loaded Path", "").getEntry();
     private SendableChooser<AutonModes> modeChooser = new SendableChooser<>();
 
     private DataLog datalog = DataLogManager.getLog();
@@ -107,7 +108,7 @@ public class Auton{
         actions.put("conePullTransition", intakeSubsystem.pullTimed(1.5, true).andThen(highTransitionSequenceCone()));
 
         autonCommand = getAutonSequence();
-        configTab.add(new InstantCommand(() -> {autonCommand = getAutonSequence();}).beforeStarting(new WaitCommand(1)).withName("Load Auton").ignoringDisable(true)); //wait command is to show if the load auton command ran
+        configTab.add(new InstantCommand(() -> {autonCommand = getAutonSequence(); loadEntry.setString(autonMode.toString());}).beforeStarting(new WaitCommand(1)).withName("Load Auton").ignoringDisable(true)); //wait command is to show if the load auton command ran
     }
 
     private PathPlannerTrajectory getTrajectory(String name) throws NullPointerException{
