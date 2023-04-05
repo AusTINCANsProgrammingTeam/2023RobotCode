@@ -46,6 +46,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private static ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   private static GenericEntry intakeEntry = matchTab.add("Intake Speed", 0.0).getEntry();
   private static GenericEntry intakeMode = matchTab.add("Intake Mode", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow")).getEntry();
+  private static GenericEntry scoreMode = matchTab.add("Has Cube", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Red", "colorWhenTrue", "Green")).getEntry();
   private static GenericEntry currentState = matchTab.add("ToF State", FlightStates.IDLE.toString()).getEntry();
   private static GenericEntry sensor0Up = matchTab.add("Cone ToF sensor up: ", true).getEntry();
   private static GenericEntry sensor1Up = matchTab.add("Cube ToF sensor up: ", true).getEntry(); 
@@ -105,7 +106,9 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public boolean hasCube() {
     int cubeDistance = timeOfFlightSensor.getDistance1();
     boolean cubeSensorUp = cubeDistance != -1;
-    return cubeOverride || (cubeDistance <= mmCubeActivationThreshold && cubeSensorUp);
+    boolean hasCube = cubeOverride || (cubeDistance <= mmCubeActivationThreshold && cubeSensorUp);
+    scoreMode.setBoolean(hasCube);
+    return hasCube;
   }
   
   public double getSpeed(){
