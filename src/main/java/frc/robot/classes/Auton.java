@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -41,7 +40,7 @@ public class Auton{
     private enum AutonModes{
         //Number after a path name corresponds to its starting position
         //Test routines
-        PLACETEST, LAUNCHTEST, TESTOVERIDE,
+        PLACETEST, LAUNCHTEST,
         //Skip scoring and balance
         CHARGE1, CHARGE6,
         //Score preload and drive out of the community
@@ -49,17 +48,13 @@ public class Auton{
         //Score preload and balance
         ONESCORECHARGE1, ONESCORECHARGE2, ONESCORECHARGE3, ONESCORECHARGE4, ONESCORECHARGE5, ONESCORECHARGE6,
         //Score preload, intake another game piece, then balance
-        ONESCORELOADCHARGE1, ONESCORELOADCHARGE6, ONECUBELOAD1, ONECUBELOAD6,
+        ONESCORECHARGELOAD,
         //Score preload then score another game piece
-        TWOSCORE1, TWOSCORECUBE1, TWOSCORE6,
+        TWOSCORE,
         //Score preload, score another game piece, then balance
-        TWOSCORECUBECHARGE1, TWOSCORECHARGE1, TWOSCORECHARGE6,
-        //Score preload, score another game piece, intake another game piece, then balance
-        TWOSCORELOADCHARGE1, TWOSCORELOADCHARGE6,
+        TWOSCORECHARGE,
         //Score preload, then score two other game pieces
-        THREESCORE1, THREESCORE6,
-        //Score preload, score two other game pieces, then balance
-        THREESCORECHARGE1, THREESCORECHARGE6
+        THREESCORE
     }
     private final AutonModes kDefaultAutonMode = AutonModes.ONESCORE;
 
@@ -205,12 +200,6 @@ public class Auton{
                     new SequentialCommandGroup(
                         cubeapultSubsystem.launch()
                     );
-            case TESTOVERIDE:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("TestVelocityOveride"),
-                        swerveSubsystem.followTrajectory("TestVelocityOveride", getTrajectory("TestVelocityOveride"))
-                    );
             case ONESCORE:
                 return
                     new SequentialCommandGroup(
@@ -251,9 +240,12 @@ public class Auton{
                 return
                     new SequentialCommandGroup(
                         resetOdometry("1ScoreCharge-2"),
+                        highTransitionSequenceCone(),
+                        translateY(-0.1, 0.5),
+                        resetOdometry("1ScoreCharge-2"),
                         highScoreSequenceCone(),
                         swerveSubsystem.followTrajectory("1ScoreCharge-2", getTrajectory("1ScoreCharge-2"))
-                        .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
+                        .deadlineWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
                         swerveSubsystem.assistedBalance(true)
                     );
             case ONESCORECHARGE3:
@@ -303,211 +295,64 @@ public class Auton{
                         swerveSubsystem.followTrajectory("1ScoreCharge-6", getTrajectory("1ScoreCharge-6"))
                         .deadlineWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
                         swerveSubsystem.assistedBalance(true)
-                    );
-            case ONESCORELOADCHARGE1:
+                    );    
+            case ONESCORECHARGELOAD:
             return
                 new SequentialCommandGroup(
-                    resetOdometry("1ScoreConeLoad1-1"),
-                    highTransitionSequenceCone(),
-                    translateY(-0.1, 0.5),
-                    resetOdometry("1ScoreConeLoad1-1"),
-                    highScoreSequenceCone(),
-                    swerveSubsystem.followTrajectory("1ScoreConeLoad1-1", getTrajectory("1ScoreConeLoad1-1")).deadlineWith(armSubsystem.transitionToState(ArmState.CONEINTAKE)),
-                    new ParallelDeadlineGroup(
-                        swerveSubsystem.followTrajectory("1ScoreLoad2-1", getTrajectory("1ScoreLoad2-1")),
-                        intakeSubsystem.pullTimed(3, true)
-                    ).andThen(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                    swerveSubsystem.assistedBalance(false)
-                );
-            case ONESCORELOADCHARGE6:
-            return
-                new SequentialCommandGroup(
-                    resetOdometry("1ScoreConeLoad1-6"),
-                    highTransitionSequenceCone(),
-                    translateY(-0.1, 0.5),
-                    resetOdometry("1ScoreConeLoad1-6"),
-                    highScoreSequenceCone(),
-                    swerveSubsystem.followTrajectory("1ScoreConeLoad1-6", getTrajectory("1ScoreConeLoad1-6")).deadlineWith(armSubsystem.goToStateDelay(ArmState.CONEINTAKE)),
-                    new ParallelDeadlineGroup(
-                        swerveSubsystem.followTrajectory("1ScoreLoad2-6", getTrajectory("1ScoreLoad2-6")),
-                        intakeSubsystem.pullTimed(3, true)
-                    ).andThen(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                    swerveSubsystem.assistedBalance(false)
-                );        
-            case ONECUBELOAD1:
-            return
-                new SequentialCommandGroup(
-                    resetOdometry("1ScoreCubeLoad1-1"),
+                    resetOdometry("1ScoreChargeLoad"),
                     cubeapultSubsystem.launch(),
                     new FollowPathWithEvents(
-                        swerveSubsystem.followTrajectory("1ScoreCubeLoad1-1", getTrajectory("1ScoreCubeLoad1-1")), 
-                        getTrajectory("1ScoreCubeLoad1-1").getMarkers(),
+                        swerveSubsystem.followTrajectory("1ScoreChargeLoad", getTrajectory("1ScoreChargeLoad")), 
+                        getTrajectory("1ScoreChargeLoad").getMarkers(),
                         actions
                     ),
                     swerveSubsystem.assistedBalance(false)
                     );
-            case ONECUBELOAD6:
-            return
-                new SequentialCommandGroup(
-                    resetOdometry("1ScoreCubeLoad1-6"),
-                    cubeapultSubsystem.launch(),
-                    swerveSubsystem.followTrajectory("1ScoreCubeLoad1-6", getTrajectory("1ScoreCubeLoad1-6")),
-                    new ParallelDeadlineGroup(
-                        swerveSubsystem.followTrajectory("1ScoreLoad2-6", getTrajectory("1ScoreLoad2-6")),
-                        intakeSubsystem.pullTimed(3, true)
-                    ).andThen(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                    swerveSubsystem.assistedBalance(false)
-                    );            
-            case TWOSCORE1:
+            case TWOSCORE:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("2Score-1"),
+                        resetOdometry("2Score"),
                         cubeapultSubsystem.launch(),
                         new FollowPathWithEvents(
-                            swerveSubsystem.followTrajectory("2Score-1", getTrajectory("2Score-1")), 
-                            getTrajectory("2Score-1").getMarkers(),
-                            actions
-                        ),
-                        translateY(-0.1,0.3),
-                        highScoreSequenceCone()
-                    );
-            case TWOSCORECUBE1:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("2ScoreCube-1"),
-                        cubeapultSubsystem.launch(),
-                        new FollowPathWithEvents(
-                            swerveSubsystem.followTrajectory("2ScoreCube-1", getTrajectory("2ScoreCube-1")), 
-                            getTrajectory("2ScoreCube-1").getMarkers(),
+                            swerveSubsystem.followTrajectory("2Score", getTrajectory("2Score")), 
+                            getTrajectory("2Score").getMarkers(),
                             actions
                         ),
                         scoreSequenceCube()
                     );
-            case TWOSCORE6:
+            case TWOSCORECHARGE:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("2Score1-6"),
-                        highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("2Score1-6", getTrajectory("2Score1-6"))
-                        .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.followTrajectory("2Score2-6", getTrajectory("2Score2-6"))
-                    );
-            case TWOSCORECUBECHARGE1:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("2ScoreCube-1"),
+                        resetOdometry("2Score"),
                         cubeapultSubsystem.launch(),
                         new FollowPathWithEvents(
-                            swerveSubsystem.followTrajectory("2ScoreCube-1", getTrajectory("2ScoreCube-1")), 
-                            getTrajectory("2ScoreCube-1").getMarkers(),
+                            swerveSubsystem.followTrajectory("2Score", getTrajectory("2Score")), 
+                            getTrajectory("2Score").getMarkers(),
                             actions
                         ),
                         scoreSequenceCube(),
-                        swerveSubsystem.followTrajectory("2ScoreCubeCharge-1", getTrajectory("2ScoreCubeCharge-1"))
+                        swerveSubsystem.followTrajectory("2ScoreCharge", getTrajectory("2ScoreCharge"))
                         .alongWith(armSubsystem.goToState(ArmState.STOWED)),
                         swerveSubsystem.assistedBalance(true)
                     );
-            case TWOSCORECHARGE1:
+            case THREESCORE:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("2ScoreCharge1-1"),
-                        highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("2ScoreCharge1-1", getTrajectory("2ScoreCharge1-1"))
-                        .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.followTrajectory("2ScoreCharge2-1", getTrajectory("2ScoreCharge2-1")),
-                        swerveSubsystem.followTrajectory("2ScoreCharge3-1", getTrajectory("2ScoreCharge3-1")),
-                        swerveSubsystem.assistedBalance(true)
-                    );
-            case TWOSCORECHARGE6:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("2ScoreCharge1-6"),
-                        highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("2ScoreCharge1-6", getTrajectory("2ScoreCharge1-6"))
-                        .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.followTrajectory("2ScoreCharge2-6", getTrajectory("2ScoreCharge2-6")),
-                        swerveSubsystem.followTrajectory("2ScoreCharge3-6", getTrajectory("2ScoreCharge3-6")),
-                        swerveSubsystem.assistedBalance(true)
-                    );
-            case THREESCORE1:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("3ScoreCube1-1"),
+                        resetOdometry("3Score1"),
                         cubeapultSubsystem.launch(),
                         new FollowPathWithEvents(
-                            swerveSubsystem.followTrajectory("3ScoreCube1-1", getTrajectory("3ScoreCube1-1")), 
-                            getTrajectory("3ScoreCube1-1").getMarkers(),
+                            swerveSubsystem.followTrajectory("3Score1", getTrajectory("3Score1")), 
+                            getTrajectory("3Score1").getMarkers(),
                             actions
                         ),
                         scoreSequenceCube(),
-                        resetOdometry("3ScoreCube2-1"),
+                        resetOdometry("3Score2"),
                         new FollowPathWithEvents(
-                            swerveSubsystem.followTrajectory("3ScoreCube2-1", getTrajectory("3ScoreCube2-1")), 
-                            getTrajectory("3ScoreCube2-1").getMarkers(),
+                            swerveSubsystem.followTrajectory("3Score2", getTrajectory("3Score2")), 
+                            getTrajectory("3Score2").getMarkers(),
                             actions
                         )
 
-                    );
-            case THREESCORE6:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("3Score1-6"),
-                        highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("3Score1-6", getTrajectory("3Score1-6"))
-                        .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.followTrajectory("3Score2-6", getTrajectory("3Score2-6")),
-                        swerveSubsystem.followTrajectory("3Score3-6", getTrajectory("3Score3-6")),
-                        swerveSubsystem.followTrajectory("3Score4-6", getTrajectory("3Score4-6"))
-                    );
-            case TWOSCORELOADCHARGE1:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("2ScoreLoadCharge1-1"),
-                        highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("2ScoreLoadCharge1-1", getTrajectory("2ScoreLoadCharge1-1"))
-                        .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.followTrajectory("2ScoreLoadCharge2-1", getTrajectory("2ScoreLoadCharge2-1")),
-                        swerveSubsystem.followTrajectory("2ScoreLoadCharge3-1", getTrajectory("2ScoreLoadCharge3-1")),
-                        swerveSubsystem.followTrajectory("2ScoreLoadCharge4-1", getTrajectory("2ScoreLoadCharge4-1")),
-                        swerveSubsystem.assistedBalance(true)
-                    );
-            case TWOSCORELOADCHARGE6:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("2ScoreLoadCharge1-6"),
-                        highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("2ScoreLoadCharge1-6", getTrajectory("2ScoreLoadCharge1-6"))
-                        .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.followTrajectory("2ScoreLoadCharge2-6", getTrajectory("2ScoreLoadCharge2-6")),
-                        swerveSubsystem.followTrajectory("2ScoreLoadCharge3-6", getTrajectory("2ScoreLoadCharge3-6")),
-                        swerveSubsystem.followTrajectory("2ScoreLoadCharge4-6", getTrajectory("2ScoreLoadCharge4-6")),
-                        swerveSubsystem.assistedBalance(true)
-                    );
-            case THREESCORECHARGE1:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("3ScoreCharge1-1"),
-                        highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("3ScoreCharge1-1", getTrajectory("3ScoreCharge1-1"))
-                        .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.followTrajectory("3ScoreCharge2-1", getTrajectory("3ScoreCharge2-1")),
-                        swerveSubsystem.followTrajectory("3ScoreCharge3-1", getTrajectory("3ScoreCharge3-1")),
-                        swerveSubsystem.followTrajectory("3ScoreCharge4-1", getTrajectory("3ScoreCharge4-1")),
-                        swerveSubsystem.followTrajectory("3ScoreCharge5-1", getTrajectory("3ScoreCharge5-1")),
-                        swerveSubsystem.assistedBalance(true)
-                    );
-            case THREESCORECHARGE6:
-                return
-                    new SequentialCommandGroup(
-                        resetOdometry("3ScoreCharge1-6"),
-                        highScoreSequenceCone(),
-                        swerveSubsystem.followTrajectory("3ScoreCharge1-6", getTrajectory("3ScoreCharge1-6"))
-                        .alongWith(armSubsystem.goToStateDelay(ArmState.STOWED)),
-                        swerveSubsystem.followTrajectory("3ScoreCharge2-6", getTrajectory("3ScoreCharge2-6")),
-                        swerveSubsystem.followTrajectory("3ScoreCharge3-6", getTrajectory("3ScoreCharge3-6")),
-                        swerveSubsystem.followTrajectory("3ScoreCharge4-6", getTrajectory("3ScoreCharge4-6")),
-                        swerveSubsystem.followTrajectory("3ScoreCharge5-6", getTrajectory("3ScoreCharge5-6")),
-                        swerveSubsystem.assistedBalance(true)
                     );
             default:
                 return null;
