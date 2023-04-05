@@ -60,7 +60,7 @@ public class ArmSubsystem extends SubsystemBase {
     HIGHTRANSITIONAUTON(1.0743,0.9349), //High transition state used in auton to avoid getting stuck
     HIGHDROPB(1.7783, 1.0252),
     HIGHDROPC(1.4433, 0.9266), //High scoring motion
-    TRANSITION(0.7124, 0.1644);//Used to transition to any state from stowed position
+    TRANSITION(0.857, 0.1644);//Used to transition to any state from stowed position
 
 
     private double x; //Position relative to the base of the arm, in meters
@@ -382,6 +382,8 @@ public class ArmSubsystem extends SubsystemBase {
   //Cancels commmand, but profPIDcontroller keeps going to next setpoint, before dropping back to where the button was pressed.
   public void cancelCommands() {
     getCurrentCommand().cancel();
+    basePIDController.reset(getBaseAngle());
+    elbowPIDController.reset(getElbowAngle());
   }
 
 
