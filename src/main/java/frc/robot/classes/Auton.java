@@ -106,6 +106,7 @@ public class Auton{
         actions.put("conePull", intakeSubsystem.pullTimed(1.5, true).andThen(armSubsystem.goToState(ArmState.STOWED)));
         actions.put("conePullTransition", intakeSubsystem.pullTimed(1.5, true).andThen(highTransitionSequenceCone()));
 
+        autonCommand = getAutonSequence();
         autonSelectionTrig = new Trigger(() -> {return autonMode != modeChooser.getSelected();});
         autonSelectionTrig.whileTrue(new InstantCommand(() -> {
             autonCommand = getAutonSequence();
