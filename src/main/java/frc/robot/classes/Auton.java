@@ -346,18 +346,18 @@ public class Auton{
             case THREESCORE:
                 return
                     new SequentialCommandGroup(
-                        resetOdometry("3Score1"),
+                        resetOdometry("2Score"),
                         cubeapultSubsystem.launch(),
                         new FollowPathWithEvents(
-                            swerveSubsystem.followTrajectory("3Score1", getTrajectory("3Score1")), 
-                            getTrajectory("3Score1").getMarkers(),
+                            swerveSubsystem.followTrajectory("2Score", getTrajectory("2Score")), 
+                            getTrajectory("2Score").getMarkers(),
                             actions
                         ),
                         scoreSequenceCube(),
-                        resetOdometry("3Score2"),
+                        resetOdometry("3Score"),
                         new FollowPathWithEvents(
-                            swerveSubsystem.followTrajectory("3Score2", getTrajectory("3Score2")), 
-                            getTrajectory("3Score2").getMarkers(),
+                            swerveSubsystem.followTrajectory("3Score", getTrajectory("3Score")), 
+                            getTrajectory("3Score").getMarkers(),
                             actions
                         )
 
