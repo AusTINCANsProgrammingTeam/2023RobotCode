@@ -105,9 +105,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public boolean hasCube() {
-    int cubeDistance = timeOfFlightSensor.getDistance1();
-    boolean cubeSensorUp = cubeDistance != -1;
-    return cubeOverride || (cubeDistance <= mmCubeActivationThreshold && cubeSensorUp);
+    return cubeOverride || !isConeMode;
   }
   
   public double getSpeed(){
