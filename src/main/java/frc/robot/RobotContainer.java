@@ -14,6 +14,7 @@ import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
 import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.subsystems.SimulationSubsystem;
+import frc.robot.commands.ASArmLog3D;
 import frc.robot.commands.ArmAnglesCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -28,8 +29,10 @@ import frc.robot.subsystems.led.LedStripSubsystem.StripMode;
 import frc.robot.commands.ToFIntakeCommand;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.CubeapultSubsystem;
@@ -120,6 +123,8 @@ public class RobotContainer {
     }
     // Configure the button bindings    
     configureButtonBindings();
+
+    CommandScheduler.getInstance().schedule(new RepeatCommand(new ASArmLog3D(armSubsystem, swerveSubsystem)));
   }
 
   /**
@@ -176,7 +181,7 @@ public class RobotContainer {
     }
 
     OI.putControllerButtons();
-    
+
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

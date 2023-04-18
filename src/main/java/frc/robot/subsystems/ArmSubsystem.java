@@ -552,11 +552,6 @@ public class ArmSubsystem extends SubsystemBase {
 
     actualXPositionLog.log(armXPosition);
     actualYPositionLog.log(armYPosition);
-
-    Logger.getInstance().recordOutput("Base Arm Pose3D", getBasePose3D());
-    Logger.getInstance().recordOutput("Elbow Arm Pose3D", getElbowPose3d());
-    Logger.getInstance().recordOutput("Base Arm Pose3D (NEW)", getBasePose3D());
-    Logger.getInstance().recordOutput("Elbow Arm Pose3D (NEW)", getElbowPose3d());
   }
 
   @Override
