@@ -50,7 +50,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private static GenericEntry currentState = matchTab.add("ToF State", FlightStates.IDLE.toString()).getEntry();
   private static GenericEntry sensor0Up = matchTab.add("Cone ToF sensor up: ", true).getEntry();
   private static GenericEntry sensor1Up = matchTab.add("Cube ToF sensor up: ", true).getEntry(); 
-  private static GenericEntry cubeDistanceEntry = matchTab.add("Cube distance mm ", true).getEntry(); 
+  private static GenericEntry cubeDistanceEntry = matchTab.add("Cube distance mm ", 0).getEntry(); 
 
   private DebugLog<Double> coneDistLog = new DebugLog<Double>(0.0, "Cone Distance", this);
   private DebugLog<Double> cubeDistLog = new DebugLog<Double>(0.0, "Cube Distance", this);
@@ -105,9 +105,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public boolean hasCube() {
-    int cubeDistance = timeOfFlightSensor.getDistance1();
-    boolean cubeSensorUp = cubeDistance != -1;
-    return cubeOverride || (cubeDistance <= mmCubeActivationThreshold && cubeSensorUp);
+    return cubeOverride || !isConeMode;
   }
   
   public double getSpeed(){

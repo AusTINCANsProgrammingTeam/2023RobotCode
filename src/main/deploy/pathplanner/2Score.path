@@ -24,20 +24,20 @@
     },
     {
       "anchorPoint": {
-        "x": 5.9,
+        "x": 5.7,
         "y": 4.6
       },
       "prevControl": {
-        "x": 4.887202308763671,
+        "x": 4.687202308763671,
         "y": 5.019514539650253
       },
       "nextControl": {
-        "x": 5.965994912167612,
+        "x": 5.765994912167612,
         "y": 4.572664012332553
       },
       "holonomicAngle": 0,
       "isReversal": false,
-      "velOverride": null,
+      "velOverride": 2.0,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
@@ -49,15 +49,15 @@
     },
     {
       "anchorPoint": {
-        "x": 6.5,
+        "x": 6.3,
         "y": 4.6
       },
       "prevControl": {
-        "x": 6.535146941765512,
+        "x": 6.335146941765512,
         "y": 4.57538984643077
       },
       "nextControl": {
-        "x": 5.89867112780778,
+        "x": 5.6986711278077795,
         "y": 5.0210550092521355
       },
       "holonomicAngle": 0.0,
@@ -75,15 +75,15 @@
     {
       "anchorPoint": {
         "x": 4.0,
-        "y": 4.898823130979595
+        "y": 5.05
       },
       "prevControl": {
         "x": 4.091295325624007,
-        "y": 4.895567799945794
+        "y": 5.046744668966198
       },
       "nextControl": {
         "x": 3.6797509492454883,
-        "y": 4.910242299117077
+        "y": 5.061419168137482
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -99,16 +99,16 @@
     },
     {
       "anchorPoint": {
-        "x": 2.05,
-        "y": 4.978757307941967
+        "x": 2.2,
+        "y": 4.65
       },
       "prevControl": {
-        "x": 2.1647612194783568,
-        "y": 4.978757307941967
+        "x": 2.460080980620132,
+        "y": 5.207745462832786
       },
       "nextControl": {
-        "x": 1.9129699823502215,
-        "y": 4.978757307941967
+        "x": 2.186350154977473,
+        "y": 4.620727812885308
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -124,12 +124,12 @@
     },
     {
       "anchorPoint": {
-        "x": 1.9,
-        "y": 4.98
+        "x": 2.0,
+        "y": 4.65
       },
       "prevControl": {
-        "x": 2.1011329589232557,
-        "y": 4.98
+        "x": 2.2283833627496312,
+        "y": 4.65
       },
       "nextControl": null,
       "holonomicAngle": 180.0,
@@ -145,20 +145,17 @@
       }
     }
   ],
-  "maxVelocity": 4.0,
-  "maxAcceleration": 3.0,
-  "isReversed": null,
   "markers": [
-    {
-      "position": 1.0,
-      "names": [
-        "conePullTransition"
-      ]
-    },
     {
       "position": 0.0,
       "names": [
-        "armConeIntake"
+        "armCubeIntake"
+      ]
+    },
+    {
+      "position": 0.85,
+      "names": [
+        "cubePullTransition"
       ]
     }
   ]
