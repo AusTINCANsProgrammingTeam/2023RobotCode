@@ -36,8 +36,9 @@ public class ASArmLog3D extends CommandBase {
   @Override
   public void execute() {
     Pose2d swervePose = swerveSubsystem.getPose();
-    Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(0.001289, -0.252741, -0.247927,new Rotation3d(-armSubsystem.getBaseAngle(), 0, 0)));
-    Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(-0.009661, armSubsystem.getArmY()-0.255489, -0.793469, new Rotation3d(armSubsystem.getElbowAngle(), 0, 0)));
+    Logger.getInstance().recordOutput("Swerve Heading", swerveSubsystem.getHeading());
+    Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)));
+    Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)));
   }
 
   // Called once the command ends or is interrupted.
