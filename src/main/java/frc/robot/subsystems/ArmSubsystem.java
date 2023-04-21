@@ -484,22 +484,6 @@ public class ArmSubsystem extends SubsystemBase {
     return currentState;
   }
 
-  public Rotation3d getBaseRotation3d() {
-    return new Rotation3d(getBaseAngle(), 0, 0);
-  }
-
-  public Rotation3d getElbowRotation3d() {
-    return new Rotation3d(getBaseAngle(), 0, 0);
-  }
-
-  public Pose3d getBasePose3D() {
-    return new Pose3d(-0.3175, -156197, 0.582218, getBaseRotation3d());
-  }
-
-  public Pose3d getElbowPose3d() {
-    return new Pose3d(-0.307975, getArmY()-0.94113, getArmX()-0.0426184, getElbowRotation3d());
-  }
-
   public Command stowArmParallel() {
     //Run along with a trajectory to stow arm after scoring
     return new WaitCommand(0.5).andThen(goToState(ArmState.STOWED));
@@ -552,6 +536,9 @@ public class ArmSubsystem extends SubsystemBase {
 
     actualXPositionLog.log(armXPosition);
     actualYPositionLog.log(armYPosition);
+
+    Logger.getInstance().recordOutput("Base Arm Pose3D", new Pose3d(-0.215911, 0.014056, 0.177293, new Rotation3d(0, 0, 0)));
+    Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(0.822993, 0.177293, 0.014056, new Rotation3d(0, 0, 0)));
   }
 
   @Override
@@ -568,5 +555,7 @@ public class ArmSubsystem extends SubsystemBase {
     
     baseArmSim.update(Robot.kDefaultPeriod); // standard loop time of 20ms
     elbowArmSim.update(Robot.kDefaultPeriod);
+    Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.215911, 0.014056, 0.177293, new Rotation3d(0, getBaseAngle()-(Math.PI/2), 0)));
+    Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(0.822993+getArmX(), 0.014056+getArmY(), 0.177293, new Rotation3d(0, getElbowAngle()-Math.PI, 0)));
   }
 }
