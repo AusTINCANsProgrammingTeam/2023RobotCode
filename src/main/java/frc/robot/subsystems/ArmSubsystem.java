@@ -556,7 +556,16 @@ public class ArmSubsystem extends SubsystemBase {
     baseArmSim.update(Robot.kDefaultPeriod); // standard loop time of 20ms
     elbowArmSim.update(Robot.kDefaultPeriod);
     Logger.getInstance().recordOutput("Arm 2D Mechanism", simArmCanvas);
-    Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.215911, 0.014056, 0.177293, new Rotation3d(0, getBaseAngle()-(Math.PI/2), 0)));
-    Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(0.822993-getArmX(), 0.014056, 0.177293-(getArmY()*2), new Rotation3d(0, getElbowAngle()-Math.PI, 0)));
+    //Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.215911, 0.014056, 0.177293, new Rotation3d(0, getBaseAngle()-(Math.PI/2), 0)));
+    // Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(-0.131528+getArmX(), 0.014056, 0.177293-(getArmY()*2), new Rotation3d(0, getElbowAngle()-Math.PI, 0)));
+
+
+    //Changed Zeros
+    // Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.215911, 0.014056, 0.177293, new Rotation3d(0, 0, 0)));
+    // Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(-0.131528+getArmX(), 0.014056, 0.177293, new Rotation3d(0, 0, 0)));
+
+    //Zeroed Position for testing (With offsets)
+    Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.215911, 0.014056, 0.177293, new Rotation3d(0, 0, 0)));
+    Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(-0.131528, 0.014056, 0.177293, new Rotation3d(0, 0, 0)));
   }
 }
