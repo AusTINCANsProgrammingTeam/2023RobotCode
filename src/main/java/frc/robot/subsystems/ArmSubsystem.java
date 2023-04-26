@@ -417,6 +417,8 @@ public class ArmSubsystem extends SubsystemBase {
     else {
       if(DriverStation.isEnabled()) {
         anglesChecked = true;
+      } else {
+        anglesChecked = false;
       }
     }
   }
@@ -592,8 +594,6 @@ public class ArmSubsystem extends SubsystemBase {
 
     actualXPositionLog.log(armXPosition);
     actualYPositionLog.log(armYPosition);
-    SmartDashboard.putNumber("Inverse Elbow", Units.radiansToDegrees(convertToElbowAngle(armXPosition, armYPosition)));
-    SmartDashboard.putNumber("Inverse Base", Units.radiansToDegrees(convertToBaseAngle(armXPosition, armYPosition)));
   }
 
   @Override

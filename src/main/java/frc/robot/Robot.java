@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.ArmSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -29,7 +28,7 @@ import frc.robot.subsystems.ArmSubsystem;
  * project.
  */
 public class Robot extends LoggedRobot {
-  public static final boolean isCompetition = false;
+  public static final boolean isCompetition = true;
   public static final boolean isReplayMode = false;
   public static final double kDefaultPeriod = 0.02;
 
