@@ -16,6 +16,7 @@ import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.subsystems.SimulationSubsystem;
 import frc.robot.commands.ArmAnglesCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.BatterySubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ArmSubsystem.ArmState;
 import frc.robot.subsystems.BuddyBalanceSubsystem;
@@ -51,6 +52,7 @@ public class RobotContainer {
   private final ArmSubsystem armSubsystem;
   private final ArmAnglesCommand armAnglesCommand;
   private final CubeapultSubsystem cubeapultSubsystem;
+  private final BatterySubsystem batterySubsystem;
 
   private LedStripSubsystem ledSubsystem;
   private LedMatrixSubsystem ledMatrixSubsystem;
@@ -99,6 +101,9 @@ public class RobotContainer {
 
     cubeapultSubsystem = Robot.cubeapultEnabled ? new CubeapultSubsystem() : null;
     subsystemEnabledLog.append(cubeapultSubsystem == null ? "Cubeapult: Disabled" : "Cubeapult: Enabled");
+
+    batterySubsystem = Robot.batteryEnabled ? new BatterySubsystem() : null;
+    subsystemEnabledLog.append(batterySubsystem == null ? "Battery: Disabled" : "Battery: Enabled");
 
     auton = Robot.swerveEnabled ? new Auton(swerveSubsystem, armSubsystem, intakeSubsystem, cubeapultSubsystem) : null;
 
