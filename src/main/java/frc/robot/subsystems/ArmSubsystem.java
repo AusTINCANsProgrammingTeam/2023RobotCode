@@ -565,8 +565,8 @@ public class ArmSubsystem extends SubsystemBase {
     // Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(-0.131528+getArmX(), 0.014056, 0.177293, new Rotation3d(0, 0, 0)));
 
     //Zeroed Position for testing (With offsets)
-    Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.215911, 0.014056, 0.177293, new Rotation3d(0, -(getBaseAngle()), 0)));
-    Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(0.56128290566-getArmX(), 0.011783, 0.177201+0.2635497378851723+getArmY(), new Rotation3d(Math.PI, -(getElbowAngle()-(Math.PI/2)), 0)));
+    Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.215911, 0.014056, 0.177293, new Rotation3d(0, Units.radiansToDegrees(armXPosition), 0)));
+    Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(0.56128290566-armXPosition, 0.011783, 0.177201+0.2635497378851723+armYPosition, new Rotation3d(Math.PI, -(getElbowAngle()-(Math.PI/2)), 0)));
     Logger.getInstance().recordOutput("getArmX()", getArmX());
     Logger.getInstance().recordOutput("getArmY()", getArmY());
   } //0.3142719056671422
