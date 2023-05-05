@@ -189,8 +189,8 @@ public class ArmSubsystem extends SubsystemBase {
   //Where the base arm begins
   MechanismRoot2d baseRoot = simArmCanvas.getRoot("Base Arm Root", 0, 0);
   //Sets the base arm to the root, then the elbow arm to the end of the base arm
-  MechanismLigament2d baseLigament = baseRoot.append(new MechanismLigament2d("Base Arm", kBaseLength*3, baseArmSim.getAngleRads()));
-  MechanismLigament2d elbowLigament = baseLigament.append(new MechanismLigament2d("Elbow Arm", kElbowLength*3, elbowArmSim.getAngleRads()));
+  MechanismLigament2d baseLigament = baseRoot.append(new MechanismLigament2d("Base Arm", kBaseLength, baseArmSim.getAngleRads()));
+  MechanismLigament2d elbowLigament = baseLigament.append(new MechanismLigament2d("Elbow Arm", kElbowLength, elbowArmSim.getAngleRads()));
   
 
   public ArmSubsystem() {
@@ -555,23 +555,28 @@ public class ArmSubsystem extends SubsystemBase {
     
     baseArmSim.update(Robot.kDefaultPeriod); // standard loop time of 20ms
     elbowArmSim.update(Robot.kDefaultPeriod);
+    
     Logger.getInstance().recordOutput("Arm 2D Mechanism", simArmCanvas);
-    //Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.215911, 0.014056, 0.177293, new Rotation3d(0, getBaseAngle()-(Math.PI/2), 0)));
-    // Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(-0.131528+getArmX(), 0.014056, 0.177293-(getArmY()*2), new Rotation3d(0, getElbowAngle()-Math.PI, 0)));
-
-
-    //Changed Zeros
-    // Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.215911, 0.014056, 0.177293, new Rotation3d(0, 0, 0)));
-    // Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(-0.131528+getArmX(), 0.014056, 0.177293, new Rotation3d(0, 0, 0)));
-
+    
     //Absolute Zero
-    Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)));
-    Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)));
+    // Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)));
+    // Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)));
 
-    //Zeroed Position for testing (With offsets)
-    // Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.215911, 0.014056, 0.177293, new Rotation3d(0, Units.radiansToDegrees(armXPosition), 0)));
-    // Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(0.56128290566-armXPosition, 0.011783, 0.177201+0.2635497378851723+armYPosition, new Rotation3d(Math.PI, -(getElbowAngle()-(Math.PI/2)), 0)));
-    Logger.getInstance().recordOutput("getArmX()", getArmX());
-    Logger.getInstance().recordOutput("getArmY()", getArmY());
+    //Just Offsets
+    // Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.238318, -0.004269, 0.177201, new Rotation3d(0, 0, 0)));
+    // Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(0.226824, -0.004269, 0.177202, new Rotation3d(0, 0, 0)));
+
+    //Offsets and Rotation
+    // Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.238318, -0.004269, 0.177201, new Rotation3d(0, -simBaseEncoderPosition, 0)));
+    // Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(0.226824, -0.004269, 0.177202, new Rotation3d(0, -simElbowEncoderPosition-(Math.PI/2), 0)));
+
+    //Offsets With Change
+    Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.238318, -0.004269, 0.177201, new Rotation3d(0, -simBaseEncoderPosition, 0)));
+    Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d((0.226824*2.75)-armXPosition, -0.004269, 0.177202+armYPosition, new Rotation3d(0, -simElbowEncoderPosition-(Math.PI/2), 0)));
+    
+    Logger.getInstance().recordOutput("Arm X", armXPosition);
+    Logger.getInstance().recordOutput("Arm Y", armYPosition);
+    Logger.getInstance().recordOutput("Base Angle", Units.radiansToDegrees(simBaseEncoderPosition));
+    Logger.getInstance().recordOutput("Elbow Angle", Units.radiansToDegrees(simElbowEncoderPosition));
   }
 }
