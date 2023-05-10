@@ -23,38 +23,76 @@ public class TinCANBus extends CAN {
            API Indices:
              1 -> Get last sensor read
              2 -> Status
-             3 -> Periodic sensor Read
 
         Device Number/ID: 0-63
     */
 
-    private static int DEV_CONFIG_API_CLASS = 0;
 
-    private static int SET_NEW_DEVICEID = 1;
+    //TODO implement this API's class methods
+    private enum DEV_CONFIG_API_CLASS {
+      SET_NEW_DEVICEID(1);
 
+      private final int APICLASS = 0;
+      private int APIID;
+      
+      DEV_CONFIG_API_CLASS(int apiindex) {
+        this.APIID = getApiID(APICLASS, apiindex);
+      }
 
-    private static int SENSOR_BRIDGE_API_CLASS = 1;
+    }
 
-    private static int   GET_READ = 1;
-    private static int   STATUS = 2;
-    private static int   PERIODIC_READ = 3;
+    private enum SENSOR_BRIDGE_API_CLASS {
+      GET_READ(1),
+      STATUS(2);
+
+      private final int APICLASS = 1;
+      private int APIID;
+      
+      SENSOR_BRIDGE_API_CLASS(int apiindex) {
+        this.APIID = getApiID(APICLASS, apiindex);
+      }
+    }
+
+    // API ID is a 10 bit sequence 
+    // Bits 9-4 -> API Class 
+    // Bits 3-0 -> API Index 
+    private static int getApiID(int apiClass, int apiIndex) {
+        return ((apiClass & 0x003F) << 4) + (apiIndex & 0x0F);
+    }
+
+    private static int byteArrayToInt(byte[] array, int length) {
+      int ret = 0;
+      for (int i = 0; i < array.length && i < length && i < Integer.BYTES; i++) {
+        ret = (ret << 8) + (array[i] & 0x00FF);
+      }
+      return ret;
+    }
+
 
     public TinCANBus(int deviceId) {
         super(deviceId);
     }
 
-    private int getApiID(int apiClass, int apiIndex) {
-        return ((apiClass & 0x003F) << 4) + (apiIndex & 0x0F);
-    }
-
-
+    // Returns 2 bytes representing the last sensor read value 
+    // or -1 if packet error occurs
     public int lastSensorRead() {
         CANData d = new CANData();
-        readPacketLatest(getApiID(SENSOR_BRIDGE_API_CLASS, GET_READ), d);
-        return ((int)d.data[0]) & 0x00FF + ((((int)d.data[1]) & 0x00FF) << 8);
+        if (readPacketLatest(SENSOR_BRIDGE_API_CLASS.GET_READ.APIID, d)) {
+          return byteArrayToInt(d.data, 2);
+        } else {
+          return -1;
+        }
+    }
 
-
-
+    // Return 1 byte status message (TBD)
+    // or -1 if packet error occurs
+    public int getSensorStatus() {
+        CANData d = new CANData();
+        if (readPacketLatest(SENSOR_BRIDGE_API_CLASS.STATUS.APIID, d)) {
+          return byteArrayToInt(d.data, 1);
+        } else {
+          return -1;
+        }
     }
 
 
