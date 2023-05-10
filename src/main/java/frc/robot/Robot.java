@@ -43,6 +43,9 @@ public class Robot extends LoggedRobot {
     BLINKIN, STRIP, MATRIX, NONE;
   }
 
+  //Enable this if you are arm offsets are correct and unchanging
+  public static final boolean offsetsFixed = true;
+
   //Subsystem toggle
   public static final LedEnum ledSubSelect = LedEnum.NONE;
 
