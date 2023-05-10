@@ -33,7 +33,7 @@ public class TinCANBus extends CAN {
       SET_NEW_DEVICEID(1);
 
       private final int APICLASS = 0;
-      private int APIID;
+      private final int APIID;
       
       DEV_CONFIG_API_CLASS(int apiindex) {
         this.APIID = getApiID(APICLASS, apiindex);
@@ -46,7 +46,7 @@ public class TinCANBus extends CAN {
       STATUS(2);
 
       private final int APICLASS = 1;
-      private int APIID;
+      private final int APIID;
       
       SENSOR_BRIDGE_API_CLASS(int apiindex) {
         this.APIID = getApiID(APICLASS, apiindex);
