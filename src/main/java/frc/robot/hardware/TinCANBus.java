@@ -32,7 +32,6 @@ public class TinCANBus extends CAN {
     */
 
 
-    //TODO implement this API's class methods
     private static enum DEV_CONFIG_API_CLASS {
       SET_NEW_DEVICEID(1);
 
