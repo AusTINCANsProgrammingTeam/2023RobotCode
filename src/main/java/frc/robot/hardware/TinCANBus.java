@@ -7,7 +7,11 @@ package frc.robot.hardware;
 import edu.wpi.first.hal.CANData;
 import edu.wpi.first.wpilibj.CAN;
 
-/** Add your docs here. */
+/*
+ * Implements an API for a custom CAN device
+ * 
+ * See FRC CAN Bus Documentation: https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html
+ */
 public class TinCANBus extends CAN {
 
     /* 
@@ -29,7 +33,7 @@ public class TinCANBus extends CAN {
 
 
     //TODO implement this API's class methods
-    private enum DEV_CONFIG_API_CLASS {
+    private static enum DEV_CONFIG_API_CLASS {
       SET_NEW_DEVICEID(1);
 
       private final int APICLASS = 0;
@@ -41,7 +45,7 @@ public class TinCANBus extends CAN {
 
     }
 
-    private enum SENSOR_BRIDGE_API_CLASS {
+    private static enum SENSOR_BRIDGE_API_CLASS {
       GET_READ(1),
       STATUS(2);
 
@@ -71,6 +75,14 @@ public class TinCANBus extends CAN {
 
     public TinCANBus(int deviceId) {
         super(deviceId);
+    }
+
+    // Send packet to tell CAN device to change the device number it listens for. 
+    // Will be applied when the CAN device is next power cycled
+    // Only use when only the CAN device of this type you want to change is connected to the bus
+    public void setNewDeviceId(int deviceId) {
+      byte[] buff = {(byte)deviceId};
+      writePacket(buff, DEV_CONFIG_API_CLASS.SET_NEW_DEVICEID.APIID);
     }
 
     // Returns 2 bytes representing the last sensor read value 
