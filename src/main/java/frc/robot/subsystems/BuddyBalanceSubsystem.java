@@ -8,7 +8,6 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -18,7 +17,6 @@ import frc.robot.hardware.MotorController.MotorConfig;
 import frc.robot.classes.TunableNumber;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
@@ -94,15 +92,13 @@ public class BuddyBalanceSubsystem extends SubsystemBase {
   }
 
   public void retrieveBuddy() { // Used to pick up the buddy robot while the lift is already underneath it
-    int errorCode = rightPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition).value;
-    errorCode += leftPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition).value;
-    if(errorCode != 0){DriverStation.reportError("An Error has occured in retrieveBuddy() for SparkMaxPIDController.setReference() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
+    MotorController.errorCheck(rightPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition));
+    MotorController.errorCheck(leftPIDController.setReference(kBalancedPosition, CANSparkMax.ControlType.kPosition));
   }
 
   public void releaseBuddy() { // Used to set down the robot
-    int errorCode = rightPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition).value;
-    errorCode += leftPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition).value;
-    if(errorCode != 0){DriverStation.reportError("An Error has occured in releaseBuddy() for SparkMaxPIDController.setReference() Code:" + REVLibError.fromInt(errorCode).toString(), null);}
+    MotorController.errorCheck(rightPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition));
+    MotorController.errorCheck(leftPIDController.setReference(kDeployedPosition, CANSparkMax.ControlType.kPosition));
   }
 
   @Override

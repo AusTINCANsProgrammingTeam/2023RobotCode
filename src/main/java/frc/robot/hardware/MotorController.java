@@ -1,6 +1,7 @@
 package frc.robot.hardware;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -117,5 +118,9 @@ public class MotorController {
         errorCode += motorPIDcontroller.setD(PIDArray[2]).value;
         if(errorCode != 0){DriverStation.reportError("An Error has occured in constructMotor(MotorConfig config, double[] PIDArray) with motor " + motor.getDeviceId() + " whilst setting PID", null);}
         return motor;
+    }
+
+    public static void errorCheck(REVLibError error) {
+        if(error != REVLibError.kOk){DriverStation.reportError("An error has occured! ", true);}
     }
 }
