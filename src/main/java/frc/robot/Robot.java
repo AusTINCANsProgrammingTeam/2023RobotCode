@@ -18,8 +18,10 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.hardware.TinCANBus;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -50,18 +52,19 @@ public class Robot extends LoggedRobot {
   public static final LedEnum ledSubSelect = LedEnum.NONE;
 
   public static final boolean cameraEnabled = false;
-  public static final boolean intakeEnabled = true;
-  public static final boolean tofEnabled = true;
-  public static final boolean swerveEnabled = true;
-  public static final boolean armEnabled = true;
+  public static final boolean intakeEnabled = false;
+  public static final boolean tofEnabled = false;
+  public static final boolean swerveEnabled = false;
+  public static final boolean armEnabled = false;
   public static final boolean buddyBalanceEnabled = false;
-  public static final boolean cubeapultEnabled = true;
+  public static final boolean cubeapultEnabled = false;
   
   private Command m_autonomousCommand;
   private DataLog loopCountlog = DataLogManager.getLog();
   private IntegerLogEntry loopCountEntry = new IntegerLogEntry(loopCountlog, "/robot/loopCount");
 
   private RobotContainer m_robotContainer;
+  private TinCANBus canbus;
 
   private int loopCount = 0;
 
@@ -93,6 +96,7 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    canbus = new TinCANBus(0);
   }
 
   /**
@@ -111,6 +115,7 @@ public class Robot extends LoggedRobot {
     loopCount++;
     loopCountEntry.append(loopCount);
     CommandScheduler.getInstance().run();
+    SmartDashboard.putNumber("Time of Flight (mm)", canbus.lastSensorRead());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -119,8 +124,9 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {}
-
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+  
+  
+  
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
