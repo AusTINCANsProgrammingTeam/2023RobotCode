@@ -555,6 +555,9 @@ public class ArmSubsystem extends SubsystemBase {
     
     baseArmSim.update(Robot.kDefaultPeriod); // standard loop time of 20ms
     elbowArmSim.update(Robot.kDefaultPeriod);
+
+    double armX = baseLigament.getLength()*Math.sin(Units.degreesToRadians(baseLigament.getAngle()))+elbowLigament.getLength()*Math.sin(Units.degreesToRadians(elbowLigament.getAngle()-90));
+    double armY = baseLigament.getLength()*Math.cos(Units.degreesToRadians(baseLigament.getAngle()))+elbowLigament.getLength()*Math.cos(Units.degreesToRadians(elbowLigament.getAngle()-90));
     
     Logger.getInstance().recordOutput("Arm 2D Mechanism", simArmCanvas);
     
@@ -571,12 +574,18 @@ public class ArmSubsystem extends SubsystemBase {
     // Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(0.226824, -0.004269, 0.177202, new Rotation3d(0, -simElbowEncoderPosition-(Math.PI/2), 0)));
 
     //Offsets With Change
-    Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.238318, -0.004269, 0.177201, new Rotation3d(0, -simBaseEncoderPosition, 0)));
-    Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d((0.226824*2.75)-armXPosition, -0.004269, 0.177202+armYPosition, new Rotation3d(0, -simElbowEncoderPosition-(Math.PI/2), 0)));
+    Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(-0.238318, -0.004269, 0.177201, new Rotation3d(0, -Units.degreesToRadians(baseLigament.getAngle()), 0)));
+    Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(1.80256-armX, -0.004269, 0.177201+armYPosition, new Rotation3d(0, -Units.degreesToRadians(baseLigament.getAngle()+elbowLigament.getAngle()),0)));
+
+    //Just Change
+    // Logger.getInstance().recordOutput("Base Arm Pose3D",  new Pose3d(0, 0, 0, new Rotation3d(0, -Units.degreesToRadians(baseLigament.getAngle()), 0)));
+    // Logger.getInstance().recordOutput("Elbow Arm Pose3D", new Pose3d(armX, 0, -armYPosition, new Rotation3d(0, -Units.degreesToRadians(baseLigament.getAngle()+elbowLigament.getAngle()),0)));
+
     
-    Logger.getInstance().recordOutput("Arm X", armXPosition);
-    Logger.getInstance().recordOutput("Arm Y", armYPosition);
-    Logger.getInstance().recordOutput("Base Angle", Units.radiansToDegrees(simBaseEncoderPosition));
-    Logger.getInstance().recordOutput("Elbow Angle", Units.radiansToDegrees(simElbowEncoderPosition));
+    Logger.getInstance().recordOutput("Arm X", armX);
+    Logger.getInstance().recordOutput("Arm X2",1.41296-armX);
+    Logger.getInstance().recordOutput("Arm Y", armY);
+    Logger.getInstance().recordOutput("Base Angle", baseLigament.getAngle());
+    Logger.getInstance().recordOutput("Elbow Angle", elbowLigament.getAngle());
   }
 }
