@@ -14,7 +14,6 @@ import frc.robot.Robot.LedEnum;
 import frc.robot.classes.Auton;
 import frc.robot.classes.TimeOfFlightSensor;
 import frc.robot.subsystems.SimulationSubsystem;
-import frc.robot.commands.ASArmLog3D;
 import frc.robot.commands.ArmAnglesCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -123,8 +122,6 @@ public class RobotContainer {
     }
     // Configure the button bindings    
     configureButtonBindings();
-
-    CommandScheduler.getInstance().schedule(new RepeatCommand(new ASArmLog3D(armSubsystem, swerveSubsystem)));
   }
 
   /**
