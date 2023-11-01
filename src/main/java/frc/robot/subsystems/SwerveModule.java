@@ -42,7 +42,6 @@ import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
 import me.nabdev.oxconfig.ConfigurableParameter;
-import me.nabdev.oxconfig.sampleClasses.ConfigurablePIDController;
 
 public class SwerveModule extends SubsystemBase {
     public static final ConfigurableParameter<Double> kWheelDiameterMeters = new ConfigurableParameter<Double>(
