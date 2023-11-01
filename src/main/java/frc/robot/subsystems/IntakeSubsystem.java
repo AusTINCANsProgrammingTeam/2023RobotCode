@@ -105,7 +105,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public boolean hasCube() {
-    int cubeDistance = timeOfFlightSensor.getDistance1();
+    int cubeDistance = timeOfFlightSensor.getDistance0();
     boolean cubeSensorUp = cubeDistance != -1;
     return cubeOverride || (cubeDistance <= mmCubeActivationThreshold && cubeSensorUp);
   }
@@ -142,7 +142,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public void changeFlightState() {
     // Check distances
     int coneDistance = timeOfFlightSensor.getDistance0();
-    int cubeDistance = timeOfFlightSensor.getDistance1();
+    int cubeDistance = timeOfFlightSensor.getDistance0();
 
     boolean coneSensorUp = coneDistance != -1;
     boolean cubeSensorUp = cubeDistance != -1;
@@ -196,7 +196,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     scoreMode.setBoolean(hasCube());
 
     int coneDistance = timeOfFlightSensor.getDistance0();
-    int cubeDistance = timeOfFlightSensor.getDistance1();
+    int cubeDistance = timeOfFlightSensor.getDistance0();
     cubeDistanceEntry.setInteger(cubeDistance);
 
     // Log distance values

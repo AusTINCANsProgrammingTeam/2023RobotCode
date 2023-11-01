@@ -1,3 +1,24 @@
+/*!
+ *
+ * @file TimeOfFlightSensor.java
+ *
+ * @brief Use Adafruit VL53L0X and VL6180X distance sensors to get distance to object
+ * in intake.
+ *
+ *
+ * @author 
+ * Co-authored-by: Asher Hoffman <ashersamhoffman@gmail.com>
+ * Co-authored-by: Kenny <kennysonle5.0@gmail.com>
+ * Co-authored-by: ModBoyEX <ModBoyEX@gmail.com>
+ * Co-authored-by: Backup DriverStation <austincans2158@gmail.com>
+ * Co-authored-by: azvanderpas <azvanderpas@gmail.com>
+ * Co-authored-by: Calvin Tucker <me@calvintucker.com>
+ *
+ * @section Changelog
+ * ToF Intake (#72 https://github.com/AusTINCANsProgrammingTeam/2023RobotCode/pull/72)
+ * Co-authored-by: JP Cassar <jp@cassartx.net>
+ * Update TimeOfFlightSensor class with more responsive and documented code
+ */
 package frc.robot.classes;
 
 import java.nio.charset.StandardCharsets;
@@ -8,9 +29,17 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SerialPortJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.SerialPort;
 
 public class TimeOfFlightSensor implements AutoCloseable {
+
+  private final AtomicBoolean debugPrints = new AtomicBoolean();
+  private boolean hasDistance0;
+  private int distance0;
+  private double lastReadTime;
+  private final ReentrantLock threadLock = new ReentrantLock();
+  private final Thread readThread;
+  private final AtomicBoolean threadRunning = new AtomicBoolean(true);
+
   private static class SingleCharSequence implements CharSequence {
     public byte[] data;
 
@@ -60,17 +89,6 @@ public class TimeOfFlightSensor implements AutoCloseable {
     return lastComma;
   }
 
-  private final AtomicBoolean debugPrints = new AtomicBoolean();
-  private boolean hasDistance0;
-  private boolean hasDistance1;
-  private int distance0;
-  private int distance1;
-  private double lastReadTime;
-  private final ReentrantLock threadLock = new ReentrantLock();
-  private final Thread readThread;
-  private final AtomicBoolean threadRunning = new AtomicBoolean(true);
-
-
   private void threadMain() {
     // Using JNI for a non allocating read
     int port = SerialPortJNI.serialInitializePort((byte)1);
@@ -91,7 +109,6 @@ public class TimeOfFlightSensor implements AutoCloseable {
     IntRef lastComma = new IntRef();
 
     int distance0;
-    int distance1;
 
     while (threadRunning.get()) {
       int read = SerialPortJNI.serialRead(port, buffer, buffer.length - 1);
@@ -99,7 +116,6 @@ public class TimeOfFlightSensor implements AutoCloseable {
         try {
           threadLock.lock();
           this.hasDistance0 = false;
-          this.hasDistance1 = false;
         } finally {
           threadLock.unlock();
         }
@@ -121,9 +137,7 @@ public class TimeOfFlightSensor implements AutoCloseable {
       lastComma.value = -1;
 
       distance0 = parseIntFromIndex(charSeq, read, lastComma);
-      distance1 = parseIntFromIndex(charSeq, read, lastComma);
       boolean hasDistance0 = distance0 != 0 && distance0 != -1;
-      boolean hasDistance1 = distance1 != 0 && distance1 != -1;
 
       double ts = Timer.getFPGATimestamp();
 
@@ -131,12 +145,8 @@ public class TimeOfFlightSensor implements AutoCloseable {
         threadLock.lock();
         this.lastReadTime = ts;
         this.hasDistance0 = hasDistance0;
-        this.hasDistance1 = hasDistance1;
         if (hasDistance0) {
           this.distance0 = distance0;
-        }
-        if (hasDistance1) {
-          this.distance1 = distance1;
         }
       } finally {
         threadLock.unlock();
@@ -160,29 +170,11 @@ public class TimeOfFlightSensor implements AutoCloseable {
       threadLock.unlock();
     }
   }
-  
-  public boolean isSensor1Connected() {
-    try {
-      threadLock.lock();
-      return hasDistance1;
-    } finally {
-      threadLock.unlock();
-    }
-  }
 
   public int getDistance0() {
     try {
       threadLock.lock();
       return (hasDistance0) ? distance0 : -1;
-    } finally {
-      threadLock.unlock();
-    }
-  }
-
-  public int getDistance1() {
-    try {
-      threadLock.lock();
-      return (hasDistance1) ? distance1 : -1;
     } finally {
       threadLock.unlock();
     }
