@@ -1,22 +1,32 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/*!
+ * Copyright (c) FIRST and other WPILib contributors.
+ * Open Source Software; you can modify and/or share it under the terms of
+ * the WPILib BSD license file in the root directory of this project.
+ * 
+ * @file CameraSubsystem.java
+ *
+ * @brief The main class for controlling Camera
+ *
+ * @section Changelog
+ * Co-authored-by: JP Cassar <jp@cassartx.net>
+ * Corrected outstanding errors
+ */
 
 package frc.robot.subsystems;
-
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.cscore.CvSource;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.StringLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CameraSubsystem extends SubsystemBase {
   private Thread m_visionThread;
@@ -45,7 +55,7 @@ public class CameraSubsystem extends SubsystemBase {
             continue;
           }
           // Put a line on the image
-          Imgproc.line(mat, new Point((mat.size().width / 2), mat.size().height), new Point((mat.size().width / 2), 0), new Scalar(0, 0, 0), 2); // TODO: Implement sensor distance into width
+          Imgproc.line(mat, new Point((mat.size().width / 2), mat.size().height), new Point((mat.size().width / 2), 0), new Scalar(0, 0, 0), 2); // Implement sensor distance into width
           outputStream.putFrame(mat);  // Give the output stream a new image to display
         }
       });

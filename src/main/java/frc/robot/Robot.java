@@ -1,6 +1,25 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/*!
+ * Copyright (c) FIRST and other WPILib contributors.
+ * Open Source Software; you can modify and/or share it under the terms of
+ * the WPILib BSD license file in the root directory of this project.
+ * 
+ * @file Robot.java
+ *
+ * @brief the main Robot class
+ *
+ *
+ * @author 
+ * Co-authored-by: Asher Hoffman <ashersamhoffman@gmail.com>
+ * Co-authored-by: Kenny <kennysonle5.0@gmail.com>
+ * Co-authored-by: ModBoyEX <ModBoyEX@gmail.com>
+ * Co-authored-by: Backup DriverStation <austincans2158@gmail.com>
+ * Co-authored-by: azvanderpas <azvanderpas@gmail.com>
+ * Co-authored-by: Calvin Tucker <me@calvintucker.com>
+ *
+ * @section Changelog
+ * Co-authored-by: JP Cassar <jp@cassartx.net>
+ * Updated to add oxconfig
+ */
 
 package frc.robot;
 
@@ -20,6 +39,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import me.nabdev.oxconfig.OxConfig;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -71,6 +91,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
+
     Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
     if (isReal()) {
@@ -94,6 +115,9 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    // Initialize OxConfig
+    OxConfig.initialize();
   }
 
   /**

@@ -1,3 +1,17 @@
+/*!
+ * Copyright (c) FIRST and other WPILib contributors.
+ * Open Source Software; you can modify and/or share it under the terms of
+ * the WPILib BSD license file in the root directory of this project.
+ * 
+ * @file OI.java
+ *
+ * @brief The main class for controlling Swerve Drives
+ *
+ * @section Changelog
+ * Co-authored-by: JP Cassar <jp@cassartx.net>
+ * Corrected outstanding errors
+ */
+
 package frc.robot;
 
 import java.util.Map;
@@ -194,7 +208,7 @@ public class OI {
         private static final int kArmElbowAxis = 3;
         private static final int kArmBaseAxis = 1;
 
-        //TODO: Tune curves to driver preference
+        // Tune curves to driver preference
         private static final ControlCurve kArmElbowCurve = new ControlCurve(0.65,0.05,1,0.1);
         private static final ControlCurve kArmBaseCurve = new ControlCurve(0.65,0.05,1,0.1);
  

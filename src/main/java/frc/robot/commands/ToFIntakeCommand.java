@@ -1,6 +1,25 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/*!
+ * Copyright (c) FIRST and other WPILib contributors.
+ * Open Source Software; you can modify and/or share it under the terms of
+ * the WPILib BSD license file in the root directory of this project.
+ * 
+ * @file SwerveModule.java
+ *
+ * @brief The main class for controlling Swerve Drives
+ *
+ *
+ * @author 
+ * Co-authored-by: Asher Hoffman <ashersamhoffman@gmail.com>
+ * Co-authored-by: Kenny <kennysonle5.0@gmail.com>
+ * Co-authored-by: ModBoyEX <ModBoyEX@gmail.com>
+ * Co-authored-by: Backup DriverStation <austincans2158@gmail.com>
+ * Co-authored-by: azvanderpas <azvanderpas@gmail.com>
+ * Co-authored-by: Calvin Tucker <me@calvintucker.com>
+ *
+ * @section Changelog
+ * Co-authored-by: JP Cassar <jp@cassartx.net>
+ * Updated to add oxconfig
+ */
 
 package frc.robot.commands;
 
@@ -45,11 +64,6 @@ public class ToFIntakeCommand extends CommandBase {
           intakeSubsystem.setConeMode();
           intakeSubsystem.hold();
         }
-        break;
-
-      case CUBE:
-        intakeSubsystem.setCubeMode();
-        intakeSubsystem.hold();
         break;
 
       case CONE_SCORE:

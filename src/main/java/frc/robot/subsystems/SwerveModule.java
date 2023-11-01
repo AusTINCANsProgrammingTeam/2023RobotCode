@@ -1,17 +1,26 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/*!
+ * Copyright (c) FIRST and other WPILib contributors.
+ * Open Source Software; you can modify and/or share it under the terms of
+ * the WPILib BSD license file in the root directory of this project.
+ * 
+ * @file SwerveModule.java
+ *
+ * @brief The main class for controlling Swerve Drives
+ *
+ * @section Changelog
+ * Co-authored-by: JP Cassar <jp@cassartx.net>
+ * Updated to add oxconfig
+ */
 
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.IdleMode;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -31,18 +40,49 @@ import frc.robot.hardware.AbsoluteEncoder;
 import frc.robot.hardware.AbsoluteEncoder.EncoderConfig;
 import frc.robot.hardware.MotorController;
 import frc.robot.hardware.MotorController.MotorConfig;
-
-
+import me.nabdev.oxconfig.ConfigurableParameter;
+import me.nabdev.oxconfig.sampleClasses.ConfigurablePIDController;
 
 public class SwerveModule extends SubsystemBase {
-    public static final double kWheelDiameterMeters = Units.inchesToMeters(3.5);
-    public static final double kDriveMotorGearRatio = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
-    public static final double kTurningMotorGearRatio = (14.0 / 50.0) * (10.0 / 60.0);
-    public static final double kDriveEncoderRotFactor = kDriveMotorGearRatio * Math.PI * kWheelDiameterMeters; //Conversion factor converting the Drive Encoder's rotations to meters
-    public static final double kDriveEncoderRPMFactor = kDriveEncoderRotFactor / 60; //Conversion factor converting the Drive Encoder's RPM to meters per second
-    public static final double kTurningEncoderRotFactor = kTurningMotorGearRatio * 2 * Math.PI; //Conversion factor converting the Turn Encoder's rotations to Radians
-    public static final double kTurningEncoderRPMFactor = kTurningEncoderRotFactor / 60; //Conersion factor converting the Turn Encoder's RPM to radians per second
-    public static final double kPTurning = 0.4; //P gain for the turning motor
+    public static final ConfigurableParameter<Double> kWheelDiameterMeters = new ConfigurableParameter<Double>(
+        Units.inchesToMeters(3.5), 
+        "wheel/diameter/meters"
+    );
+    
+    public static final ConfigurableParameter<Double> kDriveMotorGearRatio = new ConfigurableParameter<Double>(
+        (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0), 
+        "drive/motor/gear/ratio"
+    );
+    
+    public static final ConfigurableParameter<Double> kTurningMotorGearRatio = new ConfigurableParameter<Double>(
+        (14.0 / 50.0) * (10.0 / 60.0), 
+        "turning/motor/gear/ratio"
+    );
+    
+    public static final ConfigurableParameter<Double> kDriveEncoderRotFactor = new ConfigurableParameter<Double>(
+        kDriveMotorGearRatio.get() * Math.PI * kWheelDiameterMeters.get(), //Conversion factor converting the Drive Encoder's rotations to meters
+        "drive/encoder/rot/factor"
+    );
+    
+    public static final ConfigurableParameter<Double> kDriveEncoderRPMFactor = new ConfigurableParameter<Double>(
+        kDriveEncoderRotFactor.get() / 60, //Conversion factor converting the Drive Encoder's RPM to meters per second
+        "drive/encoder/rpm/factor"
+    );
+    
+    public static final ConfigurableParameter<Double> kTurningEncoderRotFactor = new ConfigurableParameter<Double>(
+        kTurningMotorGearRatio.get() * 2 * Math.PI, // Conversion factor converting the Turn Encoder's rotations to Radians
+        "turning/encoder/rot/factor"
+    );
+    
+    public static final ConfigurableParameter<Double> kTurningEncoderRPMFactor = new ConfigurableParameter<Double>(
+        kTurningEncoderRotFactor.get() / 60, // Conversion factor converting the Turn Encoder's RPM to radians per second
+        "turning/encoder/rpm/factor"
+    );
+    
+    public static final ConfigurableParameter<Double> kPTurning = new ConfigurableParameter<Double>(
+        0.4, //P gain for the turning motor
+        "pturning"
+    );
 
     private final CANSparkMax driveMotor;
     private final CANSparkMax turningMotor;
@@ -57,7 +97,7 @@ public class SwerveModule extends SubsystemBase {
     private final RelativeEncoderSim simTurningEncoder;
 
     private final SparkMaxPIDController turningPIDController;
-    private final PIDController simTurningPIDController;
+    private ConfigurablePIDController simTurningPIDController;
     private double turningSetpoint;
 
     private final WPI_CANCoder absoluteEncoder;
@@ -83,28 +123,36 @@ public class SwerveModule extends SubsystemBase {
         driveEncoder = this.driveMotor.getEncoder();
         turningEncoder = this.turningMotor.getEncoder();
 
-        driveEncoder.setPositionConversionFactor(kDriveEncoderRotFactor);
-        driveEncoder.setVelocityConversionFactor(kDriveEncoderRPMFactor);
-        turningEncoder.setPositionConversionFactor(kTurningEncoderRotFactor);
-        turningEncoder.setVelocityConversionFactor(kTurningEncoderRPMFactor);
+        driveEncoder.setPositionConversionFactor(kDriveEncoderRotFactor.get());
+        driveEncoder.setVelocityConversionFactor(kDriveEncoderRPMFactor.get());
+        turningEncoder.setPositionConversionFactor(kTurningEncoderRotFactor.get());
+        turningEncoder.setVelocityConversionFactor(kTurningEncoderRPMFactor.get());
 
         simDriveMotor = new FlywheelSim(
-            LinearSystemId.identifyVelocitySystem(2, 1.24), //TODO: Update with real SysID
+            LinearSystemId.identifyVelocitySystem(2, 1.24), 
             DCMotor.getNEO(1),
-            kDriveMotorGearRatio
+            kDriveMotorGearRatio.get()
         );
         simTurningMotor = new FlywheelSim(
-            LinearSystemId.identifyVelocitySystem(0.16, 0.0348), //TODO: Update with real SysID
+            LinearSystemId.identifyVelocitySystem(0.16, 0.0348), 
             DCMotor.getNEO(1),
-            kTurningMotorGearRatio
+            kTurningMotorGearRatio.get()
         );
 
         simDriveEncoder = new RelativeEncoderSim(driveMotor);
         simTurningEncoder = new RelativeEncoderSim(turningMotor);
         
         turningPIDController = turningMotor.getPIDController();
-        turningPIDController.setP(kPTurning);
-        simTurningPIDController = new PIDController(turningPIDController.getP(), turningPIDController.getI(), turningPIDController.getD());
+        
+        turningPIDController.setP(kPTurning.get());
+        
+        ConfigurablePIDController simTurningPIDController = new ConfigurablePIDController(
+            turningPIDController.getP(), 
+            turningPIDController.getI(), 
+            turningPIDController.getD(), /* Default Values */
+            "simTurningPIDController" /* Key of the controller itself (supports nesting with /, e.g. "drive/left") */
+        );
+
         simTurningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();

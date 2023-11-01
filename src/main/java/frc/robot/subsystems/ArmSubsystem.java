@@ -1,6 +1,24 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/*!
+ * Copyright (c) FIRST and other WPILib contributors.
+ * Open Source Software; you can modify and/or share it under the terms of
+ * the WPILib BSD license file in the root directory of this project.
+ * 
+ * @fileArmSubsystem.java
+ *
+ * @brief The main class for controlling the arm
+ *
+ *
+ * @author 
+ * Co-authored-by: Asher Hoffman <ashersamhoffman@gmail.com>
+ * Co-authored-by: Kenny <kennysonle5.0@gmail.com>
+ * Co-authored-by: ModBoyEX <ModBoyEX@gmail.com>
+ * Co-authored-by: Backup DriverStation <austincans2158@gmail.com>
+ * Co-authored-by: azvanderpas <azvanderpas@gmail.com>
+ * Co-authored-by: Calvin Tucker <me@calvintucker.com>
+ *
+ * @section Changelog
+ * Co-authored-by: JP Cassar <jp@cassartx.net>
+ */
 
 package frc.robot.subsystems;
 
@@ -47,37 +65,6 @@ import frc.robot.hardware.MotorController.MotorConfig;
 
 
 public class ArmSubsystem extends SubsystemBase {
-  public static enum ArmState{
-    STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
-    CONEINTAKE(1.0136, -0.0876), //Arm is in position to intake cones
-    CUBEINTAKE(0.78, -0.2365), //Arm is in position to intake cubes
-    MIDSCORECONE(1.4536, 0.9486), //Arm is in position to score on the mid node with a cone
-    MIDSCORECUBE(1.0657, 0.4111), //Arm is in position to score on the mid node with a cube
-    HIGHSCORECONE(1.6773, 1.2778), //Arm is in position to score on the high node with a cone
-    HIGHSCORECUBE(1.5330, 0.7575), //Arm is in position to score on the high node with a cube
-    HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
-    HIGHTRANSITIONAUTON(1.0743,0.9349), //High transition state used in auton to avoid getting stuck
-    HIGHDROPB(1.7783, 1.0252),
-    HIGHDROPC(1.4433, 0.9266), //High scoring motion
-    TRANSITION(0.9256, 0.1487);//Used to transition to any state from stowed position
-
-
-    private double x; //Position relative to the base of the arm, in meters
-    private double y; //Position above the carpet, in meters
-    
-    ArmState(double x, double y){
-      this.x = x;
-      this.y = y;
-    }
-
-    public double getX(){
-      return x;
-    }
-
-    public double getY(){
-      return y;
-    }
-  }
 
   private final ArmState kDefaultState = ArmState.STOWED;
   private ArmState currentState;
@@ -174,18 +161,6 @@ public class ArmSubsystem extends SubsystemBase {
 
   private GenericEntry currentStateEntry = matchTab.add("Current State","").getEntry();
 
-  private TunableNumber basePTuner;
-  private TunableNumber baseITuner;
-  private TunableNumber baseDTuner;
-
-  private TunableNumber elbowUpPTuner;
-  private TunableNumber elbowUpITuner;
-  private TunableNumber elbowUpDTuner;
-
-  private TunableNumber elbowDownPTuner;
-  private TunableNumber elbowDownITuner;
-  private TunableNumber elbowDownDTuner;
-
   private IntakeSubsystem intakeSubsystem;
 
   private final SingleJointedArmSim baseArmSim = new SingleJointedArmSim(DCMotor.getNEO(2), kBaseGearing, kBaseInertia, kBaseLength, kMinBaseAngle, kMaxBaseAngle, false);
@@ -199,6 +174,37 @@ public class ArmSubsystem extends SubsystemBase {
   MechanismLigament2d baseLigament = baseRoot.append(new MechanismLigament2d("Base Arm", kBaseLength*3, baseArmSim.getAngleRads()));
   MechanismLigament2d elbowLigament = baseLigament.append(new MechanismLigament2d("Elbow Arm", kElbowLength*3, elbowArmSim.getAngleRads()));
   
+  public static enum ArmState{
+    STOWED(0.5756, 0.0280), //Arm is retracted into the frame perimeter
+    CONEINTAKE(1.0136, -0.0876), //Arm is in position to intake cones
+    CUBEINTAKE(0.78, -0.2365), //Arm is in position to intake cubes
+    MIDSCORECONE(1.4536, 0.9486), //Arm is in position to score on the mid node with a cone
+    MIDSCORECUBE(1.0657, 0.4111), //Arm is in position to score on the mid node with a cube
+    HIGHSCORECONE(1.6773, 1.2778), //Arm is in position to score on the high node with a cone
+    HIGHSCORECUBE(1.5330, 0.7575), //Arm is in position to score on the high node with a cube
+    HIGHTRANSITION(1.2283,1.0732), //Used as an intermediate step when in transition to high score
+    HIGHTRANSITIONAUTON(1.0743,0.9349), //High transition state used in auton to avoid getting stuck
+    HIGHDROPB(1.7783, 1.0252),
+    HIGHDROPC(1.4433, 0.9266), //High scoring motion
+    TRANSITION(0.9256, 0.1487);//Used to transition to any state from stowed position
+
+
+    private double x; //Position relative to the base of the arm, in meters
+    private double y; //Position above the carpet, in meters
+    
+    ArmState(double x, double y){
+      this.x = x;
+      this.y = y;
+    }
+
+    public double getX(){
+      return x;
+    }
+
+    public double getY(){
+      return y;
+    }
+  }
 
   public ArmSubsystem(IntakeSubsystem intakeSubsystem) {
     this();
@@ -229,17 +235,17 @@ public class ArmSubsystem extends SubsystemBase {
       elbowPIDController = new ProfiledPIDController(kElbowUpP, kElbowUpI, kElbowUpD, kElbowConstraints);
       elbowFeedForward = new ArmFeedforward(kElbowS, kElbowG, kElbowV, kElbowA);
       
-      basePTuner = new TunableNumber("baseP", kBaseP, basePIDController::setP);
-      baseITuner = new TunableNumber("baseI", kBaseI, basePIDController::setI);
-      baseDTuner = new TunableNumber("baseD", kBaseD, basePIDController::setD);
+      new TunableNumber("baseP", kBaseP, basePIDController::setP);
+      new TunableNumber("baseI", kBaseI, basePIDController::setI);
+      new TunableNumber("baseD", kBaseD, basePIDController::setD);
   
-      elbowUpPTuner = new TunableNumber("elbowUpP", kElbowUpP, (a) -> kElbowUpP = a);
-      elbowUpITuner = new TunableNumber("elbowUpI", kElbowUpI, (a) -> kElbowUpI = a);
-      elbowUpDTuner = new TunableNumber("elbowUpD", kElbowUpD, (a) -> kElbowUpD = a);
+      new TunableNumber("elbowUpP", kElbowUpP, (a) -> kElbowUpP = a);
+      new TunableNumber("elbowUpI", kElbowUpI, (a) -> kElbowUpI = a);
+      new TunableNumber("elbowUpD", kElbowUpD, (a) -> kElbowUpD = a);
 
-      elbowDownPTuner = new TunableNumber("elbowDownP", kElbowDownP, (a) -> kElbowDownP = a);
-      elbowDownITuner = new TunableNumber("elbowDownI", kElbowDownI, (a) -> kElbowDownI = a);
-      elbowDownDTuner = new TunableNumber("elbowDownD", kElbowDownD, (a) -> kElbowDownD = a);
+      new TunableNumber("elbowDownP", kElbowDownP, (a) -> kElbowDownP = a);
+      new TunableNumber("elbowDownI", kElbowDownI, (a) -> kElbowDownI = a);
+      new TunableNumber("elbowDownD", kElbowDownD, (a) -> kElbowDownD = a);
     } else {
       SmartDashboard.putData("Arm Sim", simArmCanvas);
       elbowFeedForward = new ArmFeedforward(0, 0, 0, 0);
@@ -415,9 +421,7 @@ public class ArmSubsystem extends SubsystemBase {
       } else {
         //If the robot has incorrect offsets and is enabled, we crash the robot, as that is preferrable to it breaking the arm
         //There are two crash attempts to be safe: one is a null pointer exception, the other just closes the whole system
-        String evilString = null;
-        evilString.toString();
-        System.exit(0);
+        throw new NullPointerException("Robot has incorrect offsets and is enabled");
       }
     }
     else {

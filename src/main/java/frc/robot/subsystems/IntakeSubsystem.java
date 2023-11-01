@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public enum FlightStates{
     IDLE,
-    CUBE,
     CONE,
     CONE_SCORE
   }
@@ -48,14 +47,11 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private static GenericEntry intakeMode = matchTab.add("Intake Mode", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Purple", "colorWhenTrue", "Yellow")).getEntry();
   private static GenericEntry scoreMode = matchTab.add("Has Cube", true).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", "Red", "colorWhenTrue", "Green")).getEntry();
   private static GenericEntry currentState = matchTab.add("ToF State", FlightStates.IDLE.toString()).getEntry();
-  private static GenericEntry sensor0Up = matchTab.add("Cone ToF sensor up: ", true).getEntry();
-  private static GenericEntry sensor1Up = matchTab.add("Cube ToF sensor up: ", true).getEntry(); 
+  private static GenericEntry sensor0Up = matchTab.add("Cone/Cube ToF sensor up: ", true).getEntry();
   private static GenericEntry cubeDistanceEntry = matchTab.add("Cube distance mm ", true).getEntry(); 
 
-  private DebugLog<Double> coneDistLog = new DebugLog<Double>(0.0, "Cone Distance", this);
-  private DebugLog<Double> cubeDistLog = new DebugLog<Double>(0.0, "Cube Distance", this);
-  private DebugLog<Boolean> hasConeLog = new DebugLog<Boolean>(false, "Has Cone", this);
-  private DebugLog<Boolean> hasCubeLog = new DebugLog<Boolean>(false, "Has Cube", this);
+  private DebugLog<Double> coneDistLog = new DebugLog<Double>(0.0, "Cone/Cube Distance", this);
+  private DebugLog<Boolean> hasConeLog = new DebugLog<Boolean>(false, "Has Cone/Cube", this);
 
   private boolean isConeMode;
   private boolean cubeOverride;
@@ -142,34 +138,22 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   public void changeFlightState() {
     // Check distances
     int coneDistance = timeOfFlightSensor.getDistance0();
-    int cubeDistance = timeOfFlightSensor.getDistance0();
 
     boolean coneSensorUp = coneDistance != -1;
-    boolean cubeSensorUp = cubeDistance != -1;
-
-    
 
 
     // Log if sensors are activated
     hasConeLog.log(coneDistance <= mmConeActivationThreshold && coneSensorUp);
-    hasCubeLog.log(cubeDistance <= mmCubeActivationThreshold && cubeSensorUp);
 
     // Change state (only if sensors are online)
     switch(tofState) {
       case IDLE:
         if (coneSensorUp && coneDistance <= mmConeActivationThreshold) {
           tofState = FlightStates.CONE;
-        } else if (cubeSensorUp && cubeDistance <= mmCubeActivationThreshold) {
-          tofState = FlightStates.CUBE;
         }
         break;
       case CONE:
         if (coneSensorUp && coneDistance > mmConeActivationThreshold) {
-          tofState = FlightStates.IDLE;
-        }
-        break;
-      case CUBE:
-        if (cubeSensorUp && cubeDistance > mmCubeActivationThreshold) {
           tofState = FlightStates.IDLE;
         }
         break;
@@ -201,15 +185,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
 
     // Log distance values
     coneDistLog.log((double)coneDistance);
-    cubeDistLog.log((double)cubeDistance);
 
     // Check if sensors are online
     boolean coneSensorUp = coneDistance != -1;
-    boolean cubeSensorUp = cubeDistance != -1;
 
     // Log whether sensors are online
     sensor0Up.setBoolean(coneSensorUp);
-    sensor1Up.setBoolean(cubeSensorUp);
   }
 
   @Override

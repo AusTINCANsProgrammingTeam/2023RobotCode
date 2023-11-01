@@ -1,6 +1,17 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/*!
+ * Copyright (c) FIRST and other WPILib contributors.
+ * Open Source Software; you can modify and/or share it under the terms of
+ * the WPILib BSD license file in the root directory of this project.
+ * 
+ * @file SwerveSubsystem.java
+ *
+ * @brief The main class for controlling Swerve Drives
+ *
+ *
+ * @section Changelog
+ * Co-authored-by: JP Cassar <jp@cassartx.net>
+ * Corrected outstanding errors
+ */
 
 package frc.robot.subsystems;
 
@@ -116,11 +127,6 @@ public class SwerveSubsystem extends SubsystemBase{
     private PIDController rotationController;
     private PIDController autoRotationController;
 
-    private TunableNumber translationXTuner;
-    private TunableNumber translationYTuner;
-    private TunableNumber rotationPTuner;
-    private TunableNumber rotationITuner;
-
     public SwerveSubsystem() {
         zeroHeading();
         controlOrientationIsFOD = true;
@@ -137,10 +143,10 @@ public class SwerveSubsystem extends SubsystemBase{
         autoRotationController = new PIDController(kAutoRotationP, 0, 0);
         autoRotationController.enableContinuousInput(-Math.PI, Math.PI);
 
-        translationXTuner = new TunableNumber("X Translation P", kXTranslationP, xController::setP);
-        translationYTuner = new TunableNumber("Y Translation P", kYTranslationP, yController::setP);
-        rotationPTuner = new TunableNumber("Rotation P", kRotationP, rotationController::setP);
-        rotationITuner = new TunableNumber("Rotation I", kRotationI, rotationController::setI);
+        new TunableNumber("X Translation P", kXTranslationP, xController::setP);
+        new TunableNumber("Y Translation P", kYTranslationP, yController::setP);
+        new TunableNumber("Rotation P", kRotationP, rotationController::setP);
+        new TunableNumber("Rotation I", kRotationI, rotationController::setI);
     }
 
     public void zeroHeading() {

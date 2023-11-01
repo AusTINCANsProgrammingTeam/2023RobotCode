@@ -1,9 +1,23 @@
+/*!
+ * Copyright (c) FIRST and other WPILib contributors.
+ * Open Source Software; you can modify and/or share it under the terms of
+ * the WPILib BSD license file in the root directory of this project.
+ * 
+ * @file MotorController.java
+ *
+ * @brief The main class for controlling motors
+ *
+ * @section Changelog
+ * Co-authored-by: JP Cassar <jp@cassartx.net>
+ * Corrected outstanding errors
+ */
+
 package frc.robot.hardware;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxPIDController;
 
 public class MotorController {
     public static final class MotorDefaults{
@@ -32,7 +46,7 @@ public class MotorController {
         IntakeMotor2(5, 15, IdleMode.kBrake),
         //BuddyBalance Motors
         BuddyBalanceRight(7, 40, IdleMode.kBrake),
-        BuddyBalanceLeft(8, 40, IdleMode.kBrake, true); // TODO: update IDs for buddy balance motors when robot is finalized
+        BuddyBalanceLeft(8, 40, IdleMode.kBrake, true); // update IDs for buddy balance motors when robot is finalized
 
         private int ID;
         private int currentLimit;

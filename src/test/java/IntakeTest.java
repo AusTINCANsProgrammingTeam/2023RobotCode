@@ -1,8 +1,24 @@
-import static org.junit.jupiter.api.Assertions.*; 
-import edu.wpi.first.hal.HAL;
-import org.junit.jupiter.api.*;
+/*!
+ * Copyright (c) FIRST and other WPILib contributors.
+ * Open Source Software; you can modify and/or share it under the terms of
+ * the WPILib BSD license file in the root directory of this project.
+ * 
+ * @file IntakeTest.java
+ *
+ * @brief Test class for the intake
+ *
+ * @section Changelog
+ * Co-authored-by: JP Cassar <jp@cassartx.net>
+ * Corrected outstanding errors
+ */
 
-import frc.robot.classes.TimeOfFlightSensor;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import edu.wpi.first.hal.HAL;
 import frc.robot.subsystems.IntakeSubsystem;
 
 

@@ -1,38 +1,49 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/*!
+ * Copyright (c) FIRST and other WPILib contributors.
+ * Open Source Software; you can modify and/or share it under the terms of
+ * the WPILib BSD license file in the root directory of this project.
+ * 
+ * @filee RobotContainer.java
+ *
+ * @brief The main container for the Robot code
+ *
+ * @section Changelog
+ * Co-authored-by: JP Cassar <jp@cassartx.net>
+ * Corrected outstanding errors
+ */
 
 package frc.robot;
 
-import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
+
+import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.SwerveTeleopCommand;
-import frc.robot.Robot.LedEnum;
-import frc.robot.classes.Auton;
-import frc.robot.classes.TimeOfFlightSensor;
-import frc.robot.subsystems.SimulationSubsystem;
-import frc.robot.commands.ArmAnglesCommand;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.ArmSubsystem.ArmState;
-import frc.robot.subsystems.BuddyBalanceSubsystem;
-import frc.robot.subsystems.led.BlinkinLedSubsystem;
-import frc.robot.subsystems.led.LedMatrixSubsystem;
-import frc.robot.subsystems.led.LedStripSubsystem;
-import frc.robot.subsystems.led.BlinkinLedSubsystem.BlinkinMode;
-import frc.robot.subsystems.led.LedMatrixSubsystem.MatrixMode;
-import frc.robot.subsystems.led.LedStripSubsystem.StripMode;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import frc.robot.Robot.LedEnum;
+import frc.robot.classes.Auton;
+import frc.robot.classes.TimeOfFlightSensor;
+import frc.robot.commands.ArmAnglesCommand;
+import frc.robot.commands.SwerveTeleopCommand;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ArmSubsystem.ArmState;
+import frc.robot.subsystems.BuddyBalanceSubsystem;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.CubeapultSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.SimulationSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.led.BlinkinLedSubsystem;
+import frc.robot.subsystems.led.BlinkinLedSubsystem.BlinkinMode;
+import frc.robot.subsystems.led.LedMatrixSubsystem;
+import frc.robot.subsystems.led.LedMatrixSubsystem.MatrixMode;
+import frc.robot.subsystems.led.LedStripSubsystem;
+import frc.robot.subsystems.led.LedStripSubsystem.StripMode;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -82,10 +93,6 @@ public class RobotContainer {
     if (Robot.intakeEnabled && Robot.tofEnabled) {
       intakeSubsystem = new IntakeSubsystem(timeOfFlightSensor);
       armSubsystem = Robot.armEnabled ? new ArmSubsystem(intakeSubsystem) : null;
-    } else {
-      IntakeSubsystem intakeSubsystem2 = new IntakeSubsystem();
-      intakeSubsystem = Robot.intakeEnabled ? intakeSubsystem2 : null;
-      armSubsystem = Robot.armEnabled ? new ArmSubsystem() : null;
     }
     
     subsystemEnabledLog.append(armSubsystem == null ? "Arm: Disabled" : "Arm: Enabled");
