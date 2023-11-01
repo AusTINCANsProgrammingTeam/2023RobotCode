@@ -25,9 +25,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SerialPortJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.Timer;
 
 public class TimeOfFlightSensor implements AutoCloseable {
@@ -64,6 +64,13 @@ public class TimeOfFlightSensor implements AutoCloseable {
     int value;
   }
 
+  /** 
+   * Return the integer index value of the last comma
+   * @param charSeq
+   * @param readLen
+   * @param lastComma
+   * @return int
+   */
   int parseIntFromIndex(SingleCharSequence charSeq, int readLen, IntRef lastComma) {
     int nextComma = 0;
     try {
@@ -71,11 +78,19 @@ public class TimeOfFlightSensor implements AutoCloseable {
       int value = Integer.parseInt(charSeq, lastComma.value + 1, nextComma, 10);
       lastComma.value = nextComma;
       return value;
-    } catch (Exception ex) {
+    } catch (NumberFormatException nfex) {
       return 0;
     }
   }
 
+  
+  /** 
+   * Return the last comma position 
+   * @param data
+   * @param readLen
+   * @param lastComma
+   * @return int
+   */
   private int findNextComma(byte[] data, int readLen, int lastComma) {
     while (true) {
       if (readLen <= lastComma + 1 ) {
@@ -162,6 +177,10 @@ public class TimeOfFlightSensor implements AutoCloseable {
     readThread.start();
   }
 
+  
+  /** 
+   * @return boolean
+   */
   public boolean isSensor0Connected() {
     try {
       threadLock.lock();
@@ -171,6 +190,10 @@ public class TimeOfFlightSensor implements AutoCloseable {
     }
   }
 
+  
+  /** 
+   * @return int
+   */
   public int getDistance0() {
     try {
       threadLock.lock();
@@ -180,6 +203,10 @@ public class TimeOfFlightSensor implements AutoCloseable {
     }
   }
 
+  
+  /** 
+   * @return double
+   */
   public double getLastReadTimestampSeconds() {
     try {
       threadLock.lock();
@@ -189,10 +216,18 @@ public class TimeOfFlightSensor implements AutoCloseable {
     }
   }
 
+  
+  /** 
+   * @param debug
+   */
   void setDebugPrints(boolean debug) {
     debugPrints.set(debug);
   }
 
+  
+  /** 
+   * @throws Exception
+   */
   @Override
   public void close() throws Exception {
     threadRunning.set(false);
