@@ -1,0 +1,109 @@
+testing:
+  wheel:
+    diameter:
+      meters: 0.08889999999999999 # Auto-generated
+  pturning: 0.4 # Auto-generated
+  turning:
+    encoder:
+      rpm:
+        factor: 0.004886921905584123 # Auto-generated
+      rot:
+        factor: 0.2932153143350474 # Auto-generated
+    motor:
+      gear:
+        ratio: 0.04666666666666667 # Auto-generated
+  simTurningPIDController:
+    I: 0.0 # Auto-generated
+    D: 0.0 # Auto-generated
+    P: 0.4000000059604645 # Auto-generated
+  drive:
+    encoder:
+      rpm:
+        factor: "6.900046264690335E-4" # Auto-generated
+      rot:
+        factor: 0.04140027758814201 # Auto-generated
+    motor:
+      gear:
+        ratio: 0.14823529411764705 # Auto-generated
+competition:
+  wheel:
+    diameter:
+      meters: 0.08889999999999999 # Auto-generated
+  pturning: 0.4 # Auto-generated
+  turning:
+    encoder:
+      rpm:
+        factor: 0.004886921905584123 # Auto-generated
+      rot:
+        factor: 0.2932153143350474 # Auto-generated
+    motor:
+      gear:
+        ratio: 0.04666666666666667 # Auto-generated
+  simTurningPIDController:
+    I: 0.0 # Auto-generated
+    D: 0.0 # Auto-generated
+    P: 0.4000000059604645 # Auto-generated
+  drive:
+    encoder:
+      rpm:
+        factor: "6.900046264690335E-4" # Auto-generated
+      rot:
+        factor: 0.04140027758814201 # Auto-generated
+    motor:
+      gear:
+        ratio: 0.14823529411764705 # Auto-generated
+presentation:
+  wheel:
+    diameter:
+      meters: 0.08889999999999999 # Auto-generated
+  pturning: 0.4 # Auto-generated
+  turning:
+    encoder:
+      rpm:
+        factor: 0.004886921905584123 # Auto-generated
+      rot:
+        factor: 0.2932153143350474 # Auto-generated
+    motor:
+      gear:
+        ratio: 0.04666666666666667 # Auto-generated
+  simTurningPIDController:
+    I: 0.0 # Auto-generated
+    D: 0.0 # Auto-generated
+    P: 0.4000000059604645 # Auto-generated
+  drive:
+    encoder:
+      rpm:
+        factor: "6.900046264690335E-4" # Auto-generated
+      rot:
+        factor: 0.04140027758814201 # Auto-generated
+    motor:
+      gear:
+        ratio: 0.14823529411764705 # Auto-generated
+simulation:
+  wheel:
+    diameter:
+      meters: 0.08889999999999999 # Auto-generated
+  pturning: 0.4 # Auto-generated
+  turning:
+    encoder:
+      rpm:
+        factor: 0.004886921905584123 # Auto-generated
+      rot:
+        factor: 0.2932153143350474 # Auto-generated
+    motor:
+      gear:
+        ratio: 0.04666666666666667 # Auto-generated
+  simTurningPIDController:
+    I: 0.0 # Auto-generated
+    D: 0.0 # Auto-generated
+    P: 0.4000000059604645 # Auto-generated
+  drive:
+    encoder:
+      rpm:
+        factor: "6.900046264690335E-4" # Auto-generated
+      rot:
+        factor: 0.04140027758814201 # Auto-generated
+    motor:
+      gear:
+        ratio: 0.14823529411764705 # Auto-generated
+mode: testing # Auto-generated

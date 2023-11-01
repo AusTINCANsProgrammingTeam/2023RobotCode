@@ -21,6 +21,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -97,7 +98,7 @@ public class SwerveModule extends SubsystemBase {
     private final RelativeEncoderSim simTurningEncoder;
 
     private final SparkMaxPIDController turningPIDController;
-    private ConfigurablePIDController simTurningPIDController;
+    private final PIDController simTurningPIDController;
     private double turningSetpoint;
 
     private final WPI_CANCoder absoluteEncoder;
@@ -145,13 +146,9 @@ public class SwerveModule extends SubsystemBase {
         turningPIDController = turningMotor.getPIDController();
         
         turningPIDController.setP(kPTurning.get());
+
+        simTurningPIDController = new PIDController(turningPIDController.getP(), turningPIDController.getI(), turningPIDController.getD());
         
-        ConfigurablePIDController simTurningPIDController = new ConfigurablePIDController(
-            turningPIDController.getP(), 
-            turningPIDController.getI(), 
-            turningPIDController.getD(), /* Default Values */
-            "simTurningPIDController" /* Key of the controller itself (supports nesting with /, e.g. "drive/left") */
-        );
 
         simTurningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -260,8 +257,11 @@ public class SwerveModule extends SubsystemBase {
 
         simTurningEncoder.setPosition(simTurningEncoder.getPosition() + simTurningMotor.getAngularVelocityRadPerSec() * Robot.kDefaultPeriod);
         simTurningEncoder.setSimVelocity(simTurningMotor.getAngularVelocityRadPerSec());
-
-        turningMotor.set(simTurningPIDController.calculate(getTurningPosition(), turningSetpoint));
+        try {
+            turningMotor.set(simTurningPIDController.calculate(getTurningPosition(), turningSetpoint));
+        } catch (NullPointerException npe) {
+            throw new NullPointerException(npe.getLocalizedMessage());
+        }
   }
 
     @Override

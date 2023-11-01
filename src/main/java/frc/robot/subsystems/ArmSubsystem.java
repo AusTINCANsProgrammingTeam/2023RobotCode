@@ -409,26 +409,28 @@ public class ArmSubsystem extends SubsystemBase {
 
   //This checks the offsets of the arms' encoders to see if they are within expected values
   private void checkAngles() {
-    if(getBaseAngle() > kMaxBaseAngle || 
-    getBaseAngle() < kMinBaseAngle || 
-    getChooChooAngle() > kMaxChooChooAngle ||
-    getChooChooAngle() < kMinChooChooAngle ||
-    getElbowAngle() > kMaxElbowAngle ||
-    getElbowAngle() < kMinElbowAngle) {
-      if(DriverStation.isDisabled()) {
-        //If the robot is determined to have incorrect offsets and is disabled, a warning message is sent
-        DriverStation.reportError("Encoders read outside of possible positions, check your offsets!", true);
-      } else {
-        //If the robot has incorrect offsets and is enabled, we crash the robot, as that is preferrable to it breaking the arm
-        //There are two crash attempts to be safe: one is a null pointer exception, the other just closes the whole system
-        throw new NullPointerException("Robot has incorrect offsets and is enabled");
+    if (!Robot.isSimulation()) {
+      if(getBaseAngle() > kMaxBaseAngle || 
+      getBaseAngle() < kMinBaseAngle || 
+      getChooChooAngle() > kMaxChooChooAngle ||
+      getChooChooAngle() < kMinChooChooAngle ||
+      getElbowAngle() > kMaxElbowAngle ||
+      getElbowAngle() < kMinElbowAngle) {
+        if(DriverStation.isDisabled()) {
+          //If the robot is determined to have incorrect offsets and is disabled, a warning message is sent
+          DriverStation.reportError("Encoders read outside of possible positions, check your offsets!", true);
+        } else {
+          //If the robot has incorrect offsets and is enabled, we crash the robot, as that is preferrable to it breaking the arm
+          //There are two crash attempts to be safe: one is a null pointer exception, the other just closes the whole system
+          throw new NullPointerException("Robot has incorrect offsets and is enabled");
+        }
       }
-    }
-    else {
-      if(DriverStation.isEnabled()) {
-        anglesChecked = true;
-      } else {
-        anglesChecked = false;
+      else {
+        if(DriverStation.isEnabled()) {
+          anglesChecked = true;
+        } else {
+          anglesChecked = false;
+        }
       }
     }
   }
