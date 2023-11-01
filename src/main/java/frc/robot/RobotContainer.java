@@ -83,7 +83,8 @@ public class RobotContainer {
       intakeSubsystem = new IntakeSubsystem(timeOfFlightSensor);
       armSubsystem = Robot.armEnabled ? new ArmSubsystem(intakeSubsystem) : null;
     } else {
-      intakeSubsystem = Robot.intakeEnabled ? new IntakeSubsystem() : null;
+      IntakeSubsystem intakeSubsystem2 = new IntakeSubsystem();
+      intakeSubsystem = Robot.intakeEnabled ? intakeSubsystem2 : null;
       armSubsystem = Robot.armEnabled ? new ArmSubsystem() : null;
     }
     

@@ -6,12 +6,10 @@ import java.util.Objects;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.StringLogEntry;
@@ -24,13 +22,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.CubeapultSubsystem;
 import frc.robot.subsystems.ArmSubsystem.ArmState;
+import frc.robot.subsystems.CubeapultSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -114,22 +111,22 @@ public class Auton{
         return PathPlanner.loadPath(name, pathConstraints);
     }
 
-    private PathPlannerTrajectory getTrajectory(String name, PathConstraints pathConstraints) throws NullPointerException{
-        return PathPlanner.loadPath(name, pathConstraints);
-    }
+    // private PathPlannerTrajectory getTrajectory(String name, PathConstraints pathConstraints) throws NullPointerException{
+    //     return PathPlanner.loadPath(name, pathConstraints);
+    // }
 
-    private PathPoint constructPoint(double x, double y, double rotation, double heading){
-        return new PathPoint(new Translation2d(x, y), Rotation2d.fromDegrees(heading), Rotation2d.fromDegrees(rotation));
-    }
+    // private PathPoint constructPoint(double x, double y, double rotation, double heading){
+    //     return new PathPoint(new Translation2d(x, y), Rotation2d.fromDegrees(heading), Rotation2d.fromDegrees(rotation));
+    // }
 
-    private PathPlannerTrajectory generateTrajectory(PathPoint firstPoint, PathPoint secondPoint, PathPoint... points){
-        return PathPlanner.generatePath(
-            pathConstraints,
-            firstPoint,
-            secondPoint,
-            points
-        );
-    }
+    // private PathPlannerTrajectory generateTrajectory(PathPoint firstPoint, PathPoint secondPoint, PathPoint... points){
+    //     return PathPlanner.generatePath(
+    //         pathConstraints,
+    //         firstPoint,
+    //         secondPoint,
+    //         points
+    //     );
+    // }
 
     private Command resetOdometry(String initialTrajectory) throws NullPointerException{
         //Resets odometry to the initial position of the given trajectory
